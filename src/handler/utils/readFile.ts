@@ -25,7 +25,6 @@ export namespace Files {
     }
 
     export async function registerModules(dir: string) : Promise<void> {
-    
         Promise.all((await getCommands(dir)).map(async absPath => {
            return { name : basename(absPath), mod:  ( await import(absPath)).default as Sern.Module<unknown>   }
         })).then( modArr => {

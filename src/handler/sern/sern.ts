@@ -3,7 +3,7 @@ import { CommandType } from "../../types/handler/handler";
 import { Files } from "../utils/readFile"
 import type { Awaitable, Client, Message } from "discord.js";
 import type { possibleOutput } from "../../types/handler/handler"
-import { Ok, Result } from "ts-results";
+import { Err, Ok, Result } from "ts-results";
 
 
 
@@ -25,7 +25,7 @@ export namespace Sern {
 
                 .on("messageCreate", async message => {
                     let tryFmt = this.msgHandler.listen({message, prefix: this.prefix}).fmt();
-                    if (tryFmt === undefined) return;
+                    if (tryFmt.err) return;
                     const commandName = this.msgHandler.fmtMsg!.shift()!;
                     const module = Files.Commands.get(commandName) ?? Files.Alias.get(commandName)
                     let cmdResult = (await this.commandResult(module, message))  
@@ -60,7 +60,7 @@ export namespace Sern {
     }
 
     export interface Wrapper {
-        client : Client<boolean>,
+        client : Client,
         prefix: string,
         commands : string
         init? : () => void,
@@ -92,9 +92,10 @@ class MsgHandler {
         return this.message.author.bot || msg.slice(0, this.prefix.length).toLowerCase() !== this.prefix;
     }
 
-    fmt() : void | undefined {
-        if (this.isCommand()) return undefined;
+    fmt() : Result<void, void> {
+        if (this.isCommand()) return Err(void 0);
         this.resMsg = this.message.content.slice(this.prefix.length).trim().split(/\s+/g);
+        return Ok(void 0);
     }
 
     get fmtMsg() {

@@ -1,4 +1,4 @@
 import { Sern } from "./handler/sern/sern";
 
-exports = Sern;
+module.exports = Sern;
 export default Sern;
