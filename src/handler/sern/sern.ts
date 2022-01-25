@@ -1,8 +1,9 @@
-import { CommandType,  delegate, MessagePackage, Visibility } from "../../types/handler/handler";
+import type { MessagePackage, Visibility } from "../../types/handler/handler";
+import { CommandType } from "../../types/handler/handler";
 import { Files } from "../utils/readFile"
 import type { Awaitable, Client, Message } from "discord.js";
 import type { possibleOutput } from "../../types/handler/handler"
-import {Err, Ok, Result } from "ts-results";
+import { Ok, Result } from "ts-results";
 
 
 
