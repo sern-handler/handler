@@ -11,6 +11,7 @@
       "strictNullChecks": true,
       "importsNotUsedAsValues": "error",
       "skipLibCheck": true,
+      "declaration": true,
       "forceConsistentCasingInFileNames": true
     }
   }

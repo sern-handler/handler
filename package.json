@@ -1,5 +1,5 @@
 {
-  "name": "sernhandler2",
+  "name": "@jacoobes/sern",
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
@@ -13,5 +13,8 @@
   "dependencies": {
     "discord.js": "^13.6.0",
     "ts-results": "^3.3.0"
+  },
+  "devDependencies": {
+    "typescript": "^4.5.5"
   }
 }
