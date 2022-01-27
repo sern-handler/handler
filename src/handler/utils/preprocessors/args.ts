@@ -6,7 +6,7 @@ export namespace Utils {
     /**
      * Wrapper type taking `Ok(T)` or `Err(possibleOutput)` e.g `Result<T, possibleOutput`
      */
-    type ArgType<T> = Result<T, possibleOutput>
+    export type ArgType<T> = Result<T, possibleOutput>
     /**
      * 
      * @param {string} arg 
@@ -37,6 +37,15 @@ export namespace Utils {
             return Ok(false)
         }
         return Err(onFailure)        
+    }
+    /**
+     * 
+     * @param {string} arg
+     * @param {string} sep 
+     * @returns 
+     */
+    export function toArr(arg: string, sep: string) : ArgType<string[]> {
+        return Ok(arg.split(sep));
     }
     
 }

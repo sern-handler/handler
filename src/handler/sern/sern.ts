@@ -1,15 +1,14 @@
 import type { MessagePackage, Visibility } from "../../types/handler/handler";
 import { CommandType } from "../../types/handler/handler";
 import { Files } from "../utils/readFile"
-import type { Awaitable, Client, Message } from "discord.js";
+import type { Awaitable, Client, Message, Util } from "discord.js";
 import type { possibleOutput } from "../../types/handler/handler"
 import { Err, Ok, Result } from "ts-results";
+import type { Utils } from "../utils/preprocessors/args";
 
 
 
 export namespace Sern {
-    type Error = string;
-
     export class Handler {
         private wrapper: Sern.Wrapper;
         private msgHandler : MsgHandler = new MsgHandler();
@@ -67,13 +66,13 @@ export namespace Sern {
         privateServerId : string
     }
 
-    export interface Module<Args> { 
+    export interface Module<T> { 
         alias: string[],
         desc : string,
         visibility : Visibility,
         type: CommandType,
-        delegate : (message: Message, args: Ok<Args> ) => Awaitable<Result<possibleOutput, string > | void>  
-        parse? : (args: string) => Result<Args, Error>
+        delegate : (message: Message, args: Ok<T> ) => Awaitable<Result<possibleOutput, string > | void>  
+        parse? : (args: string) => Utils.ArgType<T>
     }
 }
 
