@@ -9,8 +9,8 @@ export namespace Utils {
     export type ArgType<T> = Result<T, possibleOutput>
     /**
      * 
-     * @param {string} arg 
-     * @param {possibleOutput} onFailure 
+     * @param {string} arg - command arguments 
+     * @param {possibleOutput} onFailure - if `Number.parseInt` returns NaN
      * @returns {ArgType<number>} Attempts to use `Number.parseInt()` on `arg`
      */
     export function parseInt(arg: string, onFailure: possibleOutput): ArgType<number> {
@@ -19,9 +19,9 @@ export namespace Utils {
     }
     /**
      * 
-     * @param {string} arg 
-     * @param {possibleOutput} onFailure 
-     * @param { {yesRegex: RegExp, noRegex: RegExp} } regexes 
+     * @param {string} arg - command arguments 
+     * @param {possibleOutput} onFailure - If cannot parse `arg` into boolean. 
+     * @param { {yesRegex: RegExp, noRegex: RegExp} } regexes - default regexes: yes : `/(yes|y|👍)/gi`, no :  /(no|n|👎)/gi 
      * @returns { ArgType<boolean> } attemps to parse `args` as a boolean
      */
     export function parseBool(
@@ -36,18 +36,35 @@ export namespace Utils {
     }
     /**
      * 
-     * @param {string} arg
+     * @param {string} arg - command arguments 
      * @param {string} sep 
-     * @returns 
+     * @returns {Ok<string[]>}
      */
     export function toArr(arg: string, sep: string) : ArgType<string[]> {
         return Ok(arg.split(sep));
     }
     
+    /**
+     * 
+     * @param {string} arg - command arguments 
+     * @param {possibleOutput} onFailure - delegates `Utils.parseInt` 
+     * @returns {ArgType<number>}
+     */
     export function toPositiveInt(arg: string, onFailure: possibleOutput) : ArgType<number> {
         return Utils.parseInt(arg, onFailure).andThen( num => Ok(num > 0 ? num : Math.abs(num)))
     }
+
+    /**
+     * 
+     * @param {string} arg - command arguments 
+     * @param {possibleOutput} onFailure - delegates `Utils.parseInt` 
+     * @returns {ArgType<number>}
+     */
+     export function toNegativeInt(arg: string, onFailure: possibleOutput) : ArgType<number> {
+        return Utils.parseInt(arg, onFailure).andThen( num => Ok(num > 0 ? -num : num))
+    }
     
+
 }
 
 
