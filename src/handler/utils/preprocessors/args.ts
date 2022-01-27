@@ -30,13 +30,9 @@ export namespace Utils {
         regexes : {yesRegex: RegExp, noRegex: RegExp} = {yesRegex : /(yes|y|👍)/gi, noRegex : /(no|n|👎)/gi}
         ): ArgType<boolean> {
 
-        if(arg.match(regexes.yesRegex)) {
-            return Ok(true);
-        }
-        if(arg.match(regexes.noRegex)) {
-            return Ok(false)
-        }
-        return Err(onFailure)        
+        if(arg.match(regexes.yesRegex))  return Ok(true);
+        if(arg.match(regexes.noRegex))   return Ok(false);
+        return Err(onFailure);        
     }
     /**
      * 
@@ -46,6 +42,10 @@ export namespace Utils {
      */
     export function toArr(arg: string, sep: string) : ArgType<string[]> {
         return Ok(arg.split(sep));
+    }
+    
+    export function toPositiveInt(arg: string, onFailure: possibleOutput) : ArgType<number> {
+        return Utils.parseInt(arg, onFailure).andThen( num => Ok(num > 0 ? num : Math.abs(num)))
     }
     
 }
