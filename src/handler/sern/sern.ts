@@ -41,7 +41,7 @@ export namespace Sern {
                 }
                 if (module.type === CommandType.SLASH) return `This may be a slash command and not a legacy command`
                 let args = this.msgHandler.fmtMsg.slice(1).join(" ");
-                let parsedArgs = module.parse === undefined ? Ok("") : module.parse(args);
+                let parsedArgs = module.parse === undefined ? Ok("") : module.parse(message, args);
                 if(parsedArgs.err) return parsedArgs.val;
                 let fn = await module.delegate(message, parsedArgs)
                 return fn instanceof Object ? fn.val : undefined 
@@ -72,7 +72,7 @@ export namespace Sern {
         visibility : Visibility,
         type: CommandType,
         delegate : (message: Message, args: Ok<T> ) => Awaitable<Result<possibleOutput, string > | void>  
-        parse? : (args: string) => Utils.ArgType<T>
+        parse? : (message: Message, args: string) => Utils.ArgType<T>
     }
 }
 
