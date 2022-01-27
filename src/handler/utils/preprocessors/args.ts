@@ -21,7 +21,8 @@ export namespace Utils {
     export function parseBool(
         arg: string,
         onFailure: possibleOutput = `Cannot parse ${arg} as a boolean`,
-        regexes : {yesRegex: RegExp, noRegex: RegExp} = {yesRegex : /(yes|y|👍)/gi, noRegex : /(no|n|👎)/gi}   ): ArgType<boolean> {
+        regexes : {yesRegex: RegExp, noRegex: RegExp} = {yesRegex : /(yes|y|👍)/gi, noRegex : /(no|n|👎)/gi}
+        ): ArgType<boolean> {
         if(arg.match(regexes.yesRegex)) {
             return Ok(true);
         }
