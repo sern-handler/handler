@@ -17,12 +17,19 @@ export namespace Utils {
         const val = Number.parseInt(arg);
         return val === NaN ? Err(onFailure) : Ok(val);
     }
-
+    /**
+     * 
+     * @param {string} arg 
+     * @param {possibleOutput} onFailure 
+     * @param { {yesRegex: RegExp, noRegex: RegExp} } regexes 
+     * @returns { ArgType<boolean> } attemps to parse `args` as a boolean
+     */
     export function parseBool(
         arg: string,
         onFailure: possibleOutput = `Cannot parse ${arg} as a boolean`,
         regexes : {yesRegex: RegExp, noRegex: RegExp} = {yesRegex : /(yes|y|👍)/gi, noRegex : /(no|n|👎)/gi}
         ): ArgType<boolean> {
+
         if(arg.match(regexes.yesRegex)) {
             return Ok(true);
         }
