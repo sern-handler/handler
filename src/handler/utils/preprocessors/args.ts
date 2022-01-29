@@ -39,7 +39,7 @@ export namespace Utils {
      * @param {string} sep 
      * @returns {Ok<string[]>}
      */
-    export function toArr(arg: string, sep: string) : ArgType<string[]> {
+    export function toArr(arg: string, sep: string = " ") : ArgType<string[]> {
         return Ok(arg.split(sep));
     }
     
