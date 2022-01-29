@@ -21,15 +21,14 @@ export namespace Utils {
      * 
      * @param {string} arg - command arguments 
      * @param {possibleOutput} onFailure - If cannot parse `arg` into boolean. 
-     * @param { {yesRegex: RegExp, noRegex: RegExp} } regexes - default regexes: yes : `/(yes|y|👍)/gi`, no :  /(no|n|👎)/gi 
+     * @param { {yesRegex: RegExp, noRegex: RegExp} } regexes - default regexes: yes : `/^(?:y(?:es)?|👍)$/i`, no :  /^(?:n(?:o)?|👎)$/i 
      * @returns { ArgType<boolean> } attemps to parse `args` as a boolean
      */
     export function parseBool(
         arg: string,
-        onFailure: possibleOutput = `Cannot parse ${arg} as a boolean`,
-        regexes : {yesRegex: RegExp, noRegex: RegExp} = {yesRegex : /(yes|y|👍)/gi, noRegex : /(no|n|👎)/gi}
+        onFailure: possibleOutput = `Cannot parse "${arg}" as a boolean`,
+        regexes : {yesRegex: RegExp, noRegex: RegExp} = { yesRegex : /^(?:y(?:es)?|👍)$/i , noRegex :  /^(?:n(?:o)?|👎)$/i }
         ): ArgType<boolean> {
-
         if(arg.match(regexes.yesRegex))  return Ok(true);
         if(arg.match(regexes.noRegex))   return Ok(false);
         return Err(onFailure);        
@@ -51,7 +50,7 @@ export namespace Utils {
      * @returns {ArgType<number>}
      */
     export function toPositiveInt(arg: string, onFailure: possibleOutput) : ArgType<number> {
-        return Utils.parseInt(arg, onFailure).andThen( num => Ok(num > 0 ? num : Math.abs(num)))
+        return Utils.parseInt(arg, onFailure).andThen( num => Ok(num > 0 ? num :-num))
     }
 
     /**

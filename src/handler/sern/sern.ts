@@ -41,7 +41,7 @@ export namespace Sern {
                     return "This command is not availible in this guild!"
                 }
                 if (module.type === CommandType.SLASH) return `This may be a slash command and not a legacy command`
-                    let args = this.msgHandler.fmtMsg.slice(1).join(" ");
+                    let args = this.msgHandler.fmtMsg.join(" ");
                     let parsedArgs = module.parse === undefined ? Ok("") : module.parse(message, args);
                 if(parsedArgs.err) return parsedArgs.val;
                     let fn = await module.delegate(message, parsedArgs)
