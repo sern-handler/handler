@@ -35,7 +35,7 @@ export namespace Sern {
                 })
             }
 
-            async commandResult(module: Sern.Module<unknown> | undefined, message: Message) : Promise<possibleOutput| undefined> {
+            private async commandResult(module: Sern.Module<unknown> | undefined, message: Message) : Promise<possibleOutput| undefined> {
                 if (module === undefined) return "Unknown Command";
                 if (module.visibility === "private" && message.guildId !== this.privateServerId) {
                     return "This command is not availible in this guild!"
