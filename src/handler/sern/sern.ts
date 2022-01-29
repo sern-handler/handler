@@ -9,6 +9,7 @@ import type { Utils } from "../utils/preprocessors/args";
 
 
 export namespace Sern {
+    
     export class Handler {
         private wrapper: Sern.Wrapper;
         private msgHandler : MsgHandler = new MsgHandler();
@@ -74,6 +75,8 @@ export namespace Sern {
         delegate : (message: Message, args: Ok<T> ) => Awaitable<Result<possibleOutput, string > | void>  
         parse? : (message: Message, args: string) => Utils.ArgType<T>
     }
+
+     
 }
 
 class MsgHandler {
