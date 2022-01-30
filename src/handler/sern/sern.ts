@@ -20,7 +20,10 @@ export namespace Sern {
              this.wrapper.client
                 .on("ready", async () => {
                     if (this.wrapper.init !== undefined) this.wrapper.init();
-                    await Files.registerModules(this.wrapper.commands);
+                    Files.registerModules(this.wrapper.commands)
+                        .then(  (_ : void)=> {
+                            /// register slash commands
+                    });
                 })
 
                 .on("messageCreate", async message => {
