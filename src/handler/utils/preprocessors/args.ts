@@ -36,7 +36,7 @@ export namespace Utils {
     /**
      * 
      * @param {string} arg - command arguments 
-     * @param {string} sep 
+     * @param {string} sep - default separator = " "
      * @returns {Ok<string[]>}
      */
     export function toArr(arg: string, sep: string = " ") : ArgType<string[]> {
