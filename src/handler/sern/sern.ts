@@ -1,9 +1,9 @@
 import type { MessagePackage, Visibility } from "../../types/handler/handler";
 import { CommandType } from "../../types/handler/handler";
 import { Files } from "../utils/readFile"
-import type { Awaitable, Client, Message, Util } from "discord.js";
+import type { Awaitable, Client, CommandInteraction, Message, Util } from "discord.js";
 import type { possibleOutput } from "../../types/handler/handler"
-import { Err, Ok, Result } from "ts-results";
+import { Err, Ok, Result, Option, None, Some } from "ts-results";
 import type { Utils } from "../utils/preprocessors/args";
 
 
@@ -20,10 +20,7 @@ export namespace Sern {
              this.wrapper.client
                 .on("ready", async () => {
                     if (this.wrapper.init !== undefined) this.wrapper.init();
-                    Files.registerModules(this.wrapper.commands)
-                        .then(  (_ : void)=> {
-                            /// register slash commands
-                    });
+                    Files.registerModules(this)      
                 })
 
                 .on("messageCreate", async message => {
@@ -36,6 +33,11 @@ export namespace Sern {
                        
                     message.channel.send(cmdResult)
                 })
+
+                .on("interactionCreate", async interaction => {
+                    if (!interaction.isCommand()) return;
+                    const module = Files.Commands.get(interaction.commandName);
+                })
             }
 
             private async commandResult(module: Sern.Module<unknown> | undefined, message: Message) : Promise<possibleOutput| undefined> {
@@ -47,35 +49,57 @@ export namespace Sern {
                     let args = this.msgHandler.fmtMsg.join(" ");
                     let parsedArgs = module.parse === undefined ? Ok("") : module.parse(message, args);
                 if(parsedArgs.err) return parsedArgs.val;
-                    let fn = await module.delegate(message, parsedArgs)
+                    let fn = await module.delegate({interaction : None, message: Some(message)}, parsedArgs)
                 return fn instanceof Object ? fn.val : undefined 
             }
 
-            get prefix() {
+            get prefix() : string {
                 return this.wrapper.prefix;
             }
-
-            private get privateServerId() {
+            get commandDir() : string {
+                return this.wrapper.commands;
+            }
+            get client() : Client<boolean> {
+                return this.wrapper.client
+            }
+            get privateServerId() {
                 return this.wrapper.privateServerId;
             }
         
         
     }
-
+    /**
+     * An object to be passed into Sern.Handler constructor. 
+     * ```ts
+     * new Sern.Handler({
+     *   client,       // Discord.js client instance          
+     *   prefix : "!", // an example prefix
+     *   commands: "",  //commands directory
+     *   init : () => console.log("Bot is ready") // function called on ready
+     *   privateServerId : "" // a server id that can be used for private or test server
+     * })
+     * ```
+     */
     export interface Wrapper {
-        client : Client,
-        prefix: string,
-        commands : string
+        readonly client : Client,
+        readonly prefix: string,
+        readonly commands : string
         init? : () => void,
-        privateServerId : string
+        readonly privateServerId : string
     }
+
+    type Context = {
+        message : Option<Message>,
+        interaction : Option<CommandInteraction>
+    }
+
 
     export interface Module<T> { 
         alias: string[],
         desc : string,
         visibility : Visibility,
         type: CommandType,
-        delegate : (message: Message, args: Ok<T> ) => Awaitable<Result<possibleOutput, string > | void>  
+        delegate : ( eventParams : Context  , args: Ok<T> ) => Awaitable<Result<possibleOutput, string > | void>  
         parse? : (message: Message, args: string) => Utils.ArgType<T>
     }
 

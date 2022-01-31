@@ -24,12 +24,14 @@ export namespace Files {
         return arrayOfFiles;
     }
 
-    export async function registerModules(dir: string) : Promise<void> {
-        Promise.all((await getCommands(dir)).map(async absPath => {
+    export async function registerModules(handler : Sern.Handler) : Promise<void> {
+        const commandDir = handler.commandDir,
+              client = handler.client;
+        Promise.all((await getCommands(commandDir)).map(async absPath => {
            return { name : basename(absPath), mod:  ( await import(absPath)).default as Sern.Module<unknown>   }
         })).then( modArr => {
             for ( const { name, mod } of modArr) {
-                Commands.set(name.substring(0, name.length-3), mod)
+                Commands.set(name.substring(0, name.length-3), mod);
                 if(mod.alias.length > 0) {
                     for( const alias of mod.alias) {
                         Alias.set(alias, mod)
