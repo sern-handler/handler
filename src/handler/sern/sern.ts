@@ -1,18 +1,18 @@
-import type { MessagePackage, Visibility } from "../../types/handler/handler";
+import type { MessagePackage, Nullable, Visibility } from "../../types/handler/handler";
 import { CommandType } from "../../types/handler/handler";
 import { Files } from "../utils/readFile"
-import type { Awaitable, Client, CommandInteraction, Message, Util } from "discord.js";
+import type { ApplicationCommand, Awaitable, Client, CommandInteraction, Message, MessageInteraction, Util } from "discord.js";
 import type { possibleOutput } from "../../types/handler/handler"
 import { Err, Ok, Result, Option, None, Some } from "ts-results";
 import type { Utils } from "../utils/preprocessors/args";
 
 
 
+
 export namespace Sern {
-    
     export class Handler {
         private wrapper: Sern.Wrapper;
-        private msgHandler : MsgHandler = new MsgHandler();
+        private CtxHandler : CtxHandler = new CtxHandler();
         constructor(
             wrapper : Sern.Wrapper,
             ) {
@@ -25,36 +25,43 @@ export namespace Sern {
                     
                 })
 
-                .on("messageCreate", async message => {
-                    let tryFmt = this.msgHandler.listen({message, prefix: this.prefix}).fmt();
+                .on("messageCreate", async message => {               
+                        
+                    let tryFmt = this.CtxHandler.listen({ message: Some(message), interaction : None, prefix: this.prefix}).fmt();
                     if (tryFmt.err) return;
-                    const commandName = this.msgHandler.fmtMsg!.shift()!;
+                    const commandName = this.CtxHandler.fmtMsg!.shift()!;
                     const module = Files.Commands.get(commandName) ?? Files.Alias.get(commandName)
                     let cmdResult = (await this.commandResult(module, message))  
                     if (cmdResult === undefined) return;
                        
                     message.channel.send(cmdResult)
+                    this.CtxHandler.clear();
                 })
 
                 .on("interactionCreate", async interaction => {
-                    if (!interaction.isCommand()) return;
-                    const module = Files.Slash.get(interaction.commandName);
-                    await this.interactionResult(module);    
-                    
+                    if(!interaction.isCommand()) return;
+                    const module = Files.Commands.get(interaction.commandName); 
+                    await this.interactionResult(module, interaction);
+
                 })
             }
 
-            private async interactionResult(module: Sern.Module<unknown> | undefined) {
-
+            private async interactionResult(module: Sern.Module<unknown> | undefined, interaction: CommandInteraction) : Promise<possibleOutput | undefined> {
+                if (module === undefined) return "Unknown slash command!";
+                module.delegate(
+                    this.CtxHandler.messagePack as Context,
+                    Ok("")
+                )
+               throw Error ("unimplemented");
             }
 
             private async commandResult(module: Sern.Module<unknown> | undefined, message: Message) : Promise<possibleOutput| undefined> {
-                if (module === undefined) return "Unknown Command";
+                if (module === undefined) return "Unknown legacy command";
                 if (module.visibility === "private" && message.guildId !== this.privateServerId) {
                     return "This command is not availible in this guild!"
                 }
                 if (module.type === CommandType.SLASH) return `This may be a slash command and not a legacy command`
-                    let args = this.msgHandler.fmtMsg.join(" ");
+                    let args = this.CtxHandler.fmtMsg.join(" ");
                     let parsedArgs = module.parse === undefined ? Ok("") : module.parse(message, args);
                 if(parsedArgs.err) return parsedArgs.val;
                     let fn = await module.delegate({interaction : None, message: Some(message)}, parsedArgs)
@@ -114,25 +121,32 @@ export namespace Sern {
      
 }
 
-class MsgHandler {
+class CtxHandler {
 
-    private msg : MessagePackage | null = null;
-    private resMsg : string[] | null =  null;
+    private msg : Nullable<MessagePackage> = null;
+    private resMsg : Nullable<string[]> =  null;
 
-    listen (msg : MessagePackage): MsgHandler  {
+    listen (msg : MessagePackage): CtxHandler  {
         this.msg = msg
         return this;
     }
 
     isCommand() : boolean {
-        const msg = this.msg!.message.content.trim()
-        return this.message.author.bot || msg.slice(0, this.prefix.length).toLowerCase() !== this.prefix;
-    }
+        const msg = this.msg!.message;
+        if(msg.some) {
+            const someMsg = msg.val.content.trim();
+            return msg.unwrap().author.bot || someMsg.slice(this.prefix.length).toLowerCase() !== this.prefix
+        }
+        return false;
+    } 
 
     fmt() : Result<void, void> {
         if (this.isCommand()) return Err(void 0);
-        this.resMsg = this.message.content.slice(this.prefix.length).trim().split(/\s+/g);
+        this.resMsg = this.message.unwrap().content.slice(this.prefix.length).trim().split(/\s+/g);
         return Ok(void 0);
+    }
+    clear() {
+        this.msg = null;
     }
 
     get fmtMsg() {

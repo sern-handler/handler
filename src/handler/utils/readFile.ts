@@ -1,9 +1,10 @@
+import type { CommandInteractionOption } from "discord.js";
 import { readdirSync, statSync } from "fs";
 import { basename, join } from "path";
 import type { Sern } from "../sern/sern";
 
 export namespace Files {
-    export const Slash = new Map<string, Sern.Module<unknown>>();
+    export const Slash = new Map<string, { mod: Sern.Module<unknown>, options: readonly CommandInteractionOption[]  }>();
     export const Commands = new Map<string, Sern.Module<unknown>>();
     export const Alias = new Map<string, Sern.Module<unknown>>(); 
 
@@ -29,15 +30,19 @@ export namespace Files {
         const commandDir = handler.commandDir,
               client = handler.client;
         Promise.all((await getCommands(commandDir)).map(async absPath => {
-           return { name : basename(absPath), mod:  ( await import(absPath)).default as Sern.Module<unknown>   }
-        })).then( modArr => {
-            for ( const { name, mod } of modArr) {
+           return { name : basename(absPath), mod:  ( await import(absPath)).default as Sern.Module<unknown>, absPath   }
+        })).then( async modArr => {
+            for ( const { name, mod, absPath } of modArr) {
                 switch (mod.type) {
                     case 2 : Commands.set(name.substring(0, name.length-3), mod); break;
-                    case 4 : Slash.set(name.substring(0, name.length - 3), mod); break;
+                    case 4 : {
+                        const options = ((await import(absPath)).options as readonly CommandInteractionOption[])
+                        Slash.set(name.substring(0, name.length - 3), { mod, options });
+                        } break;
                     case 6 : {
                         Commands.set(name.substring(0, name.length-3), mod);
-                        Slash.set(name.substring(0, name.length - 3), mod);
+                        const options = ((await import(absPath)).options as readonly CommandInteractionOption[])
+                        Slash.set(name.substring(0, name.length - 3), {mod, options});
                     } break;
                     default : throw Error(`${name}.js is not a valid module type.`);
                 }
