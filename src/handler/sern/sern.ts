@@ -20,7 +20,9 @@ export namespace Sern {
              this.wrapper.client
                 .on("ready", async () => {
                     if (this.wrapper.init !== undefined) this.wrapper.init();
-                    Files.registerModules(this)      
+                    await Files.registerModules(this);
+                    
+                    
                 })
 
                 .on("messageCreate", async message => {
@@ -36,8 +38,14 @@ export namespace Sern {
 
                 .on("interactionCreate", async interaction => {
                     if (!interaction.isCommand()) return;
-                    const module = Files.Commands.get(interaction.commandName);
+                    const module = Files.Slash.get(interaction.commandName);
+                    await this.interactionResult(module);    
+                    
                 })
+            }
+
+            private async interactionResult(module: Sern.Module<unknown> | undefined) {
+
             }
 
             private async commandResult(module: Sern.Module<unknown> | undefined, message: Message) : Promise<possibleOutput| undefined> {
