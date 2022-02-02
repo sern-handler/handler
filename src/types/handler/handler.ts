@@ -16,6 +16,6 @@ export type MessagePackage  = {
 export type delegate = Sern.Module<unknown>["delegate"]
 
 export enum CommandType {
-    TEXT  = 1 << 1,
-    SLASH = 1 << 2,
+    TEXT  = 2,
+    SLASH = 4,
 }

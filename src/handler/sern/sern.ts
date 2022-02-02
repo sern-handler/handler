@@ -1,7 +1,7 @@
 import type { MessagePackage, Nullable, Visibility } from "../../types/handler/handler";
 import { CommandType } from "../../types/handler/handler";
 import { Files } from "../utils/readFile"
-import type { ApplicationCommand, ApplicationCommandOption, ApplicationCommandOptionData, Awaitable, Client, CommandInteraction, CommandInteractionOption, Message, MessageInteraction, Util } from "discord.js";
+import type {  ApplicationCommandOptionData, Awaitable, Client, CommandInteraction, CommandInteractionOptionResolver, Message} from "discord.js";
 import type { possibleOutput } from "../../types/handler/handler"
 import { Err, Ok, Result, Option, None, Some } from "ts-results";
 import type { Utils } from "../utils/preprocessors/args";
@@ -60,9 +60,11 @@ export namespace Sern {
                     description : module.mod.desc,
                     options: module.options
                 });
+                if(module.mod.type === CommandType.SLASH) return "This is not a slash command";
+
+                let parsedArgs = module.mod.parse?.({message: None, interaction: Some(interaction)}, interaction.options ?? []) ?? Ok([]);
+                module.mod.delegate({message : None, interaction: Some(interaction)}, Ok(parsedArgs)  );
                 
-                module.mod.delegate({message : None, interaction: Some(interaction)}, Ok(interaction.options)  );
-                throw Error("unimpl")
             }
 
             private async commandResult(module: Sern.Module<unknown> | undefined, message: Message) : Promise<possibleOutput| undefined> {
@@ -117,7 +119,11 @@ export namespace Sern {
         message : Option<Message>,
         interaction : Option<CommandInteraction>
     }
-
+    type MapArgTypes = {
+        2 : Omit<CommandInteractionOptionResolver, "getMessage" | "getFocused">,
+        4: string
+        6: MapArgTypes["2"] | MapArgTypes["4"]
+    }
 
     export interface Module<T> { 
         alias: string[],
@@ -125,7 +131,7 @@ export namespace Sern {
         visibility : Visibility,
         type: CommandType,
         delegate : ( eventParams : Context  , args: Ok<T> ) => Awaitable<Result<possibleOutput, string > | void>  
-        parse? : (message: Context, args: string) => Utils.ArgType<T>
+        parse? : <C extends Module<unknown>["type"]>(ctx: Context, args: MapArgTypes[C] ) => Utils.ArgType<T>
     }
 
      

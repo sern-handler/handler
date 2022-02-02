@@ -38,7 +38,7 @@ export namespace Files {
                         const options = ((await import(absPath)).options as ApplicationCommandOptionData[])
                         Commands.set(name.substring(0, name.length - 3), { mod, options : options ?? [] });
                         } break;
-                    case 6 : {
+                    case 2 | 4 : {
                         const options = ((await import(absPath)).options as ApplicationCommandOptionData[])
                         Commands.set(name.substring(0, name.length-3),{mod,  options : options ?? [] } );
                     } break;
