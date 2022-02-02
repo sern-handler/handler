@@ -1,7 +1,7 @@
 import type { MessagePackage, Nullable, Visibility } from "../../types/handler/handler";
 import { CommandType } from "../../types/handler/handler";
 import { Files } from "../utils/readFile"
-import type { ApplicationCommand, Awaitable, Client, CommandInteraction, Message, MessageInteraction, Util } from "discord.js";
+import type { ApplicationCommand, ApplicationCommandOption, ApplicationCommandOptionData, Awaitable, Client, CommandInteraction, CommandInteractionOption, Message, MessageInteraction, Util } from "discord.js";
 import type { possibleOutput } from "../../types/handler/handler"
 import { Err, Ok, Result, Option, None, Some } from "ts-results";
 import type { Utils } from "../utils/preprocessors/args";
@@ -31,7 +31,7 @@ export namespace Sern {
                     if (tryFmt.err) return;
                     const commandName = this.CtxHandler.fmtMsg!.shift()!;
                     const module = Files.Commands.get(commandName) ?? Files.Alias.get(commandName)
-                    let cmdResult = (await this.commandResult(module, message))  
+                    let cmdResult = (await this.commandResult(module?.mod, message))  
                     if (cmdResult === undefined) return;
                        
                     message.channel.send(cmdResult)
@@ -46,13 +46,23 @@ export namespace Sern {
                 })
             }
 
-            private async interactionResult(module: Sern.Module<unknown> | undefined, interaction: CommandInteraction) : Promise<possibleOutput | undefined> {
+            private async interactionResult(
+                module: { mod: Sern.Module<unknown>, options: ApplicationCommandOptionData[]} | undefined,
+                interaction: CommandInteraction) : Promise<possibleOutput | undefined> {
+
                 if (module === undefined) return "Unknown slash command!";
-                module.delegate(
-                    this.CtxHandler.messagePack as Context,
-                    Ok("")
-                )
-               throw Error ("unimplemented");
+                const name = Array.from(Files.Commands.keys()).find(it => it === interaction.commandName)!;
+
+                (await this.client.guilds.fetch(this.privateServerId))
+                .commands
+                .create({
+                    name, 
+                    description : module.mod.desc,
+                    options: module.options
+                });
+                
+                module.mod.delegate({message : None, interaction: Some(interaction)}, Ok(interaction.options)  );
+                throw Error("unimpl")
             }
 
             private async commandResult(module: Sern.Module<unknown> | undefined, message: Message) : Promise<possibleOutput| undefined> {
@@ -62,7 +72,7 @@ export namespace Sern {
                 }
                 if (module.type === CommandType.SLASH) return `This may be a slash command and not a legacy command`
                     let args = this.CtxHandler.fmtMsg.join(" ");
-                    let parsedArgs = module.parse === undefined ? Ok("") : module.parse(message, args);
+                    let parsedArgs = module.parse === undefined ? Ok("") : module.parse( { message : Some(message), interaction : None }, args);
                 if(parsedArgs.err) return parsedArgs.val;
                     let fn = await module.delegate({interaction : None, message: Some(message)}, parsedArgs)
                 return fn instanceof Object ? fn.val : undefined 
@@ -115,7 +125,7 @@ export namespace Sern {
         visibility : Visibility,
         type: CommandType,
         delegate : ( eventParams : Context  , args: Ok<T> ) => Awaitable<Result<possibleOutput, string > | void>  
-        parse? : (message: Message, args: string) => Utils.ArgType<T>
+        parse? : (message: Context, args: string) => Utils.ArgType<T>
     }
 
      
