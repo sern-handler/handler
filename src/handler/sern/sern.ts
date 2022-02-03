@@ -63,10 +63,10 @@ export namespace Sern {
 
                 if(module.mod.type !== CommandType.SLASH) return "This is not a slash command";
                     const context = {message: None, interaction: Some(interaction)}
-                    const parsedArgs = module.mod.parse?.("slash", context)(interaction.options ?? []) ?? Ok("");
+                    const parsedArgs = module.mod.parse?.(context)("slash", interaction.options ?? []) ?? Ok("");
                 if(parsedArgs.err) return parsedArgs.val;
-                module.mod.delegate(context, Ok(parsedArgs)  );
-                
+                    const fn = await module.mod.delegate(context, Ok(parsedArgs));
+                return fn?.val;
             }
 
             private async commandResult(module: Sern.Module<unknown> | undefined, message: Message) : Promise<possibleOutput| undefined> {
@@ -77,7 +77,7 @@ export namespace Sern {
                 if (module.type === CommandType.SLASH) return `This may be a slash command and not a legacy command`
                     const args = this.CtxHandler.fmtMsg.join(" ");
                     const context = {message: Some(message), interaction: None}
-                    const parsedArgs = module.parse?.("text", context)(args) ?? Ok("");
+                    const parsedArgs = module.parse?.(context)("text", args) ?? Ok("");
                 if(parsedArgs.err) return parsedArgs.val;
                     let fn = await module.delegate(context, parsedArgs)
                 return fn instanceof Object ? fn.val : undefined 
@@ -135,7 +135,7 @@ export namespace Sern {
         visibility : Visibility,
         type: CommandType,
         delegate : ( eventParams : Context  , args: Ok<T> ) => Awaitable<Result<possibleOutput, string > | void>  
-        parse? : <K extends keyof ParseType> (what : K, ctx: Context) => ( ( ...args : ParseType[K]) => Utils.ArgType<T> )
+        parse? : <K extends keyof ParseType> (ctx: Context) => ( (what: K, ...args : ParseType[K]) => Utils.ArgType<T> )
     }
 
      
