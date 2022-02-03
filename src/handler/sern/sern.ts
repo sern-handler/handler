@@ -60,10 +60,12 @@ export namespace Sern {
                     description : module.mod.desc,
                     options: module.options
                 });
-                if(module.mod.type === CommandType.SLASH) return "This is not a slash command";
 
-                let parsedArgs = module.mod.parse?.({message: None, interaction: Some(interaction)}, interaction.options ?? []) ?? Ok([]);
-                module.mod.delegate({message : None, interaction: Some(interaction)}, Ok(parsedArgs)  );
+                if(module.mod.type !== CommandType.SLASH) return "This is not a slash command";
+                    const context = {message: None, interaction: Some(interaction)}
+                    const parsedArgs = module.mod.parse?.("slash", context)(interaction.options ?? []) ?? Ok("");
+                if(parsedArgs.err) return parsedArgs.val;
+                module.mod.delegate(context, Ok(parsedArgs)  );
                 
             }
 
@@ -73,10 +75,11 @@ export namespace Sern {
                     return "This command is not availible in this guild!"
                 }
                 if (module.type === CommandType.SLASH) return `This may be a slash command and not a legacy command`
-                    let args = this.CtxHandler.fmtMsg.join(" ");
-                    let parsedArgs = module.parse === undefined ? Ok("") : module.parse( { message : Some(message), interaction : None }, args);
+                    const args = this.CtxHandler.fmtMsg.join(" ");
+                    const context = {message: Some(message), interaction: None}
+                    const parsedArgs = module.parse === undefined ? Ok("") : module.parse("text", context)(args);
                 if(parsedArgs.err) return parsedArgs.val;
-                    let fn = await module.delegate({interaction : None, message: Some(message)}, parsedArgs)
+                    let fn = await module.delegate(context, parsedArgs)
                 return fn instanceof Object ? fn.val : undefined 
             }
 
@@ -115,15 +118,16 @@ export namespace Sern {
         readonly privateServerId : string
     }
 
-    type Context = {
+    export type Context = {
         message : Option<Message>,
         interaction : Option<CommandInteraction>
     }
-    type MapArgTypes = {
-        2 : Omit<CommandInteractionOptionResolver, "getMessage" | "getFocused">,
-        4: string
-        6: MapArgTypes["2"] | MapArgTypes["4"]
-    }
+    export type ParseType = {
+        slash : [options: Omit<CommandInteractionOptionResolver, "getMessage" | "getFocused">],
+        text : [args: string]
+        both :  ParseType["slash"] & ParseType["text"]
+    };
+
 
     export interface Module<T> { 
         alias: string[],
@@ -131,7 +135,7 @@ export namespace Sern {
         visibility : Visibility,
         type: CommandType,
         delegate : ( eventParams : Context  , args: Ok<T> ) => Awaitable<Result<possibleOutput, string > | void>  
-        parse? : <C extends Module<unknown>["type"]>(ctx: Context, args: MapArgTypes[C] ) => Utils.ArgType<T>
+        parse? : <K extends keyof ParseType> (what : K, ctx: Context) => ( ( ...args : ParseType[K]) => Utils.ArgType<T> )
     }
 
      
