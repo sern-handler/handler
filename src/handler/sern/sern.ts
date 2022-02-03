@@ -12,7 +12,6 @@ import type { Utils } from "../utils/preprocessors/args";
 export namespace Sern {
     export class Handler {
         private wrapper: Sern.Wrapper;
-        private CtxHandler : CtxHandler = new CtxHandler();
         constructor(
             wrapper : Sern.Wrapper,
             ) {
@@ -26,23 +25,27 @@ export namespace Sern {
                 })
 
                 .on("messageCreate", async message => {               
-                        
-                    let tryFmt = this.CtxHandler.listen({ message: Some(message), interaction : None, prefix: this.prefix}).fmt();
-                    if (tryFmt.err) return;
-                    const commandName = this.CtxHandler.fmtMsg!.shift()!;
+                    if (CtxHandler.isBot(message) || !CtxHandler.hasPrefix(message,this.prefix)) return;
+                    let tryFmt = CtxHandler.fmt(message, this.prefix)
+                    const commandName = tryFmt.shift()!;
                     const module = Files.Commands.get(commandName) ?? Files.Alias.get(commandName)
-                    let cmdResult = (await this.commandResult(module?.mod, message))  
+                    if(module === undefined) {
+                        message.channel.send("Unknown legacy command")
+                        return;
+                    }
+                    let cmdResult = (await this.commandResult(module?.mod, message, tryFmt.join(" ")))  
                     if (cmdResult === undefined) return;
                        
                     message.channel.send(cmdResult)
-                    this.CtxHandler.clear();
+
                 })
 
                 .on("interactionCreate", async interaction => {
                     if(!interaction.isCommand()) return;
                     const module = Files.Commands.get(interaction.commandName); 
-                    await this.interactionResult(module, interaction);
-
+                    let res = await this.interactionResult(module, interaction);
+                    if (res === undefined) return;
+                    await interaction.reply(res);
                 })
             }
 
@@ -61,7 +64,7 @@ export namespace Sern {
                     options: module.options
                 });
 
-                if(module.mod.type !== CommandType.SLASH) return "This is not a slash command";
+                if(module.mod.type < CommandType.SLASH) return "This is not a slash command";
                     const context = {text: None, slash: Some(interaction)}
                     const parsedArgs = module.mod.parse?.(context, interaction.options) ?? Ok("");
                 if(parsedArgs.err) return parsedArgs.val;
@@ -69,18 +72,17 @@ export namespace Sern {
                 return fn?.val;
             }
 
-            private async commandResult(module: Sern.Module<unknown> | undefined, message: Message) : Promise<possibleOutput| undefined> {
+            private async commandResult(module: Sern.Module<unknown> | undefined, message: Message, args : string) : Promise<possibleOutput| undefined> {
                 if (module === undefined) return "Unknown legacy command";
                 if (module.visibility === "private" && message.guildId !== this.privateServerId) {
                     return "This command is not availible in this guild!"
                 }
                 if (module.type === CommandType.SLASH) return `This may be a slash command and not a legacy command`
-                    const args = this.CtxHandler.fmtMsg.join(" ");
                     const context = {text: Some(message), slash: None}
                     const parsedArgs = module.parse?.(context, args) ?? Ok("");
                 if(parsedArgs.err) return parsedArgs.val;
                     let fn = await module.delegate(context, parsedArgs)
-                return  fn?.val 
+                return fn?.val 
             }
 
             get prefix() : string {
@@ -125,7 +127,7 @@ export namespace Sern {
     export type ParseType = {
         2 : string;
         4 : Omit<CommandInteractionOptionResolver, "getMessage" | "getFocused">
-        6 : [ParseType[2], ParseType[4]]
+        6 : [string, Omit<CommandInteractionOptionResolver, "getMessage" | "getFocused">]
     };
 
 
@@ -143,46 +145,15 @@ export namespace Sern {
 
 class CtxHandler {
 
-    private msg : Nullable<MessagePackage> = null;
-    private resMsg : Nullable<string[]> =  null;
-
-    listen (msg : MessagePackage): CtxHandler  {
-        this.msg = msg
-        return this;
+    static isBot(message: Message) {
+        return message.author.bot;
     }
 
-    isCommand() : boolean {
-        const msg = this.msg!.message;
-        if(msg.some) {
-            const someMsg = msg.val.content.trim();
-            return msg.unwrap().author.bot || someMsg.slice(this.prefix.length).toLowerCase() !== this.prefix
-        }
-        return false;
+    static hasPrefix(message: Message, prefix: string) {
+        return (message.content.slice(0, prefix.length).toLowerCase().trim()) === prefix;
     } 
 
-    fmt() : Result<void, void> {
-        if (this.isCommand()) return Err(void 0);
-        this.resMsg = this.message.unwrap().content.slice(this.prefix.length).trim().split(/\s+/g);
-        return Ok(void 0);
+    static fmt(msg: Message, prefix: string) : string[]  {
+        return msg.content.slice(prefix.length).trim().split(/\s+/g)
     }
-    clear() {
-        this.msg = null;
-    }
-
-    get fmtMsg() {
-        return this.resMsg!;
-    }
-
-    get messagePack() {
-        return this.msg;
-    }
-    
-    get message() {
-        return this.msg!.message
-    }
-    
-    get prefix() {
-        return this.msg!.prefix
-    }
-
 }
