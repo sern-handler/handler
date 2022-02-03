@@ -62,10 +62,10 @@ export namespace Sern {
                 });
 
                 if(module.mod.type !== CommandType.SLASH) return "This is not a slash command";
-                    const context = {message: None, interaction: Some(interaction)}
-                    const parsedArgs = module.mod.parse?.(context)("slash", interaction.options ?? []) ?? Ok("");
+                    const context = {text: None, slash: Some(interaction)}
+                    const parsedArgs = module.mod.parse?.(context, interaction.options) ?? Ok("");
                 if(parsedArgs.err) return parsedArgs.val;
-                    const fn = await module.mod.delegate(context, Ok(parsedArgs));
+                    const fn = await module.mod.delegate(context, parsedArgs);
                 return fn?.val;
             }
 
@@ -76,11 +76,11 @@ export namespace Sern {
                 }
                 if (module.type === CommandType.SLASH) return `This may be a slash command and not a legacy command`
                     const args = this.CtxHandler.fmtMsg.join(" ");
-                    const context = {message: Some(message), interaction: None}
-                    const parsedArgs = module.parse?.(context)("text", args) ?? Ok("");
+                    const context = {text: Some(message), slash: None}
+                    const parsedArgs = module.parse?.(context, args) ?? Ok("");
                 if(parsedArgs.err) return parsedArgs.val;
                     let fn = await module.delegate(context, parsedArgs)
-                return fn instanceof Object ? fn.val : undefined 
+                return  fn?.val 
             }
 
             get prefix() : string {
@@ -119,13 +119,13 @@ export namespace Sern {
     }
 
     export type Context = {
-        message : Option<Message>,
-        interaction : Option<CommandInteraction>
+        text : Option<Message>,
+        slash : Option<CommandInteraction>
     }
     export type ParseType = {
-        slash : [options: Omit<CommandInteractionOptionResolver, "getMessage" | "getFocused">],
-        text : [args: string]
-        both :  ParseType["slash"] & ParseType["text"]
+        2 : string;
+        4 : Omit<CommandInteractionOptionResolver, "getMessage" | "getFocused">
+        6 : [ParseType[2], ParseType[4]]
     };
 
 
@@ -135,7 +135,7 @@ export namespace Sern {
         visibility : Visibility,
         type: CommandType,
         delegate : ( eventParams : Context  , args: Ok<T> ) => Awaitable<Result<possibleOutput, string > | void>  
-        parse? : <K extends keyof ParseType> (ctx: Context) => ( (what: K, ...args : ParseType[K]) => Utils.ArgType<T> )
+        parse? :  (ctx: Context, parseable: ParseType[Module<T>["type"]] ) => Utils.ArgType<T> 
     }
 
      
