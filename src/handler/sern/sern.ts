@@ -77,7 +77,7 @@ export namespace Sern {
                 if (module.type === CommandType.SLASH) return `This may be a slash command and not a legacy command`
                     const args = this.CtxHandler.fmtMsg.join(" ");
                     const context = {message: Some(message), interaction: None}
-                    const parsedArgs = module.parse === undefined ? Ok("") : module.parse("text", context)(args);
+                    const parsedArgs = module.parse?.("text", context)(args) ?? Ok("");
                 if(parsedArgs.err) return parsedArgs.val;
                     let fn = await module.delegate(context, parsedArgs)
                 return fn instanceof Object ? fn.val : undefined 
