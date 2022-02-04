@@ -1,4 +1,4 @@
-import type { Context, MessagePackage, Nullable, ParseType, Visibility } from "../../types/handler/handler";
+import type { Arg, Context, MessagePackage, Nullable, ParseType, Visibility } from "../../types/handler/handler";
 import { CommandType } from "../../types/handler/handler";
 import { Files } from "../utils/readFile"
 import type {  ApplicationCommandOptionData, Awaitable, Client, CommandInteraction, CommandInteractionOptionResolver, Message} from "discord.js";
@@ -66,7 +66,7 @@ export namespace Sern {
 
                 if(module.mod.type < CommandType.SLASH) return "This is not a slash command";
                     const context = {text: None, slash: Some(interaction)} 
-                    const parsedArgs = module.mod.parse?.(context, "slash",  interaction.options) ?? Ok("");
+                    const parsedArgs = module.mod.parse?.(context, ["slash", interaction.options ] ) ?? Ok("");
                 if(parsedArgs.err) return parsedArgs.val;
                     const fn = await module.mod.delegate(context, parsedArgs);
                 return fn?.val;
@@ -79,7 +79,7 @@ export namespace Sern {
                 }
                 if (module.type === CommandType.SLASH) return `This may be a slash command and not a legacy command`
                     const context = {text: Some(message), slash: None}
-                    const parsedArgs = module.parse?.(context, "text",  args) ?? Ok("");
+                    const parsedArgs = module.parse?.(context, ["text", args] ) ?? Ok("");
                 if(parsedArgs.err) return parsedArgs.val;
                     let fn = await module.delegate(context, parsedArgs)
                 return fn?.val 
@@ -128,9 +128,9 @@ export namespace Sern {
         visibility : Visibility,
         type: CommandType,
         delegate : ( eventParams : Context  , args: Ok<T> ) => Awaitable<Result<possibleOutput, string > | void>  
-        parse? : <K extends keyof ParseType> (ctx: Context, cmdType : K, ...args: ParseType[K] ) => Utils.ArgType<T> 
+        parse? :  (ctx: Context,  args: ParseType<Arg> ) => Utils.ArgType<T> 
     }
-
+    
      
 }
 

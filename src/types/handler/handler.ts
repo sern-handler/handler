@@ -20,13 +20,18 @@ export enum CommandType {
     SLASH = 4,
 }
 
+/// Thanks @cursorsdottsx
+export type ParseType<T> = {
+    [K in keyof T] : T[K] extends unknown ? [k : K, args: T[K] ] : never;
+}[keyof T];
+
 export type Context = {
     text : Option<Message>,
     slash : Option<CommandInteraction>
 }
-export type ParseType = {
-    text : [arg: string];
-    slash : [SlashOptions]
+export interface Arg {
+    text : string;
+    slash : SlashOptions
 };
 
 export type SlashOptions =  Omit<CommandInteractionOptionResolver, "getMessage" | "getFocused">;
