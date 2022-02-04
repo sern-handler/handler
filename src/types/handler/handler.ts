@@ -26,5 +26,7 @@ export type Context = {
 }
 export type ParseType = {
     text : [arg: string];
-    slash : [options : Omit<CommandInteractionOptionResolver, "getMessage" | "getFocused">]
+    slash : [SlashOptions]
 };
+
+export type SlashOptions =  Omit<CommandInteractionOptionResolver, "getMessage" | "getFocused">;
