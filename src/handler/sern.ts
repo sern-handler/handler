@@ -138,6 +138,11 @@ export namespace Sern {
         delegate : ( eventParams : Context  , args: Ok<T> ) => Awaitable<Result<possibleOutput, string > | void>  
         parse? :  (ctx: Context,  args: ParseType<Arg> ) => Utils.ArgType<T> 
     }
+    /**
+     * Text = 1
+     * Slash = 2
+     * If a command is both, ( 1 | 2 ), enum value is 3
+     */
     export enum CommandType {
         TEXT  = 1,
         SLASH = 2,
