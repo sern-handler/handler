@@ -139,7 +139,7 @@ export interface Wrapper {
 /**
  * @interface - Modules that are used in command files
  */
-export interface Module<T = string> {
+export interface Module<T = void> {
     alias: string[],
     desc: string,
     visibility: Visibility,
