@@ -1,7 +1,7 @@
-import type { Arg, Context, ParseType, Visibility } from "../types/handler/handler";
+import type { Arg, Context, ParseType, Visibility } from "../types/handler";
 import * as Files from "./utils/readFile"
 import type { ApplicationCommandOptionData, Awaitable, Client, CommandInteraction, Message } from "discord.js";
-import type { possibleOutput } from "../types/handler/handler"
+import type { possibleOutput } from "../types/handler"
 import { Ok, Result, None, Some } from "ts-results";
 import type * as Utils from "./utils/preprocessors/args";
 import { CtxHandler } from "./utils/ctxHandler";
@@ -56,8 +56,8 @@ export class Handler {
         interaction: CommandInteraction): Promise<possibleOutput | undefined> {
 
         if (module === undefined) return "Unknown slash command!";
-        const name = Array.from(Files.Commands.keys()).find(it => it === interaction.commandName)!;
-
+        const name = Array.from(Files.Commands.keys()).find(it => it === interaction.commandName);
+        if(name === undefined) return `Could not find ${interaction.commandName} command!`;
         (await this.client.guilds.fetch(this.privateServerId))
             .commands
             .create({

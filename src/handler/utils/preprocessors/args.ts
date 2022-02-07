@@ -1,5 +1,5 @@
 import { Err, Ok, Result } from "ts-results";
-import type { possibleOutput } from "../../../types/handler/handler";
+import type { possibleOutput } from "../../../types/handler";
 
 
 
