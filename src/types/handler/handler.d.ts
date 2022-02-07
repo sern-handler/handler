@@ -1,6 +1,5 @@
 import type { Option } from 'ts-results';
 import type { CommandInteraction, CommandInteractionOptionResolver, Message, MessagePayload} from 'discord.js';
-import type { MessageOptions } from 'child_process';
 import type { Sern } from '../../handler/sern';
 
 export type Visibility = "private" | "public"
