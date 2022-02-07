@@ -1,4 +1,4 @@
-import type { Arg, Context,  Nullable, ParseType, Visibility } from "../types/handler/handler";
+import type { Arg, Context, ParseType, Visibility } from "../types/handler/handler";
 import { Files } from "./utils/readFile"
 import type {  ApplicationCommandOptionData, Awaitable, Client, CommandInteraction, CommandInteractionOptionResolver, Message} from "discord.js";
 import type { possibleOutput } from "../types/handler/handler"
@@ -7,8 +7,15 @@ import type { Utils } from "./utils/preprocessors/args";
 import { CtxHandler } from "./utils/ctxHandler";
 
 export namespace Sern {
+    /**
+     * @class
+     */
     export class Handler {
         private wrapper: Sern.Wrapper;
+        /**
+         * @constructor
+         * @param {Sern.Wrapper} wrapper Some data that is required to run sern handler 
+         */
         constructor(
             wrapper : Sern.Wrapper,
             ) {
@@ -79,17 +86,32 @@ export namespace Sern {
                     let fn = await module.delegate(context, parsedArgs)
                 return fn?.val 
             }
-
+            /**
+             * @readonly
+             * @returns {string} prefix used for legacy commands
+             */
             get prefix() : string {
                 return this.wrapper.prefix;
             }
+             /**
+             * @readonly
+             * @returns {string} directory of your commands folder
+             */
             get commandDir() : string {
                 return this.wrapper.commands;
             }
+            /**
+             * @readonly
+             * @returns {Client<boolean>} discord.js client
+             */
             get client() : Client<boolean> {
                 return this.wrapper.client
             }
-            get privateServerId() {
+            /**
+             * @readonly
+             * @returns {string} private server id for testing or personal use
+             */
+            get privateServerId(): string {
                 return this.wrapper.privateServerId;
             }
         
@@ -115,20 +137,7 @@ export namespace Sern {
         readonly privateServerId : string
     }
     /**
-     * Module Interfaces. Will be used to configure commands across folders
-     * Name of command is taken from filename itself.
-     * Example command in `ping.ts`
-     *```ts
-     * export default {
-     *   alias : string[],  // any other names the command would be            
-     *   desc : string,     // description of command
-     *   visibility: "public" | "private", 
-     *   //main command that gets executed 
-     *   delegate : ( eventParams : Context  , args: Ok<T> ) => Awaitable<Result<possibleOutput, string > | void>,
-     *   //if command has arguments needing parsing, this exists
-     *   parse?: (ctx: Context,  args: ParseType<Arg> ) => Utils.ArgType<T> 
-     * } as Sern.Module
-     * ```
+     * @interface - Modules that are used in command files
      */
     export interface Module<T = string> { 
         alias: string[],
@@ -139,9 +148,7 @@ export namespace Sern {
         parse? :  (ctx: Context,  args: ParseType<Arg> ) => Utils.ArgType<T> 
     }
     /**
-     * Text = 1
-     * Slash = 2
-     * If a command is both, ( 1 | 2 ), enum value is 3
+     * @enum { number };
      */
     export enum CommandType {
         TEXT  = 1,

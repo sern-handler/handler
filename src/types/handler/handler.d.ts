@@ -14,7 +14,7 @@ export type ParseType<T> = {
     [K in keyof T] : T[K] extends unknown ? [k : K, args: T[K] ] : never;
 }[keyof T];
 
-// A Sern.Module will carry a Context Parameter
+// A Sern.Module["delegate"] will carry a Context Parameter
 export type Context = {
     text : Option<Message>,
     slash : Option<CommandInteraction>
