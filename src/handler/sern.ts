@@ -1,10 +1,10 @@
-import type { Arg, Context, MessagePackage, Nullable, ParseType, Visibility } from "../../types/handler/handler";
-import { CommandType } from "../../types/handler/handler";
-import { Files } from "../utils/readFile"
+import type { Arg, Context,  Nullable, ParseType, Visibility } from "../types/handler/handler";
+import { Files } from "./utils/readFile"
 import type {  ApplicationCommandOptionData, Awaitable, Client, CommandInteraction, CommandInteractionOptionResolver, Message} from "discord.js";
-import type { possibleOutput } from "../../types/handler/handler"
+import type { possibleOutput } from "../types/handler/handler"
 import { Err, Ok, Result, Option, None, Some } from "ts-results";
-import type { Utils } from "../utils/preprocessors/args";
+import type { Utils } from "./utils/preprocessors/args";
+import { CtxHandler } from "./utils/ctxHandler";
 
 
 
@@ -18,7 +18,7 @@ export namespace Sern {
              this.wrapper = wrapper;
              this.wrapper.client
                 .on("ready", async () => {
-                    if (this.wrapper.init !== undefined) this.wrapper.init();
+                    if (this.wrapper.init !== undefined) this.wrapper.init(this);
                     await Files.registerModules(this);
                     
                     
@@ -116,13 +116,10 @@ export namespace Sern {
         readonly client : Client,
         readonly prefix: string,
         readonly commands : string
-        init? : () => void,
+        init? : (handler : Sern.Handler) => void,
         readonly privateServerId : string
     }
-
-    
-
-    export interface Module<T> { 
+    export interface Module<T = string> { 
         alias: string[],
         desc : string,
         visibility : Visibility,
@@ -131,20 +128,10 @@ export namespace Sern {
         parse? :  (ctx: Context,  args: ParseType<Arg> ) => Utils.ArgType<T> 
     }
     
+    export enum CommandType {
+        TEXT  = 2,
+        SLASH = 4,
+    }
      
 }
 
-class CtxHandler {
-
-    static isBot(message: Message) {
-        return message.author.bot;
-    }
-
-    static hasPrefix(message: Message, prefix: string) {
-        return (message.content.slice(0, prefix.length).toLowerCase().trim()) === prefix;
-    } 
-
-    static fmt(msg: Message, prefix: string) : string[]  {
-        return msg.content.slice(prefix.length).trim().split(/\s+/g)
-    }
-}

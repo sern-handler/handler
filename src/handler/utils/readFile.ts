@@ -1,7 +1,7 @@
 import type { ApplicationCommandOptionData, CommandInteractionOption } from "discord.js";
 import { readdirSync, statSync } from "fs";
 import { basename, join } from "path";
-import type { Sern } from "../sern/sern";
+import type { Sern } from "../sern";
 
 export namespace Files {
     export const Commands = new Map<string, { mod: Sern.Module<unknown>, options:  ApplicationCommandOptionData[] }>();
@@ -26,8 +26,7 @@ export namespace Files {
     }
 
     export async function registerModules(handler : Sern.Handler) : Promise<void> {
-        const commandDir = handler.commandDir,
-              client = handler.client;
+        const commandDir = handler.commandDir;
         Promise.all((await getCommands(commandDir)).map(async absPath => {
            return { name : basename(absPath), mod:  ( await import(absPath)).default as Sern.Module<unknown>, absPath   }
         })).then( async modArr => {

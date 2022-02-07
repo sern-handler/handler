@@ -1,24 +1,14 @@
-import type { Ok, Result, Option } from 'ts-results';
-import type { Awaitable, Client, CommandInteraction, CommandInteractionOptionResolver, Message, MessagePayload} from 'discord.js';
+import type { Option } from 'ts-results';
+import type { CommandInteraction, CommandInteractionOptionResolver, Message, MessagePayload} from 'discord.js';
 import type { MessageOptions } from 'child_process';
-import type { Sern } from '../../handler/sern/sern';
+import type { Sern } from '../../handler/sern';
 
 export type Visibility = "private" | "public"
 export type possibleOutput = string | MessagePayload & MessageOptions
 export type Nullable<T> = T | null;
 
-export type MessagePackage  = {
-    message : Option<Message>,
-    interaction : Option<CommandInteraction>, 
-    prefix : string
-}
-
 export type delegate = Sern.Module<unknown>["delegate"]
 
-export enum CommandType {
-    TEXT  = 2,
-    SLASH = 4,
-}
 
 /// Thanks @cursorsdottsx
 export type ParseType<T> = {
