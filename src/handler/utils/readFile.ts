@@ -32,12 +32,12 @@ export namespace Files {
         })).then( async modArr => {
             for ( const { name, mod, absPath } of modArr) {
                 switch (mod.type) {
-                    case 2 : Commands.set(name.substring(0, name.length-3), { mod, options: [] }); break;
-                    case 4 : {
+                    case 1 : Commands.set(name.substring(0, name.length-3), { mod, options: [] }); break;
+                    case 2 : {
                         const options = ((await import(absPath)).options as ApplicationCommandOptionData[])
                         Commands.set(name.substring(0, name.length - 3), { mod, options : options ?? [] });
                         } break;
-                    case 2 | 4 : {
+                    case 1 | 2 : {
                         const options = ((await import(absPath)).options as ApplicationCommandOptionData[])
                         Commands.set(name.substring(0, name.length-3),{mod,  options : options ?? [] } );
                     } break;

@@ -2,12 +2,9 @@ import type { Arg, Context,  Nullable, ParseType, Visibility } from "../types/ha
 import { Files } from "./utils/readFile"
 import type {  ApplicationCommandOptionData, Awaitable, Client, CommandInteraction, CommandInteractionOptionResolver, Message} from "discord.js";
 import type { possibleOutput } from "../types/handler/handler"
-import { Err, Ok, Result, Option, None, Some } from "ts-results";
+import { Ok, Result, None, Some } from "ts-results";
 import type { Utils } from "./utils/preprocessors/args";
 import { CtxHandler } from "./utils/ctxHandler";
-
-
-
 
 export namespace Sern {
     export class Handler {
@@ -20,8 +17,6 @@ export namespace Sern {
                 .on("ready", async () => {
                     if (this.wrapper.init !== undefined) this.wrapper.init(this);
                     await Files.registerModules(this);
-                    
-                    
                 })
 
                 .on("messageCreate", async message => {               
@@ -119,6 +114,22 @@ export namespace Sern {
         init? : (handler : Sern.Handler) => void,
         readonly privateServerId : string
     }
+    /**
+     * Module Interfaces. Will be used to configure commands across folders
+     * Name of command is taken from filename itself.
+     * Example command in `ping.ts`
+     *```ts
+     * export default {
+     *   alias : string[],  // any other names the command would be            
+     *   desc : string,     // description of command
+     *   visibility: "public" | "private", 
+     *   //main command that gets executed 
+     *   delegate : ( eventParams : Context  , args: Ok<T> ) => Awaitable<Result<possibleOutput, string > | void>,
+     *   //if command has arguments needing parsing, this exists
+     *   parse?: (ctx: Context,  args: ParseType<Arg> ) => Utils.ArgType<T> 
+     * } as Sern.Module
+     * ```
+     */
     export interface Module<T = string> { 
         alias: string[],
         desc : string,
@@ -127,10 +138,9 @@ export namespace Sern {
         delegate : ( eventParams : Context  , args: Ok<T> ) => Awaitable<Result<possibleOutput, string > | void>  
         parse? :  (ctx: Context,  args: ParseType<Arg> ) => Utils.ArgType<T> 
     }
-    
     export enum CommandType {
-        TEXT  = 2,
-        SLASH = 4,
+        TEXT  = 1,
+        SLASH = 2,
     }
      
 }
