@@ -1,6 +1,6 @@
 import type { Option } from 'ts-results'
 import type { CommandInteraction, CommandInteractionOptionResolver, Message, MessagePayload, MessageOptions } from 'discord.js';
-import type { Sern } from '../handler/sern';
+import type * as Sern from "../handler/sern"
 
 export type Visibility = "private" | "public"
 //Anything that can be sent in a `<TextChannel>#send` or `<CommandInteraction>#reply`
