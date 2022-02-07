@@ -8,9 +8,9 @@ export class CtxHandler {
 
     static hasPrefix(message: Message, prefix: string) {
         return (message.content.slice(0, prefix.length).toLowerCase().trim()) === prefix;
-    } 
+    }
 
-    static fmt(msg: Message, prefix: string) : string[]  {
+    static fmt(msg: Message, prefix: string): string[] {
         return msg.content.slice(prefix.length).trim().split(/\s+/g)
     }
 }

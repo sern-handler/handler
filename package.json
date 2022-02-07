@@ -4,15 +4,20 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "compile": "tsc",
-    "watch" : "tsc -w"
+    "watch": "tsc -w",
+    "lint": "eslint src/**/*.ts",
+    "format": "eslint src/**/*.ts --fix"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.10.2",
+    "@typescript-eslint/parser": "^5.10.2",
     "discord.js": "^13.6.0",
+    "eslint": "^8.8.0",
+    "prettier": "^2.5.1",
     "ts-results": "^3.3.0"
   },
   "devDependencies": {
