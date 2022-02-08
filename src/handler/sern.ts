@@ -5,6 +5,7 @@ import type { possibleOutput } from "../types/handler"
 import { Ok, Result, None, Some } from "ts-results";
 import type * as Utils from "./utils/preprocessors/args";
 import { CtxHandler } from "./utils/ctxHandler";
+import { DefaultLogger,  Logger } from "./logger";
 
 
 /**
@@ -12,14 +13,23 @@ import { CtxHandler } from "./utils/ctxHandler";
  */
 export class Handler {
     private wrapper: Wrapper;
+    private logger : Logger<unknown>; 
     /**
      * @constructor
      * @param {Wrapper} wrapper Some data that is required to run sern handler 
      */
     constructor(
         wrapper: Wrapper,
+        logger? : Logger<unknown>,
     ) {
         this.wrapper = wrapper;
+        logger === undefined 
+        ? this.logger = new DefaultLogger()
+        : this.logger = logger;
+
+        this.logger.clear();
+        
+
         this.wrapper.client
             .on("ready", async () => {
                 if (this.wrapper.init !== undefined) this.wrapper.init(this);
@@ -67,11 +77,15 @@ export class Handler {
             });
 
         if (module.mod.type < CommandType.SLASH) return "This is not a slash command";
-        const context = { text: None, slash: Some(interaction) }
+        const context = { message: None, interaction: Some(interaction) }
         const parsedArgs = module.mod.parse?.(context, ["slash", interaction.options]) ?? Ok("");
         if (parsedArgs.err) return parsedArgs.val;
         const fn = await module.mod.delegate(context, parsedArgs);
         return fn?.val;
+    }
+
+    private emitEvent() {
+
     }
 
     private async commandResult(module: Module<unknown> | undefined, message: Message, args: string): Promise<possibleOutput | undefined> {
@@ -80,7 +94,7 @@ export class Handler {
             return "This command is not availible in this guild!"
         }
         if (module.type === CommandType.SLASH) return `This may be a slash command and not a legacy command`
-        const context = { text: Some(message), slash: None }
+        const context = { message: Some(message), interaction: None }
         const parsedArgs = module.parse?.(context, ["text", args]) ?? Ok("");
         if (parsedArgs.err) return parsedArgs.val;
         const fn = await module.delegate(context, parsedArgs)
@@ -134,7 +148,7 @@ export interface Wrapper {
     readonly prefix: string,
     readonly commands: string
     init?: (handler: Handler) => void,
-    readonly privateServerId: string
+    readonly privateServerId: string,
 }
 /**
  * @interface - Modules that are used in command files
@@ -145,7 +159,7 @@ export interface Module<T = void> {
     visibility: Visibility,
     type: CommandType,
     delegate: (eventParams: Context, args: Ok<T>) => Awaitable<Result<possibleOutput, string> | void>
-    parse?: (ctx: Context, args: ParseType<Arg>) => Utils.ArgType<T>
+    parse?: (ctx: Context, args: Arg) => Utils.ArgType<T>
 }
 /**
  * @enum { number };

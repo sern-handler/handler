@@ -33,7 +33,7 @@ export async function registerModules(handler: Sern.Handler): Promise<void> {
             switch (mod.type) {
                 case 1: Commands.set(name.substring(0, name.length - 3), { mod, options: [] }); break;
                 case 2:
-                case 1 | 2: {
+                case (1 | 2): {
                     const options = ((await import(absPath)).options as ApplicationCommandOptionData[])
                     Commands.set(name.substring(0, name.length - 3), { mod, options: options ?? [] });
                 } break;

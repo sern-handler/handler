@@ -4,9 +4,8 @@ import type * as Sern from "../handler/sern"
 
 export type Visibility = "private" | "public"
 //Anything that can be sent in a `<TextChannel>#send` or `<CommandInteraction>#reply`
-export type possibleOutput = string | MessagePayload & MessageOptions;
+export type possibleOutput<T = string> = T | MessagePayload & MessageOptions;
 export type Nullable<T> = T | null;
-
 export type delegate = Sern.Module<unknown>["delegate"]
 
 /// Thanks @cursorsdottsx
@@ -16,12 +15,9 @@ export type ParseType<T> = {
 
 // A Sern.Module["delegate"] will carry a Context Parameter
 export type Context = {
-    text: Option<Message>,
-    slash: Option<CommandInteraction>
+    message: Option<Message>,
+    interaction: Option<CommandInteraction>
 }
-export interface Arg {
-    text: string;
-    slash: SlashOptions
-}
+export type Arg = ParseType<{text : string, slash : SlashOptions}>
 // TypeAlias for interaction.options
 export type SlashOptions = Omit<CommandInteractionOptionResolver, "getMessage" | "getFocused">;
