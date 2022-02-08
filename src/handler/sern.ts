@@ -5,7 +5,7 @@ import type { possibleOutput } from "../types/handler"
 import { Ok, Result, None, Some } from "ts-results";
 import type * as Utils from "./utils/preprocessors/args";
 import { CtxHandler } from "./utils/ctxHandler";
-import { DefaultLogger,  Logger } from "./logger";
+import { DefaultEvent, DefaultLogger,  Logger } from "./logger";
 
 
 /**
@@ -26,9 +26,10 @@ export class Handler {
         logger === undefined 
         ? this.logger = new DefaultLogger()
         : this.logger = logger;
-
-        this.logger.clear();
         
+        this.logger.clear();
+        this.logger.log("joe", DefaultEvent.MESSAGE);
+    
 
         this.wrapper.client
             .on("ready", async () => {

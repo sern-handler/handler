@@ -1,3 +1,6 @@
+import dayjs from "dayjs"
+import utc from "dayjs/plugin/utc"
+import timezone from "dayjs/plugin/timezone"
 export class DefaultLogger implements Logger<DefaultEvent>  {
 
     clear () {
@@ -5,7 +8,11 @@ export class DefaultLogger implements Logger<DefaultEvent>  {
     }
 
     log(message: string, e: DefaultEvent) {
-      console.log(`[${DefaultEvent[e]}] ${message}`)  
+      dayjs.extend(utc)
+      dayjs.extend(timezone)
+      dayjs.tz.guess()
+      const tz = dayjs().format()
+      console.log(`[${tz}][${DefaultEvent[e]}] ${message}`)  
     }
     
 }
