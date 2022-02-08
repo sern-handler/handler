@@ -5,7 +5,6 @@ import type { possibleOutput } from "../types/handler"
 import { Ok, Result, None, Some } from "ts-results";
 import type * as Utils from "./utils/preprocessors/args";
 import { CtxHandler } from "./utils/ctxHandler";
-import { DefaultEvent, DefaultLogger,  Logger } from "./logger";
 
 
 /**
@@ -13,22 +12,19 @@ import { DefaultEvent, DefaultLogger,  Logger } from "./logger";
  */
 export class Handler {
     private wrapper: Wrapper;
-    private logger : Logger<unknown>; 
     /**
      * @constructor
      * @param {Wrapper} wrapper Some data that is required to run sern handler 
      */
     constructor(
         wrapper: Wrapper,
-        logger? : Logger<unknown>,
     ) {
         this.wrapper = wrapper;
-        logger === undefined 
-        ? this.logger = new DefaultLogger()
-        : this.logger = logger;
-        
-        this.logger.clear();
-        this.logger.log("joe", DefaultEvent.MESSAGE);
+        //have any suitable positiotions open
+        // go to your college
+        // i have workstudy
+        // go to your college
+        // prof interviews
     
 
         this.wrapper.client
@@ -85,9 +81,6 @@ export class Handler {
         return fn?.val;
     }
 
-    private emitEvent() {
-
-    }
 
     private async commandResult(module: Module<unknown> | undefined, message: Message, args: string): Promise<possibleOutput | undefined> {
         if (module === undefined) return "Unknown legacy command";
