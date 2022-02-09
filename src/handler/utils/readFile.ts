@@ -25,9 +25,8 @@ async function readPath(dir: string, arrayOfFiles: string[] = []): Promise<strin
 }
 
 const fmtFileName = (n : string) => {
-    return n
-    .toLowerCase()
-    .endsWith("-test.js")
+    const endsW = n.toLowerCase().endsWith("-test.js") || n.toLowerCase().endsWith("-test.ts");
+    return endsW 
     ? { cmdName : n.substring(0, n.length - 8), testOnly : true }
     : { cmdName:  n.substring(0, n.length - 3), testOnly: false};
 };

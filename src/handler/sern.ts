@@ -81,9 +81,11 @@ export class Handler {
         if (module?.mod === undefined) return "Unknown legacy command";
         
         if (module.mod.visibility === "private") {
-           const checkTest = this.privateServers.find(({id}) => id === message.guildId!)?.test;
-           if(checkTest === undefined) return "This command has the private modifier but is not registered under Handler#privateServers";
-           
+           const checkIsTestServer = this.privateServers.find(({id}) => id === message.guildId!)?.test;
+           if(checkIsTestServer === undefined) return "This command has the private modifier but is not registered under Handler#privateServers";
+           if(checkIsTestServer !== module.testOnly) {
+               return "This private command is a testing command";
+           } 
         }
 
   
