@@ -20,12 +20,7 @@ export class Handler {
         wrapper: Wrapper,
     ) {
         this.wrapper = wrapper;
-        //have any suitable positiotions open
-        // go to your college
-        // i have workstudy
-        // go to your college
-        // prof interviews
-    
+
 
         this.wrapper.client
             .on("ready", async () => {
