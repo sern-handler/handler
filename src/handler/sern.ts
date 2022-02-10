@@ -25,7 +25,7 @@ export class Handler {
         this.client
             .on("ready", async () => {
                 Files.buildData(this)
-                    .then(this.registerModules);
+                     .then(this.registerModules);
                 if (wrapper.init !== undefined) wrapper.init(this);
             })
 
@@ -99,7 +99,17 @@ export class Handler {
         const fn = await module.mod.delegate(context, parsedArgs)
         return fn?.val
     }
-    private async registerModules(modArr: { name: string, mod: Module<unknown>, absPath: string }[]) {
+    /**
+     * This function chains `Files.buildData`
+     * @param {{name: string, mod: Module<unknown>, absPath: string}} modArr module information
+     */
+    private async registerModules(
+        modArr: {
+            name: string,
+            mod: Module<unknown>,
+            absPath: string
+        }[]
+    ) {
         for (const { name, mod, absPath } of modArr) {
             const { cmdName, testOnly } = Files.fmtFileName(name);
             switch (mod.type) {
