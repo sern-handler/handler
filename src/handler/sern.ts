@@ -22,7 +22,7 @@ export class Handler {
         this.wrapper = wrapper;
 
 
-        this.wrapper.client
+        this.client
             .on("ready", async () => {
                 Files.buildData(this)
                 .then(this.registerModules);
@@ -110,9 +110,11 @@ export class Handler {
                     Files.Commands.set(cmdName, { mod, options: options ?? [], testOnly });
                     switch(mod.visibility) {
                         case "private" : {
+                            // loading guild slash commands only
                            await this.reloadSlash(cmdName, mod.desc, options)
                         }
                         case "public" : {
+                            // creating global commands! 
                            this.client.application!.commands
                            .create({
                                name: cmdName,
@@ -132,6 +134,12 @@ export class Handler {
             }
         }
     }
+    /**
+     * 
+     * @param {string} cmdName name of command
+     * @param {string} description description of command 
+     * @param {ApplicationCommandOptionData[]} options any options for the slash command 
+     */
     private async reloadSlash(
         cmdName: string,
         description : string,
