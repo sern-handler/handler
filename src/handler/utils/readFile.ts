@@ -24,51 +24,26 @@ async function readPath(dir: string, arrayOfFiles: string[] = []): Promise<strin
     return arrayOfFiles;
 }
 
-const fmtFileName = (n : string) => {
+export const fmtFileName = (n : string) => {
     const endsW = n.toLowerCase().endsWith("-test.js") || n.toLowerCase().endsWith("-test.ts");
     return endsW 
     ? { cmdName : n.substring(0, n.length - 8), testOnly : true }
     : { cmdName:  n.substring(0, n.length - 3), testOnly: false};
 };
 
-export async function registerModules(handler: Sern.Handler): Promise<void> {
-    const commandDir = handler.commandDir;
-    Promise.all((await getCommands(commandDir)).map(async absPath => {
+export async function buildData(handler: Sern.Handler)
+    : Promise<{
+        name: string;
+        mod: Sern.Module<unknown>;
+        absPath: string;
+    }[]> {
+   const commandDir = handler.commandDir;
+   return Promise.all((await getCommands(commandDir))
+   .map(async absPath => {
         return { name: basename(absPath), mod: (await import(absPath)).default as Sern.Module<unknown>, absPath }
-    })).then(async modArr => {
-        for (const { name, mod, absPath } of modArr) {
-            const { cmdName, testOnly } = fmtFileName(name);
-            switch (mod.type) {
-                case 1: Commands.set(cmdName, { mod, options: [], testOnly }); break;
-                case 2:
-                case (1 | 2): {
-                    const options = ((await import(absPath)).options as ApplicationCommandOptionData[])
-                    Commands.set(cmdName, { mod, options: options ?? [], testOnly });
-                    switch(mod.visibility) {
-                        case "private" : {
-                            //unimplemented
-                        }
-                        case "public" : {
-                            //unimplemented
-                        }
-                    }
-                } break;
-                default: throw Error(`${name}.js is not a valid module type.`);
-            }
-
-            if (mod.alias.length > 0) {
-                for (const alias of mod.alias) {
-                    Alias.set(alias, { mod, options: [], testOnly })
-                }
-            }
-        }
-
-    })
-
+    }))
 }
+
 export async function getCommands(dir: string): Promise<string[]> {
     return readPath(join(process.cwd(), dir))
 }
-
-
-

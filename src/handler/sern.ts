@@ -1,6 +1,6 @@
 import type { Arg, Context, Visibility } from "../types/handler";
 import * as Files from "./utils/readFile"
-import type {  Awaitable, Client, CommandInteraction, Message } from "discord.js";
+import type {  ApplicationCommandOptionData, Awaitable, Client, CommandInteraction, Message } from "discord.js";
 import type { possibleOutput } from "../types/handler"
 import { Ok, Result, None, Some } from "ts-results";
 import type * as Utils from "./utils/preprocessors/args";
@@ -24,7 +24,8 @@ export class Handler {
 
         this.wrapper.client
             .on("ready", async () => {
-                await Files.registerModules(this);
+                Files.buildData(this)
+                .then(this.registerModules);
                 if (this.wrapper.init !== undefined) this.wrapper.init(this);
             })
 
@@ -97,6 +98,54 @@ export class Handler {
         if (parsedArgs.err) return parsedArgs.val;
         const fn = await module.mod.delegate(context, parsedArgs)
         return fn?.val
+    }
+    private async registerModules(modArr : {name: string, mod: Module<unknown>, absPath: string}[]) {
+        for (const { name, mod, absPath } of modArr) {
+            const { cmdName, testOnly } = Files.fmtFileName(name);
+            switch (mod.type) {
+                case 1: Files.Commands.set(cmdName, { mod, options: [], testOnly }); break;
+                case 2:
+                case (1 | 2): {
+                    const options = ((await import(absPath)).options as ApplicationCommandOptionData[])
+                    Files.Commands.set(cmdName, { mod, options: options ?? [], testOnly });
+                    switch(mod.visibility) {
+                        case "private" : {
+                           await this.reloadSlash(cmdName, mod.desc, options)
+                        }
+                        case "public" : {
+                           this.client.application!.commands
+                           .create({
+                               name: cmdName,
+                               description: mod.desc,
+                               options
+                           }) 
+                        }
+                    }
+                } break;
+                default: throw Error(`${name}.js is not a valid module type.`);
+            }
+
+            if (mod.alias.length > 0) {
+                for (const alias of mod.alias) {
+                    Files.Alias.set(alias, { mod, options: [], testOnly })
+                }
+            }
+        }
+    }
+    private async reloadSlash(
+        cmdName: string,
+        description : string,
+        options: ApplicationCommandOptionData[]
+        ) {
+        for(const {id} of this.privateServers) {
+            const guild = (await this.client.guilds.fetch(id));
+            
+            guild.commands.create({
+                name: cmdName,
+                description,
+                options
+            })
+        }
     }
     /**
      * @readonly
