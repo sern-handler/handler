@@ -147,9 +147,11 @@ export interface Wrapper {
     readonly privateServers: {test: boolean, id : string}[],
 }
 /**
- * @interface - Modules that are used in command files
+ * An object to be passed into Sern.Handler constructor. 
+ * @typedef {object} Module<T=string>
+ * 
  */
-export interface Module<T = void> {
+export interface Module<T = string> {
     alias: string[],
     desc: string,
     visibility: Visibility,
