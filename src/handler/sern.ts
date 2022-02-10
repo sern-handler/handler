@@ -4,7 +4,7 @@ import type {  ApplicationCommandOptionData, Awaitable, Client, CommandInteracti
 import type { possibleOutput } from "../types/handler"
 import { Ok, Result, None, Some } from "ts-results";
 import type * as Utils from "./utils/preprocessors/args";
-import { CtxHandler } from "./utils/ctxHandler";
+import { isBot, hasPrefix, fmt } from "./utils/messageHelpers";
 
 
 /**
@@ -26,14 +26,14 @@ export class Handler {
             .on("ready", async () => {
                 Files.buildData(this)
                 .then(this.registerModules);
-                if (this.wrapper.init !== undefined) this.wrapper.init(this);
+                if (wrapper.init !== undefined) wrapper.init(this);
             })
 
             .on("messageCreate", async message => {
-                if (CtxHandler.isBot(message) || !CtxHandler.hasPrefix(message, this.prefix)) return;
+                if (isBot(message) || !hasPrefix(message, this.prefix)) return;
                 if(message.channel.type === "DM") return;
 
-                const tryFmt = CtxHandler.fmt(message, this.prefix)
+                const tryFmt = fmt(message, this.prefix)
                 const commandName = tryFmt.shift()!;
                 const module = Files.Commands.get(commandName) ?? Files.Alias.get(commandName)
                 if (module === undefined) {
