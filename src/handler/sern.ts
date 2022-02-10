@@ -149,7 +149,11 @@ export interface Wrapper {
 /**
  * An object to be passed into Sern.Handler constructor. 
  * @typedef {object} Module<T=string>
- * 
+ * @property {string} desc
+ * @property {Visibility} visibility
+ * @property {CommandType} type
+ * @property {(eventParams : Context, args : Ok<T=string>) => Awaitable<Result<possibleOutput, string> | void>)} delegate
+ * @prop {(ctx: Context, args: Arg) => Utils.ArgType<T>} parse
  */
 export interface Module<T = string> {
     alias: string[],
