@@ -54,7 +54,12 @@ export class Handler {
                 await interaction.reply(res);
             })
     }
-
+    /**
+     * 
+     * @param {Files.CommandVal | undefined} module command file information 
+     * @param {CommandInteraction} interaction a Discord.js command interaction 
+     * @returns {possibleOutput | undefined} takes return value and replies it, if possible input
+     */
     private async interactionResult(
         module: Files.CommandVal | undefined,
         interaction: CommandInteraction): Promise<possibleOutput | undefined> {
@@ -70,7 +75,13 @@ export class Handler {
         const fn = await module.mod.delegate(context, parsedArgs);
         return fn?.val;
     }  
-
+    /**
+     * 
+     * @param {Files.CommandVal | undefined} module command file information
+     * @param {Message} message a message object
+     * @param {string} args anything after the command 
+     * @returns takes return value and replies it, if possible input
+     */
     private async commandResult(module: Files.CommandVal | undefined, message: Message, args: string): Promise<possibleOutput | undefined> {
         if (module?.mod === undefined) return "Unknown legacy command";
         if (module.mod.type === CommandType.SLASH) return `This may be a slash command and not a legacy command`
@@ -118,17 +129,15 @@ export class Handler {
 
 
 }
+
 /**
  * An object to be passed into Sern.Handler constructor. 
- * ```ts
- * new Sern.Handler({
- *   client,       // Discord.js client instance          
- *   prefix : "!", // an example prefix
- *   commands: "",  //commands directory
- *   init : () => console.log("Bot is ready") // function called on ready
- *   privateServerId : "" // a server id that can be used for private or test server
- * })
- * ```
+ * @typedef {object} Wrapper
+ * @property {readonly Client} client
+ * @property {readonly string} prefix
+ * @property {readonly string} commands
+ * @prop {(handler : Handler) => void)} init
+ * @property {readonly {test: boolean, id: string}[]} privateServers
  */
 export interface Wrapper {
     readonly client: Client,

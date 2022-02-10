@@ -1,7 +1,7 @@
 import type { Message } from "discord.js";
 
 export class CtxHandler {
-
+    
     static isBot(message: Message) {
         return message.author.bot;
     }
