@@ -44,6 +44,14 @@ export async function registerModules(handler: Sern.Handler): Promise<void> {
                 case (1 | 2): {
                     const options = ((await import(absPath)).options as ApplicationCommandOptionData[])
                     Commands.set(cmdName, { mod, options: options ?? [], testOnly });
+                    switch(mod.visibility) {
+                        case "private" : {
+                            //unimplemented
+                        }
+                        case "public" : {
+                            //unimplemented
+                        }
+                    }
                 } break;
                 default: throw Error(`${name}.js is not a valid module type.`);
             }

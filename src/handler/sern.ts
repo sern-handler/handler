@@ -24,8 +24,8 @@ export class Handler {
 
         this.wrapper.client
             .on("ready", async () => {
-                if (this.wrapper.init !== undefined) this.wrapper.init(this);
                 await Files.registerModules(this);
+                if (this.wrapper.init !== undefined) this.wrapper.init(this);
             })
 
             .on("messageCreate", async message => {
@@ -69,23 +69,18 @@ export class Handler {
         if (parsedArgs.err) return parsedArgs.val;
         const fn = await module.mod.delegate(context, parsedArgs);
         return fn?.val;
-    }
-
+    }  
 
     private async commandResult(module: Files.CommandVal | undefined, message: Message, args: string): Promise<possibleOutput | undefined> {
         if (module?.mod === undefined) return "Unknown legacy command";
-        
+        if (module.mod.type === CommandType.SLASH) return `This may be a slash command and not a legacy command`
         if (module.mod.visibility === "private") {
            const checkIsTestServer = this.privateServers.find(({id}) => id === message.guildId!)?.test;
            if(checkIsTestServer === undefined) return "This command has the private modifier but is not registered under Handler#privateServers";
            if(checkIsTestServer !== module.testOnly) {
                return "This private command is a testing command";
            } 
-        }
-
-  
-        
-        if (module.mod.type === CommandType.SLASH) return `This may be a slash command and not a legacy command`
+        }        
         const context = { message: Some(message), interaction: None }
         const parsedArgs = module.mod.parse?.(context, ["text", args]) ?? Ok("");
         if (parsedArgs.err) return parsedArgs.val;
