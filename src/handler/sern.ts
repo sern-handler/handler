@@ -1,6 +1,6 @@
 import type { Arg, Context, Visibility } from "../types/handler";
 import * as Files from "./utils/readFile"
-import type {  ApplicationCommandOptionData, Awaitable, Client, CommandInteraction, Message } from "discord.js";
+import type { ApplicationCommandOptionData, Awaitable, Client, CommandInteraction, Message } from "discord.js";
 import type { possibleOutput } from "../types/handler"
 import { Ok, Result, None, Some } from "ts-results";
 import type * as Utils from "./utils/preprocessors/args";
@@ -25,13 +25,13 @@ export class Handler {
         this.client
             .on("ready", async () => {
                 Files.buildData(this)
-                .then(this.registerModules);
+                    .then(this.registerModules);
                 if (wrapper.init !== undefined) wrapper.init(this);
             })
 
             .on("messageCreate", async message => {
                 if (isBot(message) || !hasPrefix(message, this.prefix)) return;
-                if(message.channel.type === "DM") return;
+                if (message.channel.type === "DM") return;
 
                 const tryFmt = fmt(message, this.prefix)
                 const commandName = tryFmt.shift()!;
@@ -67,7 +67,7 @@ export class Handler {
 
         if (module === undefined) return "Unknown slash command!";
         const name = Array.from(Files.Commands.keys()).find(it => it === interaction.commandName);
-        if(name === undefined) return `Could not find ${interaction.commandName} command!`;
+        if (name === undefined) return `Could not find ${interaction.commandName} command!`;
 
         if (module.mod.type < CommandType.SLASH) return "This is not a slash command";
         const context = { message: None, interaction: Some(interaction) }
@@ -75,7 +75,7 @@ export class Handler {
         if (parsedArgs.err) return parsedArgs.val;
         const fn = await module.mod.delegate(context, parsedArgs);
         return fn?.val;
-    }  
+    }
     /**
      * 
      * @param {Files.CommandVal | undefined} module command file information
@@ -87,19 +87,19 @@ export class Handler {
         if (module?.mod === undefined) return "Unknown legacy command";
         if (module.mod.type === CommandType.SLASH) return `This may be a slash command and not a legacy command`
         if (module.mod.visibility === "private") {
-           const checkIsTestServer = this.privateServers.find(({id}) => id === message.guildId!)?.test;
-           if(checkIsTestServer === undefined) return "This command has the private modifier but is not registered under Handler#privateServers";
-           if(checkIsTestServer !== module.testOnly) {
-               return "This private command is a testing command";
-           } 
-        }        
+            const checkIsTestServer = this.privateServers.find(({ id }) => id === message.guildId!)?.test;
+            if (checkIsTestServer === undefined) return "This command has the private modifier but is not registered under Handler#privateServers";
+            if (checkIsTestServer !== module.testOnly) {
+                return "This private command is a testing command";
+            }
+        }
         const context = { message: Some(message), interaction: None }
         const parsedArgs = module.mod.parse?.(context, ["text", args]) ?? Ok("");
         if (parsedArgs.err) return parsedArgs.val;
         const fn = await module.mod.delegate(context, parsedArgs)
         return fn?.val
     }
-    private async registerModules(modArr : {name: string, mod: Module<unknown>, absPath: string}[]) {
+    private async registerModules(modArr: { name: string, mod: Module<unknown>, absPath: string }[]) {
         for (const { name, mod, absPath } of modArr) {
             const { cmdName, testOnly } = Files.fmtFileName(name);
             switch (mod.type) {
@@ -108,19 +108,19 @@ export class Handler {
                 case (1 | 2): {
                     const options = ((await import(absPath)).options as ApplicationCommandOptionData[])
                     Files.Commands.set(cmdName, { mod, options: options ?? [], testOnly });
-                    switch(mod.visibility) {
-                        case "private" : {
+                    switch (mod.visibility) {
+                        case "private": {
                             // loading guild slash commands only
-                           await this.reloadSlash(cmdName, mod.desc, options)
+                            await this.reloadSlash(cmdName, mod.desc, options)
                         }
-                        case "public" : {
+                        case "public": {
                             // creating global commands! 
-                           this.client.application!.commands
-                           .create({
-                               name: cmdName,
-                               description: mod.desc,
-                               options
-                           }) 
+                            this.client.application!.commands
+                                .create({
+                                    name: cmdName,
+                                    description: mod.desc,
+                                    options
+                                })
                         }
                     }
                 } break;
@@ -142,12 +142,12 @@ export class Handler {
      */
     private async reloadSlash(
         cmdName: string,
-        description : string,
+        description: string,
         options: ApplicationCommandOptionData[]
-        ) {
-        for(const {id} of this.privateServers) {
+    ) {
+        for (const { id } of this.privateServers) {
             const guild = (await this.client.guilds.fetch(id));
-            
+
             guild.commands.create({
                 name: cmdName,
                 description,
@@ -180,7 +180,7 @@ export class Handler {
      * @readonly
      * @returns {{test: boolean, id: string}[]} private server id for testing or personal use
      */
-    get privateServers() : {test: boolean, id: string}[] {
+    get privateServers(): { test: boolean, id: string }[] {
         return this.wrapper.privateServers;
     }
 
@@ -201,7 +201,7 @@ export interface Wrapper {
     readonly prefix: string,
     readonly commands: string
     init?: (handler: Handler) => void,
-    readonly privateServers: {test: boolean, id : string}[],
+    readonly privateServers: { test: boolean, id: string }[],
 }
 /**
  * An object to be passed into Sern.Handler constructor. 
