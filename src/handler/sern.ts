@@ -23,6 +23,10 @@ export class Handler {
 
 
         this.client
+            /**
+             * On ready, builds command data and registers them all
+             * from command directory 
+             **/
             .on("ready", async () => {
                 Files.buildData(this)
                      .then(this.registerModules);
@@ -124,7 +128,7 @@ export class Handler {
                             await this.reloadSlash(cmdName, mod.desc, options)
                         }
                         case "public": {
-                            // creating global commands! 
+                            // creating global commands!
                             this.client.application!.commands
                                 .create({
                                     name: cmdName,
