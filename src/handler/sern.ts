@@ -35,7 +35,7 @@ export class Handler {
 
             .on("messageCreate", async message => {
                 if (isBot(message) || !hasPrefix(message, this.prefix)) return;
-                if (message.channel.type === "DM") return;
+                if (message.channel.type === "DM") return; //todo, handle dms
 
                 const tryFmt = fmt(message, this.prefix)
                 const commandName = tryFmt.shift()!;
@@ -77,8 +77,7 @@ export class Handler {
         const context = { message: None, interaction: Some(interaction) }
         const parsedArgs = module.mod.parse?.(context, ["slash", interaction.options]) ?? Ok("");
         if (parsedArgs.err) return parsedArgs.val;
-        const fn = await module.mod.delegate(context, parsedArgs);
-        return fn?.val;
+        return (await module.mod.delegate(context, parsedArgs))?.val;
     }
     /**
      * 
@@ -100,8 +99,7 @@ export class Handler {
         const context = { message: Some(message), interaction: None }
         const parsedArgs = module.mod.parse?.(context, ["text", args]) ?? Ok("");
         if (parsedArgs.err) return parsedArgs.val;
-        const fn = await module.mod.delegate(context, parsedArgs)
-        return fn?.val
+        return (await module.mod.delegate(context, parsedArgs))?.val;
     }
     /**
      * This function chains `Files.buildData`
