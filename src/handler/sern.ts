@@ -29,7 +29,7 @@ export class Handler {
              **/
             .on("ready", async () => {
                 Files.buildData(this)
-                     .then(this.registerModules);
+                     .then( data => this.registerModules(data))
                 if (wrapper.init !== undefined) wrapper.init(this);
             })
 
@@ -114,7 +114,7 @@ export class Handler {
             absPath: string
         }[]
     ) {
-        for (const { name, mod, absPath } of modArr) {
+        for await (const { name, mod, absPath } of modArr) {
             const { cmdName, testOnly } = Files.fmtFileName(name);
             switch (mod.type) {
                 case 1: Files.Commands.set(cmdName, { mod, options: [], testOnly }); break;
@@ -125,11 +125,11 @@ export class Handler {
                     switch (mod.visibility) {
                         case "private": {
                             // loading guild slash commands only
-                            await this.reloadSlash(cmdName, mod.desc, options)
+                           await this.reloadSlash(cmdName, mod.desc, options)
                         }
                         case "public": {
                             // creating global commands!
-                            this.client.application!.commands
+                           await this.client.application!.commands
                                 .create({
                                     name: cmdName,
                                     description: mod.desc,
@@ -138,7 +138,7 @@ export class Handler {
                         }
                     }
                 } break;
-                default: throw Error(`${name}.js is not a valid module type.`);
+                default: throw Error(`${name} with ${mod.visibility} is not a valid module type.`);
             }
 
             if (mod.alias.length > 0) {
@@ -158,7 +158,7 @@ export class Handler {
         cmdName: string,
         description: string,
         options: ApplicationCommandOptionData[]
-    ) {
+    ) : Promise<void> {
         for (const { id } of this.privateServers) {
             const guild = (await this.client.guilds.fetch(id));
 
