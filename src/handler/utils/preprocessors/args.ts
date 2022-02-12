@@ -16,6 +16,7 @@ export type ArgType<T> = Result<T, possibleOutput>;
 
 export function parseInt(arg: string, onFailure: possibleOutput): ArgType<number> {
     const val = Number.parseInt(arg);
+
     return val === NaN ? Err(onFailure) : Ok(val);
 }
 
@@ -30,7 +31,13 @@ export function parseInt(arg: string, onFailure: possibleOutput): ArgType<number
 export function parseBool(
     arg: string,
     onFailure: possibleOutput = `Cannot parse '${arg}' as a boolean`,
-    regexes: { yesRegex: RegExp, noRegex: RegExp } = { yesRegex: /^(?:y(?:es)?|👍)$/i, noRegex: /^(?:n(?:o)?|👎)$/i }
+    regexes: {
+        yesRegex: RegExp,
+        noRegex: RegExp
+    } = {
+        yesRegex: /^(?:y(?:es)?|👍)$/i,
+        noRegex: /^(?:n(?:o)?|👎)$/i
+    }
 ): ArgType<boolean> {
     if (arg.match(regexes.yesRegex)) return Ok(true);
     if (arg.match(regexes.noRegex)) return Ok(false);

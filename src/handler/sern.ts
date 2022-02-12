@@ -2,10 +2,10 @@ import * as Files from './utils/readFile'
 import type * as Utils from './utils/preprocessors/args';
 
 import type {
-    Arg,
-    Context,
-    Visibility,
-    possibleOutput
+  Arg,
+  Context,
+  Visibility,
+  possibleOutput
 } from '../types/handler';
 
 import type {
@@ -26,31 +26,31 @@ import { isBot, hasPrefix, fmt } from './utils/messageHelpers';
 
 export class Handler {
     private wrapper: Wrapper;
+
     /**
      * @constructor
      * @param {Wrapper} wrapper Some data that is required to run sern handler 
      */
+    
     constructor(
         wrapper: Wrapper,
     ) {
         this.wrapper = wrapper;
 
         this.client
+            
             /**
              * On ready, builds command data and registers them all
              * from command directory 
              **/
+            
             .on('ready', async () => {
                 Files.buildData(this)
                     .then(data => this.registerModules(data))
                 if (wrapper.init !== undefined) wrapper.init(this);
             })
 
-            .on('messageCreate', async (message: {
-                channel: {
-                    type: string; send: (arg0: string) => void;
-                };
-            }) => {
+            .on('messageCreate', async (message: any) => {
                 if (isBot(message) || !hasPrefix(message, this.prefix)) return;
                 if (message.channel.type === 'DM') return; // TODO: Handle dms
 
@@ -68,9 +68,7 @@ export class Handler {
 
             })
 
-            .on('interactionCreate', async (interaction: {
-                isCommand: () => boolean; commandName: string; reply: (arg0: any) => any;
-            }) => {
+            .on('interactionCreate', async (interaction) => {
                 if (!interaction.isCommand()) return;
                 const module = Files.Commands.get(interaction.commandName);
                 const res = await this.interactionResult(module, interaction);
@@ -81,9 +79,9 @@ export class Handler {
 
     /**
      * 
-     * @param {Files.CommandVal | undefined} module command file information 
-     * @param {CommandInteraction} interaction a Discord.js command interaction 
-     * @returns {possibleOutput | undefined} takes return value and replies it, if possible input
+     * @param {Files.CommandVal | undefined} module Command file information 
+     * @param {CommandInteraction} interaction The Discord.js command interaction (DiscordJS#CommandInteraction)) 
+     * @returns {possibleOutput | undefined} Takes return value and replies it, if possible input
      */
     
     private async interactionResult(
@@ -95,18 +93,21 @@ export class Handler {
         if (name === undefined) return `Could not find ${interaction.commandName} command!`;
 
         if (module.mod.type < CommandType.SLASH) return 'This is not a slash command';
+        
         const context = { message: None, interaction: Some(interaction) }
         const parsedArgs = module.mod.parse?.(context, ['slash', interaction.options]) ?? Ok('');
+        
         if (parsedArgs.err) return parsedArgs.val;
+        
         return (await module.mod.delegate(context, parsedArgs))?.val;
     }
 
     /**
      * 
-     * @param {Files.CommandVal | undefined} module command file information
-     * @param {Message} message a message object
-     * @param {string} args anything after the command 
-     * @returns takes return value and replies it, if possible input
+     * @param {Files.CommandVal | undefined} module Command file information
+     * @param {Message} message The message object
+     * @param {string} args Anything after the command 
+     * @returns Takes return value and replies it, if possible input
      */
     
     private async commandResult(module: Files.CommandVal | undefined, message: Message, args: string): Promise<possibleOutput | undefined> {
@@ -220,7 +221,7 @@ export class Handler {
 
     /**
      * @readonly
-     * @returns {Client<boolean>} the DiscordJS.Client();
+     * @returns {Client<boolean>} the discord.js client (DiscordJS#Client));
      */
     
     get client(): Client<boolean> {
@@ -278,9 +279,6 @@ export interface Module<T = string> {
  */
 
 export enum CommandType {
-    TEXT = 1,
-    SLASH = 2,
+  TEXT = 1,
+  SLASH = 2,
 }
-
-
-

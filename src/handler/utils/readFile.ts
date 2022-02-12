@@ -1,6 +1,14 @@
 import type { ApplicationCommandOptionData } from 'discord.js';
-import { readdirSync, statSync } from 'fs';
-import { basename, join } from 'path';
+
+import {
+  readdirSync,
+  statSync
+} from 'fs';
+
+import {
+    basename,
+    join
+} from 'path';
 
 import type * as Sern from '../sern';
 
@@ -17,11 +25,10 @@ async function readPath(dir: string, arrayOfFiles: string[] = []): Promise<strin
   try {
       const files = readdirSync(dir);
       for (const file of files) {
-          if (statSync(dir + '/' + file).isDirectory()) {
+          if (statSync(dir + '/' + file).isDirectory())
               await readPath(dir + '/' + file, arrayOfFiles)
-          } else {
+          else
               arrayOfFiles.push(join(dir, '/', file));
-          }
       }
   } catch (err) {
       throw err;
@@ -38,10 +45,9 @@ export const fmtFileName = (n: string) => {
 };
 
 /**
- * 
  * @param {Sern.Handler} handler an instance of Sern.Handler 
  * @returns {Promise<{ name: string; mod: Sern.Module<unknown>; absPath: string; }[]>} data from command files
- */
+*/
 
 export async function buildData(handler: Sern.Handler)
     : Promise<{
