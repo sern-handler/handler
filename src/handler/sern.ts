@@ -1,12 +1,12 @@
-import * as Files from './utils/readFile'
-import type * as Utils from './utils/preprocessors/args';
+import * as Files from './Utilities/readFile';
+import type * as Utils from './Utilities/Preprocessors/args';
 
 import type {
-  Arg,
-  Context,
-  Visibility,
-  possibleOutput
-} from '../types/handler';
+    Arg,
+    Context,
+    Visibility,
+    possibleOutput
+} from '../Types/Handler';
 
 import type {
     ApplicationCommandOptionData,
@@ -17,7 +17,7 @@ import type {
 } from 'discord.js';
 
 import { Ok, Result, None, Some } from 'ts-results';
-import { isBot, hasPrefix, fmt } from './utils/messageHelpers';
+import { isBot, hasPrefix, fmt } from './Utilities/messageHelpers';
 
 
 /**
@@ -29,14 +29,13 @@ export class Handler {
 
     /**
      * @constructor
-     * @param {Wrapper} wrapper Some data that is required to run sern handler 
+     * @param {Wrapper} wrapper The data that is required to run sern handler 
      */
     
     constructor(
         wrapper: Wrapper,
     ) {
         this.wrapper = wrapper;
-
         this.client
             
             /**

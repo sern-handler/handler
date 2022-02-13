@@ -23,15 +23,15 @@ export const Alias = new Map<string, CommandVal>();
 // Courtesy of Townsy#0001 on Discord
 async function readPath(dir: string, arrayOfFiles: string[] = []): Promise<string[]> {
   try {
-      const files = readdirSync(dir);
-      for (const file of files) {
-          if (statSync(dir + '/' + file).isDirectory())
-              await readPath(dir + '/' + file, arrayOfFiles)
-          else
-              arrayOfFiles.push(join(dir, '/', file));
+    const files = readdirSync(dir);
+    for (const file of files) {
+      if (statSync(dir + '/' + file).isDirectory())
+        await readPath(dir + '/' + file, arrayOfFiles)
+      else
+        arrayOfFiles.push(join(dir, '/', file));
       }
   } catch (err) {
-      throw err;
+    throw err;
   }
 
   return arrayOfFiles;

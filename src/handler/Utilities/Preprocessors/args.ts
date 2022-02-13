@@ -1,5 +1,5 @@
 import { Err, Ok, Result } from 'ts-results';
-import type { possibleOutput } from '../../../types/handler';
+import type { possibleOutput } from '../../../Types/Handler';
 
 /**
  * Wrapper type taking `Ok(T)` or `Err(possibleOutput)` e.g `Result<T, possibleOutput`
@@ -21,7 +21,6 @@ export function parseInt(arg: string, onFailure: possibleOutput): ArgType<number
 }
 
 /**
- * 
  * @param {string} arg - command arguments 
  * @param {possibleOutput} onFailure - If cannot parse `arg` into boolean. 
  * @param { {yesRegex: RegExp, noRegex: RegExp} } regexes - default regexes: yes : `/^(?:y(?:es)?|👍)$/i`, no :  /^(?:n(?:o)?|👎)$/i 
@@ -41,6 +40,7 @@ export function parseBool(
 ): ArgType<boolean> {
     if (arg.match(regexes.yesRegex)) return Ok(true);
     if (arg.match(regexes.noRegex)) return Ok(false);
+
     return Err(onFailure);
 }
 
@@ -73,5 +73,5 @@ export function toPositiveInt(arg: string, onFailure: possibleOutput): ArgType<n
  * @returns {ArgType<number>}
  */
 export function toNegativeInt(arg: string, onFailure: possibleOutput): ArgType<number> {
-    return parseInt(arg, onFailure).andThen(num => Ok(num > 0 ? -num : num))
+    return parseInt(arg, onFailure).andThen(num => Ok(num > 0 ? -num : num));
 }

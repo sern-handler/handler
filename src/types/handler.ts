@@ -8,7 +8,7 @@ import type {
   MessageOptions
 } from 'discord.js';
 
-import type * as Sern from '../handler/sern';
+import type * as Sern from '../Handler/sern';
 
 export type Visibility = 'private' | 'public';
 
@@ -19,15 +19,17 @@ export type delegate = Sern.Module<unknown>['delegate'];
 
 // Thanks @cursorsdottsx
 export type ParseType<T> = {
-    [K in keyof T]: T[K] extends unknown ? [k: K, args: T[K]] : never;
+  [K in keyof T]: T[K] extends unknown ? [k: K, args: T[K]] : never;
 } [keyof T];
 
 // A Sern.Module['delegate'] will carry a Context Parameter
+
 export type Context = {
   message: Option<Message>,
   interaction: Option<CommandInteraction>
 }
-export type Arg = ParseType<{text : string, slash : SlashOptions}>
+
+export type Arg = ParseType<{ text: string, slash: SlashOptions }>;
     
 // TypeAlias for interaction.options
 export type SlashOptions = Omit<CommandInteractionOptionResolver, 'getMessage' | 'getFocused'>;
