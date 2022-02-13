@@ -2,19 +2,11 @@ import * as Files from './utilities/readFile';
 import type * as Utils from './utilities/preprocessors/args';
 
 import type {
-<<<<<<< HEAD
   Arg,
   Context,
   Visibility,
   possibleOutput
-} from '../Types/Handler';
-=======
-    Arg,
-    Context,
-    Visibility,
-    possibleOutput
 } from '../types/handler';
->>>>>>> ad86658e11a26d01e86d1a83e0bbcecef57d3001
 
 import type {
   ApplicationCommandOptionData,
@@ -27,7 +19,6 @@ import type {
 import { Ok, Result, None, Some } from 'ts-results';
 import { isBot, hasPrefix, fmt } from './utilities/messageHelpers';
 import Logger from './logger';
-
 
 /**
  * @class

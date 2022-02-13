@@ -1,17 +1,31 @@
-import dayjs from 'dayjs';
-import timezone from 'dayjs/plugin/timezone';
-import utc from 'dayjs/plugin/timezone';
+import dayJS from 'dayjs';
+import Timezone from 'dayjs/plugin/timezone';
+import UTC from 'dayjs/plugin/timezone';
 
 enum sEvent  {
-  TEXT_CMD,
   GLOBAL_SLASH,
   LOCAL_SLASH,
-  DM,  
+  DM,
   CRASH,
+  TEXT_CMD,
 }
 
-class Logger {
+export default class Logger {
   public log<T extends sEvent>(e : T, message: string) {
-    console.log(`[${'ISOSTRING (todo) '}][${sEvent[e]}] :: ${message}`);
+    dayJS.extend(UTC);
+    dayJS.extend(Timezone);
+    dayJS.tz.guess();
+
+    const tz = dayJS().format();
+    console.log(`[${`${tz}`}][${sEvent[e]}] :: ${message}`);
+  }
+
+  public tableRam() {  
+    throw Error('unimpl');
+
+    console.table(
+      Object.values(process.memoryUsage())
+        .map(([k,v]) =>  { return {[k] : `${(Math.round(v) / 1024 / 1024 * 100) / 100}`} })
+        .reduce(((r, c) => Object.assign(r, c)), {}))
   }
 }
