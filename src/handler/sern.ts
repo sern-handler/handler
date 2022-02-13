@@ -47,7 +47,7 @@ export class Handler {
                 Files.buildData(this)
                     .then(data => this.registerModules(data))
                 if (wrapper.init !== undefined) wrapper.init(this);
-                new Logger().tableRam();
+                new Logger().tableRam()
             })
 
             .on('messageCreate', async (message: Message) => {
@@ -256,7 +256,7 @@ export interface Wrapper {
 }
 
 /**
- * An object to be passed into Sern.Handler constructor. 
+ * An object that gets imported and acts as a command. 
  * @typedef {object} Module<T=string>
  * @property {string} desc
  * @property {Visibility} visibility

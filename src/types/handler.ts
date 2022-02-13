@@ -11,7 +11,6 @@ import type {
 import type * as Sern from '../handler/sern';
 
 export type Visibility = 'private' | 'public';
-
 // Anything that can be sent in a `<TextChannel>#send` or `<CommandInteraction>#reply`
 export type possibleOutput<T = string> = T | MessagePayload & MessageOptions;
 export type Nullable<T> = T | null;
