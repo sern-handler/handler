@@ -11,7 +11,7 @@ npm install sern-handler
 ```
 
 ```sh
-npm install sern-handler
+yarn add sern-handler
 ```
 
 # Documentation
