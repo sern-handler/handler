@@ -1,3 +1,7 @@
+import dayjs from 'dayjs';
+import timezone from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/timezone';
+
 enum sEvent  {
   TEXT_CMD,
   GLOBAL_SLASH,
@@ -8,6 +12,6 @@ enum sEvent  {
 
 class Logger {
   public log<T extends sEvent>(e : T, message: string) {
-    console.log(`[${"ISOSTRING (todo) "}][${sEvent[e]}] :: ${message}`);
+    console.log(`[${'ISOSTRING (todo) '}][${sEvent[e]}] :: ${message}`);
   }
 }
