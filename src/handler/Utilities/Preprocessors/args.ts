@@ -1,5 +1,5 @@
 import { Err, Ok, Result } from 'ts-results';
-import type { possibleOutput } from '../../../Types/Handler';
+import type { possibleOutput } from '../../../types/handler';
 
 /**
  * Wrapper type taking `Ok(T)` or `Err(possibleOutput)` e.g `Result<T, possibleOutput`

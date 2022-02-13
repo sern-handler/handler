@@ -1,12 +1,12 @@
-import * as Files from './Utilities/readFile';
-import type * as Utils from './Utilities/Preprocessors/args';
+import * as Files from './utilities/readFile';
+import type * as Utils from './utilities/preprocessors/args';
 
 import type {
     Arg,
     Context,
     Visibility,
     possibleOutput
-} from '../Types/Handler';
+} from '../types/handler';
 
 import type {
     ApplicationCommandOptionData,
@@ -17,7 +17,8 @@ import type {
 } from 'discord.js';
 
 import { Ok, Result, None, Some } from 'ts-results';
-import { isBot, hasPrefix, fmt } from './Utilities/messageHelpers';
+import { isBot, hasPrefix, fmt } from './utilities/messageHelpers';
+import Logger from './logger';
 
 
 /**
@@ -47,6 +48,7 @@ export class Handler {
                 Files.buildData(this)
                     .then(data => this.registerModules(data))
                 if (wrapper.init !== undefined) wrapper.init(this);
+                new Logger().tableRam();
             })
 
             .on('messageCreate', async (message: any) => {
