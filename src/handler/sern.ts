@@ -63,7 +63,7 @@ export class Handler {
                 const cmdResult = (await this.commandResult(module, message, tryFmt.join(' ')))
                 if (cmdResult === undefined) return;
 
-                message.channel.send(cmdResult)
+                message.channel.send(cmdResult);
 
             })
 
@@ -115,7 +115,7 @@ export class Handler {
         if (module.mod.visibility === 'private') {
             const checkIsTestServer = this.privateServers.find(({ id }) => id === message.guildId!)?.test;
             if (checkIsTestServer === undefined) return 'This command has the private modifier but is not registered under Handler#privateServers';
-            if (checkIsTestServer !== module.testOnly) {
+            if (checkIsTestServer !== module.mod.test) {
                 const msg = `This command is only available on test servers.`; // TODO: Customizable private message
 
                 return msg;
@@ -143,13 +143,13 @@ export class Handler {
         }[]
     ) {
         for await (const { name, mod, absPath } of modArr) {
-            const { cmdName, testOnly } = Files.fmtFileName(name);
+            const cmdName = Files.fmtFileName(name);
             switch (mod.type) {
-                case 1: Files.Commands.set(cmdName, { mod, options: [], testOnly }); break;
+                case 1: Files.Commands.set(cmdName, { mod, options: []  }); break;
                 case 2:
                 case (1 | 2): {
                     const options = ((await import(absPath)).options as ApplicationCommandOptionData[])
-                    Files.Commands.set(cmdName, { mod, options: options ?? [], testOnly });
+                    Files.Commands.set(cmdName, { mod, options: options ?? [] });
                     switch (mod.visibility) {
                         case 'private': {
                             // Loading guild slash commands only
@@ -171,7 +171,7 @@ export class Handler {
 
             if (mod.alias.length > 0) {
                 for (const alias of mod.alias) {
-                    Files.Alias.set(alias, { mod, options: [], testOnly })
+                    Files.Alias.set(alias, { mod, options: [] })
                 }
             }
         }
@@ -269,6 +269,7 @@ export interface Module<T = string> {
     desc: string,
     visibility: Visibility,
     type: CommandType,
+    test : boolean,
     delegate: (eventParams: Context, args: Ok<T>) => Awaitable<Result<possibleOutput, string> | void>
     parse?: (ctx: Context, args: Arg) => Utils.ArgType<T>
 }

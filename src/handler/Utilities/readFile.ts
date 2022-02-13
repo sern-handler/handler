@@ -15,7 +15,6 @@ import type * as Sern from '../sern';
 export type CommandVal = {
   mod: Sern.Module<unknown>,
   options: ApplicationCommandOptionData[],
-  testOnly: boolean
 }
 export const Commands = new Map<string, CommandVal>();
 export const Alias = new Map<string, CommandVal>();
@@ -37,12 +36,7 @@ async function readPath(dir: string, arrayOfFiles: string[] = []): Promise<strin
   return arrayOfFiles;
 }
 
-export const fmtFileName = (n: string) => {
-    const endsW = n.toLowerCase().endsWith('-test.js') || n.toLowerCase().endsWith('-test.ts');
-    return endsW
-        ? { cmdName: n.substring(0, n.length - 8), testOnly: true }
-        : { cmdName: n.substring(0, n.length - 3), testOnly: false };
-};
+export const fmtFileName = (n: string) => n.substring(0, n.length - 3);
 
 /**
  * @param {Sern.Handler} handler an instance of Sern.Handler 
