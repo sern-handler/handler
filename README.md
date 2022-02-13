@@ -4,7 +4,17 @@ Sern is making easier to create & automate your discord bot with new version com
 
 - A reincarnation of [this old project](https://github.com/jacoobes/sern_handler)
 
-# Links
+# Installation
+
+```sh
+npm install sern-handler
+```
+
+```sh
+npm install sern-handler
+```
+
+# Documentation
 
 - 📑 [Documentation](https://sernhandler.js.org)
 
