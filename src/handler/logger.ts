@@ -1,7 +1,6 @@
 import dayJS from 'dayjs';
 import Timezone from 'dayjs/plugin/timezone';
 import UTC from 'dayjs/plugin/timezone';
-
 enum sEvent  {
   GLOBAL_SLASH,
   LOCAL_SLASH,
@@ -20,12 +19,11 @@ export default class Logger {
     console.log(`[${`${tz}`}][${sEvent[e]}] :: ${message}`);
   }
 
-  public tableRam() {  
-    throw Error('unimpl');
-
-    console.table(
-      Object.values(process.memoryUsage())
-        .map(([k,v]) =>  { return {[k] : `${(Math.round(v) / 1024 / 1024 * 100) / 100}`} })
-        .reduce(((r, c) => Object.assign(r, c)), {}))
-  }
+    public tableRam() {  
+      console.table(
+        Object.entries(process.memoryUsage())
+          .map(([k, v] : [string, number]) =>  { return {[k] : ((Math.round(v) / 1024 / 1024 * 100) / 100).toFixed(2) }})
+          .reduce(((r, c) => Object.assign(r, c)), {})
+      )
+    }
 }

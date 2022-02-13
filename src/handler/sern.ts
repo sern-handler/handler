@@ -50,7 +50,7 @@ export class Handler {
                 new Logger().tableRam();
             })
 
-            .on('messageCreate', async (message: any) => {
+            .on('messageCreate', async (message: Message) => {
                 if (isBot(message) || !hasPrefix(message, this.prefix)) return;
                 if (message.channel.type === 'DM') return; // TODO: Handle dms
 

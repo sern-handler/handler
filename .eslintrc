@@ -3,6 +3,7 @@
     "extends": ["plugin:@typescript-eslint/recommended"],
     "parserOptions": { "ecmaVersion": "esnext", "sourceType": "" },
     "rules": {
-      "@typescript-eslint/no-non-null-assertion": "off"
+      "@typescript-eslint/no-non-null-assertion": "off",
+      "quotes": [2, "single", { "avoidEscape": true, "allowTemplateLiterals" : true }]
     }
   }
