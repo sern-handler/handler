@@ -1,11 +1,11 @@
 
-
-
 enum sEvent  {
     GLOBAL_SLASH,
     LOCAL_SLASH,
     TEXT_CMD,
     CRASH,
+    DM,
+    
 }
 
 class Logger {
