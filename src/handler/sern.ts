@@ -2,18 +2,18 @@ import * as Files from './Utilities/readFile';
 import type * as Utils from './Utilities/Preprocessors/args';
 
 import type {
-    Arg,
-    Context,
-    Visibility,
-    possibleOutput
+  Arg,
+  Context,
+  Visibility,
+  possibleOutput
 } from '../Types/Handler';
 
 import type {
-    ApplicationCommandOptionData,
-    Awaitable,
-    Client,
-    CommandInteraction,
-    Message
+  ApplicationCommandOptionData,
+  Awaitable,
+  Client,
+  CommandInteraction,
+  Message
 } from 'discord.js';
 
 import { Ok, Result, None, Some } from 'ts-results';
@@ -116,9 +116,9 @@ export class Handler {
             const checkIsTestServer = this.privateServers.find(({ id }) => id === message.guildId!)?.test;
             if (checkIsTestServer === undefined) return 'This command has the private modifier but is not registered under Handler#privateServers';
             if (checkIsTestServer !== module.mod.test) {
-                const msg = `This command is only available on test servers.`; // TODO: Customizable private message
-
-                return msg;
+              const msg = `This command is only available on test servers.`; // TODO: Customizable private message  
+              
+              return msg;
             }
         }
         const context = {
@@ -152,7 +152,7 @@ export class Handler {
                     Files.Commands.set(cmdName, { mod, options: options ?? [] });
                     switch (mod.visibility) {
                         case 'private': {
-                            // Loading guild slash commands only
+                            // Reloading guild slash commands
                            await this.reloadSlash(cmdName, mod.desc, options)
                         }
                         case 'public': {
@@ -196,7 +196,7 @@ export class Handler {
                 name: cmdName,
                 description,
                 options
-            })
+            });
         }
     }
 
@@ -224,7 +224,7 @@ export class Handler {
      */
     
     get client(): Client<boolean> {
-        return this.wrapper.client
+        return this.wrapper.client;
     }
     
     /**

@@ -1,16 +1,13 @@
-
 enum sEvent  {
-    GLOBAL_SLASH,
-    LOCAL_SLASH,
-    TEXT_CMD,
-    CRASH,
-    DM,
-    
+  TEXT_CMD,
+  GLOBAL_SLASH,
+  LOCAL_SLASH,
+  DM,  
+  CRASH,
 }
 
 class Logger {
-
-    public log<T extends sEvent>(e : T, message: string) {
-        console.log(`[${"ISOSTRING (todo) "}][${sEvent[e]}] :: ${message}`)
-    }
+  public log<T extends sEvent>(e : T, message: string) {
+    console.log(`[${"ISOSTRING (todo) "}][${sEvent[e]}] :: ${message}`);
+  }
 }
