@@ -27,6 +27,7 @@ export type Context = {
   message: Option<Message>,
   interaction: Option<CommandInteraction>
 }
+// `string` | `SlashOptions`, narrow down your type by checking `text` | `slash`
 export type Arg = ParseType<{text : string, slash : SlashOptions}>
     
 // TypeAlias for interaction.options
