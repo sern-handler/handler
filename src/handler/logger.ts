@@ -20,11 +20,26 @@ export default class Logger {
     console.log(`[${`${tz}`}][${sEvent[e]}] :: ${message}`);
   }
 
-    public tableRam() {  
+  /**
+   * ┌──────────────┬─────────┐
+   * │   (index)    │ Values  │
+   * ├──────────────┼─────────┤
+   * │     rss      │ '50.26' │
+   * │  heapTotal   │ '29.15' │
+   * │   heapUsed   │ '12.62' │
+   * │   external   │ '0.84'  │
+   * │ arrayBuffers │ '0.10'  │
+   * └──────────────┴─────────┘         
+   * This method will print out memory usage. Optional at startup.        
+  */
+  
+    public tableRam() {
       console.table(
         Object.entries(process.memoryUsage())
-          .map(([k, v] : [string, number]) =>  { return {[k] : ((Math.round(v) / 1024 / 1024 * 100) / 100).toFixed(2) }})
+          .map(([k, v]: [string, number]) => {
+            return { [k]: ((Math.round(v) / 1024 / 1024 * 100) / 100).toFixed(2) };
+          })
           .reduce(((r, c) => Object.assign(r, c)), {})
-      )
+      );
     }
 }
