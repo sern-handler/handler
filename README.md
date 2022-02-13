@@ -16,18 +16,33 @@ yarn add sern-handler
 
 # Basic Usage
 
-```js
-	import { Sern, PayloadOptions } from 'sern-handler';
+```ts
+const client = new Client({
+    intents: [
+        Intents.FLAGS.GUILDS,
+        Intents.FLAGS.GUILD_MESSAGES,
+        Intents.FLAGS.GUILD_MEMBERS
+    ]
 
-	const payload = new PayloadOptions({
-		commands: '/commands', // Folder where all commands are located (subfolders supported).
-		events: '/events' // Events folder directory (subfolders supported).         
-		owners: ['182326315813306369'], // Array of Discord ID(s).
-		prefix: '/', // Prefix for your bot (if no provied then it will use /).
-		client // The instance of Discord#Client().
-	});                              
+})
 
-	const handler = new Sern(payload); // Create a new instance of Sern with payloads.
+ new Sern.Handler( {
+    client,   
+    prefix,   
+    commands : "dist/commands",  
+    privateServers : [           
+        {
+            test : true,
+            id: "server id"
+        }
+    ],
+    init: async (handler : Sern.Handler) => {
+        /* an optional function to initialize anything else on bot startup */
+    },
+});
+
+
+client.login(token)
 ```
 
 # Links
