@@ -16,9 +16,8 @@ import type {
   Message
 } from 'discord.js';
 
-import { Ok, Result, None, Some } from 'ts-results';
+import { Ok, Result, None, Some, Option } from 'ts-results';
 import { isBot, hasPrefix, fmt } from './utilities/messageHelpers';
-import Logger from './logger';
 
 /**
  * @class
@@ -47,16 +46,14 @@ export class Handler {
                 Files.buildData(this)
                     .then(data => this.registerModules(data))
                 if (wrapper.init !== undefined) wrapper.init(this);
-                new Logger().tableRam()
             })
 
             .on('messageCreate', async (message: Message) => {
                 if (isBot(message) || !hasPrefix(message, this.prefix)) return;
                 if (message.channel.type === 'DM') return; // TODO: Handle dms
 
-                const tryFmt = fmt(message, this.prefix)
-                const commandName = tryFmt.shift()!;
-                const module = Files.Commands.get(commandName) ?? Files.Alias.get(commandName)
+                const tryFmt = fmt(message, this.prefix);
+                const module = this.findCommand(tryFmt.shift()!);
                 if (module === undefined) {
                     message.channel.send('Unknown legacy command')
                     return;
@@ -89,9 +86,8 @@ export class Handler {
         interaction: CommandInteraction): Promise<possibleOutput | undefined> {
 
         if (module === undefined) return 'Unknown slash command!';
-        const name = Array.from(Files.Commands.keys()).find(it => it === interaction.commandName);
-        if (name === undefined) return `Could not find ${interaction.commandName} command!`;
-
+        const name = this.findCommand(interaction.commandName);
+        if (name === undefined) `${interaction.commandName} is not a valid command!`;
         if (module.mod.type < CommandType.SLASH) return 'This is not a slash command';
         
         const context = { message: None, interaction: Some(interaction) }
@@ -176,6 +172,14 @@ export class Handler {
                 }
             }
         }
+    }
+    /**
+     * 
+     * @param {string} name name of possible command
+     * @returns {Files.CommandVal | undefined}
+     */
+    private findCommand(name : string) : Files.CommandVal | undefined {
+        return Files.Commands.get(name) ?? Files.Alias.get(name);
     }
 
     /**

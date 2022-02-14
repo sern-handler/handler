@@ -2,7 +2,7 @@ import dayJS from 'dayjs';
 import Timezone from 'dayjs/plugin/timezone';
 import UTC from 'dayjs/plugin/timezone';
 
-enum sEvent  {
+enum sEvent {
   GLOBAL_SLASH,
   LOCAL_SLASH,
   DM,
@@ -11,7 +11,9 @@ enum sEvent  {
 }
 
 export default class Logger {
-
+  
+  public clear() { console.clear() }
+  
   public log<T extends sEvent>(e : T, message: string) {
     dayJS.extend(UTC);
     dayJS.extend(Timezone);
