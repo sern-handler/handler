@@ -1,5 +1,5 @@
 import * as Files from './utilities/readFile';
-import type * as Utils from './utilities/Preprocessors/args';
+import type * as Utils from './utilities/preprocessors/args';
 
 import type { Arg, Context, Visibility, possibleOutput } from '../types/handler';
 
