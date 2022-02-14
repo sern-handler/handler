@@ -1,6 +1,6 @@
 # Sern
 
-Sern is making easier to create & automate your discord bot with new version compatibility and full customization.
+Sern automates and streamlines development your discord bot with new version compatibility and full customization.
 
 -   A reincarnation of [this old project](https://github.com/jacoobes/sern_handler)
 
@@ -39,7 +39,7 @@ new Sern.Handler({
         },
     ],
     init: async (handler: Sern.Handler) => {
-        /* an optional function to initialize anything else on bot startup */
+        /* An optional function to initialize anything else on bot startup */
     },
 });
 
