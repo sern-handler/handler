@@ -16,7 +16,7 @@ yarn add sern-handler
 
 # Basic Usage
 
-TypeScript or JavaScript
+JavaScript
 ```js
 import { Client, Intents } from 'discord.js';
 import { Handler } from 'sern-handler';
@@ -41,7 +41,7 @@ client.handler = new Handler({
             id: 'server-id'
         }
     ],
-    init: async (handler : Sern.Handler) => {
+    init: async (handler) => {
         // Optional function to initialize anything else on bot startup
     },
 });
