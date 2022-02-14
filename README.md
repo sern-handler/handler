@@ -16,12 +16,11 @@ yarn add sern-handler
 
 # Basic Usage
 
-[Typescript](https://www.typescriptlang.org/)
-```ts
-import { Client } from 'discord.js'
-import { Intents } from 'discord.js'
-import {prefix, token} from "../src/secrets.json"
-import {Sern} from "sern-handler"
+TypeScript or JavaScript
+```js
+import { Client, Intents } from 'discord.js';
+import { prefix, token } from '../src/secrets.json';
+import { Handler } from 'sern-handler';
 
 const client = new Client({
     intents: [
@@ -29,10 +28,9 @@ const client = new Client({
         Intents.FLAGS.GUILD_MESSAGES,
         Intents.FLAGS.GUILD_MEMBERS
     ]
+});
 
-})
-
- new Sern.Handler( {
+ new Handler( {
     client,   
     prefix,   
     commands : "dist/commands",  
@@ -43,12 +41,12 @@ const client = new Client({
         }
     ],
     init: async (handler : Sern.Handler) => {
-        /* an optional function to initialize anything else on bot startup */
+        // Optional function to initialize anything else on bot startup
     },
 });
 
 
-client.login(token)
+client.login(token);
 ```
 
 # Links
