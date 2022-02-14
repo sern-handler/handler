@@ -12,7 +12,7 @@ enum sEvent {
 
 export default class Logger {
   
-  public clear() { console.clear() }
+  public clear() { console.clear(); }
   
   public log<T extends sEvent>(e : T, message: string) {
     dayJS.extend(UTC);

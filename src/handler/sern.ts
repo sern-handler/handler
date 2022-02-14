@@ -44,7 +44,7 @@ export class Handler {
             
             .on('ready', async () => {
                 Files.buildData(this)
-                    .then(data => this.registerModules(data))
+                    .then(data => this.registerModules(data));
                 if (wrapper.init !== undefined) wrapper.init(this);
             })
 
@@ -55,10 +55,10 @@ export class Handler {
                 const tryFmt = fmt(message, this.prefix);
                 const module = this.findCommand(tryFmt.shift()!);
                 if (module === undefined) {
-                    message.channel.send('Unknown legacy command')
+                    message.channel.send('Unknown legacy command');
                     return;
                 }
-                const cmdResult = (await this.commandResult(module, message, tryFmt.join(' ')))
+                const cmdResult = (await this.commandResult(module, message, tryFmt.join(' ')));
                 if (cmdResult === undefined) return;
 
                 message.channel.send(cmdResult);
@@ -90,7 +90,7 @@ export class Handler {
         if (name === undefined) `${interaction.commandName} is not a valid command!`;
         if (module.mod.type < CommandType.SLASH) return 'This is not a slash command';
         
-        const context = { message: None, interaction: Some(interaction) }
+        const context = { message: None, interaction: Some(interaction) };
         const parsedArgs = module.mod.parse?.(context, ['slash', interaction.options]) ?? Ok('');
         
         if (parsedArgs.err) return parsedArgs.val;
@@ -108,7 +108,7 @@ export class Handler {
     
     private async commandResult(module: Files.CommandVal | undefined, message: Message, args: string): Promise<possibleOutput | undefined> {
         if (module?.mod === undefined) return 'Unknown legacy command';
-        if (module.mod.type === CommandType.SLASH) return `This may be a slash command and not a legacy command`
+        if (module.mod.type === CommandType.SLASH) return `This may be a slash command and not a legacy command`;
         if (module.mod.visibility === 'private') {
             const checkIsTestServer = this.privateServers.find(({ id }) => id === message.guildId!)?.test;
             if (checkIsTestServer === undefined) return 'This command has the private modifier but is not registered under Handler#privateServers';
@@ -121,7 +121,7 @@ export class Handler {
         const context = {
             message: Some(message),
             interaction: None
-        }
+        };
         const parsedArgs = module.mod.parse?.(context, ['text', args]) ?? Ok('');
         if (parsedArgs.err) return parsedArgs.val;
         return (await module.mod.delegate(context, parsedArgs))?.val;
@@ -145,12 +145,12 @@ export class Handler {
                 case 1: Files.Commands.set(cmdName, { mod, options: []  }); break;
                 case 2:
                 case (1 | 2): {
-                    const options = ((await import(absPath)).options as ApplicationCommandOptionData[])
+                    const options = ((await import(absPath)).options as ApplicationCommandOptionData[]);
                     Files.Commands.set(cmdName, { mod, options: options ?? [] });
                     switch (mod.visibility) {
                         case 'private': {
                             // Reloading guild slash commands
-                           await this.reloadSlash(cmdName, mod.desc, options)
+                           await this.reloadSlash(cmdName, mod.desc, options);
                         }
                         case 'public': {
                             // Creating global commands
@@ -169,7 +169,7 @@ export class Handler {
 
             if (mod.alias.length > 0) {
                 for (const alias of mod.alias) {
-                    Files.Alias.set(alias, { mod, options: [] })
+                    Files.Alias.set(alias, { mod, options: [] });
                 }
             }
         }

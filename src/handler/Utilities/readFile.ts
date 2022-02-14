@@ -55,7 +55,7 @@ export async function buildData(handler: Sern.Handler)
     const commandDir = handler.commandDir;
   return Promise.all((await getCommands(commandDir))
     .map(async absPath => {
-      return { name: basename(absPath), mod: (await import(absPath)).default as Sern.Module<unknown>, absPath }
+      return { name: basename(absPath), mod: (await import(absPath)).default as Sern.Module<unknown>, absPath };
     }));
 }
 
