@@ -1,4 +1,6 @@
-# Sern
+# Sern Handler
+<a href="https://www.npmjs.com/package/sern_handler">
+<img src="https://img.shields.io/npm/v/sern_handler?maxAge=3600" alt="NPM version" /></a> <a href="https://www.npmjs.com/package/shandler"><img src="https://img.shields.io/npm/dt/sern_handler?maxAge=3600" alt="NPM downloads" /></a> <a href="https://www.npmjs.com/package/sern_handler"><img src="https://img.shields.io/badge/builds-stable" alt="Builds Passing"></a>
 
 Sern automates and streamlines development your discord bot with new version compatibility and full customization.
 
@@ -13,40 +15,78 @@ npm install sern-handler
 ```sh
 yarn add sern-handler
 ```
+```sh
+pnpm add sern-handler
+```
 
 # Basic Usage
 
-### [Typescript](https://www.typescriptlang.org/)
-
+##### [Typescript](https://www.typescriptlang.org/)
 ```ts
-import { Client } from 'discord.js';
-import { Intents } from 'discord.js';
-import { prefix, token } from '../src/secrets.json';
+import { Client, Intents } from 'discord.js'
 import { Sern } from 'sern-handler';
+import { prefix, token } from '../src/secrets.json';
 
 const client = new Client({
-    intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MEMBERS],
+    intents: [
+        Intents.FLAGS.GUILDS,
+        Intents.FLAGS.GUILD_MESSAGES,
+        Intents.FLAGS.GUILD_MEMBERS
+    ]
 });
 
-new Sern.Handler({
+// Access the handler anywhere
+client.handler = new Sern.Handler({
     client,
     prefix,
-    commands: 'dist/commands', // after compiling with tsc 
-    privateServers: [
+    commands : 'dist/commands',
+    privateServers : [
         {
-            test: true,
-            id: 'server id',
-        },
+            test : true,
+            id: 'server-id'
+        }
     ],
-    init: async (handler: Sern.Handler) => {
-        /* An optional function to initialize anything else on bot startup */
+    init: async (handler : Sern.Handler) => {
+        // Optional function to initialize anything else on bot startup
     },
 });
+```
+
+##### [JavaScript](https://www.node.js.org/)
+```js
+import { Client, Intents } from 'discord.js';
+import { Handler } from 'sern-handler';
+import { prefix, token } from '../src/secrets.json';
+
+const client = new Client({
+    intents: [
+        Intents.FLAGS.GUILDS,
+        Intents.FLAGS.GUILD_MESSAGES,
+        Intents.FLAGS.GUILD_MEMBERS
+    ]
+});
+
+// Access handler anywhere
+client.handler = new Handler({
+    client,   
+    prefix,   
+    commands : 'dist/commands', 
+    privateServers : [           
+        {
+            test : true,
+            id: 'server-id'
+        }
+    ],
+    init: async (handler) => {
+        // Optional function to initialize anything else on bot startup
+    },
+});
+
 
 client.login(token);
 ```
 
-## Links ![link](https://img.shields.io/badge/Coming-Soon-orange)
+## Links ![link](https://img.shields.io/badge/Coming-Soon-purple)
 
 -   📑 Official Documentation
 -   🎧 Discord Server  
