@@ -1,13 +1,14 @@
 {
   "name": "sern-handler",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "",
   "main": "dist/index.js",
   "scripts": {
     "compile": "tsc",
     "watch": "tsc -w",
     "lint": "eslint src/**/*.ts",
-    "format": "eslint src/**/*.ts --fix"
+    "format": "eslint src/**/*.ts --fix",
+    "release": "standard-version && git push --follow-tags"
   },
   "keywords": [],
   "author": "",
@@ -22,6 +23,13 @@
     "ts-results": "^3.3.0"
   },
   "devDependencies": {
+    "cz-conventional-changelog": "^3.3.0",
+    "standard-version": "^9.3.2",
     "typescript": "^4.5.5"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }
