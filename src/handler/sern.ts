@@ -16,7 +16,7 @@ import type {
   Message
 } from 'discord.js';
 
-import { Ok, Result, None, Some, Option } from 'ts-results';
+import { Ok, Result, None, Some } from 'ts-results';
 import { isBot, hasPrefix, fmt } from './utilities/messageHelpers';
 
 /**
@@ -154,6 +154,7 @@ export class Handler {
                         }
                         case 'public': {
                             // Creating global commands
+                            // TODO : warn user they will be creating a public command
                             await this.client.application!.commands
                                 .create({
                                     name: cmdName,
