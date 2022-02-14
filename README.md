@@ -1,10 +1,10 @@
 # Sern
 
-Sern is making easier to create & automate your discord bot with new version compatibility and full customization.
+Sern automates and streamlines development your discord bot with new version compatibility and full customization.
 
-- A reincarnation of [this old project](https://github.com/jacoobes/sern_handler)
+-   A reincarnation of [this old project](https://github.com/jacoobes/sern_handler)
 
-# Installation
+## Installation
 
 ```sh
 npm install sern-handler
@@ -16,78 +16,42 @@ yarn add sern-handler
 
 # Basic Usage
 
-Typescript
+### [Typescript](https://www.typescriptlang.org/)
+
 ```ts
-import { Client } from 'discord.js'
-import { Intents } from 'discord.js'
-import { prefix, token } from "../src/secrets.json"
-import { Sern } from "sern-handler"
+import { Client } from 'discord.js';
+import { Intents } from 'discord.js';
+import { prefix, token } from '../src/secrets.json';
+import { Sern } from 'sern-handler';
 
 const client = new Client({
-    intents: [
-        Intents.FLAGS.GUILDS,
-        Intents.FLAGS.GUILD_MESSAGES,
-        Intents.FLAGS.GUILD_MEMBERS
-    ]
+    intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MEMBERS],
+});
 
-})
-
- new Sern.Handler( {
+new Sern.Handler({
     client,
     prefix,
-    commands : 'dist/commands',
-    privateServers : [
+    commands: 'dist/commands', // after compiling with tsc 
+    privateServers: [
         {
-            test : true,
-            id: 'server-id'
-        }
+            test: true,
+            id: 'server id',
+        },
     ],
-    init: async (handler : Sern.Handler) => {
-        // Optional function to initialize anything else on bot startup
+    init: async (handler: Sern.Handler) => {
+        /* An optional function to initialize anything else on bot startup */
     },
 });
-```
-
-JavaScript
-```js
-import { Client, Intents } from 'discord.js';
-import { Handler } from 'sern-handler';
-import { prefix, token } from '../src/secrets.json';
-
-const client = new Client({
-    intents: [
-        Intents.FLAGS.GUILDS,
-        Intents.FLAGS.GUILD_MESSAGES,
-        Intents.FLAGS.GUILD_MEMBERS
-    ]
-});
-
-// Access handler anywhere
-client.handler = new Handler({
-    client,   
-    prefix,   
-    commands : 'dist/commands', 
-    privateServers : [           
-        {
-            test : true,
-            id: 'server-id'
-        }
-    ],
-    init: async (handler) => {
-        // Optional function to initialize anything else on bot startup
-    },
-});
-
 
 client.login(token);
 ```
 
-# Links
+## Links ![link](https://img.shields.io/badge/Coming-Soon-orange)
 
-- 📑 [Official Documentation](https://sernhandler.js.org)
-- 🎧 [Discord Server](https://discord.gg/QWQWQWQ)
+-   📑 Official Documentation
+-   🎧 Discord Server  
 
-# Contribute
-- Pull up on issues and tell me if there are bugs.
-- Check issues.
-- Any contributions are open to suggestion!
+## Contribute 😄
+
+-   Pull up on [issues](https://github.com/jacoobes/Sern/issues) and tell me if there are bugs
+-   All kinds of contributions are welcomed!
