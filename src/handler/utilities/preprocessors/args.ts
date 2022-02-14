@@ -15,9 +15,9 @@ export type ArgType<T> = Result<T, possibleOutput>;
  */
 
 export function parseInt(arg: string, onFailure: possibleOutput): ArgType<number> {
-  const val = Number.parseInt(arg);
+    const val = Number.parseInt(arg);
 
-  return val === NaN ? Err(onFailure) : Ok(val);
+    return val === NaN ? Err(onFailure) : Ok(val);
 }
 
 /**
@@ -28,20 +28,20 @@ export function parseInt(arg: string, onFailure: possibleOutput): ArgType<number
  */
 
 export function parseBool(
-  arg: string,
-  onFailure: possibleOutput = `Cannot parse '${arg}' as a boolean`,
-  regexes: {
-    yesRegex: RegExp;
-    noRegex: RegExp;
-  } = {
-    yesRegex: /^(?:y(?:es)?|👍)$/i,
-    noRegex: /^(?:n(?:o)?|👎)$/i,
-  },
+    arg: string,
+    onFailure: possibleOutput = `Cannot parse '${arg}' as a boolean`,
+    regexes: {
+        yesRegex: RegExp;
+        noRegex: RegExp;
+    } = {
+        yesRegex: /^(?:y(?:es)?|👍)$/i,
+        noRegex: /^(?:n(?:o)?|👎)$/i,
+    },
 ): ArgType<boolean> {
-  if (arg.match(regexes.yesRegex)) return Ok(true);
-  if (arg.match(regexes.noRegex)) return Ok(false);
+    if (arg.match(regexes.yesRegex)) return Ok(true);
+    if (arg.match(regexes.noRegex)) return Ok(false);
 
-  return Err(onFailure);
+    return Err(onFailure);
 }
 
 /**
@@ -52,7 +52,7 @@ export function parseBool(
  */
 
 export function toArr(arg: string, sep = ' '): ArgType<string[]> {
-  return Ok(arg.split(sep));
+    return Ok(arg.split(sep));
 }
 
 /**
@@ -63,7 +63,7 @@ export function toArr(arg: string, sep = ' '): ArgType<string[]> {
  */
 
 export function toPositiveInt(arg: string, onFailure: possibleOutput): ArgType<number> {
-  return parseInt(arg, onFailure).andThen((num) => Ok(num > 0 ? num : -num));
+    return parseInt(arg, onFailure).andThen((num) => Ok(num > 0 ? num : -num));
 }
 
 /**
@@ -73,5 +73,5 @@ export function toPositiveInt(arg: string, onFailure: possibleOutput): ArgType<n
  * @returns {ArgType<number>}
  */
 export function toNegativeInt(arg: string, onFailure: possibleOutput): ArgType<number> {
-  return parseInt(arg, onFailure).andThen((num) => Ok(num > 0 ? -num : num));
+    return parseInt(arg, onFailure).andThen((num) => Ok(num > 0 ? -num : num));
 }
