@@ -19,8 +19,8 @@ yarn add sern-handler
 TypeScript or JavaScript
 ```js
 import { Client, Intents } from 'discord.js';
-import { prefix, token } from '../src/secrets.json';
 import { Handler } from 'sern-handler';
+import { prefix, token } from '../src/secrets.json';
 
 const client = new Client({
     intents: [
@@ -30,14 +30,15 @@ const client = new Client({
     ]
 });
 
- new Handler( {
+// Access handler anywhere
+client.handler = new Handler({
     client,   
     prefix,   
-    commands : "dist/commands",  
+    commands : 'dist/commands', 
     privateServers : [           
         {
             test : true,
-            id: "server id"
+            id: 'server-id'
         }
     ],
     init: async (handler : Sern.Handler) => {
