@@ -11,7 +11,6 @@ Sern automates and streamlines development your discord bot with new version com
 ```sh
 npm install sern-handler
 ```
-
 ```sh
 yarn add sern-handler
 ```
@@ -35,11 +34,10 @@ const client = new Client({
     ]
 });
 
-// Access the handler anywhere
-client.handler = new Sern.Handler({
+new Sern.Handler({
     client,
     prefix,
-    commands : 'dist/commands',
+    commands : 'dist/commands',  // If using typescript, target your outDir/~
     privateServers : [
         {
             test : true,
@@ -55,7 +53,7 @@ client.handler = new Sern.Handler({
 ##### [JavaScript](https://www.javascript.com)
 ```js
 import { Client, Intents } from 'discord.js';
-import { Handler } from 'sern-handler';
+import { Sern } from 'sern-handler';
 import { prefix, token } from '../src/secrets.json';
 
 const client = new Client({
@@ -66,8 +64,7 @@ const client = new Client({
     ]
 });
 
-// Access handler anywhere
-client.handler = new Handler({
+new Sern.Handler({
     client,   
     prefix,   
     commands : 'dist/commands', 
