@@ -31,7 +31,8 @@ export class Handler {
              **/
 
             .on('ready', async () => {
-                Files.buildData(this).then((data) => this.registerModules(data));
+                Files.buildData(this)
+                    .then(data => this.registerModules(data));
                 if (wrapper.init !== undefined) wrapper.init(this);
                 new Logger().tableRam();
             })
@@ -41,8 +42,7 @@ export class Handler {
                 if (message.channel.type === 'DM') return; // TODO: Handle dms
 
                 const tryFmt = fmt(message, this.prefix);
-                const commandName = tryFmt.shift()!;
-                const module = Files.Commands.get(commandName) ?? Files.Alias.get(commandName);
+                const module = this.findCommand(tryFmt.shift()!);
                 if (module === undefined) {
                     message.channel.send('Unknown legacy command');
                     return;
@@ -74,11 +74,10 @@ export class Handler {
         interaction: CommandInteraction,
     ): Promise<possibleOutput | undefined> {
         if (module === undefined) return 'Unknown slash command!';
-        const name = Array.from(Files.Commands.keys()).find((it) => it === interaction.commandName);
+        const name = this.findCommand(interaction.commandName);
         if (name === undefined) return `Could not find ${interaction.commandName} command!`;
 
         if (module.mod.type < CommandType.SLASH) return 'This is not a slash command';
-
         const context = { message: None, interaction: Some(interaction) };
         const parsedArgs = module.mod.parse?.(context, ['slash', interaction.options]) ?? Ok('');
 
@@ -170,6 +169,16 @@ export class Handler {
                 }
             }
         }
+    }
+
+    /**
+     * 
+     * @param {string} name name of possible command
+     * @returns {Files.CommandVal | undefined}
+     */
+
+    private findCommand(name: string): Files.CommandVal | undefined {
+        return Files.Commands.get(name) ?? Files.Alias.get(name);
     }
 
     /**
