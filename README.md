@@ -16,7 +16,13 @@ yarn add sern-handler
 
 # Basic Usage
 
+[Typescript](https://www.typescriptlang.org/)
 ```ts
+import { Client } from 'discord.js'
+import { Intents } from 'discord.js'
+import {prefix, token} from "../src/secrets.json"
+import {Sern} from "sern-handler"
+
 const client = new Client({
     intents: [
         Intents.FLAGS.GUILDS,
