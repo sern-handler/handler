@@ -1,12 +1,12 @@
-import * as Files from './utilities/readFile';
-import type * as Utils from './utilities/Preprocessors/args';
+import * as Files from './utilitiess/readFile';
+import type * as Utils from './utilitiess/Preprocessors/args';
 
 import type { Arg, Context, Visibility, possibleOutput } from '../types/handler';
 
 import type { ApplicationCommandOptionData, Awaitable, Client, CommandInteraction, Message } from 'discord.js';
 
 import { Ok, Result, None, Some } from 'ts-results';
-import { isBot, hasPrefix, fmt } from './utilities/messageHelpers';
+import { isBot, hasPrefix, fmt } from './utilitiess/messageHelpers';
 import Logger from './logger';
 
 /**
