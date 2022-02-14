@@ -52,7 +52,7 @@ client.handler = new Sern.Handler({
 });
 ```
 
-##### [JavaScript](https://www.node.js.org/)
+##### [JavaScript](https://www.javascript.com)
 ```js
 import { Client, Intents } from 'discord.js';
 import { Handler } from 'sern-handler';
