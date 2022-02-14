@@ -5,7 +5,7 @@ export function isBot(message: Message) {
 }
 
 export function hasPrefix(message: Message, prefix: string) {
-  return (message.content.slice(0, prefix.length).toLowerCase().trim()) === prefix;
+  return message.content.slice(0, prefix.length).toLowerCase().trim() === prefix;
 }
 
 export function fmt(msg: Message, prefix: string): string[] {
