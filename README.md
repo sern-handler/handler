@@ -16,6 +16,38 @@ yarn add sern-handler
 
 # Basic Usage
 
+Typescript
+```ts
+import { Client } from 'discord.js'
+import { Intents } from 'discord.js'
+import { prefix, token } from "../src/secrets.json"
+import { Sern } from "sern-handler"
+
+const client = new Client({
+    intents: [
+        Intents.FLAGS.GUILDS,
+        Intents.FLAGS.GUILD_MESSAGES,
+        Intents.FLAGS.GUILD_MEMBERS
+    ]
+
+})
+
+ new Sern.Handler( {
+    client,
+    prefix,
+    commands : 'dist/commands',
+    privateServers : [
+        {
+            test : true,
+            id: 'server-id'
+        }
+    ],
+    init: async (handler : Sern.Handler) => {
+        // Optional function to initialize anything else on bot startup
+    },
+});
+```
+
 JavaScript
 ```js
 import { Client, Intents } from 'discord.js';
