@@ -12,8 +12,9 @@ import type {
 } from 'discord.js';
 
 import { Ok, Result, None, Some } from 'ts-results';
-import { isBot, hasPrefix, fmt } from './utilities/messageHelpers';
+import { isNotFromBot, hasPrefix, fmt } from './utilities/messageHelpers';
 import Logger from './logger';
+import { AllTrue } from './utilities/higherOrders';
 
 /**
  * @class
@@ -44,7 +45,9 @@ export class Handler {
             })
 
             .on('messageCreate', async (message: Message) => {
-                if (isBot(message) || !hasPrefix(message, this.prefix)) return;
+                const isExecutable = AllTrue( isNotFromBot, hasPrefix );
+                if(!isExecutable(message, this.prefix)) return;   
+
                 if (message.channel.type === 'DM') return; // TODO: Handle dms
 
                 const tryFmt = fmt(message, this.prefix);
