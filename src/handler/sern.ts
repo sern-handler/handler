@@ -83,7 +83,7 @@ export class Handler {
 
         if (parsedArgs.err) return parsedArgs.val;
 
-        return (await module.mod.delegate(context, parsedArgs))?.val;
+        return (await module.mod.execute(context, parsedArgs))?.val;
     }
 
     /**
@@ -117,7 +117,7 @@ export class Handler {
         };
         const parsedArgs = module.mod.parse?.(context, ['text', args]) ?? Ok('');
         if (parsedArgs.err) return parsedArgs.val;
-        return (await module.mod.delegate(context, parsedArgs))?.val;
+        return (await module.mod.execute(context, parsedArgs))?.val;
     }
 
     /**
@@ -274,7 +274,7 @@ export interface Module<T = string> {
     visibility: Visibility;
     type: CommandType;
     test: boolean;
-    delegate: (eventParams: Context, args: Ok<T>) => Awaitable<Result<possibleOutput, string> | void>;
+    execute: (eventParams: Context, args: Ok<T>) => Awaitable<Result<possibleOutput, string> | void>;
     parse?: (ctx: Context, args: Arg) => Utils.ArgType<T>;
 }
 

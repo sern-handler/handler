@@ -9,7 +9,8 @@
     "lint": "eslint src/**/*.ts",
     "format": "eslint src/**/*.ts --fix",
     "release": "standard-version && git push --follow-tags",
-    "test": "jest --coverage --verbose"
+    "test": "jest --coverage --verbose",
+    "commit": "cz"
   },
   "keywords": [],
   "author": "",
@@ -29,14 +30,14 @@
     "@babel/preset-typescript": "^7.16.7",
     "@types/jest": "^27.4.0",
     "babel-jest": "^27.5.1",
-    "cz-conventional-changelog": "^3.3.0",
+    "cz-conventional-changelog": "^3.0.1",
     "jest": "^27.5.1",
     "standard-version": "^9.3.2",
     "typescript": "^4.5.5"
   },
   "config": {
     "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
+      "path": "cz-conventional-changelog"
     }
   }
 }
