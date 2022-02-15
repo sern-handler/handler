@@ -20,7 +20,7 @@ pnpm add sern-handler
 
 ## Basic Usage
 
-##### [Typescript](https://www.typescriptlang.org/)
+#### [Typescript](https://www.typescriptlang.org/)
 ```ts
 import { Client, Intents } from 'discord.js'
 import { Sern } from 'sern-handler';
@@ -49,8 +49,23 @@ new Sern.Handler({
     },
 });
 ```
+#### `ping.ts`
+```ts
+import  { Sern, Types } from "sern-handler";
+import { Ok } from "ts-results";
 
-##### [JavaScript](https://www.javascript.com)
+export default  {
+    alias: [],
+    desc : "ping pong",
+    visibility : "private",
+    test : false,
+    type: Sern.CommandType.SLASH | Sern.CommandType.TEXT,
+    execute : async ({message, interaction} : Types.Context, args: Ok<string> ) => Ok("pong!")      
+
+} as Sern.Module;
+```
+
+#### [JavaScript](https://www.javascript.com)
 ```js
 import { Client, Intents } from 'discord.js';
 import { Sern } from 'sern-handler';
@@ -81,6 +96,21 @@ new Sern.Handler({
 
 
 client.login(token);
+```
+#### `ping.js`
+```js
+import { Sern, Types } from "sern-handler";
+import { Ok } from "ts-results";
+
+export default  {
+    alias: [],
+    desc : "ping pong",
+    visibility : "private",
+    test : false,
+    type: Sern.CommandType.SLASH | Sern.CommandType.TEXT,
+    execute : async ({message, interaction}, args) => Ok("pong!")      
+
+};
 ```
 
 ## Links ![link](https://img.shields.io/badge/Coming-Soon-purple)
