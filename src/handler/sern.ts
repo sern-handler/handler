@@ -44,8 +44,8 @@ export class Handler {
             })
 
             .on('messageCreate', async (message: Message) => {
-                const isExecutable = AllTrue( isNotFromBot, hasPrefix );
-                if(!isExecutable(message, this.prefix)) return;   
+                const isExecutable = AllTrue(isNotFromBot, hasPrefix);
+                if (!isExecutable(message, this.prefix)) return;
 
                 if (message.channel.type === 'DM') return; // TODO: Handle dms
                 const module = this.findModuleFrom(message);
@@ -102,10 +102,9 @@ export class Handler {
      */
 
     private async commandResult(
-        module: Files.CommandVal | undefined,
+        module: Files.CommandVal,
         message: Message,
     ): Promise<possibleOutput | undefined> {
-        if (module?.mod === undefined) return 'Unknown legacy command';
         if (module.mod.type === CommandType.SLASH) return `This may be a slash command and not a legacy command`;
         if (module.mod.visibility === 'private') {
             const checkIsTestServer = this.privateServers.find(({ id }) => id === message.guildId!)?.test;
@@ -184,7 +183,7 @@ export class Handler {
      * @returns {Files.CommandVal | undefined}
      */
 
-    private findModuleFrom(ctx : Message | CommandInteraction) : Files.CommandVal | undefined {
+    private findModuleFrom(ctx: Message | CommandInteraction): Files.CommandVal | undefined {
         const name = (ctx instanceof Message ? fmt(ctx, this.prefix).shift() : [ctx.commandName].shift())!;
         const posCommand = Files.Commands.get(name) ?? Files.Alias.get(name);
         return posCommand;
