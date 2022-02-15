@@ -1,6 +1,6 @@
 # Sern Handler
 <a href="https://www.npmjs.com/package/sern_handler">
-<img src="https://img.shields.io/npm/v/sern_handler?maxAge=3600" alt="NPM version" /></a> <a href="https://www.npmjs.com/package/shandler"><img src="https://img.shields.io/npm/dt/sern_handler?maxAge=3600" alt="NPM downloads" /></a> <a href="https://www.npmjs.com/package/sern_handler"><img src="https://img.shields.io/badge/builds-stable" alt="Builds Passing"></a>
+<img src="https://img.shields.io/npm/v/sern_handler?maxAge=3600" alt="NPM version" /></a> <a href="https://www.npmjs.com/package/sern_handler"><img src="https://img.shields.io/npm/dt/sern_handler?maxAge=3600" alt="NPM downloads" /></a> <a href="https://www.npmjs.com/package/sern_handler"><img src="https://img.shields.io/badge/builds-stable" alt="Builds Passing"></a>
 
 Sern automates and streamlines development your discord bot with new version compatibility and full customization.
 
