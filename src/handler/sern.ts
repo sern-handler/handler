@@ -8,9 +8,8 @@ import type {
     Awaitable,
     Client,
     CommandInteraction,
-    Message
 } from 'discord.js';
-
+import { Message } from 'discord.js';
 import { Ok, Result, None, Some } from 'ts-results';
 import { isNotFromBot, hasPrefix, fmt } from './utilities/messageHelpers';
 import Logger from './logger';
@@ -49,14 +48,13 @@ export class Handler {
                 if(!isExecutable(message, this.prefix)) return;   
 
                 if (message.channel.type === 'DM') return; // TODO: Handle dms
+                const module = this.findModuleFrom(message);
 
-                const tryFmt = fmt(message, this.prefix);
-                const module = this.findCommand(tryFmt.shift()!);
                 if (module === undefined) {
                     message.channel.send('Unknown legacy command');
                     return;
                 }
-                const cmdResult = await this.commandResult(module, message, tryFmt.join(' '));
+                const cmdResult = await this.commandResult(module, message);
                 if (cmdResult === undefined) return;
 
                 message.channel.send(cmdResult);
@@ -83,7 +81,7 @@ export class Handler {
         interaction: CommandInteraction,
     ): Promise<possibleOutput | undefined> {
         if (module === undefined) return 'Unknown slash command!';
-        const name = this.findCommand(interaction.commandName);
+        const name = this.findModuleFrom(interaction);
         if (name === undefined) return `Could not find ${interaction.commandName} command!`;
 
         if (module.mod.type < CommandType.SLASH) return 'This is not a slash command';
@@ -106,7 +104,6 @@ export class Handler {
     private async commandResult(
         module: Files.CommandVal | undefined,
         message: Message,
-        args: string,
     ): Promise<possibleOutput | undefined> {
         if (module?.mod === undefined) return 'Unknown legacy command';
         if (module.mod.type === CommandType.SLASH) return `This may be a slash command and not a legacy command`;
@@ -124,6 +121,7 @@ export class Handler {
             message: Some(message),
             interaction: None,
         };
+        const args = message.content.slice(this.prefix.length).trim().split(/s+/g).join(' ');
         const parsedArgs = module.mod.parse?.(context, ['text', args]) ?? Ok('');
         if (parsedArgs.err) return parsedArgs.val;
         return (await module.mod.execute(context, parsedArgs))?.val;
@@ -186,8 +184,10 @@ export class Handler {
      * @returns {Files.CommandVal | undefined}
      */
 
-    private findCommand(name: string): Files.CommandVal | undefined {
-        return Files.Commands.get(name) ?? Files.Alias.get(name);
+    private findModuleFrom(ctx : Message | CommandInteraction) : Files.CommandVal | undefined {
+        const name = (ctx instanceof Message ? fmt(ctx, this.prefix).shift() : [ctx.commandName].shift())!;
+        const posCommand = Files.Commands.get(name) ?? Files.Alias.get(name);
+        return posCommand;
     }
 
     /**
