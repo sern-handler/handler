@@ -3,7 +3,13 @@ import type * as Utils from './utilities/preprocessors/args';
 
 import type { Arg, Context, Visibility, possibleOutput } from '../types/handler';
 
-import type { ApplicationCommandOptionData, Awaitable, Client, CommandInteraction, Message } from 'discord.js';
+import type {
+    ApplicationCommandOptionData,
+    Awaitable,
+    Client,
+    CommandInteraction,
+    Message
+} from 'discord.js';
 
 import { Ok, Result, None, Some } from 'ts-results';
 import { isBot, hasPrefix, fmt } from './utilities/messageHelpers';
