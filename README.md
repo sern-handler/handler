@@ -18,7 +18,7 @@ yarn add sern-handler
 pnpm add sern-handler
 ```
 
-# Basic Usage
+## Basic Usage
 
 ##### [Typescript](https://www.typescriptlang.org/)
 ```ts
