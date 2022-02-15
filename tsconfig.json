@@ -13,7 +13,9 @@
       "importsNotUsedAsValues": "error",
       "skipLibCheck": true,
       "declaration": true,
-      "forceConsistentCasingInFileNames": true
-    }
+      "forceConsistentCasingInFileNames": true,
+    },
+    "exclude": ["node_modules", "tests", "dist"],
+    "include": ["src"],
   }
   
