@@ -8,10 +8,10 @@ type MsgFn = (...args: MsgFnArgs) => boolean;
  * @param {MsgFn} fn any function that has argument `MsgFnArgs` returning boolean 
  * @returns {(message: Message, prefix: string) => boolean}
  */
-export function AllTrue(...fn : MsgFn[]) :
+export function AllTrue(...fns : MsgFn[]) :
  (message: Message, prefix: string) => boolean {
     return (message: Message, prefix: string) => {
-        return fn.every(f => f(message, prefix) === true);
+        return fns.every(g => g(message, prefix));
     };
 }
 
