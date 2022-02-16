@@ -62,7 +62,12 @@ export class Handler {
 
             .on('interactionCreate', async (interaction) => {
                 if (!interaction.isCommand()) return;
-                const module = Files.Commands.get(interaction.commandName);
+                if (interaction.guild === null) return; // TODO : handle dms
+                const module = this.findModuleFrom(interaction);
+                if (module === undefined) {
+                    interaction.channel!.send('Unknown slash command!')
+                    return;
+                }
                 const res = await this.interactionResult(module, interaction);
                 if (res === undefined) return;
                 await interaction.reply(res);
@@ -71,16 +76,15 @@ export class Handler {
 
     /**
      *
-     * @param {Files.CommandVal | undefined} module Command file information
+     * @param {Files.CommandVal} module Command file information
      * @param {CommandInteraction} interaction The Discord.js command interaction (DiscordJS#CommandInteraction))
      * @returns {possibleOutput | undefined} Takes return value and replies it, if possible input
      */
 
     private async interactionResult(
-        module: Files.CommandVal | undefined,
+        module: Files.CommandVal,
         interaction: CommandInteraction,
     ): Promise<possibleOutput | undefined> {
-        if (module === undefined) return 'Unknown slash command!';
         const name = this.findModuleFrom(interaction);
         if (name === undefined) return `Could not find ${interaction.commandName} command!`;
 
@@ -95,7 +99,7 @@ export class Handler {
 
     /**
      *
-     * @param {Files.CommandVal | undefined} module Command file information
+     * @param {Files.CommandVal} module Command file information
      * @param {Message} message The message object
      * @param {string} args Anything after the command
      * @returns Takes return value and replies it, if possible input
