@@ -64,7 +64,7 @@ export default  {
     visibility : "private",
     test : false,
     type: Sern.CommandType.SLASH | Sern.CommandType.TEXT,
-    execute : async ({message, interaction}, args) => Ok("pong!")      
+    execute : async ({message, interaction}, args) => "pong!"      
 
 };
 ```
