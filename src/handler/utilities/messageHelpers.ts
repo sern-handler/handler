@@ -7,8 +7,8 @@ import type { Message } from 'discord.js';
  * @example
  * isBot(message) ? 'yes it is a bot' : 'no it is not a bot';
  */
-export function isBot(message: Message) {
-    return message.author.bot;
+export function isNotFromBot(message: Message) {
+    return !message.author.bot;
 }
 /**
  * Checks if the message **starts** with the prefix
@@ -18,8 +18,8 @@ export function isBot(message: Message) {
  * @example
  * hasPrefix(message, '!') ? 'yes it does' : 'no it does not';
  */
-export function hasPrefix(message: Message, prefix: string) {
-    return message.content.slice(0, prefix.length).toLowerCase().trim() === prefix;
+export function hasPrefix(message: Message, prefix?: string) {
+    return message.content.startsWith(prefix!);
 }
 /**
  * Removes the first character(s) _[depending on prefix length]_ of the message

@@ -10,7 +10,8 @@
     "format": "eslint src/**/*.ts --fix",
     "release": "standard-version && git push --follow-tags",
     "test": "jest --coverage --verbose",
-    "commit": "cz"
+    "commit": "cz",
+    "docs" : "typedoc src/index.ts --out dist/docs"
   },
   "keywords": [],
   "author": "",
@@ -33,6 +34,7 @@
     "cz-conventional-changelog": "^3.0.1",
     "jest": "^27.5.1",
     "standard-version": "^9.3.2",
+    "typedoc": "^0.22.11",
     "typescript": "^4.5.5"
   },
   "config": {

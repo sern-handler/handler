@@ -15,10 +15,10 @@ import type {
     CommandInteraction,
     Message
 } from 'discord.js';
-
-import { Ok, Result, None, Some } from 'ts-results';
-import { isBot, hasPrefix, fmt } from './utilities/messageHelpers';
+import { Ok, None, Some } from 'ts-results';
+import { isNotFromBot, hasPrefix, fmt } from './utilities/messageHelpers';
 import Logger from './logger';
+import { AllTrue } from './utilities/higherOrders';
 
 /**
  * @class
@@ -50,16 +50,15 @@ export class Handler {
             })
 
             .on('messageCreate', async (message: Message) => {
-                if (isBot(message) || !hasPrefix(message, this.prefix)) return;
+                const isExecutable = AllTrue(isNotFromBot, hasPrefix);
+                if (!isExecutable(message, this.prefix)) return;
                 if (message.channel.type === 'DM') return; // TODO: Handle dms
-
-                const tryFmt = fmt(message, this.prefix);
-                const module = this.findCommand(tryFmt.shift()!);
+                const module = this.findModuleFrom(message);
                 if (module === undefined) {
                     message.channel.send('Unknown legacy command');
                     return;
                 }
-                const cmdResult = await this.commandResult(module, message, tryFmt.join(' '));
+                const cmdResult = await this.commandResult(module, message);
                 if (cmdResult === undefined) return;
 
                 message.channel.send(cmdResult);
@@ -67,7 +66,12 @@ export class Handler {
 
             .on('interactionCreate', async (interaction) => {
                 if (!interaction.isCommand()) return;
-                const module = Files.Commands.get(interaction.commandName);
+                if (interaction.guild === null) return; // TODO : handle dms
+                const module = this.findModuleFrom(interaction);
+                if (module === undefined) {
+                    interaction.channel!.send('Unknown slash command!')
+                    return;
+                }
                 const res = await this.interactionResult(module, interaction);
                 if (res === undefined) return;
                 await interaction.reply(res);
@@ -76,17 +80,16 @@ export class Handler {
 
     /**
      *
-     * @param {Files.CommandVal | undefined} module Command file information
+     * @param {Files.CommandVal} module Command file information
      * @param {CommandInteraction} interaction The Discord.js command interaction (DiscordJS#CommandInteraction))
      * @returns {possibleOutput | undefined} Takes return value and replies it, if possible input
      */
 
     private async interactionResult(
-        module: Files.CommandVal | undefined,
+        module: Files.CommandVal,
         interaction: CommandInteraction,
     ): Promise<possibleOutput | undefined> {
-        if (module === undefined) return 'Unknown slash command!';
-        const name = this.findCommand(interaction.commandName);
+        const name = this.findModuleFrom(interaction);
         if (name === undefined) return `Could not find ${interaction.commandName} command!`;
 
         if (module.mod.type < CommandType.SLASH) return 'This is not a slash command';
@@ -95,23 +98,21 @@ export class Handler {
 
         if (parsedArgs.err) return parsedArgs.val;
 
-        return (await module.mod.execute(context, parsedArgs))?.val;
+        return (await module.mod.execute?.(context, parsedArgs) as possibleOutput | undefined);
     }
 
     /**
      *
-     * @param {Files.CommandVal | undefined} module Command file information
+     * @param {Files.CommandVal} module Command file information
      * @param {Message} message The message object
      * @param {string} args Anything after the command
      * @returns Takes return value and replies it, if possible input
      */
 
     private async commandResult(
-        module: Files.CommandVal | undefined,
+        module: Files.CommandVal,
         message: Message,
-        args: string,
     ): Promise<possibleOutput | undefined> {
-        if (module?.mod === undefined) return 'Unknown legacy command';
         if (module.mod.type === CommandType.SLASH) return `This may be a slash command and not a legacy command`;
         if (module.mod.visibility === 'private') {
             const checkIsTestServer = this.privateServers.find(({ id }) => id === message.guildId!)?.test;
@@ -127,9 +128,10 @@ export class Handler {
             message: Some(message),
             interaction: None,
         };
+        const args = message.content.slice(this.prefix.length).trim().split(/s+/g).join(' ');
         const parsedArgs = module.mod.parse?.(context, ['text', args]) ?? Ok('');
         if (parsedArgs.err) return parsedArgs.val;
-        return (await module.mod.execute(context, parsedArgs))?.val;
+        return (await module.mod.execute?.(context, parsedArgs) as possibleOutput | undefined);
     }
 
     /**
@@ -185,12 +187,14 @@ export class Handler {
 
     /**
      * 
-     * @param {string} name name of possible command
+     * @param {T extends Message | CommandInteraction} ctx name of possible command
      * @returns {Files.CommandVal | undefined}
      */
 
-    private findCommand(name: string): Files.CommandVal | undefined {
-        return Files.Commands.get(name) ?? Files.Alias.get(name);
+    private findModuleFrom<T extends Message | CommandInteraction>(ctx: T): Files.CommandVal | undefined {
+        const name = ctx.applicationId === null ? fmt(ctx as Message, this.prefix).shift()! : (ctx as CommandInteraction).commandName 
+        const posCommand = Files.Commands.get(name) ?? Files.Alias.get(name);
+        return posCommand;
     }
 
     /**
@@ -276,7 +280,7 @@ export interface Wrapper {
  * @property {string} desc
  * @property {Visibility} visibility
  * @property {CommandType} type
- * @property {(eventParams : Context, args : Ok<T=string>) => Awaitable<Result<possibleOutput, string> | void>)} delegate
+ * @property {(eventParams : Context, args : Ok<T=string>) => Awaitable<possibleOutput | void>)} execute
  * @prop {(ctx: Context, args: Arg) => Utils.ArgType<T>} parse
  */
 
@@ -286,7 +290,7 @@ export interface Module<T = string> {
     visibility: Visibility;
     type: CommandType;
     test: boolean;
-    execute: (eventParams: Context, args: Ok<T>) => Awaitable<Result<possibleOutput, string> | void>;
+    execute: (eventParams: Context, args: Ok<T>) => Awaitable<possibleOutput| void>;
     parse?: (ctx: Context, args: Arg) => Utils.ArgType<T>;
 }
 

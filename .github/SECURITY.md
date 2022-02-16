@@ -12,6 +12,6 @@ Project is currently in development and is not yet ready to be used.
 
 You can report a vulnerability by opening an issue on the [project's GitHub](https://github.com/SernHandler/Sern/issues) repository.
 
-Please provide as much information as possible when reporting a vulnerability. We are looking for information for, the affected version, and the steps to reproduce the vulnerability.
+Please provide as much information as possible when reporting a vulnerability. We are lookin information for, the affected version, and the steps to reproduce the vulnerability.
 
 Be patient, we are working on fixing all reported vulnerabilities.
