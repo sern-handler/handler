@@ -1,10 +1,8 @@
 import type { ApplicationCommandOptionData } from 'discord.js';
+import type * as Sern from '../sern';
 
 import { readdirSync, statSync } from 'fs';
-
 import { basename, join } from 'path';
-
-import type * as Sern from '../sern';
 
 export type CommandVal = {
   mod: Sern.Module<unknown>;
@@ -14,7 +12,6 @@ export type CommandVal = {
 export const Commands = new Map<string, CommandVal>();
 export const Alias = new Map<string, CommandVal>();
 
-// Courtesy of Townsy#0001 on Discord
 async function readPath(dir: string, arrayOfFiles: string[] = []): Promise<string[]> {
   try {
     const files = readdirSync(dir);
@@ -32,6 +29,7 @@ async function readPath(dir: string, arrayOfFiles: string[] = []): Promise<strin
 export const fmtFileName = (n: string) => n.substring(0, n.length - 3);
 
 /**
+ * 
  * @param {Sern.Handler} handler an instance of Sern.Handler
  * @returns {Promise<{ name: string; mod: Sern.Module<unknown>; absPath: string; }[]>} data from command files
  */

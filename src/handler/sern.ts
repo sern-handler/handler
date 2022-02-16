@@ -1,7 +1,12 @@
 import * as Files from './utilities/readFile';
 import type * as Utils from './utilities/preprocessors/args';
 
-import type { Arg, Context, Visibility, possibleOutput } from '../types/handler';
+import type {
+    possibleOutput,
+    Visibility,
+    Context,
+    Arg
+} from '../types/handler';
 
 import type {
     ApplicationCommandOptionData,
@@ -23,6 +28,7 @@ export class Handler {
     private wrapper: Wrapper;
 
     /**
+     *
      * @constructor
      * @param {Wrapper} wrapper The data that is required to run sern handler
      */

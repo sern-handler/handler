@@ -21,6 +21,7 @@ export function parseInt(arg: string, onFailure: possibleOutput): ArgType<number
 }
 
 /**
+ * 
  * @param {string} arg - command arguments
  * @param {possibleOutput} onFailure - If cannot parse `arg` into boolean.
  * @param { {yesRegex: RegExp, noRegex: RegExp} } regexes - default regexes: yes : `/^(?:y(?:es)?|👍)$/i`, no :  /^(?:n(?:o)?|👎)$/i

@@ -1,4 +1,5 @@
 import type { Message } from 'discord.js';
+
 /**
  * Checks if the author of message is a bot or not
  * @param message The message to check
