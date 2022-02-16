@@ -8,9 +8,9 @@ import type {
     Awaitable,
     Client,
     CommandInteraction,
+    Message
 } from 'discord.js';
-import { Message } from 'discord.js';
-import { Ok, Result, None, Some } from 'ts-results';
+import { Ok, None, Some } from 'ts-results';
 import { isNotFromBot, hasPrefix, fmt } from './utilities/messageHelpers';
 import Logger from './logger';
 import { AllTrue } from './utilities/higherOrders';
@@ -46,10 +46,8 @@ export class Handler {
             .on('messageCreate', async (message: Message) => {
                 const isExecutable = AllTrue(isNotFromBot, hasPrefix);
                 if (!isExecutable(message, this.prefix)) return;
-
                 if (message.channel.type === 'DM') return; // TODO: Handle dms
                 const module = this.findModuleFrom(message);
-
                 if (module === undefined) {
                     message.channel.send('Unknown legacy command');
                     return;
@@ -94,7 +92,7 @@ export class Handler {
 
         if (parsedArgs.err) return parsedArgs.val;
 
-        return (await module.mod.execute(context, parsedArgs))?.val;
+        return (await module.mod.execute?.(context, parsedArgs) as possibleOutput | undefined);
     }
 
     /**
@@ -127,7 +125,7 @@ export class Handler {
         const args = message.content.slice(this.prefix.length).trim().split(/s+/g).join(' ');
         const parsedArgs = module.mod.parse?.(context, ['text', args]) ?? Ok('');
         if (parsedArgs.err) return parsedArgs.val;
-        return (await module.mod.execute(context, parsedArgs))?.val;
+        return (await module.mod.execute?.(context, parsedArgs) as possibleOutput | undefined);
     }
 
     /**
@@ -183,12 +181,12 @@ export class Handler {
 
     /**
      * 
-     * @param {string} name name of possible command
+     * @param {T extends Message | CommandInteraction} ctx name of possible command
      * @returns {Files.CommandVal | undefined}
      */
 
-    private findModuleFrom(ctx: Message | CommandInteraction): Files.CommandVal | undefined {
-        const name = (ctx instanceof Message ? fmt(ctx, this.prefix).shift() : [ctx.commandName].shift())!;
+    private findModuleFrom<T extends Message | CommandInteraction>(ctx: T): Files.CommandVal | undefined {
+        const name = ctx.applicationId === null ? fmt(ctx as Message, this.prefix).shift()! : (ctx as CommandInteraction).commandName 
         const posCommand = Files.Commands.get(name) ?? Files.Alias.get(name);
         return posCommand;
     }
@@ -276,7 +274,7 @@ export interface Wrapper {
  * @property {string} desc
  * @property {Visibility} visibility
  * @property {CommandType} type
- * @property {(eventParams : Context, args : Ok<T=string>) => Awaitable<Result<possibleOutput, string> | void>)} delegate
+ * @property {(eventParams : Context, args : Ok<T=string>) => Awaitable<possibleOutput | void>)} execute
  * @prop {(ctx: Context, args: Arg) => Utils.ArgType<T>} parse
  */
 
@@ -286,7 +284,7 @@ export interface Module<T = string> {
     visibility: Visibility;
     type: CommandType;
     test: boolean;
-    execute: (eventParams: Context, args: Ok<T>) => Awaitable<Result<possibleOutput, string> | void>;
+    execute: (eventParams: Context, args: Ok<T>) => Awaitable<possibleOutput| void>;
     parse?: (ctx: Context, args: Arg) => Utils.ArgType<T>;
 }
 
