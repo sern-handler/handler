@@ -1,6 +1,6 @@
 # Sern Handler
 <a href="https://www.npmjs.com/package/sern-handler">
-<img src="https://img.shields.io/npm/v/sern-handler?maxAge=3600" alt="NPM version" /></a> <a href="https://www.npmjs.com/package/sern-handler"><img src="https://img.shields.io/npm/dt/sern_handler?maxAge=3600" alt="NPM downloads" /></a> <a href="https://www.npmjs.com/package/sern_handler"><img src="https://img.shields.io/badge/builds-stable" alt="Builds Passing"></a>
+<img src="https://img.shields.io/npm/v/sern_handler?maxAge=3600" alt="NPM version" /></a> <a href="https://www.npmjs.com/package/sern-handler"><img src="https://img.shields.io/npm/dt/sern_handler?maxAge=3600" alt="NPM downloads" /></a> <a href="https://www.npmjs.com/package/sern-handler"><img src="https://img.shields.io/badge/builds-stable" alt="Builds Passing"></a>
 
 Sern can automate and streamline development of your discord bot with new version compatibility and full customization.
 
@@ -55,17 +55,18 @@ client.login(token);
 
 #### ` ping.js `
 ```js
-import { Sern, Types } from "sern-handler";
-import { Ok } from "ts-results";
+import { Sern, Types } from 'sern-handler';
+import { Ok } from 'ts-results';
 
 export default  {
     alias: [],
-    desc : "ping pong",
-    visibility : "private",
+    desc : 'A ping pong command',
+    visibility : 'private',
     test : false,
     type: Sern.CommandType.SLASH | Sern.CommandType.TEXT,
-    execute : async ({message, interaction}, args) => "pong!"      
-
+    execute : async ({ message, interaction }, args) => {
+        interaction.reply({ content: 'Pong! });
+    }
 };
 ```
 
