@@ -73,8 +73,9 @@ See [documentation](https://sernhandler.js.org) for TypeScript examples and more
 
 ## Links ![link](https://img.shields.io/badge/Coming-Soon-purple)
 
--   📑 Official Documentation
--   🎧 Discord Server  
+- [Official Documentation](https://tmp.com)
+- [Example Bot](https://tmp.com)
+- [Discord Server](https://google.com)
 
 ## Contribute
 
