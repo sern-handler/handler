@@ -89,3 +89,5 @@ See [documentation](https://sernhandler.js.org) for TypeScript examples and more
 - [ ] Categories
 - [ ] Ruling out all bugs in the command system
 - [ ] Better support for slash commands
+- [ ] More Build scripts
+- [ ] Logger
