@@ -82,3 +82,10 @@ See [documentation](https://sernhandler.js.org) for TypeScript examples and more
 
 -   Pull up on [issues](https://github.com/jacoobes/Sern/issues) and tell me if there are bugs
 -   All kinds of contributions are welcomed!
+
+## TODO
+
+- [ ] Default commands
+- [ ] Categories
+- [ ] Ruling out all bugs in the command system
+- [ ] Better support for slash commands
