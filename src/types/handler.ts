@@ -14,7 +14,6 @@ export type Visibility = 'private' | 'public';
 
 // Anything that can be sent in a `<TextChannel>#send` or `<CommandInteraction>#reply`
 export type possibleOutput<T = string> = T | (MessagePayload & MessageOptions);
-export type Nullable<T> = T | null;
 export type execute = Sern.Module<unknown>['execute'];
 
 export type ParseType<T> = {
