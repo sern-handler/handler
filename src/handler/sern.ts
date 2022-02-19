@@ -69,7 +69,7 @@ export class Handler {
                 if (interaction.guild === null) return; // TODO : handle dms
                 const module = this.findModuleFrom(interaction);
                 if (module === undefined) {
-                    interaction.channel!.send('Unknown slash command!')
+                    interaction.channel!.send('Unknown slash command!');
                     return;
                 }
                 const res = await this.interactionResult(module, interaction);
@@ -192,7 +192,7 @@ export class Handler {
      */
 
     private findModuleFrom<T extends Message | CommandInteraction>(ctx: T): Files.CommandVal | undefined {
-        const name = ctx.applicationId === null ? fmt(ctx as Message, this.prefix).shift()! : (ctx as CommandInteraction).commandName 
+        const name = ctx.applicationId === null ? fmt(ctx as Message, this.prefix).shift()! : (ctx as CommandInteraction).commandName; 
         const posCommand = Files.Commands.get(name) ?? Files.Alias.get(name);
         return posCommand;
     }

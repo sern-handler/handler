@@ -19,8 +19,8 @@ export interface OptionData {
     AUTO: ApplicationCommandAutocompleteOption
     NUMBER: ApplicationCommandNumericOptionData
     INTEGER: ApplicationCommandNumericOptionData
-    USER : { type: "USER" } & BaseOption
-    MENTIONABLE: { type : "MENTIONABLE" } & BaseOption
-    ROLE : { type: "ROLE" } & BaseOption
-    BOOLEAN : { type: "BOOLEAN" } & BaseOption
+    USER : { type: 'USER' } & BaseOption
+    MENTIONABLE: { type : 'MENTIONABLE' } & BaseOption
+    ROLE : { type: 'ROLE' } & BaseOption
+    BOOLEAN : { type: 'BOOLEAN' } & BaseOption
 }

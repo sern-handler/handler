@@ -1,5 +1,5 @@
-import type { Application, ApplicationCommandOptionData, Message } from 'discord.js';
-import type { OptionData } from './options';
+import type { Message } from 'discord.js';
+import type { OptionData } from '../../types/options';
 
 type MsgFnArgs = [msgOrInter: Message, prefix?: string];
 type MsgFn = (...args: MsgFnArgs) => boolean;
