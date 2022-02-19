@@ -16,7 +16,7 @@ export type Visibility = 'private' | 'public';
 export type possibleOutput<T = string> = T | (MessagePayload & MessageOptions);
 export type Nullable<T> = T | null;
 export type execute = Sern.Module<unknown>['execute'];
-
+// Thanks @cursorsdottsx
 export type ParseType<T> = {
     [K in keyof T]: T[K] extends unknown ? [k: K, args: T[K]] : never;
 }[keyof T];

@@ -12,6 +12,7 @@ export type CommandVal = {
 export const Commands = new Map<string, CommandVal>();
 export const Alias = new Map<string, CommandVal>();
 
+// Courtesy @Townsy45
 async function readPath(dir: string, arrayOfFiles: string[] = []): Promise<string[]> {
   try {
     const files = readdirSync(dir);
