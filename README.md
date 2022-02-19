@@ -78,7 +78,7 @@ See [documentation](https://sernhandler.js.org) for TypeScript examples and more
 
 ## Contribute
 
--   Pull up on [issues](https://github.com/jacoobes/Sern/issues) and tell me if there are bugs
+-   Pull up on [issues](https://github.com/jacoobes/Sern/issues) and tell us, if there are bugs
 -   All kinds of contributions are welcomed!
 
 ## TODO
