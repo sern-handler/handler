@@ -26,7 +26,7 @@ export type Context = {
     interaction: Option<CommandInteraction>;
 };
 
-export type Arg = ParseType<{ text: string; slash: SlashOptions }>;
+export type Arg = ParseType<{ text: string[]; slash: SlashOptions }>;
 
 // TypeAlias for interaction.options
 export type SlashOptions = Omit<CommandInteractionOptionResolver, 'getMessage' | 'getFocused'>;
