@@ -128,8 +128,8 @@ export class Handler {
             message: Some(message),
             interaction: None,
         };
-        const args = message.content.slice(this.prefix.length).trim().split(/s+/g).join(' ');
-        const parsedArgs = module.mod.parse?.(context, ['text', args]) ?? Ok('');
+        const args = message.content.slice(this.prefix.length).trim().split(/s+/g);
+        const parsedArgs = module.mod.parse?.(context, ['text', args.join(' ')]) ?? Ok(args);
         if (parsedArgs.err) return parsedArgs.val;
         return (await module.mod.execute?.(context, parsedArgs) as possibleOutput | undefined);
     }
