@@ -64,9 +64,7 @@ export default  {
     visibility : 'private',
     test : false,
     type: Sern.CommandType.SLASH | Sern.CommandType.TEXT,
-    execute : async ({ message, interaction }, args) => {
-        interaction.reply({ content: 'Pong! });
-    }
+    execute : async ({ message, interaction }, args) => 'pong!'
 };
 ```
 
@@ -80,14 +78,14 @@ See [documentation](https://sernhandler.js.org) for TypeScript examples and more
 
 ## Contribute
 
--   Pull up on [issues](https://github.com/jacoobes/Sern/issues) and tell me if there are bugs
+-   Pull up on [issues](https://github.com/jacoobes/Sern/issues) and tell us, if there are bugs
 -   All kinds of contributions are welcomed!
 
 ## TODO
 
-- [ ] Default commands
-- [ ] Categories
-- [ ] Ruling out all bugs in the command system
-- [ ] Better support for slash commands
-- [ ] More Build scripts
-- [ ] Logger
+- Default commands
+- Categories
+- Ruling out all bugs in the command system
+- Better support for slash commands
+- More Build scripts
+- Logger
