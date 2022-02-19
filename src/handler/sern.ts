@@ -129,7 +129,7 @@ export class Handler {
             interaction: None,
         };
         const args = message.content.slice(this.prefix.length).trim().split(/s+/g);
-        const parsedArgs = module.mod.parse?.(context, ['text', args.join(' ')]) ?? Ok(args);
+        const parsedArgs = module.mod.parse?.(context, ['text', args]) ?? Ok(args);
         if (parsedArgs.err) return parsedArgs.val;
         return (await module.mod.execute?.(context, parsedArgs) as possibleOutput | undefined);
     }
@@ -290,7 +290,7 @@ export interface Module<T = string> {
     visibility: Visibility;
     type: CommandType;
     test: boolean;
-    execute: (eventParams: Context, args: Ok<T>) => Awaitable<possibleOutput| void>;
+    execute: (eventParams: Context, args: Ok<T>) => Awaitable<possibleOutput | void>;
     parse?: (ctx: Context, args: Arg) => Utils.ArgType<T>;
 }
 
