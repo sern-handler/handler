@@ -68,7 +68,7 @@ export default  {
 };
 ```
 
-See [documentation](https://sernhandler.js.org) for TypeScript examples and more
+See [documentation](https://sern-handler.js.org) for TypeScript examples and more
 
 ## Links ![link](https://img.shields.io/badge/Coming-Soon-purple)
 
@@ -78,7 +78,7 @@ See [documentation](https://sernhandler.js.org) for TypeScript examples and more
 
 ## Contribute
 
--   Pull up on [issues](https://github.com/jacoobes/Sern/issues) and tell us, if there are bugs
+-   Pull up on [issues](https://github.com/sern-handler/Sern/issues) and tell us, if there are bugs
 -   All kinds of contributions are welcomed!
 
 ## TODO
