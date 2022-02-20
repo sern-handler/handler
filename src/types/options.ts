@@ -8,7 +8,8 @@ import type {
     ApplicationCommandSubGroupData
 } from 'discord.js';
 
-type BaseOption = { name : string, description : string, required : false };
+// TODO : make required property optional
+type BaseOption = { name : string, description : string, required : false  };
 
 export interface OptionData {
     SUB_COMMAND: ApplicationCommandSubCommandData
