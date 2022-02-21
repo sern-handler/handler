@@ -26,7 +26,7 @@ import { AllTrue } from './utilities/higherOrders';
 
 export class Handler {
     private wrapper: Wrapper;
-    private defaultLogger : Logger = new Logger();
+    private defaultLogger: Logger = new Logger();
     /**
      *
      * @constructor
@@ -55,7 +55,11 @@ export class Handler {
                 if (message.channel.type === 'DM') return; // TODO: Handle dms
                 const module = this.findModuleFrom(message);
                 if (module === undefined) {
-                    message.channel.send('Unknown legacy command');
+                    this.defaultLogger.log(
+                        sEvent.MISUSE_CMD,
+                        message.guildId!,
+                        `Unknown legacy command.`
+                    );
                     return;
                 }
                 const cmdResult = await this.commandResult(module, message);
@@ -69,7 +73,11 @@ export class Handler {
                 if (interaction.guild === null) return; // TODO : handle dms
                 const module = this.findModuleFrom(interaction);
                 if (module === undefined) {
-                    interaction.channel!.send('Unknown slash command!');
+                    this.defaultLogger.log(
+                        sEvent.MISUSE_CMD,
+                        interaction.guildId!,
+                        `Unknown slash command.`
+                    );
                     return;
                 }
                 const res = await this.interactionResult(module, interaction);
@@ -113,18 +121,31 @@ export class Handler {
         module: Files.CommandVal,
         message: Message,
     ): Promise<possibleOutput | undefined> {
-        if (module.mod.type === CommandType.SLASH) return `This may be a slash command and not a legacy command`;
+        if (module.mod.type === CommandType.SLASH) {
+            this.defaultLogger.log(
+                sEvent.MISUSE_CMD,
+                message.guildId!,
+                `The text command ${module.mod.name} may be a slash command and not a text command`
+            );
+            return;
+        }
         if (module.mod.visibility === 'private') {
             const checkIsTestServer = this.privateServers.find(({ id }) => id === message.guildId!)?.test;
-            if (checkIsTestServer === undefined)
+            if (checkIsTestServer === undefined) {
                 this.defaultLogger.log(
                     sEvent.MISUSE_CMD,
                     message.guildId!,
-                    `A com has private modifier but is not registered in private server config`
-                )
-                
+                    `The text command ${module.mod.name} has private modifier but is not registered in private server config.`
+                );
+                return;
+            }
             if (checkIsTestServer !== module.mod.test) {
-                return `This command is only available on test servers.`; // TODO: Customizable private message
+                this.defaultLogger.log(
+                    sEvent.MISUSE_CMD,
+                    message.guildId!,
+                    `The command ${module.mod.name} is only available on test servers.`
+                );
+                return;
             }
         }
         const context = {
@@ -153,13 +174,13 @@ export class Handler {
             const cmdName = Files.fmtFileName(name);
             switch (mod.type) {
                 case 1:
-                    Files.Commands.set(cmdName, { mod : { name : cmdName, ...mod }, options: [] });
+                    Files.Commands.set(cmdName, { mod: { name: cmdName, ...mod }, options: [] });
                     break;
                 case 2:
                 case 1 | 2:
                     {
                         const options = (await import(absPath)).options as ApplicationCommandOptionData[];
-                        Files.Commands.set(cmdName, { mod : { name : cmdName, ...mod }, options: options ?? [] });
+                        Files.Commands.set(cmdName, { mod: { name: cmdName, ...mod }, options: options ?? [] });
                         switch (mod.visibility) {
                             case 'private': {
                                 // Reloading guild slash commands
@@ -182,7 +203,7 @@ export class Handler {
 
             if (mod.alias.length > 0) {
                 for (const alias of mod.alias) {
-                    Files.Alias.set(alias, { mod : { name : cmdName, ...mod }, options: [] });
+                    Files.Alias.set(alias, { mod: { name: cmdName, ...mod }, options: [] });
                 }
             }
         }
@@ -195,7 +216,7 @@ export class Handler {
      */
 
     private findModuleFrom<T extends Message | CommandInteraction>(ctx: T): Files.CommandVal | undefined {
-        const name = ctx.applicationId === null ? fmt(ctx as Message, this.prefix).shift()! : (ctx as CommandInteraction).commandName; 
+        const name = ctx.applicationId === null ? fmt(ctx as Message, this.prefix).shift()! : (ctx as CommandInteraction).commandName;
         const posCommand = Files.Commands.get(name) ?? Files.Alias.get(name);
         return posCommand;
     }
@@ -214,7 +235,6 @@ export class Handler {
     ): Promise<void> {
         for (const { id } of this.privateServers) {
             const guild = await this.client.guilds.fetch(id);
-
             guild.commands.create({
                 name: cmdName,
                 description,
