@@ -17,7 +17,7 @@ import type {
 } from 'discord.js';
 import { Ok, None, Some } from 'ts-results';
 import { isNotFromBot, hasPrefix, fmt } from './utilities/messageHelpers';
-import Logger from './logger';
+import Logger, { sEvent } from './logger';
 import { AllTrue } from './utilities/higherOrders';
 
 /**
@@ -26,7 +26,7 @@ import { AllTrue } from './utilities/higherOrders';
 
 export class Handler {
     private wrapper: Wrapper;
-
+    private defaultLogger : Logger = new Logger();
     /**
      *
      * @constructor
@@ -46,7 +46,7 @@ export class Handler {
                 Files.buildData(this)
                     .then(data => this.registerModules(data));
                 wrapper.init?.(this);
-                new Logger().tableRam();
+                this.defaultLogger.tableRam();
             })
 
             .on('messageCreate', async (message: Message) => {
@@ -117,11 +117,14 @@ export class Handler {
         if (module.mod.visibility === 'private') {
             const checkIsTestServer = this.privateServers.find(({ id }) => id === message.guildId!)?.test;
             if (checkIsTestServer === undefined)
-                return 'This command has the private modifier but is not registered under Handler#privateServers';
+                this.defaultLogger.log(
+                    sEvent.MISUSE_CMD,
+                    message.guildId!,
+                    `${module} has private modifier but is not registered in private server config`
+                )
+                
             if (checkIsTestServer !== module.mod.test) {
-                const msg = `This command is only available on test servers.`; // TODO: Customizable private message
-
-                return msg;
+                return `This command is only available on test servers.`; // TODO: Customizable private message
             }
         }
         const context = {

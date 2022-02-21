@@ -2,9 +2,10 @@ import dayJS from 'dayjs';
 import Timezone from 'dayjs/plugin/timezone';
 import UTC from 'dayjs/plugin/timezone';
 
-enum sEvent {
+export enum sEvent {
     GLOBAL_SLASH,
     LOCAL_SLASH,
+    MISUSE_CMD,
     DM,
     CRASH,
     TEXT_CMD,
@@ -15,13 +16,13 @@ export default class Logger {
         console.clear();
     }
 
-    public log<T extends sEvent>(e: T, message: string) {
+    public log<T extends sEvent>(e: T, guildId: string, message: string) {
         dayJS.extend(UTC);
         dayJS.extend(Timezone);
         dayJS.tz.guess();
         // add colored logging?
         const tz = dayJS().format();
-        console.log(`[${tz}][${sEvent[e]}] :: ${message}`);
+        console.log(`[${tz}][${sEvent[e]}] @ ${guildId} :: ${message}`);
     }
 
     /**
