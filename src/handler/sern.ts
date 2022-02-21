@@ -120,7 +120,7 @@ export class Handler {
                 this.defaultLogger.log(
                     sEvent.MISUSE_CMD,
                     message.guildId!,
-                    `${module} has private modifier but is not registered in private server config`
+                    `A com has private modifier but is not registered in private server config`
                 )
                 
             if (checkIsTestServer !== module.mod.test) {
@@ -153,13 +153,13 @@ export class Handler {
             const cmdName = Files.fmtFileName(name);
             switch (mod.type) {
                 case 1:
-                    Files.Commands.set(cmdName, { mod, options: [] });
+                    Files.Commands.set(cmdName, { mod : { name : cmdName, ...mod }, options: [] });
                     break;
                 case 2:
                 case 1 | 2:
                     {
                         const options = (await import(absPath)).options as ApplicationCommandOptionData[];
-                        Files.Commands.set(cmdName, { mod, options: options ?? [] });
+                        Files.Commands.set(cmdName, { mod : { name : cmdName, ...mod }, options: options ?? [] });
                         switch (mod.visibility) {
                             case 'private': {
                                 // Reloading guild slash commands
@@ -182,7 +182,7 @@ export class Handler {
 
             if (mod.alias.length > 0) {
                 for (const alias of mod.alias) {
-                    Files.Alias.set(alias, { mod, options: [] });
+                    Files.Alias.set(alias, { mod : { name : cmdName, ...mod }, options: [] });
                 }
             }
         }

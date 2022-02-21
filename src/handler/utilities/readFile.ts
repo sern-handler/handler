@@ -5,7 +5,7 @@ import { readdirSync, statSync } from 'fs';
 import { basename, join } from 'path';
 
 export type CommandVal = {
-  mod: Sern.Module<unknown>;
+  mod: Sern.Module<unknown> & { name : string };
   options: ApplicationCommandOptionData[];
 };
 
