@@ -45,7 +45,7 @@ export class Handler {
             .on('ready', async () => {
                 Files.buildData(this)
                     .then(data => this.registerModules(data));
-                if (wrapper.init !== undefined) wrapper.init(this);
+                wrapper.init?.(this);
                 new Logger().tableRam();
             })
 
