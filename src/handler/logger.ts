@@ -22,7 +22,7 @@ export default class Logger {
         dayJS.tz.guess();
         // add colored logging?
         const tz = dayJS().format();
-        console.log(`[${tz}][${sEvent[e]}] @ ${guildId} :: ${message}`);
+        console.log(`[${tz}] [${sEvent[e]}] @ ${guildId} :: ${message}`);
     }
 
     /**

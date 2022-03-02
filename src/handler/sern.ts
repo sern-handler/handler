@@ -15,6 +15,7 @@ import type {
     CommandInteraction,
     Message
 } from 'discord.js';
+
 import { Ok, None, Some } from 'ts-results';
 import { isNotFromBot, hasPrefix, fmt } from './utilities/messageHelpers';
 import Logger, { sEvent } from './logger';
@@ -43,12 +44,11 @@ export class Handler {
              **/
 
             .on('ready', async () => {
+                this.defaultLogger.clear();
                 Files.buildData(this)
                     .then(data => this.registerModules(data));
-                wrapper.init?.(this);
-                this.defaultLogger.tableRam();
             })
-
+           
             .on('messageCreate', async (message: Message) => {
                 const isExecutable = AllTrue(isNotFromBot, hasPrefix);
                 if (!isExecutable(message, this.prefix)) return;
@@ -217,8 +217,7 @@ export class Handler {
 
     private findModuleFrom<T extends Message | CommandInteraction>(ctx: T): Files.CommandVal | undefined {
         const name = ctx.applicationId === null ? fmt(ctx as Message, this.prefix).shift()! : (ctx as CommandInteraction).commandName;
-        const posCommand = Files.Commands.get(name) ?? Files.Alias.get(name);
-        return posCommand;
+        return Files.Commands.get(name) ?? Files.Alias.get(name);
     }
 
     /**

@@ -1,4 +1,3 @@
-export module Markup {
   export enum TimestampStyles {
     BOTH_LONG = 'F',
     BOTH_SHORT = 'f',
@@ -139,7 +138,7 @@ export module Markup {
     timestamp: Timestamp
   ) {
     let ret = FrozenTimestampStyles[using];
-    for (let [key, value] of Object.entries(timestamp)) {
+    for (const [key, value] of Object.entries(timestamp)) {
       ret = ret.split(`{${key}}`).join(value);
     }
     return ret;
@@ -148,7 +147,7 @@ export module Markup {
     const date = new Date(unix);
     const timestamp = formatDate(date);
     let ret = FrozenTimestampStyles[style];
-    for (let [key, value] of Object.entries(timestamp)) {
+    for (const [key, value] of Object.entries(timestamp)) {
       ret = ret.split(`{${key}}`).join(value);
     }
     return ret;
@@ -248,7 +247,7 @@ export module Markup {
     static timestamp(
       unix: number | Date | string,
       format: TimestampStyles = TimestampStyles.BOTH_SHORT,
-      isSeconds: boolean = false
+      isSeconds = false
     ) {
       if (typeof unix === 'string') unix = Number(unix);
       if (unix instanceof Date) unix = unix.getTime();
@@ -262,7 +261,7 @@ export module Markup {
     static date(
       unix: number | Date | string,
       format: TimestampStyles = TimestampStyles.BOTH_SHORT,
-      isSeconds: boolean = false
+      isSeconds = false
     ) {
       if (typeof unix === 'string') unix = Number(unix);
       if (unix instanceof Date) unix = unix.getTime();
@@ -423,7 +422,7 @@ export module Markup {
 
     match<T extends DiscordRegexMatch>(
       type: DiscordRegexNames,
-      onlyFirst: boolean = false
+      onlyFirst = false
     ): DiscordRegexPayload<T> {
       const regex = DiscordRegex[type];
       if (regex === undefined) {
@@ -529,7 +528,7 @@ export module Markup {
     static match(
       raw: string,
       what: DiscordRegexNames,
-      onlyFirst: boolean = false
+      onlyFirst = false
     ) {
       return new this(raw).match(what, onlyFirst);
     }
@@ -558,4 +557,3 @@ export module Markup {
       return new this(raw).url();
     }
   }
-}
