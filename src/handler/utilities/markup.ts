@@ -54,6 +54,7 @@
   };
   export const EscapeBasic = (raw: string, key: keyof typeof Strings) =>
     raw.replace(Regexes[key], Replacements[key]);
+
   export const Escape: Record<string, typeof EscapeBasic> = (Object.keys(
     Strings
   ) as Array<keyof typeof Strings>).reduce(
@@ -61,6 +62,7 @@
       Object.assign(p, { [Strings[v]]: (raw: string) => EscapeBasic(raw, v) }),
     {} as Record<string, typeof EscapeBasic>
   );
+
   export const FrozenTimestampStyles: Record<TimestampStyles, string> = {
     [TimestampStyles.BOTH_LONG]:
       '{day}, {month} {date}, {year} {hour}:{minute} {meridian}',
@@ -68,7 +70,7 @@
       '{month} {date}, {year} {hour}:{minute} {meridian}',
     [TimestampStyles.DATE_LONG]: '{month} {date}, {year}',
     [TimestampStyles.DATE_SHORT]: '{month_short}/{date}/{year}',
-    [TimestampStyles.RELATIVE]: 'nope not doing this',
+    [TimestampStyles.RELATIVE]: '{raw}',
     [TimestampStyles.TIME_LONG]: '{hour}:{minute}:{second} {meridian}',
     [TimestampStyles.TIME_SHORT]: '{hour}:{minute} {meridian}'
   };
@@ -138,7 +140,7 @@
     timestamp: Timestamp
   ) {
     let ret = FrozenTimestampStyles[using];
-    for (const [key, value] of Object.entries(timestamp)) {
+    for (let [key, value] of Object.entries(timestamp)) {
       ret = ret.split(`{${key}}`).join(value);
     }
     return ret;
@@ -147,7 +149,7 @@
     const date = new Date(unix);
     const timestamp = formatDate(date);
     let ret = FrozenTimestampStyles[style];
-    for (const [key, value] of Object.entries(timestamp)) {
+    for (let [key, value] of Object.entries(timestamp)) {
       ret = ret.split(`{${key}}`).join(value);
     }
     return ret;
@@ -247,7 +249,7 @@
     static timestamp(
       unix: number | Date | string,
       format: TimestampStyles = TimestampStyles.BOTH_SHORT,
-      isSeconds = false
+      isSeconds: boolean = false
     ) {
       if (typeof unix === 'string') unix = Number(unix);
       if (unix instanceof Date) unix = unix.getTime();
@@ -261,7 +263,7 @@
     static date(
       unix: number | Date | string,
       format: TimestampStyles = TimestampStyles.BOTH_SHORT,
-      isSeconds = false
+      isSeconds: boolean = false
     ) {
       if (typeof unix === 'string') unix = Number(unix);
       if (unix instanceof Date) unix = unix.getTime();
@@ -422,7 +424,7 @@
 
     match<T extends DiscordRegexMatch>(
       type: DiscordRegexNames,
-      onlyFirst = false
+      onlyFirst: boolean = false
     ): DiscordRegexPayload<T> {
       const regex = DiscordRegex[type];
       if (regex === undefined) {
@@ -528,7 +530,7 @@
     static match(
       raw: string,
       what: DiscordRegexNames,
-      onlyFirst = false
+      onlyFirst: boolean = false
     ) {
       return new this(raw).match(what, onlyFirst);
     }
