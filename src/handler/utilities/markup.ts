@@ -1,3 +1,6 @@
+ /**
+   * An enumeration of all the valid Discord timestamp styles.
+   */
   export enum TimestampStyles {
     BOTH_LONG = 'F',
     BOTH_SHORT = 'f',
@@ -7,7 +10,10 @@
     TIME_LONG = 'T',
     TIME_SHORT = 't'
   }
-  export function trueSlice(text: string, limit?: number): string
+  /**
+   * Utility to cut messages by bytes and not characters
+   */
+  export function trueSlice(text: string, limit?: number): string {
     if (limit) {
       return new TextDecoder().decode(
         new TextEncoder().encode(text).slice(0, limit)
@@ -15,6 +21,9 @@
     }
     return text;
   }
+  /**
+   * Object that holds all the Discord Markup identifiers.
+   */
   export const Strings = {
     BOLD: '**',
     CODEBLOCK: '```',
@@ -26,7 +35,10 @@
     STRIKE: '~~',
     UNDERLINE: '__'
   };
-   export const Regexes = {
+  /**
+   * Object that maps all the Discord Markup identifiers to their respective RegExp matchers.
+   */
+  const Regexes = {
     [Strings.BOLD]: /\*\*/g,
     [Strings.CODEBLOCK]: new RegExp(Strings.CODEBLOCK, 'g'),
     [Strings.CODESTRING]: new RegExp(Strings.CODESTRING, 'g'),
@@ -41,7 +53,10 @@
     MENTION_HARDCORE: /@/g,
     URL: /\)/g
   };
-  export const Replacements = {
+  /**
+   * Object to replace Discord Markup identifiers with when escaping strings.
+   */
+  const Replacements = {
     [Strings.BOLD]: '\\*\\*',
     [Strings.CODEBLOCK]: '``\u200b`',
     [Strings.CODESTRING]: '\\`',
@@ -52,30 +67,41 @@
     [Strings.UNDERLINE]: '\\_\\_',
     MENTION: '\u200b'
   };
-  export const EscapeBasic = (raw: string, key: keyof typeof Strings) =>
-    raw.replace(Regexes[key], Replacements[key]);
-
-  export const Escape: Record<string, typeof EscapeBasic> = (Object.keys(
-    Strings
-  ) as Array<keyof typeof Strings>).reduce(
-    (p, v) =>
-      Object.assign(p, { [Strings[v]]: (raw: string) => EscapeBasic(raw, v) }),
+  /**
+   * Utility to escape some Discord Markup Identifier
+   */
+  function EscapeBasic(raw: string, key: keyof typeof Strings) {
+    return raw.replace(Regexes[key], Replacements[key]);
+  }
+  /**
+   * Object of all the Escape functions used to apply mixed markup
+   */
+  export const Escape: Record<
+    keyof typeof Strings,
+    typeof EscapeBasic
+  > = (Object.keys(Strings) as Array<keyof typeof Strings>).reduce(
+    (p, v) => Object.assign(p, { [v]: (raw: string) => EscapeBasic(raw, v) }),
     {} as Record<string, typeof EscapeBasic>
   );
-
-  export const FrozenTimestampStyles: Record<TimestampStyles, string> = {
+  /**
+   * String formatting for freezing Discord timestamps that have the Relative (R) flag
+   */
+  const FrozenTimestampStyles: Record<TimestampStyles, string> = {
     [TimestampStyles.BOTH_LONG]:
       '{day}, {month} {date}, {year} {hour}:{minute} {meridian}',
     [TimestampStyles.BOTH_SHORT]:
       '{month} {date}, {year} {hour}:{minute} {meridian}',
     [TimestampStyles.DATE_LONG]: '{month} {date}, {year}',
     [TimestampStyles.DATE_SHORT]: '{month_short}/{date}/{year}',
-    [TimestampStyles.RELATIVE]: '{raw}',
+    [TimestampStyles.RELATIVE]: '{relative}',
     [TimestampStyles.TIME_LONG]: '{hour}:{minute}:{second} {meridian}',
     [TimestampStyles.TIME_SHORT]: '{hour}:{minute} {meridian}'
   };
-  export interface Timestamp {
-    raw: Date;
+  /**
+   * Holds metadata and string conversions of a UNIX Timestamp
+   */
+  interface Timestamp {
+    raw: number;
     month: string;
     month_short: string;
     date: string;
@@ -85,8 +111,12 @@
     hour: string;
     minute: string;
     day: string;
+    relative: string;
   }
-  export const Days: Record<number, string> = {
+  /**
+   * Converter for number to Days of the Week
+   */
+  const Days: Record<number, string> = {
     0: 'Sunday',
     1: 'Monday',
     2: 'Tuesday',
@@ -95,7 +125,10 @@
     5: 'Friday',
     6: 'Saturday'
   };
-  export const Months: Record<number, string> = {
+  /**
+   * Converter for number to Months of the Year
+   */
+  const Months: Record<number, string> = {
     0: 'January',
     1: 'February',
     2: 'March',
@@ -109,9 +142,13 @@
     10: 'November',
     11: 'December'
   };
-  export function formatDate(date: Date): Timestamp {
+  /**
+   * Converts a Date object to a Timestamp object
+   */
+  function formatDate(date: Date): Timestamp {
     return {
-      raw: date,
+      relative: toTimeString(date.getTime(), TimestampUnits),
+      raw: date.getTime(),
       date: date
         .getDate()
         .toString()
@@ -135,17 +172,86 @@
       year: date.getFullYear().toString()
     };
   }
-  export function timestampToString(
-    using: TimestampStyles,
-    timestamp: Timestamp
-  ) {
-    let ret = FrozenTimestampStyles[using];
-    for (let [key, value] of Object.entries(timestamp)) {
-      ret = ret.split(`{${key}}`).join(value);
-    }
-    return ret;
+  /**
+   * Collectively multiplies bigints together
+   */
+  function multiplyLarge(...nums: Array<number | bigint>): bigint {
+    return nums.map(BigInt).reduce((p, v) => (p *= v), 1n);
   }
-  export function freezeUnix(unix: number, style: TimestampStyles) {
+  /**
+   * Get the absolute value of a bigint
+   */
+  function bigintAbs(int: bigint) {
+    if (int < 0) return -int;
+    return int;
+  }
+  /**
+   * Object of Units matched with their string representations.
+   */
+  const TimestampUnits = {
+    myriad: multiplyLarge(10, 10, 10, 10, 12, 4, 7, 24, 60, 1000),
+    millenium: multiplyLarge(10, 10, 10, 12, 4, 7, 24, 60, 1000),
+    century: multiplyLarge(10, 10, 12, 4, 7, 24, 60, 1000),
+    decade: multiplyLarge(10, 12, 4, 7, 24, 60, 60, 1000),
+    year: multiplyLarge(12, 4, 7, 24, 60, 60, 1000),
+    month: multiplyLarge(4, 7, 24, 60, 60, 1000),
+    week: multiplyLarge(7, 24, 60, 60, 1000),
+    day: multiplyLarge(24, 60, 60, 1000),
+    hour: multiplyLarge(60, 60, 1000),
+    minute: multiplyLarge(60, 1000),
+    second: multiplyLarge(1000),
+    millisecond: multiplyLarge(1)
+  };
+  /**
+   * Utility type. Used to force Object.entries to allow non-strings.
+   */
+  type ObjectEntries<K, V> = Array<[K, V]>;
+  /**
+   * Converts a UNIX timestamp to a Relative String
+   */
+  function toTimeString<T extends string | number | symbol>(
+    unix: bigint | number,
+    units: Record<T, bigint>,
+    isFromNow: boolean = false,
+    limit?: number
+  ) {
+    if (typeof unix === 'number') unix = BigInt(unix);
+
+    if (isFromNow) unix = bigintAbs(unix - BigInt(Date.now()));
+    if (unix === 0n) return '0 milliseconds';
+
+    const formatted: Map<T, number> = new Map();
+    const unitList: ObjectEntries<T, bigint> = Object.entries(units) as any;
+    let run = unix;
+
+    for (const [unit, value] of unitList) {
+      if (run < value) continue;
+      const runs = run / value + 1n;
+
+      for (let loop = 0; loop <= runs; loop++) {
+        if (run < value) break;
+        const item = formatted.get(unit);
+
+        if (item) formatted.set(unit, item + 1);
+        else formatted.set(unit, 1);
+
+        run -= value;
+      }
+    }
+    let returned: Array<string> = [];
+    for (const [key, value] of formatted) {
+      const unit = key + (value === 1 ? '' : 's');
+      returned.push(`${value} ${unit}`);
+    }
+    if (limit !== undefined) {
+      returned = returned.slice(0, limit);
+    }
+    return returned.join(', ');
+  }
+  /**
+   * Freezes a UNIT timestamp into some time string based on the Timestamp Style
+   */
+  function freezeUnix(unix: number, style: TimestampStyles) {
     const date = new Date(unix);
     const timestamp = formatDate(date);
     let ret = FrozenTimestampStyles[style];
@@ -154,7 +260,10 @@
     }
     return ret;
   }
-  export class FormatInner {
+  /**
+   * Instanced Class for formatting strings into their Markup variants
+   */
+  class FormatInner {
     public raw: string;
     public static: typeof FormatInner = FormatInner;
     constructor(raw: string | FormatInner) {
@@ -207,7 +316,7 @@
     }
 
     build(key: keyof typeof Strings, w: string) {
-      const escaped = Escape[Strings[key]](w, key);
+      const escaped = Escape[key](w, key);
       const ret = this.static.wrap(escaped, Strings[key]);
       return new this.static(ret);
     }
@@ -215,6 +324,9 @@
       return `${what}${raw}${what}`;
     }
   }
+  /**
+   * Formats strings into their Markup Variants
+   */
   export class Format extends FormatInner {
     static bold(text: string) {
       return new this(text).bold();
@@ -278,7 +390,10 @@
       return new this(`[${text}](${url})`);
     }
   }
-  export enum DiscordRegexNames {
+  /**
+   * Enumeration of names used in the Matching process
+   */
+  enum DiscordRegexNames {
     EMOJI = 'EMOJI',
     JUMP_CHANNEL = 'JUMP_CHANNEL',
     JUMP_CHANNEL_MESSAGE = 'JUMP_CHANNEL_MESSAGE',
@@ -295,6 +410,9 @@
     TEXT_UNDERLINE = 'TEXT_UNDERLINE',
     TEXT_URL = 'TEXT_URL'
   }
+  /**
+   * Mapping of Matching Names to their respective Regular Expressions
+   */
   export const DiscordRegex = {
     [DiscordRegexNames.EMOJI]: /<a?:(\w+):(\d+)>/g,
     [DiscordRegexNames.JUMP_CHANNEL]: /^(?:https?):\/\/(?:(?:(?:canary|ptb)\.)?(?:discord|discordapp)\.com\/channels\/)(\@me|\d+)\/(\d+)$/g,
@@ -312,6 +430,9 @@
     [DiscordRegexNames.TEXT_UNDERLINE]: /__([\s\S]+?)__/g,
     [DiscordRegexNames.TEXT_URL]: /((?:https?):\/\/[^\s<]+[^<.,:;"'\]\s])/g
   };
+  /**
+   * Object containing all the data from some Matching sequence
+   */
   export interface DiscordRegexMatch {
     animated?: boolean;
     channelId?: string;
@@ -323,8 +444,11 @@
     messageId?: string;
     name?: string;
     text?: string;
+    species: DiscordRegexNames;
   }
-
+  /**
+   * The result of a matched string.
+   */
   export interface DiscordRegexPayload<T extends DiscordRegexMatch> {
     match: {
       regex: RegExp;
@@ -332,43 +456,87 @@
     };
     matches: Array<T>;
   }
-
   export interface EmojiMatch extends DiscordRegexMatch {
     name: string;
     id: string;
     animated: boolean;
+    species: DiscordRegexNames.EMOJI;
   }
-  export interface JumpChannelMatch extends DiscordRegexMatch {
+  export interface JumpMatch extends DiscordRegexMatch {
     guildId: string;
-    channelId: string;
+    species:
+      | DiscordRegexNames.JUMP_CHANNEL
+      | DiscordRegexNames.JUMP_CHANNEL_MESSAGE;
   }
-  export interface JumpChannelMessageMatch extends JumpChannelMatch {
+  export interface JumpChannelMatch extends JumpMatch {
+    channelId: string;
+    species: DiscordRegexNames.JUMP_CHANNEL;
+  }
+  export interface JumpChannelMessageMatch extends JumpMatch {
+    channelId: string;
     messageId: string;
+    species: DiscordRegexNames.JUMP_CHANNEL_MESSAGE;
   }
   export interface MentionableMatch extends DiscordRegexMatch {
     id: string;
+    species:
+      | DiscordRegexNames.MENTION_CHANNEL
+      | DiscordRegexNames.MENTION_ROLE
+      | DiscordRegexNames.MENTION_USER;
   }
-  export interface MentionChannelMatch extends MentionableMatch {}
-  export interface MentionRoleMatch extends MentionableMatch {}
+  export interface MentionChannelMatch extends MentionableMatch {
+    species: DiscordRegexNames.MENTION_CHANNEL;
+  }
+  export interface MentionRoleMatch extends MentionableMatch {
+    species: DiscordRegexNames.MENTION_ROLE;
+  }
   export interface MentionUserMatch extends MentionableMatch {
     mentionType: string;
+    species: DiscordRegexNames.MENTION_USER;
   }
   export interface TextMatch extends DiscordRegexMatch {
     text: string;
+    species:
+      | DiscordRegexNames.TEXT_BOLD
+      | DiscordRegexNames.TEXT_CODEBLOCK
+      | DiscordRegexNames.TEXT_CODESTRING
+      | DiscordRegexNames.TEXT_ITALICS
+      | DiscordRegexNames.TEXT_SNOWFLAKE
+      | DiscordRegexNames.TEXT_SPOILER
+      | DiscordRegexNames.TEXT_STRIKE
+      | DiscordRegexNames.TEXT_UNDERLINE
+      | DiscordRegexNames.TEXT_URL;
   }
   export interface TextCodeblockMatch extends TextMatch {
     language: string;
+    species: DiscordRegexNames.TEXT_CODEBLOCK;
   }
-  export interface TextBoldMatch extends TextMatch {}
-  export interface TextCodestringMatch extends TextMatch {}
-  export interface TextItalicsMatch extends TextMatch {}
-  export interface TextSnowflakeMatch extends TextMatch {}
-  export interface TextSpoilerMatch extends TextMatch {}
-  export interface TextStrikeMatch extends TextMatch {}
-  export interface TextUnderlineMatch extends TextMatch {}
-  export interface TextUrlMatch extends TextMatch {}
+  export interface TextBoldMatch extends TextMatch {
+    species: DiscordRegexNames.TEXT_BOLD;
+  }
+  export interface TextCodestringMatch extends TextMatch {
+    species: DiscordRegexNames.TEXT_CODESTRING;
+  }
+  export interface TextItalicsMatch extends TextMatch {
+    species: DiscordRegexNames.TEXT_ITALICS;
+  }
+  export interface TextSnowflakeMatch extends TextMatch {
+    species: DiscordRegexNames.TEXT_SNOWFLAKE;
+  }
+  export interface TextSpoilerMatch extends TextMatch {
+    species: DiscordRegexNames.TEXT_SPOILER;
+  }
+  export interface TextStrikeMatch extends TextMatch {
+    species: DiscordRegexNames.TEXT_STRIKE;
+  }
+  export interface TextUnderlineMatch extends TextMatch {
+    species: DiscordRegexNames.TEXT_UNDERLINE;
+  }
+  export interface TextUrlMatch extends TextMatch {
+    species: DiscordRegexNames.TEXT_URL;
+  }
 
-  export class MatchInner {
+  class MatchInner {
     public raw: string;
     public static: typeof MatchInner = MatchInner;
 
@@ -439,7 +607,7 @@
 
       let match: RegExpExecArray | null = null;
       while ((match = regex.exec(this.raw))) {
-        const result: DiscordRegexMatch = { matched: match[0] };
+        const result: DiscordRegexMatch = { matched: match[0], species: type };
         switch (type) {
           case DiscordRegexNames.EMOJI:
             {
@@ -559,5 +727,4 @@
       return new this(raw).url();
     }
   }
- 
-{
+
