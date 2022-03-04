@@ -7,7 +7,7 @@
     TIME_LONG = 'T',
     TIME_SHORT = 't'
   }
-  export function trueSlice(text: string, limit?: number): string {
+  export function trueSlice(text: string, limit?: number): string
     if (limit) {
       return new TextDecoder().decode(
         new TextEncoder().encode(text).slice(0, limit)
@@ -26,7 +26,7 @@
     STRIKE: '~~',
     UNDERLINE: '__'
   };
-  export const Regexes = {
+   export const Regexes = {
     [Strings.BOLD]: /\*\*/g,
     [Strings.CODEBLOCK]: new RegExp(Strings.CODEBLOCK, 'g'),
     [Strings.CODESTRING]: new RegExp(Strings.CODESTRING, 'g'),
@@ -559,3 +559,5 @@
       return new this(raw).url();
     }
   }
+ 
+{
