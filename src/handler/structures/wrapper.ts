@@ -1,5 +1,4 @@
 import type { Client } from 'discord.js';
-import type * as Sern from '../sern';
 
 /**
  * An object to be passed into Sern.Handler constructor.
@@ -14,7 +13,7 @@ interface Wrapper {
     readonly client: Client;
     readonly prefix: string;
     readonly commands: string;
-    init?: (handler: Sern.Handler) => void;
+    init?: (handler: Wrapper) => void;
     readonly privateServers: { test: boolean; id: string }[];
 }
 

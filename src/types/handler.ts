@@ -3,6 +3,8 @@ import type {
     CommandInteractionOptionResolver,
     MessagePayload,
     MessageOptions,
+    ClientEvents,
+    Awaitable,
 } from 'discord.js';
 
 import type Module from '../handler/structures/module';
@@ -21,4 +23,5 @@ export type ParseType<T> = {
 export type Arg = ParseType<{ text: string[]; slash: SlashOptions }>;
 
 // TypeAlias for interaction.options
+export type eventConfig =  {  [K in keyof ClientEvents] :  (...args :  ClientEvents[K] ) => Awaitable<void>}[];
 export type SlashOptions = Omit<CommandInteractionOptionResolver, 'getMessage' | 'getFocused'>;
