@@ -1,5 +1,4 @@
 import * as Files from './utilities/readFile';
-
 import type {
     possibleOutput,
 } from '../types/handler';
@@ -15,12 +14,13 @@ import { Ok, None, Some } from 'ts-results';
 import { isNotFromBot, hasPrefix, fmt } from './utilities/messageHelpers';
 import Logger, { sEvent } from './logger';
 import { AllTrue } from './utilities/higherOrders';
-import type Module from './module';
-import Context from './context';
+import type Module from './structures/module';
+import Context from './structures/context';
+import type Wrapper from './structures/wrapper';
+
 /**
  * @class
  */
-
 export class Handler {
     private wrapper: Wrapper;
     private defaultLogger: Logger = new Logger();
@@ -272,22 +272,7 @@ export class Handler {
     }
 }
 
-/**
- * An object to be passed into Sern.Handler constructor.
- * @typedef {object} Wrapper
- * @property {readonly Client} client
- * @property {readonly string} prefix
- * @property {readonly string} commands
- * @prop {(handler : Handler) => void)} init
- * @property {readonly {test: boolean, id: string}[]} privateServers
- */
-export interface Wrapper {
-    readonly client: Client;
-    readonly prefix: string;
-    readonly commands: string;
-    init?: (handler: Handler) => void;
-    readonly privateServers: { test: boolean; id: string }[];
-}
+
 
 
 

@@ -1,6 +1,6 @@
 import type { ApplicationCommandOptionData } from 'discord.js';
 import type * as Sern from '../sern';
-import type Module from '../module';
+import type Module from '../structures/module';
 
 import { readdirSync, statSync } from 'fs';
 import { basename, join } from 'path';

@@ -5,7 +5,7 @@ import type {
     MessageOptions,
 } from 'discord.js';
 
-import type Module from '../handler/module';
+import type Module from '../handler/structures/module';
 
 export type Visibility = 'private' | 'public';
 

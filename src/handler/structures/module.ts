@@ -1,9 +1,9 @@
-import type { Visibility,  possibleOutput, Arg } from '../types/handler';
-import type { CommandType } from './sern';
+import type { Visibility,  possibleOutput, Arg } from '../../types/handler';
+import type { CommandType } from '../sern';
 import type  Context  from './context' ;
 import type { Awaitable } from 'discord.js';
 import type { Ok } from 'ts-results';
-import type * as Utils from './utilities/preprocessors/args';
+import type * as Utils from '../utilities/preprocessors/args';
 
 /**
  * An object that gets imported and acts as a command.
