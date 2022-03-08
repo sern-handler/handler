@@ -249,7 +249,7 @@ export class Handler {
      * @returns {string} Directory of the commands folder
      */
 
-    get commandDir(): string {
+    get commandDklir(): string {
         return this.wrapper.commands;
     }
 
