@@ -1,16 +1,11 @@
 import * as Files from './utilities/readFile';
-import type * as Utils from './utilities/preprocessors/args';
 
 import type {
     possibleOutput,
-    Visibility,
-    Context,
-    Arg
 } from '../types/handler';
 
 import type {
     ApplicationCommandOptionData,
-    Awaitable,
     Client,
     CommandInteraction,
     Message
@@ -20,7 +15,8 @@ import { Ok, None, Some } from 'ts-results';
 import { isNotFromBot, hasPrefix, fmt } from './utilities/messageHelpers';
 import Logger, { sEvent } from './logger';
 import { AllTrue } from './utilities/higherOrders';
-
+import type Module from './module';
+import Context from './context';
 /**
  * @class
  */
@@ -101,7 +97,7 @@ export class Handler {
         if (name === undefined) return `Could not find ${interaction.commandName} command!`;
 
         if (module.mod.type < CommandType.SLASH) return 'This is not a slash command';
-        const context = { message: None, interaction: Some(interaction) };
+        const context = new Context(None, Some(interaction));
         const parsedArgs = module.mod.parse?.(context, ['slash', interaction.options]) ?? Ok('');
 
         if (parsedArgs.err) return parsedArgs.val;
@@ -148,10 +144,7 @@ export class Handler {
                 return;
             }
         }
-        const context = {
-            message: Some(message),
-            interaction: None,
-        };
+        const context = new Context ( Some(message), None );
         const args = message.content.slice(this.prefix.length).trim().split(/s+/g);
         const parsedArgs = module.mod.parse?.(context, ['text', args]) ?? Ok(args);
         if (parsedArgs.err) return parsedArgs.val;
@@ -296,25 +289,7 @@ export interface Wrapper {
     readonly privateServers: { test: boolean; id: string }[];
 }
 
-/**
- * An object that gets imported and acts as a command.
- * @typedef {object} Module<T=string>
- * @property {string} desc
- * @property {Visibility} visibility
- * @property {CommandType} type
- * @property {(eventParams : Context, args : Ok<T=string>) => Awaitable<possibleOutput | void>)} execute
- * @prop {(ctx: Context, args: Arg) => Utils.ArgType<T>} parse
- */
 
-export interface Module<T = string> {
-    alias: string[];
-    desc: string;
-    visibility: Visibility;
-    type: CommandType;
-    test: boolean;
-    execute: (eventParams: Context, args: Ok<T>) => Awaitable<possibleOutput | void>;
-    parse?: (ctx: Context, args: Arg) => Utils.ArgType<T>;
-}
 
 /**
  * @enum { number };

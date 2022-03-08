@@ -1,17 +1,18 @@
 import type {
-    CommandInteraction,
+    Interaction,
     Message
 } from 'discord.js';
 import { None, Option } from 'ts-results';
 
-export class Context {
+export default class Context {
     private msg: Option<Message> = None;
-    private interac: Option<CommandInteraction> = None;
+    private interac: Option<Interaction> = None;
 
-    constructor(message : Option<Message>, interaction: Option<CommandInteraction> ) {
+    constructor(message : Option<Message>, interaction: Option<Interaction> ) {
         this.msg = message;
-        this.interac = interaction
+        this.interac = interaction;
     }
+
     get messageUnchecked() {
         return this.msg.unwrap();
     }
@@ -25,3 +26,4 @@ export class Context {
        return this.interac;
     }
 }
+

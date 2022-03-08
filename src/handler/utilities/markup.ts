@@ -212,7 +212,7 @@
   function toTimeString<T extends string | number | symbol>(
     unix: bigint | number,
     units: Record<T, bigint>,
-    isFromNow: boolean = false,
+    isFromNow = false,
     limit?: number
   ) {
     if (typeof unix === 'number') unix = BigInt(unix);
@@ -255,7 +255,7 @@
     const date = new Date(unix);
     const timestamp = formatDate(date);
     let ret = FrozenTimestampStyles[style];
-    for (let [key, value] of Object.entries(timestamp)) {
+    for (const [key, value] of Object.entries(timestamp)) {
       ret = ret.split(`{${key}}`).join(value);
     }
     return ret;
@@ -361,7 +361,7 @@
     static timestamp(
       unix: number | Date | string,
       format: TimestampStyles = TimestampStyles.BOTH_SHORT,
-      isSeconds: boolean = false
+      isSeconds = false
     ) {
       if (typeof unix === 'string') unix = Number(unix);
       if (unix instanceof Date) unix = unix.getTime();
@@ -375,7 +375,7 @@
     static date(
       unix: number | Date | string,
       format: TimestampStyles = TimestampStyles.BOTH_SHORT,
-      isSeconds: boolean = false
+      isSeconds = false
     ) {
       if (typeof unix === 'string') unix = Number(unix);
       if (unix instanceof Date) unix = unix.getTime();
@@ -592,7 +592,7 @@
 
     match<T extends DiscordRegexMatch>(
       type: DiscordRegexNames,
-      onlyFirst: boolean = false
+      onlyFirst = false
     ): DiscordRegexPayload<T> {
       const regex = DiscordRegex[type];
       if (regex === undefined) {
@@ -698,7 +698,7 @@
     static match(
       raw: string,
       what: DiscordRegexNames,
-      onlyFirst: boolean = false
+      onlyFirst = false
     ) {
       return new this(raw).match(what, onlyFirst);
     }
