@@ -1,5 +1,6 @@
 import * as Files from './utilities/readFile';
 import type {
+    DiscordEvent,
     possibleOutput,
 } from '../types/handler';
 
@@ -17,11 +18,19 @@ import { AllTrue } from './utilities/higherOrders';
 import type Module from './structures/module';
 import Context from './structures/context';
 import type Wrapper from './structures/wrapper';
+import { fromEvent } from 'rxjs';
 
-/**
- * @class
- */
-export class Handler {
+export function init( { client, events} : Wrapper) {
+   if (events !== undefined) eventObserver(client, events);
+}
+
+function eventObserver(client: Client, events: DiscordEvent[] ) {
+  events.forEach( ( [event, cb] ) => {
+      fromEvent(client, event, cb).subscribe();
+  });
+}
+
+export class Handler { 
     private wrapper: Wrapper;
     private defaultLogger: Logger = new Logger();
     /**
@@ -29,8 +38,7 @@ export class Handler {
      * @constructor
      * @param {Wrapper} wrapper The data that is required to run sern handler
      */
-
-    constructor(wrapper: Wrapper) {
+    constructor(wrapper: Wrapper) { 
         this.wrapper = wrapper;
         this.client
 
@@ -249,7 +257,7 @@ export class Handler {
      * @returns {string} Directory of the commands folder
      */
 
-    get commandDklir(): string {
+    get commandDir(): string {
         return this.wrapper.commands;
     }
 
