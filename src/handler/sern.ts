@@ -18,14 +18,29 @@ import { AllTrue } from './utilities/higherOrders';
 import type Module from './structures/module';
 import Context from './structures/context';
 import type Wrapper from './structures/wrapper';
-import { fromEvent } from 'rxjs';
+import { concatMap, first, fromEvent, pipe, tap  } from 'rxjs';
+import { SernError } from './structures/errors';
 
-export function init( { client, events} : Wrapper) {
+export function init( wrapper : Wrapper) {
+   const { events, client, init, commands } = wrapper; 
    if (events !== undefined) eventObserver(client, events);
+
+   fromEvent(client, 'ready')
+       .pipe(
+           first(),
+           tap(() => init?.( wrapper ) ),
+           concatMap( 
+                pipe( 
+                  () => Files.buildData(commands),
+                )
+            ),  
+        )
+       .subscribe(console.log);
 }
 
 function eventObserver(client: Client, events: DiscordEvent[] ) {
   events.forEach( ( [event, cb] ) => {
+      if (event === 'ready') throw Error(SernError.RESERVED_EVENT);
       fromEvent(client, event, cb).subscribe();
   });
 }
@@ -48,9 +63,6 @@ export class Handler {
              **/
 
             .on('ready', async () => {
-                this.defaultLogger.clear();
-                Files.buildData(this)
-                    .then(data => this.registerModules(data));
             })
            
             .on('messageCreate', async (message: Message) => {

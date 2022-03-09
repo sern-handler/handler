@@ -28,9 +28,7 @@ export default class Logger {
     /**
      *  Utilizes console.table() to print out memory usage of current process.
      *  Optional at startup.
-     *
      */
-
     public tableRam() {
         console.table(
             Object.entries(process.memoryUsage())
