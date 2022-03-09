@@ -7,8 +7,9 @@ import type { DiscordEvent } from '../../types/handler';
  * @property {readonly Client} client
  * @property {readonly string} prefix
  * @property {readonly string} commands
- * @prop {(handler : Handler) => void)} ini
+ * @prop {(handler : Handler) => void)} init
  * @property {readonly {test: boolean, id: string}[]} privateServers
+ * @prop { readonly DiscordEvent[] } events
  */
 interface Wrapper {
     readonly client: Client;
