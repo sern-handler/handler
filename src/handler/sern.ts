@@ -18,24 +18,14 @@ import { AllTrue } from './utilities/higherOrders';
 import type Module from './structures/module';
 import Context from './structures/context';
 import type Wrapper from './structures/wrapper';
-import { concatMap, first, fromEvent, pipe, tap  } from 'rxjs';
+import { fromEvent } from 'rxjs';
 import { SernError } from './structures/errors';
+import { onReady } from './events/readyEvent';
 
 export function init( wrapper : Wrapper) {
-   const { events, client, init, commands } = wrapper; 
+   const { events, client } = wrapper; 
    if (events !== undefined) eventObserver(client, events);
-
-   fromEvent(client, 'ready')
-       .pipe(
-           first(),
-           tap(() => init?.( wrapper ) ),
-           concatMap( 
-                pipe( 
-                  () => Files.buildData(commands),
-                )
-            ),  
-        )
-       .subscribe(console.log);
+   onReady(wrapper);  
 }
 
 function eventObserver(client: Client, events: DiscordEvent[] ) {
@@ -57,13 +47,7 @@ export class Handler {
         this.wrapper = wrapper;
         this.client
 
-            /**
-             * On ready, builds command data and registers them all
-             * from command directory
-             **/
-
-            .on('ready', async () => {
-            })
+           
            
             .on('messageCreate', async (message: Message) => {
                 const isExecutable = AllTrue(isNotFromBot, hasPrefix);
