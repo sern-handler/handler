@@ -1,6 +1,17 @@
 import type { Message } from 'discord.js';
 
 /**
+ * @param message The message object
+ * @returns `true` if message comes from DM, `false` otherwise
+ * @example isNotFromDM(message) ? 'Not From DM' : 'from DM'
+ *
+ */
+
+export function isNotFromDM ( message: Message ) { 
+   return message.channel.type !== 'DM';
+}
+
+/**
  * Checks if the author of message is a bot or not
  * @param message The message to check
  * @returns `true` if the author of the message is a bot, `false` otherwise

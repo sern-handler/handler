@@ -14,7 +14,6 @@ import type {
 import { Ok, None, Some } from 'ts-results';
 import { isNotFromBot, hasPrefix, fmt } from './utilities/messageHelpers';
 import Logger, { sEvent } from './logger';
-import { AllTrue } from './utilities/higherOrders';
 import type Module from './structures/module';
 import Context from './structures/context';
 import type Wrapper from './structures/wrapper';
@@ -51,8 +50,6 @@ export class Handler {
            
            
             .on('messageCreate', async (message: Message) => {
-                const isExecutable = AllTrue(isNotFromBot, hasPrefix);
-                if (!isExecutable(message, this.prefix)) return;
                 if (message.channel.type === 'DM') return; // TODO: Handle dms
                 const module = this.findModuleFrom(message);
                 if (module === undefined) {
