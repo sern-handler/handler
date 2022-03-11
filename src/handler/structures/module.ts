@@ -1,4 +1,4 @@
-import type { Visibility,  possibleOutput, Arg } from '../../types/handler';
+import type { possibleOutput, Arg } from '../../types/handler';
 import type { CommandType } from '../sern';
 import type  Context  from './context' ;
 import type { Awaitable } from 'discord.js';
@@ -18,9 +18,7 @@ import type * as Utils from '../utilities/preprocessors/args';
 interface Module<T = string> {
     alias: string[];
     desc: string;
-    visibility: Visibility;
     type: CommandType;
-    test: boolean;
     execute: (eventParams: Context, args: Ok<T>) => Awaitable<possibleOutput | void>;
     parse?: (ctx: Context, args: Arg) => Utils.ArgType<T>;
 }
