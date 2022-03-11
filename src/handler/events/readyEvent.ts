@@ -16,8 +16,6 @@ export const onReady = ( wrapper : Wrapper ) => {
         )
        .subscribe();
 }
-
-async function createCommandCache ( ) {
-
+async function createCommandCache( ) {
 
 }

@@ -1,5 +1,5 @@
 import type { Message } from "discord.js";
-import { filter, fromEvent, Observable } from "rxjs";
+import { filter, fromEvent, map, Observable } from "rxjs";
 import type Wrapper from "../structures/wrapper";
 import { isNotFromDM, isNotFromBot, hasPrefix } from "../utilities/messageHelpers";
 
@@ -9,7 +9,7 @@ export const onMessageCreate = ( wrapper : Wrapper) => {
     .pipe ( 
         filter( isNotFromBot ),
         filter( isNotFromDM ),
-        filter(m =>  hasPrefix(m, defaultPrefix)),
+        filter(m => hasPrefix(m, defaultPrefix)),
         
     ).subscribe(console.log) 
 

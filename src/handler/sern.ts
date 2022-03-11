@@ -12,7 +12,6 @@ import type {
 } from 'discord.js';
 
 import { Ok, None, Some } from 'ts-results';
-import { isNotFromBot, hasPrefix, fmt } from './utilities/messageHelpers';
 import Logger, { sEvent } from './logger';
 import type Module from './structures/module';
 import Context from './structures/context';
@@ -20,11 +19,15 @@ import type Wrapper from './structures/wrapper';
 import { fromEvent } from 'rxjs';
 import { SernError } from './structures/errors';
 import { onReady } from './events/readyEvent';
+import { onMessageCreate } from './events/messageEvent';
 
 export function init( wrapper : Wrapper) {
+   const logger = new Logger(); 
    const { events, client } = wrapper; 
    if (events !== undefined) eventObserver(client, events);
-   onReady(wrapper);
+   onReady( wrapper );
+   onMessageCreate( wrapper );
+
    
 }
 
@@ -50,7 +53,6 @@ export class Handler {
            
            
             .on('messageCreate', async (message: Message) => {
-                if (message.channel.type === 'DM') return; // TODO: Handle dms
                 const module = this.findModuleFrom(message);
                 if (module === undefined) {
                     this.defaultLogger.log(
