@@ -2,15 +2,16 @@ import type { ApplicationCommandOptionData } from 'discord.js';
 import type Module from '../structures/module';
 
 import { readdirSync, statSync } from 'fs';
-import { basename, join } from 'path';
+import { join } from 'path';
+import type { Command } from '../structures/commands/command';
 
 export type CommandVal = {
-  mod: Module<unknown> & { name : string };
+  mod: Command;
   options: ApplicationCommandOptionData[];
 };
 
 export const Commands = new Map<string, CommandVal>();
-export const Alias = new Map<string, CommandVal>();
+export const Alias = new Map<string, Exclude< CommandVal, 'options' >>();
 
 // Courtesy @Townsy45
 function readPath(dir: string, arrayOfFiles: string[] = []): string[] {
@@ -31,20 +32,19 @@ export const fmtFileName = (n: string) => n.substring(0, n.length - 3);
 
 /**
  * 
- * @param {Sern.Handler} handler an instance of Sern.Handler
- * @returns {Promise<{ name: string; mod: Module<unknown>; absPath: string; }[]>} data from command files
+ * @param {commandsDir} Relative path to commands directory
+ * @returns {Promise<{ mod: Command; absPath: string; }[]>} data from command files
  */
 
 export async function buildData(commandDir: string ): Promise<
   {
-    name: string;
-    mod: Module<unknown>;
+    mod: Command;
     absPath: string;
   }[]
 > {
   return Promise.all(
     getCommands(commandDir).map( async (absPath) => {
-      return { name: basename(absPath), mod: (await import(absPath)).default as Module<unknown>, absPath };
+      return {  mod: (await import(absPath)).default as Command, absPath };
     }),
   );
 }
