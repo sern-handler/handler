@@ -25,7 +25,8 @@ import { onReady } from './events/readyEvent';
 export function init( wrapper : Wrapper) {
    const { events, client } = wrapper; 
    if (events !== undefined) eventObserver(client, events);
-   onReady(wrapper);  
+   onReady(wrapper);
+   
 }
 
 function eventObserver(client: Client, events: DiscordEvent[] ) {
@@ -245,7 +246,7 @@ export class Handler {
      */
 
     get prefix(): string {
-        return this.wrapper.prefix;
+        return this.wrapper.defaultPrefix;
     }
 
     /**
