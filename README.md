@@ -22,9 +22,9 @@ pnpm add sern-handler
 
 #### ` index.js `
 ```js
-import { Client, Intents } from 'discord.js';
-import { Sern } from 'sern-handler';
-import { prefix, token } from '../src/secrets.json';
+const { Client, Intents } = require('discord.js');
+const { Sern } = require('sern-handler');
+const { prefix, token } = require('../src/secrets.json');
 
 const client = new Client({
     intents: [
@@ -37,7 +37,7 @@ const client = new Client({
 new Sern.Handler({
     client,   
     prefix,   
-    commands : 'dist/commands', 
+    commands : 'src/commands', 
     privateServers : [           
         {
             test : true,
@@ -55,10 +55,10 @@ client.login(token);
 
 #### ` ping.js `
 ```js
-import { Sern, Types } from 'sern-handler';
-import { Ok } from 'ts-results';
+const { Sern, Types } = require('sern-handler');
+const { Ok } = require('ts-results');
 
-export default  {
+module.exports = {
     alias: [],
     desc : 'A ping pong command',
     visibility : 'private',
@@ -68,13 +68,13 @@ export default  {
 };
 ```
 
-See [documentation](https://sern-handler.js.org) for TypeScript examples and more
+See [documentation](https://sern-handler.js.org) for JavaScript examples and more
 
 ## Links ![link](https://img.shields.io/badge/Coming-Soon-purple)
 
-- [Official Documentation](https://tmp.com)
-- [Example Bot](https://tmp.com)
-- [Discord Server](https://google.com)
+- [Official Documentation](https://sern-handler.js.org)
+- Example Bot
+- Discord Server
 
 ## Contribute
 
@@ -83,9 +83,9 @@ See [documentation](https://sern-handler.js.org) for TypeScript examples and mor
 
 ## TODO
 
-- Default commands
-- Categories
-- Ruling out all bugs in the command system
-- Better support for slash commands
-- More Build scripts
-- Logger
+- [ ] Default commands
+- [ ] Categories
+- [ ] Ruling out all bugs in the command system
+- [ ] Better support for slash commands
+- [ ] More Build scripts
+- [ ] Logger
