@@ -4,6 +4,7 @@ import Context from "../context";
 import type * as Utils from '../../utilities/preprocessors/args';
 import { None, Ok } from "ts-results";
 import { CommandType } from "../../sern";
+import { SernError } from "../errors";
 
 
 export abstract class Command {
@@ -15,22 +16,27 @@ export abstract class Command {
     protected _alias : string[] | undefined;
     protected constructor ( 
         commandType : CommandType,
+        alias : string[] | [],
         options?: ApplicationCommandOptionData[],
-        alias? : string[],
         name? : string | undefined
     ) {
         this._name = name;
         this._commandType = commandType;
         switch ( commandType ) {
             case CommandType.TEXT : {
+              this._options = undefined;
               this._alias = alias;
-              this._options = undefined; 
             } break;
-            case CommandType.SLASH : case CommandType.BOTH : {
-              this._alias = undefined        
+            case CommandType.SLASH : {
+              if(alias.length < 0) throw Error(SernError.NO_ALIAS);
+              this._options = options;
+            } break;
+            case CommandType.BOTH : {
               this._options = options; 
+              this._alias = alias;
             } break;
-
+            
+            
         }
     }
 
