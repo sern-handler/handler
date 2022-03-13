@@ -5,6 +5,7 @@ import type * as Utils from '../../utilities/preprocessors/args';
 import { None, Ok } from "ts-results";
 import { CommandType } from "../../sern";
 import { SernError } from "../errors";
+import type CommandOptions from "./command-options";
 
 
 export abstract class Command {
@@ -15,10 +16,7 @@ export abstract class Command {
     protected _options : ApplicationCommandOptionData[] | undefined;
     protected _alias : string[] | undefined;
     protected constructor ( 
-        commandType : CommandType,
-        alias : string[] | [],
-        options?: ApplicationCommandOptionData[],
-        name? : string | undefined
+        { name, commandType, options, alias } : CommandOptions 
     ) {
         this._name = name;
         this._commandType = commandType;
@@ -42,9 +40,9 @@ export abstract class Command {
 
     abstract execute<T> ( args: Ok<T> ) : Awaitable<possibleOutput | void>;
     abstract parse?<T> ( args: Arg ) : Utils.ArgType<T>;
-    public set ctx ( context: Context ) {  this._ctx = context; }
-    public get name () { return this._name; }
-    public get commandType () { return this._commandType; } 
-    public get options() { return this._options; }
-    public get alias() { return this._alias }
+    public setCtx ( context: Context ) {  this._ctx = context; }
+    public getName () { return this._name; }
+    public getCommandType () { return this._commandType; } 
+    public getOptions() { return this._options; }
+    public getAlias() { return this._alias }
 }

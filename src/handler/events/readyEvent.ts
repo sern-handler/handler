@@ -21,10 +21,10 @@ export const onReady = ( wrapper : Wrapper ) => {
 }
 
 function setCommands ( { mod, absPath } : { mod : Command, absPath : string } ) {
-   const options = mod.options ?? [] as ApplicationCommandOptionData[];
-   const name = mod.name ?? Files.fmtFileName(basename(absPath));
+   const options = mod.getOptions() ?? [] as ApplicationCommandOptionData[];
+   const name = mod.getName() ?? Files.fmtFileName(basename(absPath));
 
-   mod.alias?.forEach( n =>  Files.Alias.set( n, { mod, options } )); 
+   mod.getAlias()?.forEach( n =>  Files.Alias.set( n, { mod, options } )); 
 
    Files.Commands.set(name, { mod, options });
 }

@@ -1,19 +1,12 @@
 import type {
     DiscordEvent,
-    possibleOutput,
 } from '../types/handler';
 
 import type {
-    ApplicationCommandOptionData,
     Client,
-    CommandInteraction,
-    Message
 } from 'discord.js';
 
-import { Ok, None, Some } from 'ts-results';
-import Logger, { sEvent } from './logger';
-import type Module from './structures/module';
-import Context from './structures/context';
+import Logger from './logger';
 import type Wrapper from './structures/wrapper';
 import { fromEvent } from 'rxjs';
 import { SernError } from './structures/errors';
@@ -27,6 +20,7 @@ export function init( wrapper : Wrapper) {
    onReady( wrapper );
    onMessageCreate( wrapper );
 
+
    
 }
 
@@ -38,17 +32,6 @@ function eventObserver(client: Client, events: DiscordEvent[] ) {
 }
 
 export class Handler { 
-    private wrapper: Wrapper;
-    private defaultLogger: Logger = new Logger();
-    /**
-     *
-     * @constructor
-     * @param {Wrapper} wrapper The data that is required to run sern handler
-     */
-    constructor(wrapper: Wrapper) { 
-        this.wrapper = wrapper;
-
-    }       
 /**           
             .on('messageCreate', async (message: Message) => {
                 const module = this.findModuleFrom(message);

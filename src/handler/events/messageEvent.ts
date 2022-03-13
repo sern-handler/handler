@@ -1,5 +1,5 @@
 import type { Message } from "discord.js";
-import { filter, fromEvent, map, Observable } from "rxjs";
+import { filter, fromEvent,  Observable } from "rxjs";
 import type Wrapper from "../structures/wrapper";
 import { isNotFromDM, isNotFromBot, hasPrefix } from "../utilities/messageHelpers";
 
