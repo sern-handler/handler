@@ -1,5 +1,5 @@
 import type { ApplicationCommandOptionData } from 'discord.js';
-import type { CommandType } from '../sern';
+import type { CommandType } from '../../sern';
 
 /**
  * An object that gets imported and acts as a command.
@@ -15,7 +15,6 @@ interface CommandOptions {
     alias : string[] | [],
     options?: ApplicationCommandOptionData[],
     name? : string | undefined
-
 }
 
 export default CommandOptions;
