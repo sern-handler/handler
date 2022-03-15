@@ -1,5 +1,5 @@
 import Context from './context';
-import type Module from './module';
+import * as ModuleTypes from './commands/module';
 import type Wrapper from './wrapper';
 
-export { Context, Module, Wrapper };
+export { Context, ModuleTypes, Wrapper };

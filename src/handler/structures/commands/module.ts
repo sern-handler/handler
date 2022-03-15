@@ -8,19 +8,16 @@ interface BaseModule {
     name? : string;
     description : string;
     execute() : Awaitable<possibleOutput | void>
-    plugins? : [] //TODO
 }
 
-type TextCommand = { moduleType : CommandType.TEXT; alias : string[] | [] };
-type SlashCommand = { moduleType : CommandType.SLASH; options : ApplicationCommandOptionData[] | [] };
-type BothCommand = { moduleType : CommandType.BOTH; alias : string[] | []; options : ApplicationCommandOptionData[] | [] }
+export type Text= { type : CommandType.TEXT; alias : string[] | [] };
+export type Slash={ type : CommandType.SLASH; options : ApplicationCommandOptionData[] | [] };
+export type Both= { type : CommandType.BOTH; alias : string[] | []; options : ApplicationCommandOptionData[] | [] }
 
 export type Module = 
-    BaseModule & (
-    TextCommand
-    | SlashCommand
-    | BothCommand
-    );
+    BaseModule 
+    &  Slash | Both | Text;
+    
 
 
 
