@@ -1,30 +1,22 @@
 import { CommandType } from "../../sern";
-import { SernError } from "../errors";
-import type { Modules }  from "../structxports";
+import type { Text, Both, Slash, BaseModule }  from "./module";
 
-export type TextAction = ( mod : Modules.Text ) => unknown;
-export type BothAction = ( mod : Modules.Both) => unknown;
-export type SlashAction= ( mod : Modules.Slash) => unknown;
+//https://stackoverflow.com/questions/64092736/alternative-to-switch-statement-for-typescript-discriminated-union
 
-export type Action =
-    TextAction
-    | BothAction
-    | SlashAction;
-
-
-export function onModule<T extends Modules.Module> ( mod: T, action : Action ) : unknown {
-    switch (mod.type) {
-        case CommandType.TEXT : { 
-           return (action as TextAction)(mod); 
-        }
-        case CommandType.SLASH : {
-           return (action as SlashAction)(mod);
-        }
-        case CommandType.BOTH : {
-           return (action as BothAction)(mod);
-        }
-        default : throw Error(SernError.NOT_VALID_MOD_TYPE);
-    }
-
+// Explicit Module Definitions for mapping
+export type ModuleDefs = {
+    [CommandType.TEXT] : Text & BaseModule,
+    [CommandType.SLASH] : Slash & BaseModule,
+    [CommandType.BOTH] : Both & BaseModule,
 }
+
+//Keys of ModuleDefs
+export type ModuleType = keyof ModuleDefs;
+// The keys mapped to a constructed union with its type
+export type ModuleStates = { [ K in ModuleType ] : { type : K } & ModuleDefs[K] };
+// A handler callback that is called on each ModuleDef 
+export type HandlerCallback<K extends ModuleType>= ( params : ModuleStates[K] ) => unknown;
+//An object that acts as the mapped object to handler
+export type ModuleHandlers = { [K in ModuleType] : HandlerCallback<K> };
+
 
