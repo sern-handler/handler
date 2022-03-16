@@ -1,4 +1,4 @@
-import type { Message } from 'discord.js';
+import { ChannelType, Message } from 'discord.js';
 
 /**
  * @param message The message object
@@ -8,7 +8,7 @@ import type { Message } from 'discord.js';
  */
 
 export function isNotFromDM ( message: Message ) { 
-   return message.channel.type !== 'DM';
+   return message.channel.type !== ChannelType.DM;
 }
 
 /**

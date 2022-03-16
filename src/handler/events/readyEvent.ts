@@ -2,8 +2,10 @@ import { concatMap, first, from, fromEvent, map, pipe, tap } from "rxjs";
 import { basename } from 'path';
 import * as Files from '../utilities/readFile';
 import type Wrapper from '../structures/wrapper';
-import type { Command } from "../structures/commands/command";
-import type { ApplicationCommandOptionData } from "discord.js";
+import type { Modules } from "../structures/structxports";
+import type { HandlerCallback, ModuleDefs, ModuleHandlers, ModuleStates, ModuleType } from "../structures/commands/moduleHandler";
+import { CommandType } from "../sern";
+
 export const onReady = ( wrapper : Wrapper ) => {
     const { client, init, commands, } = wrapper;
     fromEvent(client, 'ready')
@@ -20,17 +22,32 @@ export const onReady = ( wrapper : Wrapper ) => {
        .subscribe( () => console.log(Files.Commands));
 }
 
-function setCommands ( { mod, absPath } : { mod : Command, absPath : string } ) {
-   const options = mod.getOptions() ?? [] as ApplicationCommandOptionData[];
-   const name = mod.getName() ?? Files.fmtFileName(basename(absPath));
+const handler = ( name : string ) =>
+    ({
+        [CommandType.TEXT] : mod => {
+            mod.alias.forEach ( a => Files.Alias.set(a,mod));
+            Files.Commands.set( name,  mod  );
+        },
+        [CommandType.SLASH]: mod => {
+            Files.Commands.set( name,  mod);
+        },
+        [CommandType.BOTH] : mod => {
+            Files.Commands.set ( name, mod); 
+            mod.alias.forEach (a => Files.Alias.set(a, mod));
+        }
+    }) as ModuleHandlers;
 
-   mod.getAlias()?.forEach( n =>  Files.Alias.set( n, { mod, options } )); 
+const registerModules = <T extends ModuleType >(name : string, mod : ModuleStates[T]) =>
+    (handler(name)[mod.type] as HandlerCallback<T>)(mod);
 
-   Files.Commands.set(name, { mod, options });
+function setCommands ( { mod, absPath } : { mod : Modules.Module, absPath : string } ) {
+   const name = mod.name ?? Files.fmtFileName(basename(absPath));
+   registerModules(name, mod); 
 }
 
 async function createCommandCache( 
-    arr: Promise<{mod: Command, absPath: string}[]> 
+    arr: Promise<{mod: Modules.Module, absPath: string}[]> 
     ) {
+    console.log(await arr);
     from(await arr).subscribe ( setCommands );
 }

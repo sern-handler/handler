@@ -1,4 +1,4 @@
-import type { ApplicationCommandOptionData, Awaitable } from "discord.js";
+import type { ApplicationCommandOptionData, Awaitable, PartialWebhookMixin } from "discord.js";
 import type { possibleOutput } from "../../../types/handler";
 import type { CommandType } from "../../sern";
 
@@ -15,7 +15,7 @@ export type Slash = { type : CommandType.SLASH; options : ApplicationCommandOpti
 export type Both = { type : CommandType.BOTH; alias : string[] | []; options : ApplicationCommandOptionData[] | [] }
 
 export type Module = 
-    (BaseModule  &  Slash) | (BaseModule & Both) | (BaseModule & Text);
+    (BaseModule & Slash) | (BaseModule & Both) | (BaseModule & Text);
     
 
 

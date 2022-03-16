@@ -2,15 +2,11 @@ import type { ApplicationCommandOptionData } from 'discord.js';
 
 import { readdirSync, statSync } from 'fs';
 import { join } from 'path';
-import type { Command } from '../structures/commands/command';
+import type { Module } from '../structures/commands/module';
 
-export type CommandVal = {
-  mod: Command;
-  options: ApplicationCommandOptionData[];
-};
 
-export const Commands = new Map<string, CommandVal>();
-export const Alias = new Map<string, Exclude< CommandVal, 'options' >>();
+export const Commands = new Map<string, Module>();
+export const Alias = new Map<string, Module>();
 
 // Courtesy @Townsy45
 function readPath(dir: string, arrayOfFiles: string[] = []): string[] {
@@ -37,13 +33,13 @@ export const fmtFileName = (n: string) => n.substring(0, n.length - 3);
 
 export async function buildData(commandDir: string ): Promise<
   {
-    mod: Command;
+    mod: Module;
     absPath: string;
   }[]
 > {
   return Promise.all(
     getCommands(commandDir).map( async (absPath) => {
-      return {  mod: (await import(absPath)).default as Command, absPath };
+      return {  mod: (await import(absPath)).module as Module, absPath };
     }),
   );
 }
