@@ -7,10 +7,10 @@ import type {
     Awaitable,
 } from 'discord.js';
 
-import type { Modules } from '../handler/structures/structxports';
+import type { Context, Modules } from '../handler/structures/structxports';
 
 export type Visibility = 'private' | 'public';
-
+export type parseArgs = <T>( ctx: Context, args : string[] )  => T | possibleOutput;
 // Anything that can be sent in a `<TextChannel>#send` or `<CommandInteraction>#reply`
 export type possibleOutput<T = string> = T | (MessagePayload & MessageOptions);
 export type execute = Modules.Module['execute'];

@@ -47,7 +47,7 @@ function setCommands ( { mod, absPath } : { mod : Modules.Module, absPath : stri
 
 async function createCommandCache( 
     arr: Promise<{mod: Modules.Module, absPath: string}[]> 
-    ) {
+  ) {
     console.log(await arr);
     from(await arr).subscribe ( setCommands );
 }
