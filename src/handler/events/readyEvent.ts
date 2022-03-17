@@ -3,7 +3,7 @@ import { basename } from 'path';
 import * as Files from '../utilities/readFile';
 import type Wrapper from '../structures/wrapper';
 import type { Modules } from "../structures/structxports";
-import type { HandlerCallback, ModuleDefs, ModuleHandlers, ModuleStates, ModuleType } from "../structures/commands/moduleHandler";
+import type { HandlerCallback, ModuleHandlers, ModuleStates, ModuleType } from "../structures/commands/moduleHandler";
 import { CommandType } from "../sern";
 
 export const onReady = ( wrapper : Wrapper ) => {
@@ -19,7 +19,12 @@ export const onReady = ( wrapper : Wrapper ) => {
                 )
             ),  
         )
-       .subscribe( () => console.log(Files.Commands));
+       .subscribe({
+            complete() {
+                // on ready event, complete!
+                // log stuff?
+            }
+       });
 }
 
 const handler = ( name : string ) =>
@@ -48,6 +53,5 @@ function setCommands ( { mod, absPath } : { mod : Modules.Module, absPath : stri
 async function createCommandCache( 
     arr: Promise<{mod: Modules.Module, absPath: string}[]> 
   ) {
-    console.log(await arr);
     from(await arr).subscribe ( setCommands );
 }
