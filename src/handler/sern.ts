@@ -112,7 +112,6 @@ export class Handler {
 /**
  * @enum { number };
  */
-
 export enum CommandType {
     TEXT  = 0b0001,
     SLASH = 0b0010,

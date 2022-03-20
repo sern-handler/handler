@@ -40,7 +40,7 @@ const handler = ( name : string ) =>
             Files.Commands.set ( name, mod); 
             mod.alias.forEach (a => Files.Alias.set(a, mod));
         }
-    }) as ModuleHandlers;
+    } as ModuleHandlers);
 
 const registerModules = <T extends ModuleType >(name : string, mod : ModuleStates[T]) =>
     (handler(name)[mod.type] as HandlerCallback<T>)(mod);

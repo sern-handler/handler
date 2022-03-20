@@ -1,6 +1,7 @@
 import type { Message } from "discord.js";
-import { map, filter, fromEvent,  Observable, of, concatMap, tap  } from "rxjs";
+import { map, filter, fromEvent,  Observable, of, concatMap } from "rxjs";
 import { None, Some } from "ts-results";
+import { CommandType } from "../sern";
 import Context from "../structures/context";
 import type Wrapper from "../structures/wrapper";
 import { isNotFromDM, isNotFromBot, hasPrefix, fmt } from "../utilities/messageHelpers";
@@ -18,7 +19,7 @@ export const onMessageCreate = (wrapper : Wrapper) => {
             map(([prefix, ...args ]) =>{
                 return [Files.Commands.get(prefix) ?? Files.Alias.get(prefix), new Context(Some(m), None), args ] as const;
             }),
-            filter( ([mod]) => mod !== undefined),
+            filter( ([mod]) => mod !== undefined && (mod.type & CommandType.TEXT) != 0 ),
             map ( async ([ mod, ctx, args ]) => {
                  const parsedArgs = mod!.parse?.(ctx, args);
                  const res = await mod!.execute(ctx, parsedArgs);
