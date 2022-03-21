@@ -1,5 +1,5 @@
 import type { Message } from "discord.js";
-import { map, filter, fromEvent,  Observable, of, concatMap } from "rxjs";
+import { map, filter, fromEvent,  Observable, of, concatMap, tap } from "rxjs";
 import { None, Some } from "ts-results";
 import { CommandType } from "../sern";
 import Context from "../structures/context";
@@ -16,15 +16,16 @@ export const onMessageCreate = (wrapper : Wrapper) => {
         filter( m => hasPrefix(m, defaultPrefix)),
         concatMap ( m => of( fmt(m, defaultPrefix) )
            .pipe (
-            map(([prefix, ...args ]) =>{
-                return [Files.Commands.get(prefix) ?? Files.Alias.get(prefix), new Context(Some(m), None), args ] as const;
-            }),
+            map(([prefix, ...args ]) => 
+                [
+                    Files.Commands.get(prefix) ?? Files.Alias.get(prefix),
+                    new Context(Some(m), None), 
+                    args 
+                ] as const
+            ),
             filter( ([mod]) => mod !== undefined && (mod.type & CommandType.TEXT) != 0 ),
-            map ( async ([ mod, ctx, args ]) => {
-                 const parsedArgs = mod!.parse?.(ctx, args);
-                 const res = await mod!.execute(ctx, parsedArgs);
-                 // some ducktape lol
-                 return res !== undefined ? ctx.messageUnchecked.channel.send(res) : null;
+            tap ( ([ mod, ctx, args ]) => {
+                mod!.execute(ctx, ['text', args])
              }),
            )
         )
@@ -36,7 +37,7 @@ export const onMessageCreate = (wrapper : Wrapper) => {
        },
        next(command) {
         //log on each command emitted 
-        command.then( res => console.log(`a command returned ${ res ?? `no value`}`));
+        console.log(command);
        },
     }) 
 
