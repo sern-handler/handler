@@ -3,6 +3,7 @@ import type { ApplicationCommandOptionData } from 'discord.js';
 import { readdirSync, statSync } from 'fs';
 import { join } from 'path';
 import type { Module } from '../structures/commands/module';
+import { SernError } from '../structures/errors';
 
 
 export const Commands = new Map<string, Module>();
@@ -39,7 +40,9 @@ export async function buildData(commandDir: string ): Promise<
 > {
   return Promise.all(
     getCommands(commandDir).map( async (absPath) => {
-      return {  mod: (await import(absPath)).module as Module, absPath };
+      const mod = (await import(absPath)).module as Module;
+      if (mod === undefined) throw Error(`${SernError.UNDEFINED_MODULE} ${absPath}`)
+      return {  mod, absPath };
     }),
   );
 }
