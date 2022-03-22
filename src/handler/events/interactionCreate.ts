@@ -16,8 +16,8 @@ export const onInteractionCreate = ( wrapper : Wrapper ) => {
         concatMap ( interaction => {
             if (interaction.isChatInputCommand()) {
                 return of(interaction.commandName).pipe(
-                    map ( Files.Commands.get ),
-                    filter ( mod => mod !== undefined && (mod.type & CommandType.SLASH) != 0),
+                    map ( name => Files.Commands.get(name) ),
+                    filter( mod => mod !== undefined && (mod.type & CommandType.SLASH) != 0),
                     tap ( mod => {
                         const ctx = new Context(None, Some(interaction));
                         mod!.execute(ctx, ['slash', interaction.options]); 
@@ -31,9 +31,8 @@ export const onInteractionCreate = ( wrapper : Wrapper ) => {
             else { return of() }
         })
       ).subscribe({
-       error() {
-        //log things
-        console.log('Failed to finished message subscription!');
+       error(e) {
+        throw e;
        },
        next(command) {
         //log on each command emitted 

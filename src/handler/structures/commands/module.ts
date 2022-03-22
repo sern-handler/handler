@@ -8,7 +8,7 @@ import type Context from "../context";
 export interface BaseModule {
     name? : string;
     description : string;
-    execute<T>(ctx: Context, args: Args) : Awaitable<T>
+    execute: (ctx: Context, args: Args) => Awaitable<void>;
 }
 export type Text = {
     type : CommandType.TEXT;

@@ -6,20 +6,19 @@ import type {
     Client,
 } from 'discord.js';
 
-import Logger from './logger';
 import type Wrapper from './structures/wrapper';
 import { fromEvent } from 'rxjs';
 import { SernError } from './structures/errors';
 import { onReady } from './events/readyEvent';
 import { onMessageCreate } from './events/messageEvent';
+import { onInteractionCreate } from './events/interactionCreate';
 
 export function init( wrapper : Wrapper) {
-   const logger = new Logger(); 
    const { events, client } = wrapper; 
    if (events !== undefined) eventObserver(client, events);
    onReady( wrapper );
    onMessageCreate( wrapper );
-
+   onInteractionCreate ( wrapper ); 
 
    
 }
