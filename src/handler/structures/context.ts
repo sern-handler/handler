@@ -11,7 +11,7 @@ function firstSome<T>(...args : Option<T>[]) : T | null {
     return null;
 }
 
-export default class Context<I extends Interaction> {
+export default class Context<I extends Interaction = Interaction> {
     private msg: Option<Message> = None;
     private interac: Option<I> = None;
 

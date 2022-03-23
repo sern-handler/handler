@@ -1,13 +1,13 @@
 import { CommandType } from "../../sern";
-import type { Text, Both, Slash, BaseModule }  from "./module";
+import type { TextCommand, BothCommand, SlashCommand, BaseModule }  from "./module";
 
 //https://stackoverflow.com/questions/64092736/alternative-to-switch-statement-for-typescript-discriminated-union
 
 // Explicit Module Definitions for mapping
 export type ModuleDefs = {
-    [CommandType.TEXT] : Text & BaseModule,
-    [CommandType.SLASH] : Slash & BaseModule,
-    [CommandType.BOTH] : Both & BaseModule,
+    [CommandType.TEXT] : TextCommand,
+    [CommandType.SLASH] : SlashCommand,
+    [CommandType.BOTH] : BothCommand,
 }
 
 //Keys of ModuleDefs
