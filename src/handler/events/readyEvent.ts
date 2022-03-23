@@ -21,7 +21,6 @@ export const onReady = ( wrapper : Wrapper ) => {
         )
        .subscribe({
             complete() {
-                console.log(Files.Commands);
                 // on ready event, complete!
                 // log stuff?
             }

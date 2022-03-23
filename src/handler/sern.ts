@@ -13,7 +13,7 @@ import { onReady } from './events/readyEvent';
 import { onMessageCreate } from './events/messageEvent';
 import { onInteractionCreate } from './events/interactionCreate';
 
-export function init( wrapper : Wrapper) {
+export function init( wrapper : Wrapper ) {
    const { events, client } = wrapper; 
    if (events !== undefined) eventObserver(client, events);
    onReady( wrapper );

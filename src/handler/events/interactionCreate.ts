@@ -1,5 +1,5 @@
-import type { Awaitable, ChatInputCommandInteraction, Interaction } from "discord.js";
-import { map, filter, fromEvent,  Observable, of, mergeMap, tap, concatMap} from "rxjs";
+import type { Interaction } from "discord.js";
+import { map, filter, fromEvent,  Observable, of,  tap, concatMap} from "rxjs";
 import { None, Some } from "ts-results";
 import { CommandType } from "../sern";
 import Context from "../structures/context";
@@ -26,7 +26,6 @@ export const onInteractionCreate = ( wrapper : Wrapper ) => {
             }
             if (interaction.isContextMenuCommand()) {
                 return of() 
-
             }
             else { return of() }
         })
