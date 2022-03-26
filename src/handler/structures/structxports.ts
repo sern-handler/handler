@@ -1,5 +1,5 @@
 import Context from './context';
-import type { SlashCommand, TextCommand, BothCommand } from './commands/module';
+import type { SlashCommand, TextCommand, BothCommand, Module } from './commands/module';
 import type Wrapper from './wrapper';
 
 export { 
@@ -7,5 +7,6 @@ export {
     SlashCommand,
     TextCommand,
     BothCommand,
+    Module,
     Wrapper 
 };
