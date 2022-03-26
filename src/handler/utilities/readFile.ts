@@ -1,5 +1,3 @@
-import type { ApplicationCommandOptionData } from 'discord.js';
-
 import { readdirSync, statSync } from 'fs';
 import { join } from 'path';
 import type { Module } from '../structures/commands/module';
