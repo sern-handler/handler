@@ -112,7 +112,9 @@ export class Handler {
  * @enum { number };
  */
 export enum CommandType {
-    TEXT  = 0b0001,
-    SLASH = 0b0010,
-    BOTH  = 0b0011
+    TEXT  =      0b0001,
+    SLASH =      0b0010,
+    MENU_USER =  0b0100,
+    MENU_MSG =   0b1000,
+    BOTH  =      0b0011,
 }

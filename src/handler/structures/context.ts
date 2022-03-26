@@ -37,13 +37,13 @@ export default class Context<I extends Interaction = Interaction> {
       return firstSome(
           this.message.andThen(m => Some(m.channel)),
           this.interaction.andThen(i => Some(i.channel))
-      )
+      );
     }
     public get user() {
         return firstSome(
           this.message.andThen(m => Some(m.author)),
           this.interaction.andThen(i => Some(i.user))
-      ) 
+      ); 
     }
 }
 

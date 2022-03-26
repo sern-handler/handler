@@ -1,10 +1,10 @@
-import { concatMap, first, from, fromEvent, map, pipe, tap } from "rxjs";
+import { concatMap, first, from, fromEvent, pipe, tap } from 'rxjs';
 import { basename } from 'path';
 import * as Files from '../utilities/readFile';
 import type Wrapper from '../structures/wrapper';
-import type { Modules } from "../structures/structxports";
-import type { HandlerCallback, ModuleHandlers, ModuleStates, ModuleType } from "../structures/commands/moduleHandler";
-import { CommandType } from "../sern";
+import type { Module } from '../structures/structxports';
+import type { HandlerCallback, ModuleHandlers, ModuleStates, ModuleType } from '../structures/commands/moduleHandler';
+import { CommandType } from '../sern';
 
 export const onReady = ( wrapper : Wrapper ) => {
     const { client, init, commands, } = wrapper;
@@ -25,7 +25,7 @@ export const onReady = ( wrapper : Wrapper ) => {
                 // log stuff?
             }
        });
-}
+};
 
 const handler = ( name : string ) =>
     ({
@@ -39,19 +39,26 @@ const handler = ( name : string ) =>
         [CommandType.BOTH] : mod => {
             Files.Commands.set ( name, mod); 
             mod.alias.forEach (a => Files.Alias.set(a, mod));
+        },
+        [CommandType.MENU_USER] : mod => {
+            Files.Commands.set ( name, mod );
+        },
+        [CommandType.MENU_MSG] : mod =>  { 
+
+            Files.Commands.set (name, mod );
         }
     } as ModuleHandlers);
 
 const registerModules = <T extends ModuleType >(name : string, mod : ModuleStates[T]) =>
     (handler(name)[mod.type] as HandlerCallback<T>)(mod);
 
-function setCommands ( { mod, absPath } : { mod : Modules.Module, absPath : string } ) {
+function setCommands ( { mod, absPath } : { mod : Module, absPath : string } ) {
    const name = mod.name ?? Files.fmtFileName(basename(absPath));
    registerModules(name, mod); 
 }
 
 async function createCommandCache( 
-    arr: Promise<{mod: Modules.Module, absPath: string}[]> 
+    arr: Promise<{mod: Module, absPath: string}[]> 
   ) {
     from(await arr).subscribe ( setCommands );
 }

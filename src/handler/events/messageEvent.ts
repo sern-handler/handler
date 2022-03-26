@@ -1,11 +1,11 @@
-import type { Message } from "discord.js";
-import { map, filter, fromEvent,  Observable, of, concatMap, tap } from "rxjs";
-import { None, Some } from "ts-results";
-import { CommandType } from "../sern";
-import type { TextCommand } from "../structures/commands/module";
-import Context from "../structures/context";
-import type Wrapper from "../structures/wrapper";
-import { isNotFromDM, isNotFromBot, hasPrefix, fmt } from "../utilities/messageHelpers";
+import type { Message } from 'discord.js';
+import { map, filter, fromEvent,  Observable, of, concatMap, tap } from 'rxjs';
+import { None, Some } from 'ts-results';
+import { CommandType } from '../sern';
+import type { TextCommand } from '../structures/commands/module';
+import Context from '../structures/context';
+import type Wrapper from '../structures/wrapper';
+import { isNotFromDM, isNotFromBot, hasPrefix, fmt } from '../utilities/messageHelpers';
 import * as Files from '../utilities/readFile';
 
 export const onMessageCreate = (wrapper : Wrapper) => {
@@ -26,7 +26,7 @@ export const onMessageCreate = (wrapper : Wrapper) => {
             ),
             filter( ([mod]) => mod !== undefined && (mod.type & CommandType.TEXT) != 0 ),
             tap ( ([ mod, ctx, args ]) => {
-                (mod as TextCommand)!.execute(ctx, ['text', args])
+                (mod as TextCommand)!.execute(ctx, ['text', args]);
              }),
            )
         )
@@ -40,7 +40,7 @@ export const onMessageCreate = (wrapper : Wrapper) => {
         //log on each command emitted 
         console.log(command);
        },
-    }) 
+    }); 
 
 
-}
+};

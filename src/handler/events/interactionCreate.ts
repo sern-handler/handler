@@ -1,9 +1,10 @@
-import type { Interaction } from "discord.js";
-import { map, filter, fromEvent,  Observable, of,  tap, concatMap} from "rxjs";
-import { None, Some } from "ts-results";
-import { CommandType } from "../sern";
-import Context from "../structures/context";
-import type Wrapper from "../structures/wrapper";
+import type { ChatInputCommandInteraction, CommandInteraction, Interaction } from 'discord.js';
+import { map, filter, fromEvent,  Observable, of,  tap, concatMap} from 'rxjs';
+import { None, Some } from 'ts-results';
+import type { SlashCommand } from '../..';
+import { CommandType } from '../sern';
+import Context from '../structures/context';
+import type Wrapper from '../structures/wrapper';
 import * as Files from '../utilities/readFile';
 
 
@@ -17,17 +18,22 @@ export const onInteractionCreate = ( wrapper : Wrapper ) => {
             if (interaction.isChatInputCommand()) {
                 return of(interaction.commandName).pipe(
                     map ( name => Files.Commands.get(name) ),
-                    filter( mod => mod !== undefined && (mod.type & CommandType.SLASH) != 0),
+                    filter( mod => mod !== undefined 
+                           && (mod.type & CommandType.SLASH) != 0
+                          ),
                     tap ( mod => {
                         const ctx = new Context(None, Some(interaction));
-                        mod!.execute(ctx, ['slash', interaction.options]); 
+                        (mod as SlashCommand)!.execute(ctx, ['slash', interaction.options]); 
                     }),
-                 )
+                 );
             }
             if (interaction.isContextMenuCommand()) {
-                return of() 
+                return of(); 
             }
-            else { return of() }
+            if (interaction.isMessageContextMenuCommand()) {
+                return of();
+            }
+            else { return of(); }
         })
       ).subscribe({
        error(e) {
@@ -39,6 +45,6 @@ export const onInteractionCreate = ( wrapper : Wrapper ) => {
        },
 
 
-      })
-}
+      });
+};
 
