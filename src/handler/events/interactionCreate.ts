@@ -8,7 +8,7 @@ import type { ContextMenuMsg, ContextMenuUser } from '../structures/commands/mod
 import Context from '../structures/context';
 import type Wrapper from '../structures/wrapper';
 import * as Files from '../utilities/readFile';
-import { is } from './interactionHandling';
+import { filterTap, is } from './interactionHandling';
 
 
 export const onInteractionCreate = ( wrapper : Wrapper ) => {
@@ -20,31 +20,29 @@ export const onInteractionCreate = ( wrapper : Wrapper ) => {
             if (interaction.isChatInputCommand()) {
                 return of(Files.Commands.get(interaction.commandName))
                 .pipe(
-                    filter(mod => is(mod, CommandType.SLASH)),
-                    tap ( mod => {
+                    filterTap(CommandType.SLASH, mod => {
                         const ctx = Context.wrap(interaction);
-                        (mod as SlashCommand)!.execute(ctx, ['slash', interaction.options]); 
-                    }),
+                        mod.execute(ctx, ['slash', interaction.options]);
+                    })
                  );
             }
             if (interaction.isContextMenuCommand()) {
                 return of(Files.ContextMenuUser.get(interaction.commandName))
                 .pipe(
-                    filter( mod => is(mod, CommandType.MENU_USER)),
-                    tap ( mod => {
+                    filterTap(CommandType.MENU_USER, mod => { 
                         const ctx = Context.wrap(interaction);
-                        (mod as ContextMenuUser)!.execute(ctx);
-                    })
+                        mod.execute(ctx);
+                    }),
+                    
                 )
             }
             if (interaction.isMessageContextMenuCommand()) {
                 return of(Files.ContextMenuMsg.get(interaction.commandName))
                 .pipe(
-                    filter( mod => is(mod, CommandType.MENU_MSG)),
-                    tap ( mod => {
+                    filterTap(CommandType.MENU_MSG, mod => {
                         const ctx = Context.wrap(interaction);
-                        (mod as ContextMenuMsg)!.execute(ctx);
-                    })
+                        mod.execute(ctx);
+                    }),
                 )
             }
             else { return of(); }
