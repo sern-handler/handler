@@ -15,9 +15,15 @@ export default class Context<I extends Interaction = Interaction> {
     private msg: Option<Message> = None;
     private interac: Option<I> = None;
 
-    constructor(message : Option<Message>, interaction: Option<I> ) {
+    private constructor(message : Option<Message>, interaction: Option<I> ) {
         this.msg = message;
         this.interac = interaction;
+    }
+    static wrap<I extends Interaction>(wrappable: I | Message) : Context<I> {
+        if ( "token" in wrappable) {
+           return new Context( None, Some(wrappable));
+        }
+        return new Context(Some(wrappable), None)
     }
 
     private get messageUnchecked() {

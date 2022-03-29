@@ -22,7 +22,7 @@ export const onInteractionCreate = ( wrapper : Wrapper ) => {
                 .pipe(
                     filter(mod => is(mod, CommandType.SLASH)),
                     tap ( mod => {
-                        const ctx = new Context(None, Some(interaction));
+                        const ctx = Context.wrap(interaction);
                         (mod as SlashCommand)!.execute(ctx, ['slash', interaction.options]); 
                     }),
                  );
@@ -32,7 +32,7 @@ export const onInteractionCreate = ( wrapper : Wrapper ) => {
                 .pipe(
                     filter( mod => is(mod, CommandType.MENU_USER)),
                     tap ( mod => {
-                        const ctx = new Context(None, Some(interaction));
+                        const ctx = Context.wrap(interaction);
                         (mod as ContextMenuUser)!.execute(ctx);
                     })
                 )
@@ -42,7 +42,7 @@ export const onInteractionCreate = ( wrapper : Wrapper ) => {
                 .pipe(
                     filter( mod => is(mod, CommandType.MENU_MSG)),
                     tap ( mod => {
-                        const ctx = new Context(None, Some(interaction));
+                        const ctx = Context.wrap(interaction);
                         (mod as ContextMenuMsg)!.execute(ctx);
                     })
                 )

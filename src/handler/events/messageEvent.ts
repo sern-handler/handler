@@ -33,9 +33,10 @@ export const onMessageCreate = (wrapper : Wrapper) => {
         )
         
     ).subscribe ({
-       error() {
+       error(e) {
         //log things
         console.log('Failed to finished message subscription!');
+        throw e;
        },
        next(command) {
         //log on each command emitted 
