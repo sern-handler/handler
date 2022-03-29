@@ -19,11 +19,11 @@ export default class Context<I extends Interaction = Interaction> {
         this.msg = message;
         this.interac = interaction;
     }
-    static wrap<I extends Interaction>(wrappable: I | Message) : Context<I> {
+    static wrap<I extends Interaction = Interaction>(wrappable: I | Message) : Context<I> {
         if ( "token" in wrappable) {
-           return new Context( None, Some(wrappable));
+           return new Context<I>( None, Some(wrappable));
         }
-        return new Context(Some(wrappable), None)
+        return new Context<I>(Some(wrappable), None)
     }
 
     private get messageUnchecked() {
