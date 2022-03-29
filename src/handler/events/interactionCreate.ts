@@ -1,12 +1,14 @@
-import type { ChatInputCommandInteraction, CommandInteraction, Interaction } from 'discord.js';
-import { map, filter, fromEvent,  Observable, of,  tap, concatMap} from 'rxjs';
+
+import type { Interaction } from 'discord.js';
+import { filter, fromEvent,  Observable, of,  tap, concatMap} from 'rxjs';
 import { None, Some } from 'ts-results';
 import type { SlashCommand } from '../..';
 import { CommandType } from '../sern';
+import type { ContextMenuMsg, ContextMenuUser } from '../structures/commands/module';
 import Context from '../structures/context';
 import type Wrapper from '../structures/wrapper';
 import * as Files from '../utilities/readFile';
-
+import { is } from './interactionHandling';
 
 
 export const onInteractionCreate = ( wrapper : Wrapper ) => {
@@ -16,11 +18,9 @@ export const onInteractionCreate = ( wrapper : Wrapper ) => {
       .pipe( 
         concatMap ( interaction => {
             if (interaction.isChatInputCommand()) {
-                return of(interaction.commandName).pipe(
-                    map ( name => Files.Commands.get(name) ),
-                    filter( mod => mod !== undefined 
-                           && (mod.type & CommandType.SLASH) != 0
-                          ),
+                return of(Files.Commands.get(interaction.commandName))
+                .pipe(
+                    filter(mod => is(mod, CommandType.SLASH)),
                     tap ( mod => {
                         const ctx = new Context(None, Some(interaction));
                         (mod as SlashCommand)!.execute(ctx, ['slash', interaction.options]); 
@@ -28,10 +28,24 @@ export const onInteractionCreate = ( wrapper : Wrapper ) => {
                  );
             }
             if (interaction.isContextMenuCommand()) {
-                return of(); 
+                return of(Files.ContextMenuUser.get(interaction.commandName))
+                .pipe(
+                    filter( mod => is(mod, CommandType.MENU_USER)),
+                    tap ( mod => {
+                        const ctx = new Context(None, Some(interaction));
+                        (mod as ContextMenuUser)!.execute(ctx);
+                    })
+                )
             }
             if (interaction.isMessageContextMenuCommand()) {
-                return of();
+                return of(Files.ContextMenuMsg.get(interaction.commandName))
+                .pipe(
+                    filter( mod => is(mod, CommandType.MENU_MSG)),
+                    tap ( mod => {
+                        const ctx = new Context(None, Some(interaction));
+                        (mod as ContextMenuMsg)!.execute(ctx);
+                    })
+                )
             }
             else { return of(); }
         })

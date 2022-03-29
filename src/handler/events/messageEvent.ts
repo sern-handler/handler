@@ -7,6 +7,7 @@ import Context from '../structures/context';
 import type Wrapper from '../structures/wrapper';
 import { isNotFromDM, isNotFromBot, hasPrefix, fmt } from '../utilities/messageHelpers';
 import * as Files from '../utilities/readFile';
+import { is } from './interactionHandling';
 
 export const onMessageCreate = (wrapper : Wrapper) => {
     const { client, defaultPrefix } = wrapper;
@@ -24,7 +25,7 @@ export const onMessageCreate = (wrapper : Wrapper) => {
                     args 
                 ] as const
             ),
-            filter( ([mod]) => mod !== undefined && (mod.type & CommandType.TEXT) != 0 ),
+            filter( ([mod]) => is( mod, CommandType.TEXT) ),
             tap ( ([ mod, ctx, args ]) => {
                 (mod as TextCommand)!.execute(ctx, ['text', args]);
              }),

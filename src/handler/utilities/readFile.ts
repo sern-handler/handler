@@ -3,7 +3,8 @@ import { join } from 'path';
 import type { Module } from '../structures/commands/module';
 import { SernError } from '../structures/errors';
 
-
+export const ContextMenuUser = new Map<string, Module>();
+export const ContextMenuMsg = new Map<string, Module>();
 export const Commands = new Map<string, Module>();
 export const Alias = new Map<string, Module>();
 

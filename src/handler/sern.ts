@@ -19,8 +19,6 @@ export function init( wrapper : Wrapper ) {
    onReady( wrapper );
    onMessageCreate( wrapper );
    onInteractionCreate ( wrapper ); 
-
-   
 }
 
 function eventObserver(client: Client, events: DiscordEvent[] ) {
@@ -32,22 +30,6 @@ function eventObserver(client: Client, events: DiscordEvent[] ) {
 
 export class Handler { 
 /**           
-            .on('messageCreate', async (message: Message) => {
-                const module = this.findModuleFrom(message);
-                if (module === undefined) {
-                    this.defaultLogger.log(
-                        sEvent.MISUSE_CMD,
-                        message.guildId!,
-                        `Unknown legacy command.`
-                    );
-                    return;
-                }
-                const cmdResult = await this.commandResult(module, message);
-                if (cmdResult === undefined) return;
-
-                message.channel.send(cmdResult);
-            })
-
             .on('interactionCreate', async (interaction) => {
                 if (!interaction.isCommand()) return;
                 if (interaction.guild === null) return; // TODO : handle dms

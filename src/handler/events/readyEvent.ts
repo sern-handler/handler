@@ -41,11 +41,10 @@ const handler = ( name : string ) =>
             mod.alias.forEach (a => Files.Alias.set(a, mod));
         },
         [CommandType.MENU_USER] : mod => {
-            Files.Commands.set ( name, mod );
+            Files.ContextMenuUser.set ( name, mod );
         },
         [CommandType.MENU_MSG] : mod =>  { 
-
-            Files.Commands.set (name, mod );
+            Files.ContextMenuMsg.set (name, mod );
         }
     } as ModuleHandlers);
 
