@@ -1,9 +1,10 @@
-import type { Awaitable } from "discord.js";
+import type { Awaitable, Message } from "discord.js";
 import type { CommandType } from "../sern";
 import type { Module } from "../structures/structxports";
-import { ignoreElements, Observable, throwError } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import type { ModuleDefs } from "../structures/commands/moduleHandler";
 import { SernError } from "../structures/errors";
+import { isNotFromBot, isNotFromDM } from "../utilities/messageHelpers";
 
 export function match(mod: Module | undefined, type : CommandType) : boolean {
     return mod !== undefined && (mod.type & type) != 0;
@@ -13,9 +14,8 @@ export function filterTap<T extends keyof ModuleDefs>(
     tap: (mod : ModuleDefs[T]) => Awaitable<void>
 ) {
     return (src : Observable<Module|undefined>) => 
-        new Observable( subscriber => {
-            return src.subscribe({
-                next(modul) {
+        new Observable( subscriber => { 
+            return src.subscribe({ next(modul) {
                     if(match(modul, cmdType)) {
                        tap(modul as ModuleDefs[T]);
                     } else {
@@ -30,5 +30,27 @@ export function filterTap<T extends keyof ModuleDefs>(
             })
 
         })
-    }
+  }
+export function ignoreNonBot(prefix : string) {
+    return (src : Observable<Message>) => 
+        new Observable<Message>(subscriber => {
+           return src.subscribe({
+               next(m) {
+                  const passAll = [
+                    isNotFromDM,
+                    isNotFromBot,
+                    (m : Message) => m.content.startsWith(prefix)
+                  ].every( fn => fn(m));
+
+                  if (passAll) {
+                    subscriber.next(m);
+                  }
+               },
+               error: (e) =>  subscriber.error(e),
+               complete: () => subscriber.complete()
+
+            })
+       })
+}
+
 

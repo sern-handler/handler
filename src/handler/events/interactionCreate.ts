@@ -1,14 +1,11 @@
 
 import type { Interaction } from 'discord.js';
-import { filter, fromEvent,  Observable, of,  tap, concatMap} from 'rxjs';
-import { None, Some } from 'ts-results';
-import type { SlashCommand } from '../..';
+import { fromEvent,  Observable, of,  concatMap} from 'rxjs';
 import { CommandType } from '../sern';
-import type { ContextMenuMsg, ContextMenuUser } from '../structures/commands/module';
 import Context from '../structures/context';
 import type Wrapper from '../structures/wrapper';
 import * as Files from '../utilities/readFile';
-import { filterTap, is } from './interactionHandling';
+import { filterTap } from './observableHandling';
 
 
 export const onInteractionCreate = ( wrapper : Wrapper ) => {
@@ -45,7 +42,7 @@ export const onInteractionCreate = ( wrapper : Wrapper ) => {
                     }),
                 )
             }
-            else { return of(); }
+            else { return of() }
         })
       ).subscribe({
        error(e) {
@@ -55,8 +52,6 @@ export const onInteractionCreate = ( wrapper : Wrapper ) => {
         //log on each command emitted 
         console.log(command);
        },
-
-
-      });
+   });
 };
 
