@@ -45,8 +45,9 @@ export function ignoreNonBot(prefix : string) {
                     (m : Message) => 
                        m.content
                         .slice(0,prefix.length)
-                        .toLocaleLowerCase()
-                        .indexOf(prefix.toLocaleLowerCase()) !== -1
+                        .localeCompare(prefix,
+                         undefined, { sensitivity : 'accent' }
+                        ) === 0
                   ].every( fn => fn(m));
 
                   if (passAll) {
