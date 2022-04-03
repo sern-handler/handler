@@ -54,53 +54,53 @@ export default class Context<I extends Interaction = Interaction> {
     */
 
     public mapInteraction<B extends Interaction = Interaction>(
-        cb : ( ctx: I ) => B
+        cb : ( ctx: I ) => Context<B>
     ) : Context<B> {
         if (this.oInterac.none) return Context.empty();
-        return Context.wrap(cb(this.oInterac.val));
+        return cb(this.oInterac.val);
     }
 
     public get id() : Snowflake {
        return firstSome(
-        this.oInterac.andThen( i => Some(i.id)),
-        this.oMsg.andThen(m => Some(m.id))
+        this.oInterac.map( i => i.id),
+        this.oMsg.map(m => m.id)
        )!; 
     }
     public get channel() : Nullish<TextBasedChannel>  {
       return firstSome(
-          this.oMsg.andThen(m => Some(m.channel)),
-          this.oInterac.andThen(i => Some(i.channel))
+          this.oMsg.map(m => m.channel),
+          this.oInterac.map(i => i.channel)
       );
     }
     public get user(): Nullish<User> {
         return firstSome(
-          this.oMsg.andThen(m => Some(m.author)),
-          this.oInterac.andThen(i => Some(i.user))
+          this.oMsg.map(m => m.author),
+          this.oInterac.map(i => i.user)
       ); 
     }
     public get createdTimestamp() : number {
         return firstSome(
-         this.oMsg.andThen(m => Some(m.createdTimestamp)),
-         this.oInterac.andThen(i => Some(i.createdTimestamp))
+         this.oMsg.map(m => m.createdTimestamp),
+         this.oInterac.map(i => i.createdTimestamp)
         )!;
     }
 
     public get guild() : Nullish<Guild> {
         return firstSome(
-         this.oMsg.andThen(m => Some(m.guild)),
-         this.oInterac.andThen(i => Some(i.guild))
+         this.oMsg.map(m => m.guild),
+         this.oInterac.map(i => i.guild)
         );
     }
     public get guildId() : Nullish<Snowflake> {
         return firstSome(
-         this.oMsg.andThen(m => Some(m.guildId)),
-         this.oInterac.andThen(i => Some(i.guildId))
+         this.oMsg.map(m => m.guildId),
+         this.oInterac.map(i => i.guildId)
        );
     }
     public get member() : Nullish<GuildMember | APIInteractionGuildMember> {
        return firstSome(
-         this.oMsg.andThen(m => Some(m.member)),
-         this.oInterac.andThen(i => Some(i.member))
+         this.oMsg.map(m => m.member),
+         this.oInterac.map(i => i.member)
        ); 
     }
     /*
@@ -110,8 +110,8 @@ export default class Context<I extends Interaction = Interaction> {
       onInteraction : ( interaction : I ) => Awaitable<void>,
       onMsg? : (message : Message) => Awaitable<void>
     ): Context<I> {
-      this.oInterac.andThen(i => Some(onInteraction(i)));
-      this.oMsg.andThen(m => Some(onMsg?.(m)));
+      this.oInterac.map(onInteraction);
+      this.oMsg.map(m => onMsg?.(m));
       return this;
     }
     public extractInteraction<T>(
@@ -121,11 +121,21 @@ export default class Context<I extends Interaction = Interaction> {
       return extract(this.oInterac.val);
    }
    public extractMessage<T>(
-      extract :  (interaction : Message)  => T
+      extract :  (message: Message)  => T
    ): Nullish<T> {
       if(this.oMsg.none) return null;
       return extract(this.oMsg.val);
    }
+    // extract either
+   public extractEither<T,V>(
+      i : (interaction : I) => T,
+      m : (message : Message ) => V
+   ) {
+      const iExtract = this.extractMessage(m);
+      const mExtract = this.extractInteraction(i);
+      return iExtract ?? mExtract;
+   }
+   
 }
 
 
