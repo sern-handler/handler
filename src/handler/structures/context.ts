@@ -1,11 +1,19 @@
+import { ContextMenuCommandBuilder } from '@discordjs/builders';
+import type { APIInteractionGuildMember } from 'discord-api-types/v9';
 import type {
+    Awaitable,
+    Guild,
+    GuildMember,
     Interaction,
     Message,
-    Snowflake
+    Snowflake,
+    TextBasedChannel,
+    User
 } from 'discord.js';
 import { None, Option, Some } from 'ts-results';
+import type { Nullish } from '../../types/handler';
 
-function firstSome<T>(...args : Option<T>[]) : T | null {
+function firstSome<T>(...args : Option<T>[]) : Nullish<T> {
     for ( const op of args ) {
         if (op.some) return op.val;
     }
@@ -41,17 +49,16 @@ export default class Context<I extends Interaction = Interaction> {
         return this.oInterac.unwrap();
     }
 
-
     /**
     * maps a general Context<I> to Context<B>
     * if interaction is None return Context.empty()
     */
 
     public map_interaction<B extends Interaction = Interaction>(
-        cb : ( ctx: I ) => Context<B>
+        cb : ( ctx: I ) => B
     ) : Context<B> {
         if (this.oInterac.none) return Context.empty();
-        return cb(this.oInterac.val);
+        return Context.wrap(cb(this.oInterac.val));
     }
 
     public get id() : Snowflake {
@@ -60,14 +67,13 @@ export default class Context<I extends Interaction = Interaction> {
         this.oMsg.andThen(m => Some(m.id))
        )!; 
     }
-
-    public get channel() {
+    public get channel() : Nullish<TextBasedChannel>  {
       return firstSome(
           this.oMsg.andThen(m => Some(m.channel)),
           this.oInterac.andThen(i => Some(i.channel))
       );
     }
-    public get user() {
+    public get user(): Nullish<User> {
         return firstSome(
           this.oMsg.andThen(m => Some(m.author)),
           this.oInterac.andThen(i => Some(i.user))
@@ -79,8 +85,49 @@ export default class Context<I extends Interaction = Interaction> {
          this.oInterac.andThen(i => Some(i.createdTimestamp))
         )!;
     }
-}
 
+    public get guild() : Nullish<Guild> {
+        return firstSome(
+         this.oMsg.andThen(m => Some(m.guild)),
+         this.oInterac.andThen(i => Some(i.guild))
+        );
+    }
+    public get guildId() : Nullish<Snowflake> {
+        return firstSome(
+         this.oMsg.andThen(m => Some(m.guildId)),
+         this.oInterac.andThen(i => Some(i.guildId))
+       );
+    }
+    public get member() : Nullish<GuildMember | APIInteractionGuildMember> {
+       return firstSome(
+         this.oMsg.andThen(m => Some(m.member)),
+         this.oInterac.andThen(i => Some(i.member))
+       ); 
+    }
+    /*
+     * Returns the underlying Context but allows for doing other operations
+     */
+    public on ( 
+      onInteraction : ( interaction : I ) => Awaitable<void>,
+      onMsg? : (message : Message) => Awaitable<void>
+    ): Context<I> {
+      this.oInterac.andThen(i => Some(onInteraction(i)));
+      this.oMsg.andThen(m => Some(onMsg?.(m)));
+      return this;
+    }
+    public extractInteraction<T>(
+      extract :  (interaction : I)  => T
+    ): Nullish<T> {
+      if(this.oInterac.none) return null;
+      return extract(this.oInterac.val);
+   }
+   public extractMessage<T>(
+      extract :  (interaction : Message)  => T
+   ): Nullish<T> {
+      if(this.oMsg.none) return null;
+      return extract(this.oMsg.val);
+   }
+}
 
 
 

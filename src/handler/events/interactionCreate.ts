@@ -40,6 +40,9 @@ export const onInteractionCreate = ( wrapper : Wrapper ) => {
                     }),
                 )
             }
+            if (interaction.isModalSubmit()) {
+                return of();
+            }
             else { return of() }
         })
       ).subscribe({
@@ -48,7 +51,7 @@ export const onInteractionCreate = ( wrapper : Wrapper ) => {
        },
        next(command) {
         //log on each command emitted 
-        console.log(command);
+        console.log(command?.name);
        },
    });
 };

@@ -12,7 +12,7 @@ import type { Module } from '../handler/structures/structxports';
 // Anything that can be sent in a `<TextChannel>#send` or `<CommandInteraction>#reply`
 export type possibleOutput<T = string> = T | (MessagePayload & MessageOptions);
 export type execute = Module['execute'];
-
+export type Nullish<T> = T | undefined | null;
 // Thanks @cursorsdottsx
 export type ParseType<T> = {
     [K in keyof T]: T[K] extends unknown ? [k: K, args: T[K]] : never;
