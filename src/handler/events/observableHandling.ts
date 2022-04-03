@@ -14,10 +14,12 @@ export function filterTap<T extends keyof ModuleDefs>(
     tap: (mod : ModuleDefs[T]) => Awaitable<void>
 ) {
     return (src : Observable<Module|undefined>) => 
-        new Observable( subscriber => { 
-            return src.subscribe({ next(modul) {
+        new Observable<Module|undefined>( subscriber => { 
+            return src.subscribe({ 
+                next(modul ) {
                     if(match(modul, cmdType)) {
                        tap(modul as ModuleDefs[T]);
+                       subscriber.next(modul as ModuleDefs[T]);
                     } else {
                        if (modul === undefined) { 
                           return throwError(() => SernError.UNDEFINED_MODULE); 

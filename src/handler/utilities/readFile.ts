@@ -41,7 +41,7 @@ export async function buildData(commandDir: string ): Promise<
     getCommands(commandDir).map( async (absPath) => {
       const mod = (await import(absPath)).module as Module;
       if (mod === undefined) throw Error(`${SernError.UNDEFINED_MODULE} ${absPath}`);
-      return {  mod, absPath };
+      return { mod, absPath };
     }),
   );
 }

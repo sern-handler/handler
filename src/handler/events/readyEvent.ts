@@ -46,6 +46,7 @@ const handler = ( name : string ) =>
         [CommandType.MENU_MSG] : mod =>  { 
             Files.ContextMenuMsg.set (name, mod );
         }
+
     } as ModuleHandlers);
 
 const registerModules = <T extends ModuleType >(name : string, mod : ModuleStates[T]) =>

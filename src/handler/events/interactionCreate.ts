@@ -1,12 +1,11 @@
 
 import type { Interaction } from 'discord.js';
-import { fromEvent,  Observable, of,  concatMap} from 'rxjs';
+import { fromEvent,  Observable, of,  concatMap } from 'rxjs';
 import { CommandType } from '../sern';
 import Context from '../structures/context';
 import type Wrapper from '../structures/wrapper';
 import * as Files from '../utilities/readFile';
 import { filterTap } from './observableHandling';
-
 
 export const onInteractionCreate = ( wrapper : Wrapper ) => {
       const { client } = wrapper;  
@@ -20,7 +19,7 @@ export const onInteractionCreate = ( wrapper : Wrapper ) => {
                     filterTap(CommandType.SLASH, mod => {
                         const ctx = Context.wrap(interaction);
                         mod.execute(ctx, ['slash', interaction.options]);
-                    })
+                    }),
                  );
             }
             if (interaction.isContextMenuCommand()) {
@@ -30,7 +29,6 @@ export const onInteractionCreate = ( wrapper : Wrapper ) => {
                         const ctx = Context.wrap(interaction);
                         mod.execute(ctx);
                     }),
-                    
                 )
             }
             if (interaction.isMessageContextMenuCommand()) {
