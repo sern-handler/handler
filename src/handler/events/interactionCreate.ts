@@ -10,7 +10,7 @@ import { filterTap } from './observableHandling';
 export const onInteractionCreate = ( wrapper : Wrapper ) => {
       const { client } = wrapper;  
 
-      (fromEvent(client, 'interactionCreate') as Observable<Interaction>)
+      (<Observable<Interaction>> fromEvent(client, 'interactionCreate'))
       .pipe( 
         concatMap ( interaction => {
             if (interaction.isChatInputCommand()) {
@@ -29,7 +29,7 @@ export const onInteractionCreate = ( wrapper : Wrapper ) => {
                         const ctx = Context.wrap(interaction);
                         mod.execute(ctx);
                     }),
-                )
+                );
             }
             if (interaction.isMessageContextMenuCommand()) {
                 return of(Files.ContextMenuMsg.get(interaction.commandName))
@@ -38,7 +38,7 @@ export const onInteractionCreate = ( wrapper : Wrapper ) => {
                         const ctx = Context.wrap(interaction);
                         mod.execute(ctx);
                     }),
-                )
+                );
             }
             if (interaction.isButton()) {
                 return of(Files.Buttons.get(interaction.customId))
@@ -47,7 +47,7 @@ export const onInteractionCreate = ( wrapper : Wrapper ) => {
                         const ctx = Context.wrap(interaction);
                         mod.execute(ctx);
                     })
-                )
+                );
             }
             if (interaction.isSelectMenu()) {
                 return of(Files.SelectMenus.get(interaction.customId))
@@ -56,10 +56,9 @@ export const onInteractionCreate = ( wrapper : Wrapper ) => {
                         const ctx = Context.wrap(interaction);
                         mod.execute(ctx);
                     })
-
-                )
+                );
             }
-            else { return of() }
+            else { return of(); }
         })
       ).subscribe({
        error(e) {

@@ -1,6 +1,5 @@
 import { CommandType } from '../../sern';
-import type { TextCommand, BothCommand, ButtonCommand, SlashCommand, BaseModule, ContextMenuMsg, ContextMenuUser, SelectMenuCommand }  from './module';
-
+import type { TextCommand, BothCommand, ButtonCommand, SlashCommand, ContextMenuMsg, ContextMenuUser, SelectMenuCommand }  from './module';
 //https://stackoverflow.com/questions/64092736/alternative-to-switch-statement-for-typescript-discriminated-union
 
 // Explicit Module Definitions for mapping

@@ -9,7 +9,7 @@ import { filterTap, ignoreNonBot } from './observableHandling';
 
 export const onMessageCreate = (wrapper : Wrapper) => {
     const { client, defaultPrefix } = wrapper;
-    (fromEvent( client, 'messageCreate') as Observable<Message>)
+    (<Observable<Message>> fromEvent( client, 'messageCreate'))
     .pipe ( 
         ignoreNonBot(defaultPrefix),
         concatMap ( m =>  {
@@ -22,7 +22,7 @@ export const onMessageCreate = (wrapper : Wrapper) => {
                     filterTap(CommandType.TEXT, mod => {
                         mod.execute(ctx, ['text', data]); 
                     })
-                )
+                );
         })
     ).subscribe ({
        error(e) {

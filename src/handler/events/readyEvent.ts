@@ -56,7 +56,7 @@ const handler = ( name : string ) =>
     } as ModuleHandlers);
 
 const registerModules = <T extends ModuleType >(name : string, mod : ModuleStates[T]) =>
-    (handler(name)[mod.type] as HandlerCallback<T>)(mod);
+    (<HandlerCallback<T>> handler(name)[mod.type])(mod);
 
 function setCommands ( { mod, absPath } : { mod : Module, absPath : string } ) {
    const name = mod.name ?? Files.fmtFileName(basename(absPath));

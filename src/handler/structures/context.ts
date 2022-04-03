@@ -29,7 +29,7 @@ export default class Context<I extends Interaction = Interaction> {
         this.oInterac = oInterac;
     }
     static wrap<I extends Interaction = Interaction>(wrappable: I|Message) : Context<I> {
-        if ( "token" in wrappable ) {
+        if ( 'token' in wrappable ) {
            return new Context<I>( None, Some(wrappable));
         }
         return new Context<I>(Some(wrappable), None);

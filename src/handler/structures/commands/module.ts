@@ -41,6 +41,7 @@ export type SelectMenuCommand = {
     type : CommandType.MENU_SELECT;
 } & Override<BaseModule, { execute : (ctx : Context<SelectMenuInteraction> ) => Awaitable<void> }>;
 
+
 export type Module = 
     TextCommand 
     | SlashCommand 

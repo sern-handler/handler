@@ -1,10 +1,10 @@
-import type { Awaitable, Message } from "discord.js";
-import type { CommandType } from "../sern";
-import type { Module } from "../structures/structxports";
+import type { Awaitable, Message } from 'discord.js';
+import type { CommandType } from '../sern';
+import type { Module } from '../structures/structxports';
 import { Observable, throwError } from 'rxjs';
-import type { ModuleDefs } from "../structures/commands/moduleHandler";
-import { SernError } from "../structures/errors";
-import { isNotFromBot, isNotFromDM } from "../utilities/messageHelpers";
+import type { ModuleDefs } from '../structures/commands/moduleHandler';
+import { SernError } from '../structures/errors';
+import { isNotFromBot, isNotFromDM } from '../utilities/messageHelpers';
 
 export function match(mod: Module | undefined, type : CommandType) : boolean {
     return mod !== undefined && (mod.type & type) != 0;
@@ -18,8 +18,9 @@ export function filterTap<T extends keyof ModuleDefs>(
             return src.subscribe({ 
                 next(modul ) {
                     if(match(modul, cmdType)) {
-                       tap(modul as ModuleDefs[T]);
-                       subscriber.next(modul as ModuleDefs[T]);
+                       const asModT = <ModuleDefs[T]> modul; 
+                       tap(asModT);
+                       subscriber.next(asModT);
                     } else {
                        if (modul === undefined) { 
                           return throwError(() => SernError.UNDEFINED_MODULE); 
@@ -29,9 +30,9 @@ export function filterTap<T extends keyof ModuleDefs>(
                 },
                 error: (e) =>  subscriber.error(e),
                 complete: () => subscriber.complete()
-            })
+            });
 
-        })
+        });
   }
 export function ignoreNonBot(prefix : string) {
     return (src : Observable<Message>) => 
@@ -41,7 +42,11 @@ export function ignoreNonBot(prefix : string) {
                   const passAll = [
                     isNotFromDM,
                     isNotFromBot,
-                    (m : Message) => m.content.startsWith(prefix)
+                    (m : Message) => 
+                       m.content
+                        .slice(0,prefix.length)
+                        .toLocaleLowerCase()
+                        .indexOf(prefix.toLocaleLowerCase()) !== -1
                   ].every( fn => fn(m));
 
                   if (passAll) {
@@ -50,9 +55,8 @@ export function ignoreNonBot(prefix : string) {
                },
                error: (e) =>  subscriber.error(e),
                complete: () => subscriber.complete()
-
-            })
-       })
+            });
+       });
 }
 
 
