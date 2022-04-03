@@ -1,9 +1,9 @@
 import type { Message } from 'discord.js';
-import { fromEvent,  Observable, of, concatMap, filter}  from 'rxjs';
+import { fromEvent,  Observable, of, concatMap } from 'rxjs';
 import { CommandType } from '../sern';
 import Context from '../structures/context';
 import type Wrapper from '../structures/wrapper';
-import { isNotFromDM, isNotFromBot, hasPrefix, fmt } from '../utilities/messageHelpers';
+import { fmt } from '../utilities/messageHelpers';
 import * as Files from '../utilities/readFile';
 import { filterTap, ignoreNonBot } from './observableHandling';
 

@@ -40,8 +40,24 @@ export const onInteractionCreate = ( wrapper : Wrapper ) => {
                     }),
                 )
             }
-            if (interaction.isModalSubmit()) {
-                return of();
+            if (interaction.isButton()) {
+                return of(Files.Buttons.get(interaction.customId))
+                .pipe(
+                    filterTap(CommandType.BUTTON, mod => {
+                        const ctx = Context.wrap(interaction);
+                        mod.execute(ctx);
+                    })
+                )
+            }
+            if (interaction.isSelectMenu()) {
+                return of(Files.SelectMenus.get(interaction.customId))
+                .pipe(
+                    filterTap(CommandType.MENU_SELECT, mod => {
+                        const ctx = Context.wrap(interaction);
+                        mod.execute(ctx);
+                    })
+
+                )
             }
             else { return of() }
         })

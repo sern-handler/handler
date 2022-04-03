@@ -45,6 +45,12 @@ const handler = ( name : string ) =>
         },
         [CommandType.MENU_MSG] : mod =>  { 
             Files.ContextMenuMsg.set (name, mod );
+        },
+        [CommandType.BUTTON] : mod => {
+            Files.Buttons.set(name, mod);
+        },
+        [CommandType.MENU_SELECT] : mod => {
+            Files.SelectMenus.set(name, mod);
         }
 
     } as ModuleHandlers);

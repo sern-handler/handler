@@ -1,4 +1,3 @@
-import { ContextMenuCommandBuilder } from '@discordjs/builders';
 import type { APIInteractionGuildMember } from 'discord-api-types/v9';
 import type {
     Awaitable,
@@ -35,9 +34,6 @@ export default class Context<I extends Interaction = Interaction> {
         }
         return new Context<I>(Some(wrappable), None);
     }
-    public static empty<T extends Interaction>() : Context<T> {
-        return new Context<T>(None, None);
-    }
     public isEmpty() {
         return this.oMsg.none && this.oInterac.none;
     }
@@ -56,7 +52,7 @@ export default class Context<I extends Interaction = Interaction> {
     public mapInteraction<B extends Interaction = Interaction>(
         cb : ( ctx: I ) => Context<B>
     ) : Context<B> {
-        if (this.oInterac.none) return Context.empty();
+        if (this.oInterac.none) return new Context();
         return cb(this.oInterac.val);
     }
 

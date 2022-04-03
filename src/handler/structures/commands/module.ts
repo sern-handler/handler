@@ -1,4 +1,4 @@
-import type { ApplicationCommandOptionData, Awaitable, ChatInputCommandInteraction, ContextMenuCommandInteraction, Interaction, MessageContextMenuCommandInteraction } from 'discord.js';
+import type { ApplicationCommandOptionData, Awaitable, ButtonInteraction, ChatInputCommandInteraction, ContextMenuCommandInteraction, Interaction, MessageContextMenuCommandInteraction, SelectMenuInteraction } from 'discord.js';
 import type { Args, Override } from '../../../types/handler';
 import type { CommandType } from '../../sern';
 import type Context from '../context';
@@ -33,11 +33,20 @@ export type ContextMenuUser = {
 export type ContextMenuMsg = {
     type : CommandType.MENU_MSG;
 } & Override<BaseModule, { execute : ( ctx: Context<MessageContextMenuCommandInteraction> ) => Awaitable<void> }>;
+export type ButtonCommand = {
+    type : CommandType.BUTTON;
+} & Override<BaseModule, { execute : (ctx : Context<ButtonInteraction> ) => Awaitable<void> }>;
+
+export type SelectMenuCommand = {
+    type : CommandType.MENU_SELECT;
+} & Override<BaseModule, { execute : (ctx : Context<SelectMenuInteraction> ) => Awaitable<void> }>;
 
 export type Module = 
     TextCommand 
     | SlashCommand 
     | BothCommand
     | ContextMenuUser
-    | ContextMenuMsg;
+    | ContextMenuMsg
+    | ButtonCommand
+    | SelectMenuCommand;
           
