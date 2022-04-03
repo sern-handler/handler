@@ -41,7 +41,6 @@ export default class Context<I extends Interaction = Interaction> {
     public isEmpty() {
         return this.oMsg.none && this.oInterac.none;
     }
-
     public get message()  {
         return this.oMsg.unwrap();
     }
@@ -54,7 +53,7 @@ export default class Context<I extends Interaction = Interaction> {
     * if interaction is None return Context.empty()
     */
 
-    public map_interaction<B extends Interaction = Interaction>(
+    public mapInteraction<B extends Interaction = Interaction>(
         cb : ( ctx: I ) => B
     ) : Context<B> {
         if (this.oInterac.none) return Context.empty();
