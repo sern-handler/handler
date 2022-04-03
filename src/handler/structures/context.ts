@@ -13,12 +13,13 @@ function firstSome<T>(...args : Option<T>[]) : T | null {
 }
 
 export default class Context<I extends Interaction = Interaction> {
-    private msg: Option<Message> = None;
-    private interac: Option<I> = None;
 
-    private constructor(message : Option<Message>, interaction: Option<I> ) {
-        this.msg = message;
-        this.interac = interaction;
+    private constructor(
+        private oMsg: Option<Message> = None,
+        private oInterac: Option<I> = None 
+    ) {
+        this.oMsg = oMsg;
+        this.oInterac = oInterac;
     }
     static wrap<I extends Interaction = Interaction>(wrappable: I|Message) : Context<I> {
         if ( "token" in wrappable ) {
@@ -30,21 +31,16 @@ export default class Context<I extends Interaction = Interaction> {
         return new Context<T>(None, None);
     }
     public isEmpty() {
-        return this.msg.none && this.interaction.none;
+        return this.oMsg.none && this.oInterac.none;
     }
 
-    public get messageUnchecked()  {
-        return this.msg.unwrap();
+    public get message()  {
+        return this.oMsg.unwrap();
     }
-    public get interactionUnchecked() {
-        return this.interac.unwrap();
+    public get interaction() {
+        return this.oInterac.unwrap();
     }
-    private get message() {
-       return this.msg; 
-    }
-    private get interaction() {
-       return this.interac;
-    }
+
 
     /**
     * maps a general Context<I> to Context<B>
@@ -54,33 +50,33 @@ export default class Context<I extends Interaction = Interaction> {
     public map_interaction<B extends Interaction = Interaction>(
         cb : ( ctx: I ) => Context<B>
     ) : Context<B> {
-        if (this.interac.none) return Context.empty();
-        return cb(this.interactionUnchecked);
+        if (this.oInterac.none) return Context.empty();
+        return cb(this.oInterac.val);
     }
 
     public get id() : Snowflake {
        return firstSome(
-        this.interac.andThen( i => Some(i.id)),
-        this.msg.andThen(m => Some(m.id))
+        this.oInterac.andThen( i => Some(i.id)),
+        this.oMsg.andThen(m => Some(m.id))
        )!; 
     }
 
     public get channel() {
       return firstSome(
-          this.message.andThen(m => Some(m.channel)),
-          this.interaction.andThen(i => Some(i.channel))
+          this.oMsg.andThen(m => Some(m.channel)),
+          this.oInterac.andThen(i => Some(i.channel))
       );
     }
     public get user() {
         return firstSome(
-          this.message.andThen(m => Some(m.author)),
-          this.interaction.andThen(i => Some(i.user))
+          this.oMsg.andThen(m => Some(m.author)),
+          this.oInterac.andThen(i => Some(i.user))
       ); 
     }
     public get createdTimestamp() : number {
         return firstSome(
-         this.message.andThen(m => Some(m.createdTimestamp)),
-         this.interaction.andThen(i => Some(i.createdTimestamp))
+         this.oMsg.andThen(m => Some(m.createdTimestamp)),
+         this.oInterac.andThen(i => Some(i.createdTimestamp))
         )!;
     }
 }
