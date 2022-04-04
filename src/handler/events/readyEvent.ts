@@ -9,24 +9,15 @@ import { CommandType } from '../sern';
 export const onReady = ( wrapper : Wrapper ) => {
     const { client, init, commands, } = wrapper;
     fromEvent(client, 'ready')
-       .pipe(
-           first(),
-           tap(() => init?.( wrapper ) ),
-           concatMap( 
-                pipe( 
-                  () => Files.buildData(commands),
-                  ( createCommandCache )
-                )
-            ),  
-        )
-       .subscribe({
-            complete() {
-                // on ready event, complete!
-                // log stuff?
-            }
-       });
+       .pipe(first())
+       .subscribe(() => {
+            init?.( wrapper );
+            Files.buildData( commands )
+            .then( createCommandCache );
+       })
 };
 
+// Refactor : ? Possibly repetitive and verbose. 
 const handler = ( name : string ) =>
     ({
         [CommandType.TEXT] : mod => {
@@ -34,7 +25,7 @@ const handler = ( name : string ) =>
             Files.Commands.set( name,  mod  );
         },
         [CommandType.SLASH]: mod => {
-            Files.Commands.set( name,  mod);
+            Files.Commands.set( name ,  mod);
         },
         [CommandType.BOTH] : mod => {
             Files.Commands.set ( name, mod); 
@@ -64,7 +55,7 @@ function setCommands ( { mod, absPath } : { mod : Module, absPath : string } ) {
 }
 
 async function createCommandCache( 
-    arr: Promise<{mod: Module, absPath: string}[]> 
+    arr: {mod: Module, absPath: string}[] 
   ) {
-    from(await arr).subscribe ( setCommands );
+    from(arr).subscribe ( setCommands );
 }
