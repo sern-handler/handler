@@ -1,4 +1,4 @@
-import type { Message } from 'discord.js';
+import type { ChatInputCommandInteraction, Message } from 'discord.js';
 import { fromEvent,  Observable, of, concatMap } from 'rxjs';
 import { CommandType } from '../sern';
 import Context from '../structures/context';
@@ -15,14 +15,14 @@ export const onMessageCreate = (wrapper : Wrapper) => {
         concatMap ( m =>  {
         const [ prefix, ...data ] = fmt(m, defaultPrefix);
         const posMod = Files.Commands.get(prefix) ?? Files.Alias.get(prefix);
-        const ctx = Context.wrap(m);
 
         return of( posMod )
                 .pipe (
                     filterTap(CommandType.TEXT, mod => {
+                        const ctx = Context.wrap(m);
                         mod.execute(ctx, ['text', data]); 
                     })
-                );
+               );
         })
     ).subscribe ({
        error(e) {

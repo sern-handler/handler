@@ -1,13 +1,13 @@
-import { concatMap, first, from, fromEvent, pipe, tap } from 'rxjs';
+import {  first, from, fromEvent } from 'rxjs';
 import { basename } from 'path';
 import * as Files from '../utilities/readFile';
 import type Wrapper from '../structures/wrapper';
 import type { Module } from '../structures/structxports';
-import type { HandlerCallback, ModuleHandlers, ModuleStates, ModuleType } from '../structures/commands/moduleHandler';
+import type { HandlerCallback, ModuleHandlers, ModuleStates, ModuleType } from '../structures/modules/commands/moduleHandler';
 import { CommandType } from '../sern';
 
 export const onReady = ( wrapper : Wrapper ) => {
-    const { client, init, commands, } = wrapper;
+    const { client, init, commands } = wrapper;
     fromEvent(client, 'ready')
        .pipe(first())
        .subscribe(() => {
@@ -54,7 +54,7 @@ function setCommands ( { mod, absPath } : { mod : Module, absPath : string } ) {
    registerModules(name, mod); 
 }
 
-async function createCommandCache( 
+function createCommandCache( 
     arr: {mod: Module, absPath: string}[] 
   ) {
     from(arr).subscribe ( setCommands );

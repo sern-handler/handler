@@ -2,7 +2,7 @@ import type { Awaitable, Message } from 'discord.js';
 import type { CommandType } from '../sern';
 import type { Module } from '../structures/structxports';
 import { Observable, throwError } from 'rxjs';
-import type { ModuleDefs } from '../structures/commands/moduleHandler';
+import type { ModuleDefs } from '../structures/modules/commands/moduleHandler';
 import { SernError } from '../structures/errors';
 import { isNotFromBot, isNotFromDM } from '../utilities/messageHelpers';
 
@@ -16,7 +16,7 @@ export function filterTap<T extends keyof ModuleDefs>(
     return (src : Observable<Module|undefined>) => 
         new Observable<Module|undefined>( subscriber => { 
             return src.subscribe({ 
-                next(modul ) {
+                next(modul) {
                     if(match(modul, cmdType)) {
                        const asModT = <ModuleDefs[T]> modul; 
                        tap(asModT);
@@ -31,9 +31,9 @@ export function filterTap<T extends keyof ModuleDefs>(
                 error: (e) =>  subscriber.error(e),
                 complete: () => subscriber.complete()
             });
-
         });
   }
+
 export function ignoreNonBot(prefix : string) {
     return (src : Observable<Message>) => 
         new Observable<Message>(subscriber => {

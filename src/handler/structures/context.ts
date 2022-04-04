@@ -1,9 +1,8 @@
-import type { APIInteractionGuildMember } from 'discord-api-types/v9';
 import type {
     Awaitable,
+    ChatInputCommandInteraction,
     Guild,
     GuildMember,
-    Interaction,
     Message,
     Snowflake,
     TextBasedChannel,
@@ -18,21 +17,22 @@ function firstSome<T>(...args : Option<T>[]) : Nullish<T> {
     }
     return null;
 }
-
-export default class Context<I extends Interaction = Interaction> {
+export default class Context {
 
     private constructor(
         private oMsg: Option<Message> = None,
-        private oInterac: Option<I> = None 
+        private oInterac: Option<ChatInputCommandInteraction> = None 
     ) {
         this.oMsg = oMsg;
         this.oInterac = oInterac;
     }
-    static wrap<I extends Interaction = Interaction>(wrappable: I|Message) : Context<I> {
+    static wrap(
+        wrappable: ChatInputCommandInteraction|Message
+    ) : Context {
         if ( 'token' in wrappable ) {
-           return new Context<I>( None, Some(wrappable));
+           return new Context( None, Some(wrappable));
         }
-        return new Context<I>(Some(wrappable), None);
+        return new Context(Some(wrappable), None);
     }
     public isEmpty() {
         return this.oMsg.none && this.oInterac.none;
@@ -42,18 +42,6 @@ export default class Context<I extends Interaction = Interaction> {
     }
     public get interaction() {
         return this.oInterac.unwrap();
-    }
-
-    /**
-    * maps a general Context<I> to Context<B>
-    * if interaction is None return Context.empty()
-    */
-
-    public mapInteraction<B extends Interaction = Interaction>(
-        cb : ( ctx: I ) => Context<B>
-    ) : Context<B> {
-        if (this.oInterac.none) return new Context();
-        return cb(this.oInterac.val);
     }
 
     public get id() : Snowflake {
@@ -68,11 +56,11 @@ export default class Context<I extends Interaction = Interaction> {
           this.oInterac.map(i => i.channel)
       );
     }
-    public get user(): Nullish<User> {
+    public get user(): User {
         return firstSome(
           this.oMsg.map(m => m.author),
           this.oInterac.map(i => i.user)
-      ); 
+      )!; 
     }
     public get createdTimestamp() : number {
         return firstSome(
@@ -81,55 +69,50 @@ export default class Context<I extends Interaction = Interaction> {
         )!;
     }
 
-    public get guild() : Nullish<Guild> {
+    public get guild() : Guild {
         return firstSome(
-         this.oMsg.map(m => m.guild),
+         this.oMsg.map(m => m.guild!),
          this.oInterac.map(i => i.guild)
-        );
+        )!;
     }
-    public get guildId() : Nullish<Snowflake> {
+    public get guildId() : Snowflake {
         return firstSome(
          this.oMsg.map(m => m.guildId),
          this.oInterac.map(i => i.guildId)
-       );
+       )!;
     }
-    public get member() : Nullish<GuildMember | APIInteractionGuildMember> {
+    public get member() : Nullish<GuildMember> {
        return firstSome(
-         this.oMsg.map(m => m.member),
-         this.oInterac.map(i => i.member)
+         this.oMsg.andThen(m => Some(m.member!)),
+         this.oInterac.andThen(i => i.inCachedGuild() ? Some(i.member) : None)
        ); 
     }
     /*
      * Returns the underlying Context but allows for doing other operations
      */
-    public on ( 
-      onInteraction : ( interaction : I ) => Awaitable<void>,
-      onMsg? : (message : Message) => Awaitable<void>
-    ): Context<I> {
+    public onInteraction( 
+      onInteraction : ( interaction : ChatInputCommandInteraction ) => Awaitable<void>,
+    ): Context {
       this.oInterac.map(onInteraction);
-      this.oMsg.map(m => onMsg?.(m));
       return this;
     }
-    public extractInteraction<T>(
-      extract :  (interaction : I)  => T
+    public onMessage(
+      onMessage : ( message : Message ) => Awaitable<void>
+    ): Context {
+      this.oMsg.map( onMessage );
+      return this;
+    }
+    public takeInteractionValue<T>(
+      extract :  (interaction : ChatInputCommandInteraction) => T
     ): Nullish<T> {
       if(this.oInterac.none) return null;
       return extract(this.oInterac.val);
    }
-   public extractMessage<T>(
-      extract :  (message: Message)  => T
-   ): Nullish<T> {
+   public takeMessageValue<T>(
+      extract : (message: Message) => T
+   ):  Nullish<T> {
       if(this.oMsg.none) return null;
       return extract(this.oMsg.val);
-   }
-    // extract either
-   public extractEither<T,V>(
-      i : (interaction : I) => T,
-      m : (message : Message ) => V
-   ) {
-      const iExtract = this.extractMessage(m);
-      const mExtract = this.extractInteraction(i);
-      return iExtract ?? mExtract;
    }
    
 }

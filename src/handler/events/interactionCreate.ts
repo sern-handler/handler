@@ -6,12 +6,14 @@ import Context from '../structures/context';
 import type Wrapper from '../structures/wrapper';
 import * as Files from '../utilities/readFile';
 import { filterTap } from './observableHandling';
+import { filter } from 'rxjs';
 
 export const onInteractionCreate = ( wrapper : Wrapper ) => {
       const { client } = wrapper;  
 
       (<Observable<Interaction>> fromEvent(client, 'interactionCreate'))
-      .pipe( 
+      .pipe(
+        filter( i => i.inGuild() ),
         concatMap ( interaction => {
             if (interaction.isChatInputCommand()) {
                 return of(Files.Commands.get(interaction.commandName))
@@ -26,8 +28,7 @@ export const onInteractionCreate = ( wrapper : Wrapper ) => {
                 return of(Files.ContextMenuUser.get(interaction.commandName))
                 .pipe(
                     filterTap(CommandType.MENU_USER, mod => { 
-                        const ctx = Context.wrap(interaction);
-                        mod.execute(ctx);
+                        mod.execute(interaction);
                     }),
                 );
             }
@@ -35,8 +36,7 @@ export const onInteractionCreate = ( wrapper : Wrapper ) => {
                 return of(Files.ContextMenuMsg.get(interaction.commandName))
                 .pipe(
                     filterTap(CommandType.MENU_MSG, mod => {
-                        const ctx = Context.wrap(interaction);
-                        mod.execute(ctx);
+                        mod.execute(interaction);
                     }),
                 );
             }
@@ -44,8 +44,7 @@ export const onInteractionCreate = ( wrapper : Wrapper ) => {
                 return of(Files.Buttons.get(interaction.customId))
                 .pipe(
                     filterTap(CommandType.BUTTON, mod => {
-                        const ctx = Context.wrap(interaction);
-                        mod.execute(ctx);
+                        mod.execute(interaction);
                     })
                 );
             }
@@ -53,8 +52,7 @@ export const onInteractionCreate = ( wrapper : Wrapper ) => {
                 return of(Files.SelectMenus.get(interaction.customId))
                 .pipe(
                     filterTap(CommandType.MENU_SELECT, mod => {
-                        const ctx = Context.wrap(interaction);
-                        mod.execute(ctx);
+                        mod.execute(interaction);
                     })
                 );
             }

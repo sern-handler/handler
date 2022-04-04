@@ -1,4 +1,4 @@
-import { CommandType } from '../../sern';
+import { CommandType } from '../../../sern';
 import type { TextCommand, BothCommand, ButtonCommand, SlashCommand, ContextMenuMsg, ContextMenuUser, SelectMenuCommand }  from './module';
 //https://stackoverflow.com/questions/64092736/alternative-to-switch-statement-for-typescript-discriminated-union
 

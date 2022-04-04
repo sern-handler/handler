@@ -27,6 +27,8 @@ function eventObserver(client: Client, events: DiscordEvent[] ) {
       fromEvent(client, event, cb).subscribe();
   });
 }
+
+
 /**
  * @enum { number };
  */
@@ -40,3 +42,4 @@ export enum CommandType {
     BOTH  =      0b000011,
     ANY   =      0b111111
 }
+
