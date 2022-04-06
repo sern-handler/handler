@@ -21,8 +21,8 @@
     "wrapper",
     "discord.js"
   ],
-  "author": "",
-  "license": "ISC",
+  "author": "Team SernHandler",
+  "license": "GPL-2.0",
   "dependencies": {
     "@typescript-eslint/eslint-plugin": "^5.10.2",
     "@typescript-eslint/parser": "^5.10.2",
