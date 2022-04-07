@@ -1,10 +1,11 @@
-
 import type { Interaction } from 'discord.js';
+import type Wrapper from '../structures/wrapper';
+
+import * as Files from '../utilities/readFile';
+import Context from '../structures/context';
+
 import { fromEvent,  Observable, of,  concatMap } from 'rxjs';
 import { CommandType } from '../sern';
-import Context from '../structures/context';
-import type Wrapper from '../structures/wrapper';
-import * as Files from '../utilities/readFile';
 import { filterTap } from './observableHandling';
 import { filter } from 'rxjs';
 
