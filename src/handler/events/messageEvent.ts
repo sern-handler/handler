@@ -1,4 +1,4 @@
-import type { ChatInputCommandInteraction, Message } from 'discord.js';
+import type { Message } from 'discord.js';
 import { fromEvent,  Observable, of, concatMap } from 'rxjs';
 import { CommandType } from '../sern';
 import Context from '../structures/context';
@@ -18,7 +18,7 @@ export const onMessageCreate = (wrapper : Wrapper) => {
 
         return of( posMod )
                 .pipe (
-                    filterTap(CommandType.TEXT, mod => {
+                    filterTap(CommandType.Text, mod => {
                         const ctx = Context.wrap(m);
                         mod.execute(ctx, ['text', data]); 
                     })

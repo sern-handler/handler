@@ -42,8 +42,7 @@ const handler = ( name : string ) =>
         },
         [CommandType.MENU_SELECT] : mod => {
             Files.SelectMenus.set(name, mod);
-        }
-
+        },
     } as ModuleHandlers);
 
 const registerModules = <T extends ModuleType >(name : string, mod : ModuleStates[T]) =>

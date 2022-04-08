@@ -1,9 +1,12 @@
+import type { APIGuildMember } from 'discord-api-types/v9';
 import type {
     Awaitable,
     ChatInputCommandInteraction,
     Guild,
     GuildMember,
+    InteractionReplyOptions,
     Message,
+    ReplyMessageOptions,
     Snowflake,
     TextBasedChannel,
     User
@@ -17,8 +20,10 @@ function firstSome<T>(...args : Option<T>[]) : Nullish<T> {
     }
     return null;
 }
+//
+//Will need refactoring after applying context in practice
+//
 export default class Context {
-
     private constructor(
         private oMsg: Option<Message> = None,
         private oInterac: Option<ChatInputCommandInteraction> = None 
@@ -71,7 +76,7 @@ export default class Context {
 
     public get guild() : Guild {
         return firstSome(
-         this.oMsg.map(m => m.guild!),
+         this.oMsg.map(m => m.guild),
          this.oInterac.map(i => i.guild)
         )!;
     }
@@ -81,10 +86,13 @@ export default class Context {
          this.oInterac.map(i => i.guildId)
        )!;
     }
-    public get member() : Nullish<GuildMember> {
+    /*
+     * interactions can return APIGuildMember if the guild it is emitted from is not cached
+     */ 
+    public get member() : Nullish<GuildMember|APIGuildMember> {
        return firstSome(
-         this.oMsg.andThen(m => Some(m.member!)),
-         this.oInterac.andThen(i => i.inCachedGuild() ? Some(i.member) : None)
+         this.oMsg.map(m => m.member),
+         this.oInterac.map(i => i.member)
        ); 
     }
     /*
@@ -93,13 +101,19 @@ export default class Context {
     public onInteraction( 
       onInteraction : ( interaction : ChatInputCommandInteraction ) => Awaitable<void>,
     ): Context {
-      this.oInterac.map(onInteraction);
+      if (this.oInterac.some) {
+        onInteraction(this.oInterac.val);
+        return Context.wrap(this.oInterac.val);
+      }
       return this;
     }
     public onMessage(
       onMessage : ( message : Message ) => Awaitable<void>
     ): Context {
-      this.oMsg.map( onMessage );
+      if (this.oMsg.some) {
+        onMessage(this.oMsg.val);
+        return Context.wrap(this.oMsg.val);
+      }
       return this;
     }
     public takeInteractionValue<T>(
@@ -108,14 +122,28 @@ export default class Context {
       if(this.oInterac.none) return null;
       return extract(this.oInterac.val);
    }
+
    public takeMessageValue<T>(
       extract : (message: Message) => T
    ):  Nullish<T> {
       if(this.oMsg.none) return null;
       return extract(this.oMsg.val);
    }
-   
-}
 
+   public reply(
+      content : Omit<InteractionReplyOptions, 'fetchReply'> | ReplyMessageOptions
+   ): Promise<Context> { 
+      return firstSome(
+        this.oInterac.map(async i => { 
+          await i.reply( content as InteractionReplyOptions);
+          return new Context(Some(await i.fetchReply() as Message), Some(i))
+        }),
+        this.oMsg.map(async m => {
+           const reply = await m.reply( content as ReplyMessageOptions )
+           return new Context(Some(reply), this.oInterac);
+        })
+      )!;
+   }
+}
 
 

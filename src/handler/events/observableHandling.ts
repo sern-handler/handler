@@ -4,7 +4,7 @@ import type { Module } from '../structures/structxports';
 import { Observable, throwError } from 'rxjs';
 import type { ModuleDefs } from '../structures/modules/commands/moduleHandler';
 import { SernError } from '../structures/errors';
-import { isNotFromBot, isNotFromDM } from '../utilities/messageHelpers';
+import { isNotFromBot } from '../utilities/messageHelpers';
 
 export function match(mod: Module | undefined, type : CommandType) : boolean {
     return mod !== undefined && (mod.type & type) != 0;
@@ -23,9 +23,9 @@ export function filterTap<T extends keyof ModuleDefs>(
                        subscriber.next(asModT);
                     } else {
                        if (modul === undefined) { 
-                          return throwError(() => SernError.UNDEFINED_MODULE); 
+                          return throwError(() => SernError.UndefinedModule); 
                        }
-                       return throwError(() => SernError.MISMATCH_MODULE_TYPE);
+                       return throwError(() => SernError.MismatchModule);
                     }
                 },
                 error: (e) =>  subscriber.error(e),
@@ -40,7 +40,6 @@ export function ignoreNonBot(prefix : string) {
            return src.subscribe({
                next(m) {
                   const passAll = [
-                    isNotFromDM,
                     isNotFromBot,
                     (m : Message) => 
                        m.content
@@ -59,5 +58,3 @@ export function ignoreNonBot(prefix : string) {
             });
        });
 }
-
-

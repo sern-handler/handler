@@ -12,6 +12,8 @@ import { SernError } from './structures/errors';
 import { onReady } from './events/readyEvent';
 import { onMessageCreate } from './events/messageEvent';
 import { onInteractionCreate } from './events/interactionCreate';
+import type { Module } from '..';
+import { Modified, Modifiers } from './structures/modifiers';
 
 export function init( wrapper : Wrapper ) {
    const { events, client } = wrapper; 
@@ -21,6 +23,7 @@ export function init( wrapper : Wrapper ) {
    onInteractionCreate ( wrapper ); 
 }
 
+//TODO : Add event listener for any other generic node js event emitter
 function eventObserver(client: Client, events: DiscordEvent[] ) {
   events.forEach( ( [event, cb] ) => {
       if (event === 'ready') throw Error(SernError.RESERVED_EVENT);
@@ -29,17 +32,18 @@ function eventObserver(client: Client, events: DiscordEvent[] ) {
 }
 
 
+
 /**
  * @enum { number };
  */
 export enum CommandType {
-    TEXT  =      0b000001,
-    SLASH =      0b000010,
-    MENU_USER =  0b000100,
-    MENU_MSG =   0b001000,
-    BUTTON =     0b010000,
-    MENU_SELECT= 0b100000,
-    BOTH  =      0b000011,
-    ANY   =      0b111111
+    Text  =      0b0000001,
+    Slash =      0b0000010,
+    MenuUser =   0b0000100,
+    MenuMsg =    0b0001000,
+    Button =     0b0010000,
+    MenuSelect = 0b0100000,
+    Both  =      0b0000011,
+    Auto  =      0b1000000
 }
 
