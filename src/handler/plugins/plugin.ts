@@ -13,7 +13,7 @@
 //
 
 import type { Err, Ok, Result } from "ts-results";
-import type { Override } from "../..";
+import type { Override, Wrapper } from "../..";
 import type { BaseModule } from "../structures/modules/module";
 
 export enum PluginType {
@@ -33,15 +33,15 @@ interface BasePlugin extends Override<BaseModule, executePlugin>{
     type : PluginType
 }
 
-type CommandPlugin = {
+export type CommandPlugin = {
     type : PluginType.Command
-} & BasePlugin;
+} & Override<BasePlugin, { execute : ( wrapper : Wrapper ) => Result<void,void>}>;
 
-type EventPlugin = {
+export type EventPlugin = {
     type : PluginType.Event
 } & BasePlugin;
 
-export type Plugin =
+export type SernPlugin =
     CommandPlugin
     | EventPlugin;
 
