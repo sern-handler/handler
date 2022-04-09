@@ -1,5 +1,5 @@
 import type { Awaitable, ChatInputCommandInteraction, Interaction } from "discord.js";
-import type { Args } from "../../..";
+import type { Args, Module } from "../../..";
 import type Context from "../context";
 
 export interface BaseModule {
@@ -9,5 +9,7 @@ export interface BaseModule {
 }
 
 
+export function sernModule<T extends Module> (module : T, plugins : Plugin[]) { 
 
 
+}

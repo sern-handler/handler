@@ -20,27 +20,27 @@ export const onReady = ( wrapper : Wrapper ) => {
 // Refactor : ? Possibly repetitive and verbose. 
 const handler = ( name : string ) =>
     ({
-        [CommandType.TEXT] : mod => {
+        [CommandType.Text] : mod => {
             mod.alias.forEach ( a => Files.Alias.set(a,mod));
             Files.Commands.set( name,  mod  );
         },
-        [CommandType.SLASH]: mod => {
+        [CommandType.Slash]: mod => {
             Files.Commands.set( name ,  mod);
         },
-        [CommandType.BOTH] : mod => {
+        [CommandType.Both] : mod => {
             Files.Commands.set ( name, mod); 
             mod.alias.forEach (a => Files.Alias.set(a, mod));
         },
-        [CommandType.MENU_USER] : mod => {
+        [CommandType.MenuUser] : mod => {
             Files.ContextMenuUser.set ( name, mod );
         },
-        [CommandType.MENU_MSG] : mod =>  { 
+        [CommandType.MenuMsg] : mod =>  { 
             Files.ContextMenuMsg.set (name, mod );
         },
-        [CommandType.BUTTON] : mod => {
+        [CommandType.Button] : mod => {
             Files.Buttons.set(name, mod);
         },
-        [CommandType.MENU_SELECT] : mod => {
+        [CommandType.MenuSelect] : mod => {
             Files.SelectMenus.set(name, mod);
         },
     } as ModuleHandlers);
@@ -50,11 +50,17 @@ const registerModules = <T extends ModuleType >(name : string, mod : ModuleState
 
 function setCommands ( { mod, absPath } : { mod : Module, absPath : string } ) {
    const name = mod.name ?? Files.fmtFileName(basename(absPath));
-   registerModules(name, mod); 
+   // making all modules have name property
+   if (mod.name === undefined ) {
+    registerModules(name, { name, ...mod });
+   } else {
+    registerModules(name, mod); 
+   }
 }
 
 function createCommandCache( 
     arr: {mod: Module, absPath: string}[] 
   ) {
+      // possible mem leak?
     from(arr).subscribe ( setCommands );
 }

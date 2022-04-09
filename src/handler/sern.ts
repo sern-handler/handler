@@ -12,8 +12,6 @@ import { SernError } from './structures/errors';
 import { onReady } from './events/readyEvent';
 import { onMessageCreate } from './events/messageEvent';
 import { onInteractionCreate } from './events/interactionCreate';
-import type { Module } from '..';
-import { Modified, Modifiers } from './structures/modifiers';
 
 export function init( wrapper : Wrapper ) {
    const { events, client } = wrapper; 
@@ -26,7 +24,7 @@ export function init( wrapper : Wrapper ) {
 //TODO : Add event listener for any other generic node js event emitter
 function eventObserver(client: Client, events: DiscordEvent[] ) {
   events.forEach( ( [event, cb] ) => {
-      if (event === 'ready') throw Error(SernError.RESERVED_EVENT);
+      if (event === 'ready') throw Error(SernError.ReservedEvent);
       fromEvent(client, event, cb).subscribe();
   });
 }
