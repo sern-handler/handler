@@ -14,7 +14,7 @@
 
 import type { Err, Ok, Result } from "ts-results";
 import type { Override, Wrapper } from "../..";
-import type { BaseModule } from "../structures/modules/module";
+import { apply, BaseModule, sernModule } from "../structures/modules/module";
 
 export enum PluginType {
     Command = 0b00,
@@ -27,15 +27,17 @@ interface Controller {
 
 }
 
-type executePlugin = { execute : ( controller : Controller ) => Result<void, void> }
+type executeCmdPlugin = { execute : ( wrapper : Wrapper, controller : Controller ) => Result<void, void> }
 
-interface BasePlugin extends Override<BaseModule, executePlugin>{
+interface BasePlugin extends Override<BaseModule, executeCmdPlugin>{
     type : PluginType
 }
 
 export type CommandPlugin = {
     type : PluginType.Command
-} & Override<BasePlugin, { execute : ( wrapper : Wrapper ) => Result<void,void>}>;
+} & Override<BasePlugin, { 
+    execute : (wrapper:Wrapper, controller:Controller) => Result<void,void>
+}>;
 
 export type EventPlugin = {
     type : PluginType.Event
@@ -44,6 +46,12 @@ export type EventPlugin = {
 export type SernPlugin =
     CommandPlugin
     | EventPlugin;
+
+
+sernModule(
+  
+)
+
 
 
 

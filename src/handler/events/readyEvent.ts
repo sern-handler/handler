@@ -5,6 +5,7 @@ import type Wrapper from '../structures/wrapper';
 import type { Module } from '../structures/structxports';
 import type { HandlerCallback, ModuleHandlers, ModuleStates, ModuleType } from '../structures/modules/commands/moduleHandler';
 import { CommandType } from '../sern';
+import type { PluggedModule } from '../structures/modules/module';
 
 export const onReady = ( wrapper : Wrapper ) => {
     const { client, init, commands } = wrapper;
@@ -48,19 +49,22 @@ const handler = ( name : string ) =>
 const registerModules = <T extends ModuleType >(name : string, mod : ModuleStates[T]) =>
     (<HandlerCallback<T>> handler(name)[mod.type])(mod);
 
-function setCommands ( { mod, absPath } : { mod : Module, absPath : string } ) {
-   const name = mod.name ?? Files.fmtFileName(basename(absPath));
+
+function setCommands ( { plugged, absPath } : { plugged: PluggedModule, absPath : string } ) {
+   const name = plugged.mod.name ?? Files.fmtFileName(basename(absPath));
    // making all modules have name property
-   if (mod.name === undefined ) {
-    registerModules(name, { name, ...mod });
+   if (plugged.mod.name === undefined ) {
+    registerModules(name, { name, ...plugged.mod });
    } else {
-    registerModules(name, mod); 
+    registerModules(name, plugged.mod); 
    }
 }
 
 function createCommandCache( 
-    arr: {mod: Module, absPath: string}[] 
+    arr: {plugged: PluggedModule, absPath: string}[] 
   ) {
       // possible mem leak?
     from(arr).subscribe ( setCommands );
 }
+
+

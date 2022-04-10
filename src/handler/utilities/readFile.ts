@@ -2,6 +2,7 @@ import { readdirSync, statSync } from 'fs';
 import { join } from 'path';
 import type { Module } from '../structures/modules/commands/module';
 import { SernError } from '../structures/errors';
+import type { PluggedModule } from '../structures/modules/module';
 
 //We can look into lazily loading modules once everything is set
 export const ContextMenuUser = new Map<string, Module>();
@@ -32,20 +33,20 @@ export const fmtFileName = (n: string) => n.substring(0, n.length - 3);
 /**
  * 
  * @param {commandsDir} Relative path to commands directory
- * @returns {Promise<{ mod: Command; absPath: string; }[]>} data from command files
+ * @returns {Promise<{ mod: PluggedModule; absPath: string; }[]>} data from command files
  */
 
 export async function buildData(commandDir: string ): Promise<
   {
-    mod: Module;
+    plugged: PluggedModule;
     absPath: string;
   }[]
 > {
   return Promise.all(
     getCommands(commandDir).map( async (absPath) => {
-      const mod = <Module> (await import(absPath)).module;
-      if (mod === undefined) throw Error(`${SernError.UndefinedModule} ${absPath}`);
-      return { mod, absPath };
+      const plugged = <PluggedModule> (await import(absPath)).module;
+      if (plugged === undefined) throw Error(`${SernError.UndefinedModule} ${absPath}`);
+      return { plugged , absPath };
     }),
   );
 }

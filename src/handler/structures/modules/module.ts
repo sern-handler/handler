@@ -1,4 +1,4 @@
-import type { Awaitable, ChatInputCommandInteraction, Interaction } from "discord.js";
+import type { Awaitable, ChatInputCommandInteraction } from "discord.js";
 import type { Args, Module } from "../../..";
 import type { CommandPlugin, EventPlugin, SernPlugin } from "../../plugins/plugin";
 import type Context from "../context";
@@ -9,8 +9,8 @@ export interface BaseModule {
     execute: (ctx: Context, args: Args) => Awaitable<void>;
 }
 
-export interface PluggedModule<T extends Module> {
-    mod : T;
+export interface PluggedModule {
+    mod : Module;
     plugins : SernPlugin[];
 }
 
@@ -26,10 +26,10 @@ export function apply(...plugins: SernPlugin[]) {
     return plugins;
 }
 
-export function sernModule<T extends Module>
-    (plugins : () => SernPlugin[], mod : T, ) : PluggedModule<T> { 
+export function sernModule
+    (plugins : SernPlugin[], mod : Module, ) : PluggedModule { 
         return {
             mod,
-            plugins : plugins()
+            plugins 
         }
 }
