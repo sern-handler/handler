@@ -28,10 +28,14 @@ pnpm add sern-handler
 ```js
 const { Client, Intents } = require('discord.js');
 const { Sern } = require('sern-handler');
-const { prefix, token } = require('../src/secrets.json');
+const { prefix, token } = require('./config.json');
 
 const client = new Client({
-  intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MEMBERS],
+  intents: [
+    Intents.FLAGS.GUILDS, 
+    Intents.FLAGS.GUILD_MESSAGES,
+    Intents.FLAGS.GUILD_MEMBERS
+   ],
 });
 
 new Sern.Handler({
@@ -56,7 +60,6 @@ client.login(token);
 
 ```js
 const { Sern, Types } = require('sern-handler');
-const { Ok } = require('ts-results');
 
 module.exports = {
   alias: [],
