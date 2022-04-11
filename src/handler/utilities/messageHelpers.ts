@@ -3,9 +3,9 @@ import type { Message } from 'discord.js';
 /**
  * Checks if the author of message is a bot or not
  * @param message The message to check
- * @returns `true` if the author of the message is a bot, `false` otherwise
+ * @returns `false` if the author of the message is a bot, `true` otherwise
  * @example
- * isBot(message) ? 'yes it is a bot' : 'no it is not a bot';
+ * isNotFromBot(message) ? 'no it is not from a bot' : 'yes it is from a bot';
  */
 export function isNotFromBot(message: Message) {
     return !message.author.bot;
