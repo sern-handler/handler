@@ -12,9 +12,10 @@
 //
 //
 
+import type { Client } from "discord.js";
 import type { Err, Ok, Result } from "ts-results";
 import type { Override, Wrapper } from "../..";
-import { apply, BaseModule, sernModule } from "../structures/modules/module";
+import type { BaseModule } from "../structures/modules/module";
 
 export enum PluginType {
     Command = 0b00,
@@ -36,7 +37,7 @@ interface BasePlugin extends Override<BaseModule, executeCmdPlugin>{
 export type CommandPlugin = {
     type : PluginType.Command
 } & Override<BasePlugin, { 
-    execute : (wrapper:Wrapper, controller:Controller) => Result<void,void>
+    execute : (wrapper:Client, controller:Controller) => Result<void,void>
 }>;
 
 export type EventPlugin = {
@@ -48,9 +49,7 @@ export type SernPlugin =
     | EventPlugin;
 
 
-sernModule(
-  
-)
+
 
 
 

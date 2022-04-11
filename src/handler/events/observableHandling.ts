@@ -58,3 +58,13 @@ export function ignoreNonBot(prefix : string) {
             });
        });
 }
+export function partition<T,U extends T,V extends T>
+    (array: T[], isValid: (el : T) => el is U): [U[], V[]] {
+        return array.reduce(([pass, fail], elem) => {
+            return isValid(elem) 
+            ? [[...pass, <U>elem], fail]
+            : [pass, [...fail, <V>elem]];
+    }, [<U[]>[], <V[]>[]] );
+}
+
+

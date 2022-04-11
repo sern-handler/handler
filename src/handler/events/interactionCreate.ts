@@ -57,7 +57,7 @@ export const onInteractionCreate = ( wrapper : Wrapper ) => {
             else return of();
         })
       ).subscribe({
-       error(e) {
+       error(e){
         throw e;
        },
        next(command) {

@@ -14,7 +14,6 @@ interface Wrapper {
     readonly client: Client;
     readonly defaultPrefix: string;
     readonly commands: string;
-    init?: (handler: Wrapper) => void;
     readonly events? : DiscordEvent[];
 }
 

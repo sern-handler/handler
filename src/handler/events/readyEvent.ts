@@ -1,20 +1,29 @@
-import {  first, from, fromEvent } from 'rxjs';
+import {  concatMap, first, from, fromEvent, map, tap } from 'rxjs';
 import { basename } from 'path';
 import * as Files from '../utilities/readFile';
 import type Wrapper from '../structures/wrapper';
-import type { Module } from '../structures/structxports';
 import type { HandlerCallback, ModuleHandlers, ModuleStates, ModuleType } from '../structures/modules/commands/moduleHandler';
 import { CommandType } from '../sern';
 import type { PluggedModule } from '../structures/modules/module';
+import type { CommandPlugin, SernPlugin } from '../plugins/plugin';
+import { partition } from './observableHandling';
+import type { Client } from 'discord.js';
+import { Err, Ok } from 'ts-results';
 
 export const onReady = ( wrapper : Wrapper ) => {
-    const { client, init, commands } = wrapper;
+    const { client, commands } = wrapper;
     fromEvent(client, 'ready')
-       .pipe(first())
+       .pipe(
+        take(1),
+        concatMap ( _ => {
+          
+
+
+        })
+       )
        .subscribe(() => {
-            init?.( wrapper );
             Files.buildData( commands )
-            .then( createCommandCache );
+            .then( deployCommands(client) );
        })
 };
 
@@ -49,22 +58,45 @@ const handler = ( name : string ) =>
 const registerModules = <T extends ModuleType >(name : string, mod : ModuleStates[T]) =>
     (<HandlerCallback<T>> handler(name)[mod.type])(mod);
 
-
-function setCommands ( { plugged, absPath } : { plugged: PluggedModule, absPath : string } ) {
-   const name = plugged.mod.name ?? Files.fmtFileName(basename(absPath));
-   // making all modules have name property
-   if (plugged.mod.name === undefined ) {
-    registerModules(name, { name, ...plugged.mod });
-   } else {
-    registerModules(name, plugged.mod); 
-   }
+function setCommands (  plugged : PluggedModule  ) {
+    registerModules(plugged.mod.name!, plugged.mod); 
 }
 
-function createCommandCache( 
-    arr: {plugged: PluggedModule, absPath: string}[] 
-  ) {
-      // possible mem leak?
-    from(arr).subscribe ( setCommands );
+function deployCommands (wrapper : Client) {
+
+    return function (arr : { plugged : PluggedModule, absPath : string}[]) {
+        from(arr)
+            .pipe(
+                map (({plugged, absPath}) => {
+                    const name = plugged.mod.name ?? Files.fmtFileName(basename(absPath));
+                    if (plugged.mod.name === undefined ) {
+                        return { mod: { name, ...plugged.mod }, plugins : plugged.plugins };
+                    }
+                    return plugged;
+                }),
+                concatMap( ({ plugins, mod} ) => {
+                    const [ cmdPlugins, eventPlugins ] = partition(plugins, isCmdPlugin);
+
+                    return from(cmdPlugins)
+                    .pipe(
+                        
+
+                    )
+                }),
+                tap (plug => deployPlugins(plug, wrapper)),
+                tap ( setCommands ),
+            ).subscribe ( );
+    }
 }
 
+function isCmdPlugin ( p : SernPlugin) : p is CommandPlugin { 
+    return (p.type & 0) !== 0;
+}
 
+// 0b0
+// 0b0
+function deployPlugins(plugged: PluggedModule, client : Client) {
+        const { plugins, mod } = plugged;
+        const [ cmdPlugins, eventPlugins ] = partition(plugins, isCmdPlugin) 
+        
+}
