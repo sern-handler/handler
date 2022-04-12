@@ -4,19 +4,18 @@ import type { DiscordEvent } from '../../types/handler';
 /**
  * An object to be passed into Sern.Handler constructor.
  * @typedef {object} Wrapper
- * @property {readonly Client} Client
- * @property {readonly string} The default prefix
- * @property {readonly string} Commands
- * @prop {(handler: Handler) => void)} init
- * @prop { readonly DiscordEvent[] } Events
+ * @property {readonly Client} client
+ * @property {readonly string} defaultPrefix
+ * @property {readonly string} commands
+ * @prop {(handler : Handler) => void)} init
+ * @prop { readonly DiscordEvent[] } events
  */
-
 interface Wrapper {
-  readonly client: Client;
-  readonly defaultPrefix: string;
-  readonly commands: string;
-  init?: (handler: Wrapper) => void;
-  readonly events?: DiscordEvent[];
+    readonly client: Client;
+    readonly defaultPrefix: string;
+    readonly commands: string;
+    init?: (handler: Wrapper) => void;
+    readonly events? : DiscordEvent[];
 }
 
 export default Wrapper;
