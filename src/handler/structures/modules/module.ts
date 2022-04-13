@@ -14,22 +14,4 @@ export interface PluggedModule {
     plugins : SernPlugin[];
 }
 
-export function commmand ( plug : CommandPlugin ) { 
-    return plug;
-}
 
-export function event( plug : EventPlugin ) {
-    return plug;
-}
-
-export function apply(...plugins: SernPlugin[]) {
-    return plugins;
-}
-
-export function sernModule
-    (plugins : SernPlugin[], mod : Module, ) : PluggedModule { 
-        return {
-            mod,
-            plugins 
-        }
-}

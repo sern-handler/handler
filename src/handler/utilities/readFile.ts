@@ -1,16 +1,15 @@
 import { readdirSync, statSync } from 'fs';
 import { join } from 'path';
-import type { Module } from '../structures/modules/commands/module';
 import { SernError } from '../structures/errors';
 import type { PluggedModule } from '../structures/modules/module';
 
 //We can look into lazily loading modules once everything is set
-export const ContextMenuUser = new Map<string, Module>();
-export const ContextMenuMsg = new Map<string, Module>();
-export const Commands = new Map<string, Module>();
-export const Alias = new Map<string, Module>();
-export const Buttons = new Map<string, Module>();
-export const SelectMenus = new Map<string, Module>();
+export const ContextMenuUser = new Map<string, PluggedModule>();
+export const ContextMenuMsg = new Map<string, PluggedModule>();
+export const Commands = new Map<string, PluggedModule>();
+export const Alias = new Map<string, PluggedModule>();
+export const Buttons = new Map<string, PluggedModule>();
+export const SelectMenus = new Map<string, PluggedModule>();
 
 
 // Courtesy @Townsy45
@@ -40,8 +39,7 @@ export async function buildData(commandDir: string ): Promise<
   {
     plugged: PluggedModule;
     absPath: string;
-  }[]
-> {
+  }[]> {
   return Promise.all(
     getCommands(commandDir).map( async (absPath) => {
       const plugged = <PluggedModule> (await import(absPath)).module;

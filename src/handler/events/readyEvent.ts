@@ -1,102 +1,84 @@
-import {  concatMap, first, from, fromEvent, map, tap } from 'rxjs';
-import { basename } from 'path';
+import {  from, fromEvent, map,  take,concat, concatAll, mergeMap, skip} from 'rxjs'; import { basename } from 'path';
 import * as Files from '../utilities/readFile';
 import type Wrapper from '../structures/wrapper';
 import type { HandlerCallback, ModuleHandlers, ModuleStates, ModuleType } from '../structures/modules/commands/moduleHandler';
 import { CommandType } from '../sern';
-import type { PluggedModule } from '../structures/modules/module';
 import type { CommandPlugin, SernPlugin } from '../plugins/plugin';
 import { partition } from './observableHandling';
-import type { Client } from 'discord.js';
 import { Err, Ok } from 'ts-results';
+import type { PluggedModule } from '../structures/modules/module';
 
 export const onReady = ( wrapper : Wrapper ) => {
     const { client, commands } = wrapper;
-    fromEvent(client, 'ready')
-       .pipe(
-        take(1),
-        concatMap ( _ => {
-          
-
-
-        })
-       )
-       .subscribe(() => {
-            Files.buildData( commands )
-            .then( deployCommands(client) );
-       })
-};
+    const ready$ = fromEvent(client, 'ready').pipe(take(1));
+    const processCommandFiles$ = from(Files.buildData(commands)).pipe( 
+             concatAll(),
+             map(({plugged, absPath}) => {
+                const name = plugged.mod.name ?? Files.fmtFileName(basename(absPath));
+                if (plugged.mod.name === undefined ) {
+                    return { mod: { name, ...plugged.mod }, plugins : plugged.plugins };
+                }
+                return plugged;
+             }),
+             mergeMap(({ mod, plugins: allPlugins }) => {
+                const [ cmdPlugins, plugins ] = partition(allPlugins, isCmdPlugin);
+                return cmdPlugins.map(pl => {
+                    const res = pl.execute(client, mod, {
+                        next: () => Ok.EMPTY,
+                        stop: () => Err.EMPTY
+                    })
+                    return { res, plugged : <PluggedModule>{ mod, plugins } }
+                })
+             }),
+            );
+    concat(ready$.pipe(skip(1)),processCommandFiles$)
+    .subscribe( _ => {
+        if(a.ok) {
+            registerModule(mod.name!, mod, plugins)
+        } else {
+            
+        }
+    })
+}
 
 // Refactor : ? Possibly repetitive and verbose. 
 const handler = ( name : string ) =>
     ({
-        [CommandType.Text] : mod => {
-            mod.alias.forEach ( a => Files.Alias.set(a,mod));
-            Files.Commands.set( name,  mod  );
+        [CommandType.Text] : (mod, plugins) => {
+            mod.alias.forEach ( a => Files.Alias.set(a,{ mod, plugins}));
+            Files.Commands.set( name,  { mod, plugins } );
         },
-        [CommandType.Slash]: mod => {
-            Files.Commands.set( name ,  mod);
+        [CommandType.Slash]: (mod, plugins) => {
+            Files.Commands.set( name ,  { mod, plugins });
         },
-        [CommandType.Both] : mod => {
-            Files.Commands.set ( name, mod); 
-            mod.alias.forEach (a => Files.Alias.set(a, mod));
+        [CommandType.Both] :( mod, plugins )=> {
+            Files.Commands.set ( name,{ mod, plugins}); 
+            mod.alias.forEach (a => Files.Alias.set(a, {mod,plugins}));
         },
-        [CommandType.MenuUser] : mod => {
-            Files.ContextMenuUser.set ( name, mod );
+        [CommandType.MenuUser] : (mod, plugins) => {
+            Files.ContextMenuUser.set ( name, {mod, plugins} );
         },
-        [CommandType.MenuMsg] : mod =>  { 
-            Files.ContextMenuMsg.set (name, mod );
+        [CommandType.MenuMsg] : (mod,plugins) =>  { 
+            Files.ContextMenuMsg.set (name, {mod, plugins} );
         },
-        [CommandType.Button] : mod => {
-            Files.Buttons.set(name, mod);
+        [CommandType.Button] : (mod,plugins) => {
+            Files.Buttons.set(name, {mod, plugins});
         },
-        [CommandType.MenuSelect] : mod => {
-            Files.SelectMenus.set(name, mod);
+        [CommandType.MenuSelect] : ( mod, plugins ) => {
+            Files.SelectMenus.set(name, { mod, plugins });
         },
     } as ModuleHandlers);
 
-const registerModules = <T extends ModuleType >(name : string, mod : ModuleStates[T]) =>
-    (<HandlerCallback<T>> handler(name)[mod.type])(mod);
-
-function setCommands (  plugged : PluggedModule  ) {
-    registerModules(plugged.mod.name!, plugged.mod); 
-}
-
-function deployCommands (wrapper : Client) {
-
-    return function (arr : { plugged : PluggedModule, absPath : string}[]) {
-        from(arr)
-            .pipe(
-                map (({plugged, absPath}) => {
-                    const name = plugged.mod.name ?? Files.fmtFileName(basename(absPath));
-                    if (plugged.mod.name === undefined ) {
-                        return { mod: { name, ...plugged.mod }, plugins : plugged.plugins };
-                    }
-                    return plugged;
-                }),
-                concatMap( ({ plugins, mod} ) => {
-                    const [ cmdPlugins, eventPlugins ] = partition(plugins, isCmdPlugin);
-
-                    return from(cmdPlugins)
-                    .pipe(
-                        
-
-                    )
-                }),
-                tap (plug => deployPlugins(plug, wrapper)),
-                tap ( setCommands ),
-            ).subscribe ( );
-    }
+function registerModule <T extends ModuleType> (
+    name : string,
+    mod : ModuleStates[T],
+    plugins : SernPlugin[]
+) {
+    return (<HandlerCallback<T>> handler(name)[mod.type])(mod, plugins);
 }
 
 function isCmdPlugin ( p : SernPlugin) : p is CommandPlugin { 
     return (p.type & 0) !== 0;
 }
 
-// 0b0
-// 0b0
-function deployPlugins(plugged: PluggedModule, client : Client) {
-        const { plugins, mod } = plugged;
-        const [ cmdPlugins, eventPlugins ] = partition(plugins, isCmdPlugin) 
-        
-}
+

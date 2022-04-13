@@ -62,7 +62,7 @@ export const onInteractionCreate = ( wrapper : Wrapper ) => {
        },
        next(command) {
         //log on each command emitted 
-        console.log(command?.name);
+        console.log(command);
        },
    });
 };

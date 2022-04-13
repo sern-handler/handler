@@ -5,22 +5,24 @@ import { Observable, throwError } from 'rxjs';
 import type { ModuleDefs } from '../structures/modules/commands/moduleHandler';
 import { SernError } from '../structures/errors';
 import { isNotFromBot } from '../utilities/messageHelpers';
+import type { PluggedModule } from '../structures/modules/module';
+import type { SernPlugin } from '../plugins/plugin';
 
-export function match(mod: Module | undefined, type : CommandType) : boolean {
-    return mod !== undefined && (mod.type & type) != 0;
+export function match(plug: PluggedModule | undefined, type : CommandType) : boolean {
+    return plug !== undefined && (plug.mod.type & type) != 0;
 }
 export function filterTap<T extends keyof ModuleDefs>(
     cmdType : T,
-    tap: (mod : ModuleDefs[T]) => Awaitable<void>
+    tap: (mod : ModuleDefs[T], plugins : SernPlugin[]) => Awaitable<void>
 ) {
-    return (src : Observable<Module|undefined>) => 
-        new Observable<Module|undefined>( subscriber => { 
+    return (src : Observable<PluggedModule|undefined>) => 
+        new Observable<PluggedModule|undefined>( subscriber => { 
             return src.subscribe({ 
                 next(modul) {
                     if(match(modul, cmdType)) {
-                       const asModT = <ModuleDefs[T]> modul; 
-                       tap(asModT);
-                       subscriber.next(asModT);
+                       const asModT = <ModuleDefs[T]> modul!.mod; 
+                       tap(asModT, modul!.plugins);
+                       subscriber.next(modul);
                     } else {
                        if (modul === undefined) { 
                           return throwError(() => SernError.UndefinedModule); 

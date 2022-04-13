@@ -10,19 +10,18 @@
 // categorizing commands, cooldowns, permissions, etc
 // Plugins are reminisce of middleware in express.
 //
-//
 
-import type { Client } from "discord.js";
+import type { Awaitable, Client } from "discord.js";
 import type { Err, Ok, Result } from "ts-results";
-import type { Override, Wrapper } from "../..";
-import type { BaseModule } from "../structures/modules/module";
+import type { Module, Override, Wrapper } from "../..";
+import type { BaseModule, PluggedModule } from "../structures/modules/module";
 
 export enum PluginType {
     Command = 0b00,
     Event   = 0b01
 }
 
-interface Controller {
+export interface Controller {
   next : () => Ok<void>,
   stop : () => Err<void>
 
@@ -37,7 +36,9 @@ interface BasePlugin extends Override<BaseModule, executeCmdPlugin>{
 export type CommandPlugin = {
     type : PluginType.Command
 } & Override<BasePlugin, { 
-    execute : (wrapper:Client, controller:Controller) => Result<void,void>
+    execute : (
+        wrapper:Client, module : Module, controller:Controller
+    ) => Awaitable<Result<void,void>>
 }>;
 
 export type EventPlugin = {
@@ -48,7 +49,25 @@ export type SernPlugin =
     CommandPlugin
     | EventPlugin;
 
+export function commmand(plug : CommandPlugin) { 
+    return plug;
+}
 
+export function event(plug : EventPlugin) {
+    return plug;
+}
+
+export function apply(...plugins: SernPlugin[]) {
+    return plugins;
+}
+
+export function sernModule
+    (plugins : SernPlugin[], mod : Module ) : PluggedModule { 
+        return {
+            mod,
+            plugins 
+        }
+}
 
 
 

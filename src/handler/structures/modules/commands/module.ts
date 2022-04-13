@@ -1,12 +1,10 @@
-import type { ApplicationCommandOptionData, AutocompleteInteraction, Awaitable, ButtonInteraction, ContextMenuCommandInteraction, MessageContextMenuCommandInteraction, SelectMenuInteraction } from 'discord.js';
+import type { ApplicationCommandOptionData, Awaitable, ButtonInteraction, ContextMenuCommandInteraction, MessageContextMenuCommandInteraction, SelectMenuInteraction } from 'discord.js';
 import type { Override } from '../../../../types/handler';
 import type { CommandType } from '../../../sern';
 import type { BaseModule } from '../module';
 
 
-type AutoComp =  {
-    update : (ctx : AutocompleteInteraction) => Awaitable<void>
-}
+
 //possible refactoring to interfaces and not types
 export type TextCommand = {
     type : CommandType.Text;
@@ -38,12 +36,12 @@ export type SelectMenuCommand = {
 } & Override<BaseModule, { execute : (ctx : SelectMenuInteraction ) => Awaitable<void> }>;
 
 
-export type Module = 
+export type Module = (
     TextCommand 
     | SlashCommand 
     | BothCommand
     | ContextMenuUser
     | ContextMenuMsg
     | ButtonCommand
-    | SelectMenuCommand;
-          
+    | SelectMenuCommand
+);
