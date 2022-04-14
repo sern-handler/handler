@@ -11,7 +11,7 @@
     "release": "standard-version && git push --follow-tags",
     "test": "jest --coverage --verbose",
     "commit": "cz",
-    "docs": "typedoc src/index.ts --out docs"
+    "docs": "typedoc src/index.ts --out .typedoc"
   },
   "keywords": [],
   "author": "",
