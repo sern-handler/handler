@@ -36,7 +36,7 @@
     "@babel/core": "^7.17.2",
     "@babel/preset-env": "^7.16.11",
     "@babel/preset-typescript": "^7.16.7",
-    "@types/jest": "^27.4.0",
+    "@types/jest": "27.4.1",
     "babel-jest": "^27.5.1",
     "cz-conventional-changelog": "^3.0.1",
     "jest": "^27.5.1",
