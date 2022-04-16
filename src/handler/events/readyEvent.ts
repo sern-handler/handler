@@ -1,4 +1,5 @@
-import {  from, fromEvent, map,  take,concat, concatAll, mergeMap, skip, Observable, defer} from 'rxjs'; import { basename } from 'path';
+import {  from, fromEvent, map,  take,concat, concatAll, mergeMap, skip, Observable} from 'rxjs';
+import { basename } from 'path';
 import * as Files from '../utilities/readFile';
 import type Wrapper from '../structures/wrapper';
 import type { HandlerCallback, ModuleHandlers, ModuleStates, ModuleType } from '../structures/modules/commands/moduleHandler';
@@ -11,12 +12,12 @@ import type { Awaitable } from 'discord.js';
 
 export const onReady = ( wrapper : Wrapper ) => {
     const { client, commands } = wrapper;
-    const ready$ = fromEvent(client, 'ready').pipe(take(1));
+    const ready$ = fromEvent(client, 'ready').pipe(take(1),skip(1));
     const processCommandFiles$ = from(Files.buildData(commands)).pipe( 
              concatAll(),
              map(({plugged, absPath}) => {
-                const name = plugged.mod.name ?? Files.fmtFileName(basename(absPath));
-                if (plugged.mod.name === undefined ) {
+                const name = plugged.mod?.name ?? Files.fmtFileName(basename(absPath));
+                if (plugged.mod?.name === undefined ) {
                     return { mod: { name, ...plugged.mod }, plugins : plugged.plugins };
                 }
                 return plugged;
@@ -32,12 +33,14 @@ export const onReady = ( wrapper : Wrapper ) => {
                 })
              }),
             );
-    (concat(ready$.pipe(skip(1)),processCommandFiles$) as Observable<{
+
+    (concat(ready$,processCommandFiles$) as Observable<{
         res : Awaitable<Result<void, void>>, plugged : PluggedModule 
     }>).pipe(
-      mergeMap(async( {res, plugged})=> ({ res:await res, plugged }) )
-    )
-    .subscribe( ({ res, plugged: { mod, plugins }}) => {
+      mergeMap(async( {res, plugged} ) => ({ res:await res, plugged }) )
+    ).subscribe( 
+
+    ({ res, plugged: { mod, plugins }}) => {
         if(res.ok) {
             registerModule(mod.name!, mod, plugins)
         } else {
@@ -87,7 +90,7 @@ function registerModule <T extends ModuleType> (
 }
 
 function isCmdPlugin ( p : SernPlugin) : p is CommandPlugin { 
-    return (p.type & 0) !== 0;
+    return (p.type & 0) === 0;
 }
 
 
