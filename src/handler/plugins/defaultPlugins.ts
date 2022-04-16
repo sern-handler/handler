@@ -1,5 +1,5 @@
 import type { Client } from "discord.js";
-import type { Module } from "../..";
+import { Module, Sern } from "../..";
 import { CommandPlugin, Controller, PluginType } from "./plugin";
 
 export function reload(
@@ -13,6 +13,7 @@ export function reload(
         async execute(client : Client, module: Module, controller : Controller ) {
             const curGuild = await client.guilds.fetch(data.guildId);
             await curGuild.commands.edit(data.applicationId, {
+                type : Sern.cmdTypeToDjs(module.type),
                 name : module.name!,
                 description: module.description,
             })

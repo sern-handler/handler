@@ -1,12 +1,13 @@
-import {  from, fromEvent, map,  take,concat, concatAll, mergeMap, skip} from 'rxjs'; import { basename } from 'path';
+import {  from, fromEvent, map,  take,concat, concatAll, mergeMap, skip, Observable, defer} from 'rxjs'; import { basename } from 'path';
 import * as Files from '../utilities/readFile';
 import type Wrapper from '../structures/wrapper';
 import type { HandlerCallback, ModuleHandlers, ModuleStates, ModuleType } from '../structures/modules/commands/moduleHandler';
 import { CommandType } from '../sern';
 import type { CommandPlugin, SernPlugin } from '../plugins/plugin';
 import { partition } from './observableHandling';
-import { Err, Ok } from 'ts-results';
+import { Err, Ok, Result } from 'ts-results';
 import type { PluggedModule } from '../structures/modules/module';
+import type { Awaitable } from 'discord.js';
 
 export const onReady = ( wrapper : Wrapper ) => {
     const { client, commands } = wrapper;
@@ -31,15 +32,23 @@ export const onReady = ( wrapper : Wrapper ) => {
                 })
              }),
             );
-    concat(ready$.pipe(skip(1)),processCommandFiles$)
-    .subscribe( _ => {
-        if(a.ok) {
+    (concat(ready$.pipe(skip(1)),processCommandFiles$) as Observable<{
+        res : Awaitable<Result<void, void>>, plugged : PluggedModule 
+    }>).pipe(
+      mergeMap(async( {res, plugged})=> ({ res:await res, plugged }) )
+    )
+    .subscribe( ({ res, plugged: { mod, plugins }}) => {
+        if(res.ok) {
             registerModule(mod.name!, mod, plugins)
         } else {
-            
+            // TODO: add event emitter for command failures
+            console.log('a plugin failed to load');
+            console.log(`Did not register command ${mod.name!}`)
+            console.log(mod);
         }
     })
 }
+
 
 // Refactor : ? Possibly repetitive and verbose. 
 const handler = ( name : string ) =>

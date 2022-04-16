@@ -2,12 +2,14 @@ import type {
     DiscordEvent,
 } from '../types/handler';
 
-import type {
+import {
+    ApplicationCommandType,
     Client,
+    MessageType,
 } from 'discord.js';
 
 import type Wrapper from './structures/wrapper';
-import { fromEvent } from 'rxjs';
+import { fromEvent, throwError } from 'rxjs';
 import { SernError } from './structures/errors';
 import { onReady } from './events/readyEvent';
 import { onMessageCreate } from './events/messageEvent';
@@ -44,4 +46,14 @@ export enum CommandType {
     Both  =      0b0000011,
     Auto  =      0b1000000
 }
+
+export function cmdTypeToDjs(ty: CommandType) {
+    switch (ty)  {
+        case CommandType.Slash : case CommandType.Both : return ApplicationCommandType.ChatInput;
+        case CommandType.MenuUser : return ApplicationCommandType.User;
+        case CommandType.MenuMsg : return ApplicationCommandType.Message;
+        default : throw new Error(`Cannot turn this CommandType to ApplicationCommandType`)
+    }
+}
+
 
