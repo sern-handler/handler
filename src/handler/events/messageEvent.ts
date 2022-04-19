@@ -1,5 +1,5 @@
 import type { Message } from 'discord.js';
-import { fromEvent,  Observable, of, concatMap, mergeMap, map, from } from 'rxjs';
+import { fromEvent,  Observable, of, concatMap, mergeMap, map, from, every, concatAll, concat } from 'rxjs';
 import { Err, Ok } from 'ts-results';
 import type { Args } from '../..';
 import type { EventPlugin } from '../plugins/plugin';
@@ -25,23 +25,20 @@ export const onMessageCreate = (wrapper : Wrapper) => {
         }));
     const ensureModuleType$ = processMessage$.pipe(
             concatMap(payload => of(payload.mod)
-                .pipe(
-                    filterCorrectModule(CommandType.Text),
-                    map( textCommand => ({ ...payload, textCommand }))
+            .pipe(
+                filterCorrectModule(CommandType.Text),
+                map( textCommand => ({ ...payload, textCommand }))
             )));
     const processPlugins$ = ensureModuleType$.pipe(
             mergeMap( ({ctx, args, textCommand}) => {
-               const pluginRes = textCommand.plugins.map( ePlug => {
-                    return { 
-                        name : ePlug.name,
-                        description : ePlug.description,
-                        res : from((<EventPlugin>ePlug).execute([ctx, args], {
+               const res = from(textCommand.plugins.map(ePlug => {
+                    return from((<EventPlugin>ePlug).execute([ctx, args], {
                             next : () => Ok.EMPTY,
                             stop : () => Err.EMPTY
-                        }))
-                    }
-               });
-               return of( { ctx, args, mod: textCommand.mod, pluginRes })
-         })
-    );
+                    }))
+               }));
+               return res.pipe(concatAll(), every(res => res.ok))
+            })
+        );
+
 };
