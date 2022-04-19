@@ -16,11 +16,11 @@ export function match<T extends keyof ModuleDefs>(
 
 export function filterCorrectModule<T extends keyof ModuleDefs>(cmdType : T) {
     return (src : Observable<PluggedModule|undefined>) => 
-        new Observable<{cmdType : T, plug : PluggedModule}>( subscriber => { 
+        new Observable<{ mod : ModuleDefs[T], plugins : EventPlugin[] }>( subscriber => { 
             return src.subscribe({ 
                 next(plug) {
                     if(match(plug, cmdType)) {
-                       subscriber.next({cmdType, plug});
+                       subscriber.next({ mod : plug.mod, plugins : <EventPlugin[]>plug.plugins });
                     } else {
                        if (plug === undefined) { 
                           return throwError(() => SernError.UndefinedModule); 
