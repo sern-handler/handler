@@ -18,7 +18,7 @@ export const onMessageCreate = (wrapper : Wrapper) => {
         const posMod = Files.Commands.get(prefix) ?? Files.Alias.get(prefix);
         const ctx = Context.wrap(m);
         return of( posMod )
-                .pipe (
+                .pipe(
                     filterCorrectModule(CommandType.Text),
                     filterTap(CommandType.Text, async (mod,plugins) => {
                         const res = await Promise.all(

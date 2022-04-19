@@ -7,19 +7,22 @@ import { isNotFromBot } from '../utilities/messageHelpers';
 import type { PluggedModule } from '../structures/modules/module';
 import type { EventPlugin, SernPlugin } from '../plugins/plugin';
 
-export function match(plug: PluggedModule | undefined, type : CommandType) : boolean {
+
+export function match<T extends keyof ModuleDefs>(
+    plug: PluggedModule | undefined, type : T 
+) : plug is { mod: ModuleDefs[T], plugins : SernPlugin[] } {
     return plug !== undefined && (plug.mod.type & type) != 0;
 }
 
 export function filterCorrectModule<T extends keyof ModuleDefs>(cmdType : T) {
     return (src : Observable<PluggedModule|undefined>) => 
-        new Observable<PluggedModule>( subscriber => { 
+        new Observable<{cmdType : T, plug : PluggedModule}>( subscriber => { 
             return src.subscribe({ 
-                next(modul) {
-                    if(match(modul, cmdType)) {
-                       subscriber.next(modul);
+                next(plug) {
+                    if(match(plug, cmdType)) {
+                       subscriber.next({cmdType, plug});
                     } else {
-                       if (modul === undefined) { 
+                       if (plug === undefined) { 
                           return throwError(() => SernError.UndefinedModule); 
                        }
                        return throwError(() => SernError.MismatchModule);
@@ -28,7 +31,7 @@ export function filterCorrectModule<T extends keyof ModuleDefs>(cmdType : T) {
                 error: (e) =>  subscriber.error(e),
                 complete: () => subscriber.complete()
             });
-        });
+      });
 }
 
 export function filterTap<T extends keyof ModuleDefs>(

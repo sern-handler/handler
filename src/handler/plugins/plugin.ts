@@ -48,7 +48,7 @@ export type EventPlugin<T extends CommandType = 1> = {
     modTy : T 
 } & Override<BasePlugin, {
     execute : ( event : Parameters<ModuleDefs[T]['execute']>, controller: Controller ) => Awaitable<Result<void,void>> 
-} >;
+}>;
 
 export type SernPlugin =
     CommandPlugin

@@ -8,7 +8,6 @@ import type { CommandPlugin, SernPlugin } from '../plugins/plugin';
 import { partition } from './observableHandling';
 import { Err, Ok, Result } from 'ts-results';
 import type { PluggedModule } from '../structures/modules/module';
-import type { Awaitable } from 'discord.js';
 
 export const onReady = ( wrapper : Wrapper ) => {
     const { client, commands } = wrapper;
