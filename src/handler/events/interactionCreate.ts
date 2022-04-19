@@ -12,11 +12,12 @@ export const onInteractionCreate = ( wrapper : Wrapper ) => {
 
       (<Observable<Interaction>> fromEvent(client, 'interactionCreate'))
       .pipe(
-        concatMap ( interaction => {
+        concatMap (async interaction => {
+            interaction.type
             if (interaction.isChatInputCommand()) {
                 return of(Files.Commands.get(interaction.commandName))
                 .pipe(
-                    filterTap(CommandType.Slash, mod => {
+                    filterTap(CommandType.Slash, (mod) => {
                         const ctx = Context.wrap(interaction);
                         mod.execute(ctx, ['slash', interaction.options]);
                     }),
@@ -25,7 +26,7 @@ export const onInteractionCreate = ( wrapper : Wrapper ) => {
             if (interaction.isContextMenuCommand()) {
                 return of(Files.ContextMenuUser.get(interaction.commandName))
                 .pipe(
-                    filterTap(CommandType.MenuUser, mod => { 
+                    filterTap(CommandType.MenuUser, (mod) => { 
                         mod.execute(interaction);
                     }),
                 );
@@ -33,7 +34,7 @@ export const onInteractionCreate = ( wrapper : Wrapper ) => {
             if (interaction.isMessageContextMenuCommand()) {
                 return of(Files.ContextMenuMsg.get(interaction.commandName))
                 .pipe(
-                    filterTap(CommandType.MenuMsg, mod => {
+                    filterTap(CommandType.MenuMsg, (mod, plugs) => {
                         mod.execute(interaction);
                     }),
                 );
@@ -41,7 +42,7 @@ export const onInteractionCreate = ( wrapper : Wrapper ) => {
             if (interaction.isButton()) {
                 return of(Files.Buttons.get(interaction.customId))
                 .pipe(
-                    filterTap(CommandType.Button, mod => {
+                    filterTap(CommandType.Button, (mod, plugs) => {
                         mod.execute(interaction);
                     })
                 );
@@ -49,7 +50,7 @@ export const onInteractionCreate = ( wrapper : Wrapper ) => {
             if (interaction.isSelectMenu()) {
                 return of(Files.SelectMenus.get(interaction.customId))
                 .pipe(
-                    filterTap(CommandType.MenuSelect, mod => {
+                    filterTap(CommandType.MenuSelect, (mod, plugs) => {
                         mod.execute(interaction);
                     })
                 );
@@ -60,9 +61,9 @@ export const onInteractionCreate = ( wrapper : Wrapper ) => {
        error(e){
         throw e;
        },
-       next(command) {
-        //log on each command emitted 
-        console.log(command);
+       next(_command) {
+        //every command that gets triggered ends up here
+        //console.log(command);
        },
    });
 };

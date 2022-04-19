@@ -14,6 +14,8 @@
 import type { Awaitable, Client } from "discord.js";
 import type { Err, Ok, Result } from "ts-results";
 import type { Module, Override, Wrapper } from "../..";
+import type { CommandType } from "../sern";
+import type { ModuleDefs } from "../structures/modules/commands/moduleHandler";
 import type { BaseModule, PluggedModule } from "../structures/modules/module";
 
 export enum PluginType {
@@ -41,9 +43,12 @@ export type CommandPlugin = {
     ) => Awaitable<Result<void,void>>
 }>;
 
-export type EventPlugin = {
-    type : PluginType.Event
-} & BasePlugin;
+export type EventPlugin<T extends CommandType = 1> = {
+    type : PluginType.Event,
+    modTy : T 
+} & Override<BasePlugin, {
+    execute : ( event : Parameters<ModuleDefs[T]['execute']>, controller: Controller ) => Awaitable<Result<void,void>> 
+} >;
 
 export type SernPlugin =
     CommandPlugin

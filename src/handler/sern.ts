@@ -5,11 +5,10 @@ import type {
 import {
     ApplicationCommandType,
     Client,
-    MessageType,
 } from 'discord.js';
 
 import type Wrapper from './structures/wrapper';
-import { fromEvent, throwError } from 'rxjs';
+import { fromEvent } from 'rxjs';
 import { SernError } from './structures/errors';
 import { onReady } from './events/readyEvent';
 import { onMessageCreate } from './events/messageEvent';
@@ -31,8 +30,6 @@ function eventObserver(client: Client, events: DiscordEvent[] ) {
   });
 }
 
-
-
 /**
  * @enum { number };
  */
@@ -44,7 +41,6 @@ export enum CommandType {
     Button =     0b0010000,
     MenuSelect = 0b0100000,
     Both  =      0b0000011,
-    Auto  =      0b1000000
 }
 
 export function cmdTypeToDjs(ty: CommandType) {

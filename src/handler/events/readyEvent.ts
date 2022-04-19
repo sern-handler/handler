@@ -31,17 +31,18 @@ export const onReady = ( wrapper : Wrapper ) => {
                     })
                     return { res, plugged : <PluggedModule>{ mod, plugins } }
                 })
-             }),
-            );
+             })
+           );
 
     (concat(ready$,processCommandFiles$) as Observable<{
-        res : Awaitable<Result<void, void>>, plugged : PluggedModule 
-    }>).pipe(
-      mergeMap(async( {res, plugged} ) => ({ res:await res, plugged }) )
-    ).subscribe( 
+        res : Promise<Result<void, void>>, plugged : PluggedModule 
+    }>)
+    .subscribe( 
 
     ({ res, plugged: { mod, plugins }}) => {
-        if(res.ok) {
+        res.then( result => { 
+        if(result.ok) {
+            console.log(`${mod.name!} has been registered`)
             registerModule(mod.name!, mod, plugins)
         } else {
             // TODO: add event emitter for command failures
@@ -49,6 +50,7 @@ export const onReady = ( wrapper : Wrapper ) => {
             console.log(`Did not register command ${mod.name!}`)
             console.log(mod);
         }
+        });
     })
 }
 

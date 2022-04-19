@@ -1,32 +1,44 @@
 import type { Message } from 'discord.js';
-import { fromEvent,  Observable, of, concatMap } from 'rxjs';
+import { fromEvent,  Observable, of, concatMap, mergeMap } from 'rxjs';
+import { Err, Ok } from 'ts-results';
 import { CommandType } from '../sern';
 import Context from '../structures/context';
 import type Wrapper from '../structures/wrapper';
 import { fmt } from '../utilities/messageHelpers';
 import * as Files from '../utilities/readFile';
-import { filterTap, ignoreNonBot } from './observableHandling';
+import { filterCorrectModule, filterTap, ignoreNonBot } from './observableHandling';
 
 export const onMessageCreate = (wrapper : Wrapper) => {
     const { client, defaultPrefix } = wrapper;
     (<Observable<Message>> fromEvent( client, 'messageCreate'))
-    .pipe ( 
+    .pipe( 
         ignoreNonBot(defaultPrefix),
-        concatMap ( m =>  {
+        concatMap (async m =>  {
         const [ prefix, ...data ] = fmt(m, defaultPrefix);
         const posMod = Files.Commands.get(prefix) ?? Files.Alias.get(prefix);
-
+        const ctx = Context.wrap(m);
         return of( posMod )
                 .pipe (
-                    filterTap(CommandType.Text, mod => {
-                        const ctx = Context.wrap(m);
-                        mod.execute(ctx, ['text', data]); 
+                    filterCorrectModule(CommandType.Text),
+                    filterTap(CommandType.Text, async (mod,plugins) => {
+                        const res = await Promise.all(
+                            plugins.map(async pl => ({
+                                ...pl,
+                                execute : await pl.execute([ctx, ['text', data] ], {
+                                    next : () => Ok.EMPTY,
+                                    stop : () => Err.EMPTY
+                                }),
+                            }))
+
+                        );
+                        if (res.every(pl => pl.execute.ok)) {
+                           mod.execute(ctx, ['text', data]); 
+                        }
                     })
                );
         })
     ).subscribe ({
        error(e) {
-        //log things
         throw e;
        },
        next(command) {
@@ -34,6 +46,5 @@ export const onMessageCreate = (wrapper : Wrapper) => {
         console.log(command);
        },
     }); 
-
 
 };
