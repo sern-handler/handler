@@ -12,6 +12,7 @@ import { filterCorrectModule, ignoreNonBot } from './observableHandling';
 
 export const onMessageCreate = (wrapper : Wrapper) => {
     const { client, defaultPrefix } = wrapper;
+    if (!defaultPrefix) return;
     const messageEvent$ = (<Observable<Message>> fromEvent( client, 'messageCreate'));
     const processMessage$ = messageEvent$.pipe(
         ignoreNonBot(defaultPrefix),
