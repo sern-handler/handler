@@ -12,7 +12,7 @@ import type { DiscordEvent } from '../../types/handler';
  */
 interface Wrapper {
     readonly client: Client;
-    readonly defaultPrefix: string;
+    readonly defaultPrefix?: string;
     readonly commands: string;
     readonly events? : DiscordEvent[];
 }
