@@ -1,4 +1,4 @@
-import {  from, fromEvent, map,  take,concat, concatAll, mergeMap, skip, Observable} from 'rxjs';
+import {  from, fromEvent, map,  take,concat, concatAll, mergeMap, skip, Observable, tap} from 'rxjs';
 import { basename } from 'path';
 import * as Files from '../utilities/readFile';
 import type Wrapper from '../structures/wrapper';
@@ -12,16 +12,15 @@ import type { PluggedModule } from '../structures/modules/module';
 export const onReady = ( wrapper : Wrapper ) => {
     const { client, commands } = wrapper;
     const ready$ = fromEvent(client, 'ready').pipe(take(1),skip(1));
-    const processCommandFiles$ = from(Files.buildData(commands)).pipe( 
-             concatAll(),
+    const processCommandFiles$ = Files.buildData(commands).pipe( 
              map(({plugged, absPath}) => {
                 const name = plugged.mod?.name ?? Files.fmtFileName(basename(absPath));
                 if (plugged.mod?.name === undefined ) {
                     return { mod: { name, ...plugged.mod }, plugins : plugged.plugins };
                 }
                 return plugged;
-             }),
-             mergeMap(({ mod, plugins: allPlugins }) => {
+             }));
+         /**    mergeMap(({ mod, plugins: allPlugins }) => {
                 const [ cmdPlugins, plugins ] = partition(allPlugins, isCmdPlugin);
                 return cmdPlugins.map(pl => {
                     const res = pl.execute(client, mod, {
@@ -31,13 +30,13 @@ export const onReady = ( wrapper : Wrapper ) => {
                     return { res, plugged : <PluggedModule>{ mod, plugins } }
                 })
              })
-           );
+           **/
 
-    (concat(ready$,processCommandFiles$) as Observable<{
-        res : Promise<Result<void, void>>, plugged : PluggedModule 
-    }>)
-    .subscribe( 
-
+    (concat(ready$,processCommandFiles$) as Observable<
+        PluggedModule 
+    >)
+    .subscribe(console.log) 
+    /**
     ({ res, plugged: { mod, plugins }}) => {
         res.then( result => { 
         if(result.ok) {
@@ -51,6 +50,7 @@ export const onReady = ( wrapper : Wrapper ) => {
         }
         });
     })
+    **/
 }
 
 

@@ -1,8 +1,7 @@
 import type { Message } from 'discord.js';
-import { fromEvent,  Observable, of, concatMap, mergeMap, map, from, every, concatAll, concat } from 'rxjs';
+import { fromEvent,  Observable, of, concatMap, mergeMap, map, from, every, concatAll, concat, tap } from 'rxjs';
 import { Err, Ok } from 'ts-results';
 import type { Args } from '../..';
-import type { EventPlugin } from '../plugins/plugin';
 import { CommandType } from '../sern';
 import Context from '../structures/context';
 import type Wrapper from '../structures/wrapper';
@@ -18,6 +17,7 @@ export const onMessageCreate = (wrapper : Wrapper) => {
         ignoreNonBot(defaultPrefix),
         map(message => {
             const [prefix, ...rest] = fmt(message, defaultPrefix);
+            console.log(prefix, rest)
             return {
                 ctx : Context.wrap(message),
                 args : <Args>['text', rest],
@@ -27,13 +27,14 @@ export const onMessageCreate = (wrapper : Wrapper) => {
     const ensureModuleType$ = processMessage$.pipe(
             concatMap(payload => of(payload.mod)
             .pipe(
+                tap(console.log),
                 filterCorrectModule(CommandType.Text),
-                map( textCommand => ({ ...payload, textCommand }))
+                map( textCommand => ({ ...payload, mod : textCommand }))
             )));
     const processPlugins$ = ensureModuleType$.pipe(
-            mergeMap( ({ctx, args, textCommand}) => {
-               const res = from(textCommand.plugins.map(ePlug => {
-                    return from((<EventPlugin>ePlug).execute([ctx, args], {
+            mergeMap( ({ctx, args, mod}) => {
+               const res = from(mod.plugins.map(ePlug => {
+                    return from((ePlug).execute([ctx, args], {
                             next : () => Ok.EMPTY,
                             stop : () => Err.EMPTY
                     }))
@@ -41,5 +42,14 @@ export const onMessageCreate = (wrapper : Wrapper) => {
                return res.pipe(concatAll(), every(res => res.ok))
             })
         );
-
+    ensureModuleType$.pipe(
+        concatMap( pl => {
+            return processPlugins$.pipe(
+                map ( res => ({ res, pl }))
+            )
+        })
+    ).subscribe( ({ res, pl }) => {
+        console.log('test')
+        console.log(res, pl)
+    })
 };

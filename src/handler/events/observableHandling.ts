@@ -19,6 +19,7 @@ export function filterCorrectModule<T extends keyof ModuleDefs>(cmdType : T) {
         new Observable<{ mod : ModuleDefs[T], plugins : EventPlugin[] }>( subscriber => { 
             return src.subscribe({ 
                 next(plug) {
+                    console.log(plug)
                     if(match(plug, cmdType)) {
                        subscriber.next({ mod : plug.mod, plugins : <EventPlugin[]>plug.plugins });
                     } else {
