@@ -1,13 +1,14 @@
-import {  from, fromEvent, map,  take,concat, concatAll, mergeMap, skip, Observable, tap} from 'rxjs';
+import {  from, fromEvent, map,  take,concat, concatAll, mergeMap, skip, Observable, tap, of, concatMap} from 'rxjs';
 import { basename } from 'path';
 import * as Files from '../utilities/readFile';
 import type Wrapper from '../structures/wrapper';
 import type { HandlerCallback, ModuleHandlers, ModuleStates, ModuleType } from '../structures/modules/commands/moduleHandler';
 import { CommandType } from '../sern';
-import type { CommandPlugin, SernPlugin } from '../plugins/plugin';
+import type { CommandPlugin, PluginType, SernPlugin } from '../plugins/plugin';
 import { partition } from './observableHandling';
 import { Err, Ok, Result } from 'ts-results';
 import type { PluggedModule } from '../structures/modules/module';
+import type { Awaitable } from 'discord.js';
 
 export const onReady = ( wrapper : Wrapper ) => {
     const { client, commands } = wrapper;
@@ -19,23 +20,35 @@ export const onReady = ( wrapper : Wrapper ) => {
                     return { mod: { name, ...plugged.mod }, plugins : plugged.plugins };
                 }
                 return plugged;
-             }));
-         /**    mergeMap(({ mod, plugins: allPlugins }) => {
-                const [ cmdPlugins, plugins ] = partition(allPlugins, isCmdPlugin);
-                return cmdPlugins.map(pl => {
-                    const res = pl.execute(client, mod, {
-                        next: () => Ok.EMPTY,
-                        stop: () => Err.EMPTY
-                    })
-                    return { res, plugged : <PluggedModule>{ mod, plugins } }
-                })
-             })
-           **/
+            }));
+        const processPlugins$ = processCommandFiles$.pipe(
+            mergeMap( ({mod, plugins:allPlugins}) => {
+               const [ cmdPlugins, plugins ] = partition(allPlugins, isCmdPlugin);
+               const cmdPluginsRes = cmdPlugins.map(plug => { return {
+                        ...plug,
+                        name: plug.name ?? 'Unnamed Plugin',
+                        execute : plug.execute(client, mod, {
+                            next : () => Ok.EMPTY,
+                            stop : () => Err.EMPTY
+                        })
+                    }
+               });
+                return of({ plugged : <PluggedModule>{ mod , plugins }, cmdPluginsRes }) 
+            })
+        );
 
-    (concat(ready$,processCommandFiles$) as Observable<
-        PluggedModule 
-    >)
-    .subscribe(console.log) 
+       
+    (concat(ready$,processPlugins$) as Observable<{
+        plugged: PluggedModule;
+        cmdPluginsRes: {
+            execute: Awaitable<Result<void, void>>;
+            type: PluginType.Command;
+            name: string;
+            description: string;
+        }[];
+    }>).subscribe(({plugged, cmdPluginsRes }) => {
+        
+    }) 
     /**
     ({ res, plugged: { mod, plugins }}) => {
         res.then( result => { 

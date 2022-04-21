@@ -1,5 +1,6 @@
 import { readdirSync, statSync } from 'fs';
 import { join } from 'path';
+import { from, Observable } from 'rxjs';
 import { SernError } from '../structures/errors';
 import type { PluggedModule } from '../structures/modules/module';
 
@@ -35,18 +36,15 @@ export const fmtFileName = (n: string) => n.substring(0, n.length - 3);
  * @returns {Promise<{ mod: PluggedModule; absPath: string; }[]>} data from command files
  */
 
-export async function buildData(commandDir: string ): Promise<
+export function buildData(commandDir: string ): Observable<
   {
     plugged: PluggedModule;
     absPath: string;
-  }[]> {
-  return Promise.all(
-    getCommands(commandDir).map( async (absPath) => {
-      const plugged = <PluggedModule> (await import(absPath)).module;
-      if (plugged === undefined) throw Error(`${SernError.UndefinedModule} ${absPath}`);
-      return { plugged , absPath };
-    }),
-  );
+  }> {
+  return from(getCommands(commandDir).map(absPath => { 
+       const plugged = (<PluggedModule> require(absPath).module);
+       return { plugged, absPath }
+  }))
 }
 
 export function getCommands(dir: string): string[] {
