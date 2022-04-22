@@ -1,5 +1,4 @@
 import type { Awaitable, Message } from 'discord.js';
-import type { CommandType } from '../sern';
 import { Observable, throwError } from 'rxjs';
 import type { ModuleDefs } from '../structures/modules/commands/moduleHandler';
 import { SernError } from '../structures/errors';
@@ -19,7 +18,6 @@ export function filterCorrectModule<T extends keyof ModuleDefs>(cmdType : T) {
         new Observable<{ mod : ModuleDefs[T], plugins : EventPlugin[] }>( subscriber => { 
             return src.subscribe({ 
                 next(plug) {
-                    console.log(plug)
                     if(match(plug, cmdType)) {
                        subscriber.next({ mod : plug.mod, plugins : <EventPlugin[]>plug.plugins });
                     } else {
@@ -84,13 +82,16 @@ export function ignoreNonBot(prefix : string) {
             });
        });
 }
-export function partition<T,U extends T,V extends T>
-    (array: T[], isValid: (el : T) => el is U): [U[], V[]] {
-        return array.reduce(([pass, fail], elem) => {
-            return isValid(elem) 
-            ? [[...pass, <U>elem], fail]
-            : [pass, [...fail, <V>elem]];
-    }, [<U[]>[], <V[]>[]] );
+export function partition<T,U extends T>(
+    condition : (el : T) => el is U,
+    array : T[]
+) : [ U[], T[] ]  {
+    const uArr : U[] = [];
+    const vArr : T[] = [];
+    for (const el of array ) {
+        (condition(el) ? uArr : vArr).push(el)
+    }
+    return [ uArr, vArr ]
 }
 
 

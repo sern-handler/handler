@@ -1,16 +1,17 @@
-import {  from, fromEvent, map,  take,concat, concatAll, mergeMap, skip, Observable, tap, of, concatMap} from 'rxjs';
+import {concatMap,  from, fromEvent, map,  take,concat, mergeMap, skip, Observable,  of,  } from 'rxjs';
 import { basename } from 'path';
 import * as Files from '../utilities/readFile';
 import type Wrapper from '../structures/wrapper';
 import type { HandlerCallback, ModuleHandlers, ModuleStates, ModuleType } from '../structures/modules/commands/moduleHandler';
 import { CommandType } from '../sern';
-import type { CommandPlugin, PluginType, SernPlugin } from '../plugins/plugin';
+import { CommandPlugin, EventPlugin, PluginType, SernPlugin } from '../plugins/plugin';
 import { partition } from './observableHandling';
 import { Err, Ok, Result } from 'ts-results';
 import type { PluggedModule } from '../structures/modules/module';
 import type { Awaitable } from 'discord.js';
 
 export const onReady = ( wrapper : Wrapper ) => {
+
     const { client, commands } = wrapper;
     const ready$ = fromEvent(client, 'ready').pipe(take(1),skip(1));
     const processCommandFiles$ = Files.buildData(commands).pipe( 
@@ -23,18 +24,19 @@ export const onReady = ( wrapper : Wrapper ) => {
             }));
         const processPlugins$ = processCommandFiles$.pipe(
             mergeMap( ({mod, plugins:allPlugins}) => {
-               const [ cmdPlugins, plugins ] = partition(allPlugins, isCmdPlugin);
-               const cmdPluginsRes = cmdPlugins.map(plug => { return {
+               const [ cmdPlugins, eventPlugins ] = partition(isCmdPlugin, allPlugins);
+               const cmdPluginsRes = cmdPlugins.map(plug => {
+                   return {
                         ...plug,
-                        name: plug.name ?? 'Unnamed Plugin',
+                        name: plug?.name ?? 'Unnamed Plugin',
                         execute : plug.execute(client, mod, {
                             next : () => Ok.EMPTY,
                             stop : () => Err.EMPTY
                         })
                     }
                });
-                return of({ plugged : <PluggedModule>{ mod , plugins }, cmdPluginsRes }) 
-            })
+                return of({ plugged : <PluggedModule>{ mod , plugins : eventPlugins }, cmdPluginsRes }) 
+            }),
         );
 
        
@@ -46,24 +48,19 @@ export const onReady = ( wrapper : Wrapper ) => {
             name: string;
             description: string;
         }[];
-    }>).subscribe(({plugged, cmdPluginsRes }) => {
-        
+    }>).pipe (
+        concatMap( pl => 
+            from(Promise.all(pl.cmdPluginsRes.map(async e=> ({...e, execute : await e.execute }))))
+                .pipe(
+                    map(res => ({...pl, cmdPluginsRes : res })),
+            )
+    ),
+)
+    .subscribe(({ plugged : { mod, plugins }, cmdPluginsRes }) => {
+        console.log(cmdPluginsRes)
+        registerModule(mod.name!, mod, plugins) 
     }) 
-    /**
-    ({ res, plugged: { mod, plugins }}) => {
-        res.then( result => { 
-        if(result.ok) {
-            console.log(`${mod.name!} has been registered`)
-            registerModule(mod.name!, mod, plugins)
-        } else {
-            // TODO: add event emitter for command failures
-            console.log('a plugin failed to load');
-            console.log(`Did not register command ${mod.name!}`)
-            console.log(mod);
-        }
-        });
-    })
-    **/
+    
 }
 
 
@@ -103,8 +100,11 @@ function registerModule <T extends ModuleType> (
     return (<HandlerCallback<T>> handler(name)[mod.type])(mod, plugins);
 }
 
-function isCmdPlugin ( p : SernPlugin) : p is CommandPlugin { 
-    return (p.type & 0) === 0;
+function isCmdPlugin (p : SernPlugin) : p is CommandPlugin { 
+    return (p.type & PluginType.Command) !== 0;
+}
+function isEventPlugin( p : SernPlugin) : p is EventPlugin {
+    return (p.type & PluginType.Event) !== 0;
 }
 
 

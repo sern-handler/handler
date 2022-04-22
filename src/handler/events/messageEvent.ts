@@ -1,5 +1,5 @@
 import type { Message } from 'discord.js';
-import { fromEvent,  Observable, of, concatMap, mergeMap, map, from, every, concatAll, concat, tap } from 'rxjs';
+import { fromEvent,  Observable, of, concatMap, mergeMap, map, from, every, concatAll, concat, tap, switchMap } from 'rxjs';
 import { Err, Ok } from 'ts-results';
 import type { Args } from '../..';
 import { CommandType } from '../sern';
@@ -27,14 +27,13 @@ export const onMessageCreate = (wrapper : Wrapper) => {
     const ensureModuleType$ = processMessage$.pipe(
             concatMap(payload => of(payload.mod)
             .pipe(
-                tap(console.log),
                 filterCorrectModule(CommandType.Text),
                 map( textCommand => ({ ...payload, mod : textCommand }))
             )));
     const processPlugins$ = ensureModuleType$.pipe(
-            mergeMap( ({ctx, args, mod}) => {
+            switchMap( ({ctx, args, mod}) => {
                const res = from(mod.plugins.map(ePlug => {
-                    return from((ePlug).execute([ctx, args], {
+                    return (ePlug.execute([ctx, args], {
                             next : () => Ok.EMPTY,
                             stop : () => Err.EMPTY
                     }))

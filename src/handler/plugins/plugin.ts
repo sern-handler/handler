@@ -19,8 +19,8 @@ import type { ModuleDefs } from "../structures/modules/commands/moduleHandler";
 import type { BaseModule, PluggedModule } from "../structures/modules/module";
 
 export enum PluginType {
-    Command = 0b00,
-    Event   = 0b01
+    Command = 0b01,
+    Event   = 0b10
 }
 
 export interface Controller {
