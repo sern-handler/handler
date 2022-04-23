@@ -1,5 +1,5 @@
 {
-  "name": "sern-handler",
+  "name": "@sern/handler",
   "version": "0.1.0",
   "description": "",
   "main": "dist/index.js",

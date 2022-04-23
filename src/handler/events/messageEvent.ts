@@ -1,5 +1,5 @@
 import type { Message } from 'discord.js';
-import { fromEvent,  Observable, of, concatMap, mergeMap, map, from, every, concatAll, concat, tap, switchMap } from 'rxjs';
+import { fromEvent,  Observable, of, concatMap,  map, from, every, concatAll, tap, switchMap } from 'rxjs';
 import { Err, Ok } from 'ts-results';
 import type { Args } from '../..';
 import { CommandType } from '../sern';
@@ -8,6 +8,7 @@ import type Wrapper from '../structures/wrapper';
 import { fmt } from '../utilities/messageHelpers';
 import * as Files from '../utilities/readFile';
 import { filterCorrectModule, ignoreNonBot } from './observableHandling';
+import { isEventPlugin } from './readyEvent';
 
 export const onMessageCreate = (wrapper : Wrapper) => {
     const { client, defaultPrefix } = wrapper;
@@ -24,31 +25,40 @@ export const onMessageCreate = (wrapper : Wrapper) => {
                 mod : Files.Commands.get(prefix) ?? Files.Alias.get(prefix)
             }
         }));
+
     const ensureModuleType$ = processMessage$.pipe(
             concatMap(payload => of(payload.mod)
             .pipe(
                 filterCorrectModule(CommandType.Text),
                 map( textCommand => ({ ...payload, mod : textCommand }))
             )));
-    const processPlugins$ = ensureModuleType$.pipe(
-            switchMap( ({ctx, args, mod}) => {
-               const res = from(mod.plugins.map(ePlug => {
-                    return (ePlug.execute([ctx, args], {
+
+    const processEventPlugins$ = ensureModuleType$.pipe(
+            concatMap( ({ctx, args, mod:plugged}) => {
+               const eventPlugins = plugged.plugins.filter(isEventPlugin);
+               const res = Promise.all(eventPlugins.map(ePlug => {
+                    if((ePlug.modTy & plugged.mod.type) === 0) {
+                        return Err.EMPTY;
+                    }
+                    return ePlug.execute([ctx, args], {
                             next : () => Ok.EMPTY,
                             stop : () => Err.EMPTY
-                    }))
+                    });
                }));
-               return res.pipe(concatAll(), every(res => res.ok))
-            })
-        );
-    ensureModuleType$.pipe(
-        concatMap( pl => {
-            return processPlugins$.pipe(
-                map ( res => ({ res, pl }))
+               return from(res).pipe(map(res => ({ plugged, ctx, args, res })))
+            }));
+    processEventPlugins$.subscribe( ( { plugged, ctx, args, res } ) => {
+        if(res.every( pl => pl.ok)) {
+            Promise.resolve(plugged.mod.execute(ctx, args)).then(() =>
+                console.log(plugged)
             )
-        })
-    ).subscribe( ({ res, pl }) => {
-        console.log('test')
-        console.log(res, pl)
+        }
+        else {
+            console.log(plugged, "failed");
+        }
+
     })
+
+
+
 };

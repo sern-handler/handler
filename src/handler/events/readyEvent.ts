@@ -1,4 +1,4 @@
-import {concatMap,  from, fromEvent, map,  take,concat, mergeMap, skip, Observable,  of,  } from 'rxjs';
+import {concatMap,  from, fromEvent, map,  take,concat, skip, Observable,  of,  } from 'rxjs';
 import { basename } from 'path';
 import * as Files from '../utilities/readFile';
 import type Wrapper from '../structures/wrapper';
@@ -23,7 +23,7 @@ export const onReady = ( wrapper : Wrapper ) => {
                 return plugged;
             }));
         const processPlugins$ = processCommandFiles$.pipe(
-            mergeMap( ({mod, plugins:allPlugins}) => {
+            concatMap( ({mod, plugins:allPlugins}) => {
                const [ cmdPlugins, eventPlugins ] = partition(isCmdPlugin, allPlugins);
                const cmdPluginsRes = cmdPlugins.map(plug => {
                    return {
@@ -57,7 +57,6 @@ export const onReady = ( wrapper : Wrapper ) => {
     ),
 )
     .subscribe(({ plugged : { mod, plugins }, cmdPluginsRes }) => {
-        console.log(cmdPluginsRes)
         registerModule(mod.name!, mod, plugins) 
     }) 
     
@@ -103,7 +102,7 @@ function registerModule <T extends ModuleType> (
 function isCmdPlugin (p : SernPlugin) : p is CommandPlugin { 
     return (p.type & PluginType.Command) !== 0;
 }
-function isEventPlugin( p : SernPlugin) : p is EventPlugin {
+export function isEventPlugin( p : SernPlugin) : p is EventPlugin {
     return (p.type & PluginType.Event) !== 0;
 }
 
