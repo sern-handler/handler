@@ -1,24 +1,25 @@
 # Sern Handler
 
-<a href="https://www.npmjs.com/package/sern-handler">
-<img src="https://img.shields.io/npm/v/sern_handler?maxAge=3600" alt="NPM version" /></a> <a href="https://www.npmjs.com/package/sern-handler"><img src="https://img.shields.io/npm/dt/sern_handler?maxAge=3600" alt="NPM downloads" /></a> <a href="https://www.npmjs.com/package/sern-handler"><img src="https://img.shields.io/badge/builds-stable" alt="Builds Passing"></a>
+<a href="https://www.npmjs.com/package/@sern/handler">
+<img src="https://img.shields.io/npm/v/@sern/handler?maxAge=3600" alt="NPM version" /></a> <a href="https://www.npmjs.com/package/@sern/handler"><img src="https://img.shields.io/npm/dt/@sern/handler?maxAge=3600" alt="NPM downloads" /></a> <a href="https://www.npmjs.com/package/@sern/handler"><img src="https://img.shields.io/badge/builds-stable" alt="Builds Passing"></a>
 
-Sern can automate and streamline development of your discord bot with new version compatibility and full customization.
+A discord.js wrapper for you to automate and streamline your bot development. Also, we are providing a [cli](https://github.com/sern-handler/cli) for you to use.
 
 - A reincarnation of [this old project](https://github.com/jacoobes/sern_handler)
 
 ## Installation
 
 ```sh
-npm install sern-handler
+npm install @sern/handler
 ```
 
 ```sh
-yarn add sern-handler
+yarn add @sern/handler
+```
 ```
 
 ```sh
-pnpm add sern-handler
+pnpm add @sern/handler
 ```
 
 ## Basic Usage
@@ -76,7 +77,7 @@ See [documentation](https://sern-handler.js.org) for TypeScript examples and mor
 ## Links
 
 - [Official Documentation](https://sern-handler.js.org)
-- [Example Bot](https://github.com/sern-handler/cheemsBanker)
+- [Public Templates](https://github.com/sern-handler/templates)
 - [Support Server](https://discord.com/invite/Yvb7DnqjXX)
 
 ## Contribute
@@ -84,11 +85,6 @@ See [documentation](https://sern-handler.js.org) for TypeScript examples and mor
 - Pull up on [issues](https://github.com/sern-handler/Sern/issues) and tell us, if there are bugs
 - All kinds of contributions are welcomed!
 
-## TODO
+## Roadmap ![link](https://img.shields.io/badge/Coming-Soon-purple)
 
-- [ ] Default commands
-- [ ] Categories
-- [ ] Ruling out all bugs in the command system
-- [ ] Better support for slash commands
-- [ ] More Build scripts
-- [ ] Logger
+You can check our roadmap to see what's going to be added in the future.
