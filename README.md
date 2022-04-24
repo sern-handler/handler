@@ -1,24 +1,26 @@
+# SernHandler
 
-# SernHandler <a href="https://www.npmjs.com/package/@sern/handler"><img src="https://img.shields.io/npm/v/@sern/handler?maxAge=3600" alt="NPM version" /></a>
+<a href="https://www.npmjs.com/package/@sern/handler"><img src="https://img.shields.io/npm/v/@sern/handler?maxAge=3600" alt="NPM version" /></a>
 <a href="https://www.npmjs.com/package/@sern/handler"><img src="https://img.shields.io/npm/dt/@sern/handler?maxAge=3600" alt="NPM downloads" /></a>
 [![License: MIT](https://img.shields.io/badge/License-MIT-blavk.svg)](https://opensource.org/licenses/MIT)
 
 A customizable, batteries-included, powerful discord.js framework to automate and streamline your bot development.
 
-- A reincarnation of [this old project](https://github.com/jacoobes/sern_handler)
+- A reincarnation of [this old project](https://www.npmjs.com/package/sern_handler)
 
 ## Installation
 
 ```sh
-npm install sern-handler
+npm install @sern/handler
 ```
 
 ```sh
-yarn add sern-handler
+yarn add @sern/handler
+```
 ```
 
 ```sh
-pnpm add sern-handler
+pnpm add @sern/handler
 ```
 
 ## Basic Usage
@@ -66,7 +68,6 @@ See [documentation](https://sern-handler.js.org) for TypeScript examples and mor
 ## Links
 
 - [Official Documentation](https://sern-handler.js.org)
-- [Example Bot](https://github.com/sern-handler/cheemsBanker)
 - [Support Server](https://discord.com/invite/Yvb7DnqjXX)
 
 ## Contribute
