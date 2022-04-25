@@ -16,7 +16,6 @@ npm install @sern/handler
 ```sh
 yarn add @sern/handler
 ```
-```
 
 ```sh
 pnpm add @sern/handler
