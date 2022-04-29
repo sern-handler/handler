@@ -5,7 +5,6 @@
 
 A discord.js wrapper for you to automate and streamline your bot development.
 
-- A reincarnation of [this old project](https://github.com/jacoobes/sern_handler)
 
 ## Installation
 
