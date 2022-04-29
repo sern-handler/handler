@@ -75,15 +75,15 @@ export const onReady = ( wrapper : Wrapper ) => {
 function handler( name : string ) : ModuleHandlers {
     return  {
         [CommandType.Text] : (mod, plugins) => {
-            mod.alias.forEach ( a => Files.Alias.set(a,{ mod, plugins}));
+            mod.alias.forEach ( a => Files.TextCommandStore.aliases.set(a,{ mod, plugins}));
             Files.ApplicationCommandStore[1].set( name,  { mod, plugins } );
         },
         [CommandType.Slash]: (mod, plugins) => {
             Files.ApplicationCommandStore[1].set( name ,  { mod, plugins });
         },
         [CommandType.Both] :( mod, plugins )=> {
-            Files.ApplicationCommandStore[1].set ( name,{ mod, plugins}); 
-            mod.alias.forEach (a => Files.Alias.set(a, {mod,plugins}));
+            Files.BothCommand.set ( name,{ mod, plugins}); 
+            mod.alias.forEach (a => Files.TextCommandStore.aliases.set(a, {mod,plugins}));
         },
         [CommandType.MenuUser] : (mod, plugins) => {
             Files.ApplicationCommandStore[2].set ( name, {mod, plugins} );

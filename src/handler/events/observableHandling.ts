@@ -10,7 +10,7 @@ import type { EventPlugin, SernPlugin } from '../plugins/plugin';
 export function match<T extends keyof ModuleDefs>(
     plug: PluggedModule | undefined, type : T 
 ) : plug is { mod: ModuleDefs[T], plugins : SernPlugin[] } {
-    return plug !== undefined && (plug.mod.type & type) != 0;
+    return plug !== undefined && plug.mod.type === type;
 }
 
 export function filterCorrectModule<T extends keyof ModuleDefs>(cmdType : T) {

@@ -6,7 +6,7 @@ import { CommandType } from '../sern';
 import type { PluggedModule } from '../structures/modules/module';
 
 
-// A little ambigious, but ChatInput map stores text commands also. 
+export const BothCommand = new Map<string, PluggedModule>();
 export const ApplicationCommandStore = {
     [ApplicationCommandType.User] : new Map<string, PluggedModule>(),
     [ApplicationCommandType.Message] : new Map<string, PluggedModule>(),
@@ -18,9 +18,9 @@ export const MessageCompCommandStore = {
     [ComponentType.SelectMenu] : new Map<string, PluggedModule>()
 }
 export const TextCommandStore = {
-    [CommandType.Text] : new Map<string, PluggedModule>() // Aliases 
+    text : new Map<string, PluggedModule>(),
+    aliases : new Map<string, PluggedModule>()
 }
-export const Alias = new Map<string, PluggedModule>();
 
 // Courtesy @Townsy45
 function readPath(dir: string, arrayOfFiles: string[] = []): string[] {

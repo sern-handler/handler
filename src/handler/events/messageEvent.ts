@@ -1,5 +1,5 @@
 import type { Message } from 'discord.js';
-import { fromEvent,  Observable, of, concatMap,  map, from, every, concatAll, tap } from 'rxjs';
+import { fromEvent,  Observable, of, concatMap,  map, from, filter, concatAll, tap } from 'rxjs';
 import { Err, Ok } from 'ts-results';
 import type { Args } from '../..';
 import { CommandType } from '../sern';
@@ -7,7 +7,7 @@ import Context from '../structures/context';
 import type Wrapper from '../structures/wrapper';
 import { fmt } from '../utilities/messageHelpers';
 import * as Files from '../utilities/readFile';
-import { filterCorrectModule, ignoreNonBot } from './observableHandling';
+import { filterCorrectModule, ignoreNonBot, match } from './observableHandling';
 import { isEventPlugin } from './readyEvent';
 
 export const onMessageCreate = (wrapper : Wrapper) => {
@@ -23,10 +23,11 @@ export const onMessageCreate = (wrapper : Wrapper) => {
             return {
                 ctx : Context.wrap(message),
                 args : <Args>['text', rest],
-                mod : Files.ApplicationCommandStore[1].get(prefix) ?? Files.Alias.get(prefix)
+                mod : Files.ApplicationCommandStore[1].get(prefix) 
+                      ?? Files.BothCommand.get(prefix)
+                      ?? Files.TextCommandStore.aliases.get(prefix)
             }
         }));
-
     const ensureModuleType$ = processMessage$.pipe(
             concatMap(payload => of(payload.mod)
             .pipe(
