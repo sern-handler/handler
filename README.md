@@ -6,7 +6,7 @@
 
 A customizable, batteries-included, powerful discord.js framework to automate and streamline your bot development.
 
-- A reincarnation of [this old project](https://www.npmjs.com/package/sern_handler)
+- A reincarnation of [this old project](https://github.com/jacoobes/sern_handler)
 
 ## Installation
 
