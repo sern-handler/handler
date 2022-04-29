@@ -1,14 +1,29 @@
+import { ApplicationCommandType, ComponentType, InteractionType, MessageComponentInteraction, MessageComponentType } from 'discord.js';
 import { readdirSync, statSync } from 'fs';
 import { join } from 'path';
 import { from, Observable } from 'rxjs';
-import { SernError } from '../structures/errors';
 import type { PluggedModule } from '../structures/modules/module';
 
-//We can look into lazily loading modules once everything is set
+
+// A little ambigious, but ChatInput map stores text commands also. 
+export const ApplicationCommandStore = {
+    [ApplicationCommandType.User] : new Map<string, PluggedModule>(),
+    [ApplicationCommandType.Message] : new Map<string, PluggedModule>(),
+    [ApplicationCommandType.ChatInput] : new Map<string, PluggedModule>(), 
+} as {[K in ApplicationCommandType] : Map<string, PluggedModule> }
+
+export const MessageCompCommandStore = {
+    [ComponentType.Button] : new Map<string, PluggedModule>(),
+    [ComponentType.SelectMenu] : new Map<string, PluggedModule>()
+}
+export const TextCommandStore = {
+    [420] : new Map<string, PluggedModule>() // Aliases 
+}
+
+export const Alias = new Map<string, PluggedModule>();
+
 export const ContextMenuUser = new Map<string, PluggedModule>();
 export const ContextMenuMsg = new Map<string, PluggedModule>();
-export const Commands = new Map<string, PluggedModule>();
-export const Alias = new Map<string, PluggedModule>();
 export const Buttons = new Map<string, PluggedModule>();
 export const SelectMenus = new Map<string, PluggedModule>();
 

@@ -1,4 +1,4 @@
-import type { Awaitable, Message } from 'discord.js';
+import type { Awaitable, InteractionType, Message } from 'discord.js';
 import { Observable, throwError } from 'rxjs';
 import type { ModuleDefs } from '../structures/modules/commands/moduleHandler';
 import { SernError } from '../structures/errors';
@@ -33,7 +33,8 @@ export function filterCorrectModule<T extends keyof ModuleDefs>(cmdType : T) {
       });
 }
 
-export function filterTap<T extends keyof ModuleDefs>(
+
+/** export function filterTap<T extends keyof ModuleDefs>(
     cmdType : T,
     tap: (mod : ModuleDefs[T], plugins : EventPlugin[]) => Awaitable<void>
 ) {
@@ -57,7 +58,7 @@ export function filterTap<T extends keyof ModuleDefs>(
             });
         });
   }
-
+**/
 export function ignoreNonBot(prefix : string) {
     return (src : Observable<Message>) => 
         new Observable<Message>(subscriber => {
@@ -82,6 +83,7 @@ export function ignoreNonBot(prefix : string) {
             });
        });
 }
+
 export function partition<T,U extends T>(
     condition : (el : T) => el is U,
     array : T[]

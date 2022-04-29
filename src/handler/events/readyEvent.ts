@@ -2,13 +2,15 @@ import {concatMap,  from, fromEvent, map,  take,concat, skip, Observable,  of,  
 import { basename } from 'path';
 import * as Files from '../utilities/readFile';
 import type Wrapper from '../structures/wrapper';
-import type { HandlerCallback, ModuleHandlers, ModuleStates, ModuleType } from '../structures/modules/commands/moduleHandler';
+import type { ApplicationModules, HandlerCallback, MessageCompModules, ModDefs, ModuleCbs, ModuleHandlers, ModuleStates, ModuleType, StateMachine, TextCommandModules, ModuleHandler } from '../structures/modules/commands/moduleHandler';
 import { CommandType } from '../sern';
 import { CommandPlugin, EventPlugin, PluginType, SernPlugin } from '../plugins/plugin';
-import { partition } from './observableHandling';
+import { match, partition } from './observableHandling';
 import { Err, Ok, Result } from 'ts-results';
 import type { PluggedModule } from '../structures/modules/module';
 import type { Awaitable } from 'discord.js';
+import { SernError } from '../structures/errors';
+import type { ContextMenuMsg, ContextMenuUser, Module, SlashCommand } from '../structures/modules/commands/module';
 
 export const onReady = ( wrapper : Wrapper ) => {
 
@@ -56,48 +58,49 @@ export const onReady = ( wrapper : Wrapper ) => {
             )
     ),
 )
-    .subscribe(({ plugged : { mod, plugins }, cmdPluginsRes }) => {
-        registerModule(mod.name!, mod, plugins) 
+    .subscribe(({ plugged, cmdPluginsRes }) => {
+        const loadedPluginsCorrectly = cmdPluginsRes.every(res => res.execute.ok);
+        const { mod, plugins } = plugged;
+        if(loadedPluginsCorrectly) {
+            registerModule(mod.name!, mod, plugins);
+        }
+        else {
+            console.log(`Failed to load command ${mod.name!}`)
+            console.log(mod)
+        }
     }) 
     
 }
 
-
-// Refactor : ? Possibly repetitive and verbose. 
-const handler = ( name : string ) =>
-    ({
+function handler( name : string ) : ModuleHandlers {
+    return  {
         [CommandType.Text] : (mod, plugins) => {
             mod.alias.forEach ( a => Files.Alias.set(a,{ mod, plugins}));
-            Files.Commands.set( name,  { mod, plugins } );
+            Files.ApplicationCommandStore[1].set( name,  { mod, plugins } );
         },
         [CommandType.Slash]: (mod, plugins) => {
-            Files.Commands.set( name ,  { mod, plugins });
+            Files.ApplicationCommandStore[1].set( name ,  { mod, plugins });
         },
         [CommandType.Both] :( mod, plugins )=> {
-            Files.Commands.set ( name,{ mod, plugins}); 
+            Files.ApplicationCommandStore[1].set ( name,{ mod, plugins}); 
             mod.alias.forEach (a => Files.Alias.set(a, {mod,plugins}));
         },
         [CommandType.MenuUser] : (mod, plugins) => {
-            Files.ContextMenuUser.set ( name, {mod, plugins} );
+            Files.ApplicationCommandStore[2].set ( name, {mod, plugins} );
         },
         [CommandType.MenuMsg] : (mod,plugins) =>  { 
-            Files.ContextMenuMsg.set (name, {mod, plugins} );
+            Files.ApplicationCommandStore[3].set (name, {mod, plugins} );
         },
         [CommandType.Button] : (mod,plugins) => {
-            Files.Buttons.set(name, {mod, plugins});
+            Files.MessageCompCommandStore[2].set(name, {mod, plugins});
         },
         [CommandType.MenuSelect] : ( mod, plugins ) => {
-            Files.SelectMenus.set(name, { mod, plugins });
+            Files.MessageCompCommandStore[2].set(name, { mod, plugins });
         },
-    } as ModuleHandlers);
+    }
 
-function registerModule <T extends ModuleType> (
-    name : string,
-    mod : ModuleStates[T],
-    plugins : SernPlugin[]
-) {
-    return (<HandlerCallback<T>> handler(name)[mod.type])(mod, plugins);
 }
+
 
 function isCmdPlugin (p : SernPlugin) : p is CommandPlugin { 
     return (p.type & PluginType.Command) !== 0;
@@ -105,5 +108,10 @@ function isCmdPlugin (p : SernPlugin) : p is CommandPlugin {
 export function isEventPlugin( p : SernPlugin) : p is EventPlugin {
     return (p.type & PluginType.Event) !== 0;
 }
-
-
+function registerModule <T extends ModuleType> (
+    name : string,
+    mod : ModuleStates[T],
+    plugins : SernPlugin[]
+) {
+    return (<HandlerCallback<T>> handler(name)[mod.type])(mod, plugins);
+}

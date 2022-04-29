@@ -1,19 +1,23 @@
 
 import type { Interaction } from 'discord.js';
-import { fromEvent,  Observable, of,  concatMap } from 'rxjs';
+import { fromEvent,  Observable, of,  concatMap, map, tap } from 'rxjs';
 import { CommandType } from '../sern';
 import Context from '../structures/context';
 import type Wrapper from '../structures/wrapper';
 import * as Files from '../utilities/readFile';
-import { filterTap } from './observableHandling';
+
+
+
 
 export const onInteractionCreate = ( wrapper : Wrapper ) => {
       const { client } = wrapper;  
 
-      (<Observable<Interaction>> fromEvent(client, 'interactionCreate'))
-      .pipe(
-        concatMap (async interaction => {
-            interaction.type
+      const interactionEvent = (<Observable<Interaction>> fromEvent(client, 'interactionCreate'))
+      
+      interactionEvent.pipe(
+       tap(console.log)         
+      ).subscribe()
+/**       concatMap (async interaction => {
             if (interaction.isChatInputCommand()) {
                 return of(Files.Commands.get(interaction.commandName))
                 .pipe(
@@ -56,6 +60,7 @@ export const onInteractionCreate = ( wrapper : Wrapper ) => {
                 );
             }
             else return of();
+
         })
       ).subscribe({
        error(e){
@@ -66,5 +71,6 @@ export const onInteractionCreate = ( wrapper : Wrapper ) => {
         //console.log(command);
        },
    });
+   **/
 };
 

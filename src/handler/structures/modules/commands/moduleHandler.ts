@@ -1,4 +1,4 @@
-import type { EventPlugin, SernPlugin } from '../../../plugins/plugin';
+import type { SernPlugin } from '../../../plugins/plugin';
 import { CommandType } from '../../../sern';
 import type { 
     TextCommand,
@@ -21,11 +21,13 @@ export type ModuleDefs = {
     [CommandType.MenuSelect] : SelectMenuCommand;
 }
 
+
 //Keys of ModuleDefs
 export type ModuleType = keyof ModuleDefs;
 // The keys mapped to a constructed union with its type
 export type ModuleStates = { 
-    [ K in ModuleType ] : { type : K } & ModuleDefs[K] };
+    [ K in ModuleType ] : { type : K } & ModuleDefs[K] 
+};
 // A handler callback that is called on each ModuleDef 
 export type HandlerCallback<K extends ModuleType> = 
     (  mod: ModuleStates[K], plugins : SernPlugin[] ) => unknown;

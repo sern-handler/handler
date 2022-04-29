@@ -1,5 +1,5 @@
 import type { Message } from 'discord.js';
-import { fromEvent,  Observable, of, concatMap,  map, from, every, concatAll, tap, switchMap } from 'rxjs';
+import { fromEvent,  Observable, of, concatMap,  map, from, every, concatAll, tap } from 'rxjs';
 import { Err, Ok } from 'ts-results';
 import type { Args } from '../..';
 import { CommandType } from '../sern';
@@ -13,12 +13,13 @@ import { isEventPlugin } from './readyEvent';
 export const onMessageCreate = (wrapper : Wrapper) => {
     const { client, defaultPrefix } = wrapper;
     if (defaultPrefix === undefined) return;
+
     const messageEvent$ = (<Observable<Message>> fromEvent( client, 'messageCreate'));
+
     const processMessage$ = messageEvent$.pipe(
         ignoreNonBot(defaultPrefix),
         map(message => {
             const [prefix, ...rest] = fmt(message, defaultPrefix);
-            console.log(prefix, rest)
             return {
                 ctx : Context.wrap(message),
                 args : <Args>['text', rest],
@@ -47,6 +48,7 @@ export const onMessageCreate = (wrapper : Wrapper) => {
                }));
                return from(res).pipe(map(res => ({ plugged, ctx, args, res })))
             }));
+
     processEventPlugins$.subscribe( ( { plugged, ctx, args, res } ) => {
         if(res.every( pl => pl.ok)) {
             Promise.resolve(plugged.mod.execute(ctx, args)).then(() =>
