@@ -3,7 +3,7 @@
 <a href="https://www.npmjs.com/package/@sern/handler">
 <img src="https://img.shields.io/npm/v/@sern/handler?maxAge=3600" alt="NPM version" /></a> <a href="https://www.npmjs.com/package/@sern/handler"><img src="https://img.shields.io/npm/dt/@sern/handler?maxAge=3600" alt="NPM downloads" /></a> <a href="https://www.npmjs.com/package/@sern/handler"><img src="https://img.shields.io/badge/builds-stable" alt="Builds Passing"></a>
 
-A discord.js wrapper for you to automate and streamline your bot development. Also, we are providing a [cli](https://github.com/sern-handler/cli) for you to use.
+A discord.js wrapper for you to automate and streamline your bot development.
 
 - A reincarnation of [this old project](https://github.com/jacoobes/sern_handler)
 
@@ -75,13 +75,14 @@ See [documentation](https://sern-handler.js.org) for TypeScript examples and mor
 
 ## Links
 
-- [Official Documentation](https://sern-handler.js.org)
-- [Public Templates](https://github.com/sern-handler/templates)
-- [Support Server](https://discord.com/invite/Yvb7DnqjXX)
+- **[Official Documentation](https://sern-handler.js.org)**
+- **[Public Templates](https://github.com/sern-handler/templates)**
+- **[Discord Server](https://discord.com/invite/Yvb7DnqjXX)**
 
 ## Contribute
 
-- Pull up on [issues](https://github.com/sern-handler/Sern/issues) and tell us, if there are bugs
+- Read our contribution [guidelines](https://github.com/sern-handler/handler) carefully
+- Pull up on [issues](https://github.com/sern-handler/handler/issues) and tell us, if there are bugs
 - All kinds of contributions are welcomed!
 
 ## Roadmap ![link](https://img.shields.io/badge/Coming-Soon-purple)
