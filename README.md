@@ -32,10 +32,10 @@ const { defaultPrefix, token } = require('./config.json');
 
 const client = new Client({
   intents: [
-        GatewayIntentBits.Guilds,
-        GatewayIntentBits.GuildMembers,
-        GatewayIntentBits.GuildMessages
-    ]
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMembers,
+    GatewayIntentBits.GuildMessages
+  ]
 });
 
 Sern.init({
