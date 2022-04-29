@@ -23,7 +23,7 @@ export const onMessageCreate = (wrapper : Wrapper) => {
             return {
                 ctx : Context.wrap(message),
                 args : <Args>['text', rest],
-                mod : Files.Commands.get(prefix) ?? Files.Alias.get(prefix)
+                mod : Files.ApplicationCommandStore[1].get(prefix) ?? Files.Alias.get(prefix)
             }
         }));
 
@@ -60,7 +60,4 @@ export const onMessageCreate = (wrapper : Wrapper) => {
         }
 
     })
-
-
-
 };

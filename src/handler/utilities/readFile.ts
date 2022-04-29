@@ -2,6 +2,7 @@ import { ApplicationCommandType, ComponentType, InteractionType, MessageComponen
 import { readdirSync, statSync } from 'fs';
 import { join } from 'path';
 import { from, Observable } from 'rxjs';
+import { CommandType } from '../sern';
 import type { PluggedModule } from '../structures/modules/module';
 
 
@@ -17,16 +18,9 @@ export const MessageCompCommandStore = {
     [ComponentType.SelectMenu] : new Map<string, PluggedModule>()
 }
 export const TextCommandStore = {
-    [420] : new Map<string, PluggedModule>() // Aliases 
+    [CommandType.Text] : new Map<string, PluggedModule>() // Aliases 
 }
-
 export const Alias = new Map<string, PluggedModule>();
-
-export const ContextMenuUser = new Map<string, PluggedModule>();
-export const ContextMenuMsg = new Map<string, PluggedModule>();
-export const Buttons = new Map<string, PluggedModule>();
-export const SelectMenus = new Map<string, PluggedModule>();
-
 
 // Courtesy @Townsy45
 function readPath(dir: string, arrayOfFiles: string[] = []): string[] {

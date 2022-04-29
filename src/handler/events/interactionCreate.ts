@@ -13,9 +13,18 @@ export const onInteractionCreate = ( wrapper : Wrapper ) => {
       const { client } = wrapper;  
 
       const interactionEvent = (<Observable<Interaction>> fromEvent(client, 'interactionCreate'))
-      
+
       interactionEvent.pipe(
-       tap(console.log)         
+          concatMap ( async interaction => {
+            if(interaction.isCommand()) {
+                return of(
+                    Files.ApplicationCommandStore[interaction.commandType]
+                    .get(interaction.commandName)).pipe(
+
+                    )
+            }
+
+          })
       ).subscribe()
 /**       concatMap (async interaction => {
             if (interaction.isChatInputCommand()) {
