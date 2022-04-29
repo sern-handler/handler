@@ -31,10 +31,10 @@ const { prefix, token } = require('./config.json');
 
 const client = new Client({
   intents: [
-    Intents.FLAGS.GUILDS, 
-    Intents.FLAGS.GUILD_MESSAGES,
-    Intents.FLAGS.GUILD_MEMBERS
-   ],
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMembers,
+        GatewayIntentBits.GuildMessages
+    ]
 });
 
 new Sern.Handler({
