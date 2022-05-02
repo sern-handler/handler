@@ -53,12 +53,12 @@ client.login(token);
 const { Sern, CommandType } = require('@sern/handler');
 
 exports.default = {
-  description: 'A ping pong command',
-  type: CommandType.Slash,
-  execute(ctx) {
-      ctx.reply('pong!');
-  }
-};
+    description: 'A ping pong command',
+    type: CommandType.Slash,
+    execute(ctx) {
+        ctx.reply('pong!');
+    }
+  };
 ```
 
 See [documentation](https://sern-handler.js.org) for TypeScript examples and more
