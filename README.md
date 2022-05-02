@@ -84,6 +84,6 @@ See [documentation](https://sern-handler.js.org) for TypeScript examples and mor
 - Pull up on [issues](https://github.com/sern-handler/handler/issues) and tell us, if there are bugs
 - All kinds of contributions are welcomed!
 
-## Roadmap ![link](https://img.shields.io/badge/Coming-Soon-purple)
+## Roadmap
 
-You can check our roadmap to see what's going to be added in the future.
+You can check our [roadmap](https://github.com/sern-handler/roadmap) to see what's going to be added or fixed in the future.
