@@ -3,7 +3,7 @@
 <a href="https://www.npmjs.com/package/@sern/handler">
 <img src="https://img.shields.io/npm/v/@sern/handler?maxAge=3600" alt="NPM version" /></a> <a href="https://www.npmjs.com/package/@sern/handler"><img src="https://img.shields.io/npm/dt/@sern/handler?maxAge=3600" alt="NPM downloads" /></a> <a href="https://www.npmjs.com/package/@sern/handler"><img src="https://img.shields.io/badge/builds-stable" alt="Builds Passing"></a>
 
-A discord.js wrapper for you to automate and streamline your bot development.
+A customizable, batteries-included, powerful discord.js framework to automate and streamline your bot development.
 
 
 ## Installation
