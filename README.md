@@ -86,4 +86,4 @@ See [documentation](https://sern-handler.js.org) for TypeScript examples and mor
 
 ## Roadmap
 
-You can check our [roadmap](https://github.com/sern-handler/roadmap) to see what's going to be added or fixed in the future.
+You can check our [roadmap](https://github.com/sern-handler/roadmap) to see what's going to be added or patched in the future.
