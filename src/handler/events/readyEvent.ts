@@ -2,15 +2,13 @@ import {concatMap,  from, fromEvent, map,  take,concat, skip, Observable,  of,  
 import { basename } from 'path';
 import * as Files from '../utilities/readFile';
 import type Wrapper from '../structures/wrapper';
-import type { ApplicationModules, HandlerCallback, MessageCompModules, ModDefs, ModuleCbs, ModuleHandlers, ModuleStates, ModuleType, StateMachine, TextCommandModules, ModuleHandler } from '../structures/modules/commands/moduleHandler';
+import type {  HandlerCallback,   ModuleHandlers, ModuleStates, ModuleType} from '../structures/modules/commands/moduleHandler';
 import { CommandType } from '../sern';
 import { CommandPlugin, EventPlugin, PluginType, SernPlugin } from '../plugins/plugin';
 import { match, partition } from './observableHandling';
 import { Err, Ok, Result } from 'ts-results';
 import type { PluggedModule } from '../structures/modules/module';
 import type { Awaitable } from 'discord.js';
-import { SernError } from '../structures/errors';
-import type { ContextMenuMsg, ContextMenuUser, Module, SlashCommand } from '../structures/modules/commands/module';
 
 export const onReady = ( wrapper : Wrapper ) => {
 

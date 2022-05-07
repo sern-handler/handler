@@ -1,10 +1,12 @@
 
-import type { Interaction } from 'discord.js';
-import { fromEvent,  Observable, of,  concatMap, map, tap } from 'rxjs';
+import { ApplicationCommandType, Interaction } from 'discord.js';
+import { fromEvent,  Observable, of,  concatMap, map, filter } from 'rxjs';
 import { CommandType } from '../sern';
 import Context from '../structures/context';
 import type Wrapper from '../structures/wrapper';
 import * as Files from '../utilities/readFile';
+import { match, partition } from './observableHandling';
+import { isEventPlugin } from './readyEvent';
 
 
 
@@ -12,20 +14,27 @@ import * as Files from '../utilities/readFile';
 export const onInteractionCreate = ( wrapper : Wrapper ) => {
       const { client } = wrapper;  
 
-      const interactionEvent = (<Observable<Interaction>> fromEvent(client, 'interactionCreate'))
+      const interactionEvent$ = (<Observable<Interaction>> fromEvent(client, 'interactionCreate'))
+      
+      const processPlugins = <T extends keyof ModuleDefs>( plug : Observable<PluggedModule|undefined> ) => {
+        return plug 
+      };
 
-      interactionEvent.pipe(
-          concatMap ( async interaction => {
+      const processCommand$ = interactionEvent$.pipe(
+        concatMap( interaction => {
             if(interaction.isCommand()) {
-                return of(
-                    Files.ApplicationCommandStore[interaction.commandType]
-                    .get(interaction.commandName)).pipe(
-
-                    )
+                return of( Files
+                .ApplicationCommandStore[interaction.commandType]
+                .get(interaction.commandName)
+                ).pipe( 
+                )
+                
             }
+        })
+      );
 
-          })
-      ).subscribe()
+                       
+
 /**       concatMap (async interaction => {
             if (interaction.isChatInputCommand()) {
                 return of(Files.Commands.get(interaction.commandName))

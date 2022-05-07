@@ -21,7 +21,7 @@ export const onMessageCreate = (wrapper : Wrapper) => {
         map(message => {
             const [prefix, ...rest] = fmt(message, defaultPrefix);
             return {
-                ctx : Context.wrap(message),
+                ctx : Context.wrap(message), //TODO : check for BothCommand
                 args : <Args>['text', rest],
                 mod : Files.ApplicationCommandStore[1].get(prefix) 
                       ?? Files.BothCommand.get(prefix)
@@ -31,7 +31,7 @@ export const onMessageCreate = (wrapper : Wrapper) => {
     const ensureModuleType$ = processMessage$.pipe(
             concatMap(payload => of(payload.mod)
             .pipe(
-                filterCorrectModule(CommandType.Text),
+                filterCorrectModule(CommandType.Text), // fix for BothCommand
                 map( textCommand => ({ ...payload, mod : textCommand }))
             )));
 
