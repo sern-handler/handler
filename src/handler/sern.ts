@@ -13,6 +13,8 @@ import { SernError } from './structures/errors';
 import { onReady } from './events/readyEvent';
 import { onMessageCreate } from './events/messageEvent';
 import { onInteractionCreate } from './events/interactionCreate';
+import { match } from 'ts-pattern';
+import { _ } from 'ts-pattern/dist/patterns';
 
 export function init( wrapper : Wrapper ) {
    const { events, client } = wrapper; 
@@ -44,12 +46,12 @@ export enum CommandType {
 }
 
 export function cmdTypeToDjs(ty: CommandType) {
-    switch (ty)  {
-        case CommandType.Slash : case CommandType.Both : return ApplicationCommandType.ChatInput;
-        case CommandType.MenuUser : return ApplicationCommandType.User;
-        case CommandType.MenuMsg : return ApplicationCommandType.Message;
-        default : throw new Error(`Cannot turn this CommandType to ApplicationCommandType`)
-    }
+   return match(ty)  
+      .with(CommandType.Slash, () => ApplicationCommandType.ChatInput)
+      .with(CommandType.MenuUser, () => ApplicationCommandType.User)
+      .with(CommandType.MenuMsg, ()=> ApplicationCommandType.Message)
+      .with(_, () => { throw new Error(SernError.NonValidModuleType) })
+      .exhaustive()
 }
 
 

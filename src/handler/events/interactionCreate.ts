@@ -1,15 +1,16 @@
 
-import { ApplicationCommandType, Interaction } from 'discord.js';
-import { fromEvent,  Observable, of,  concatMap, map, filter } from 'rxjs';
+import { ApplicationCommandType, ChatInputCommandInteraction, Interaction } from 'discord.js';
+import { fromEvent,  Observable, of,  concatMap, map, filter, throwError } from 'rxjs';
 import { CommandType } from '../sern';
 import Context from '../structures/context';
 import type { ModuleDefs } from '../structures/modules/commands/moduleHandler';
 import type { PluggedModule } from '../structures/modules/module';
 import type Wrapper from '../structures/wrapper';
 import * as Files from '../utilities/readFile';
-import { match, partition } from './observableHandling';
+import { match } from 'ts-pattern';
 import { isEventPlugin } from './readyEvent';
-
+import { _ } from 'ts-pattern/dist/patterns';
+import { SernError } from '../structures/errors';
 
 
 
@@ -19,18 +20,32 @@ export const onInteractionCreate = ( wrapper : Wrapper ) => {
       const interactionEvent$ = (<Observable<Interaction>> fromEvent(client, 'interactionCreate'))
       
 
-      const processCommand$ = interactionEvent$.pipe(
+      interactionEvent$.pipe(
         concatMap( interaction => {
             if(interaction.isCommand()) {
                 return of( Files
                 .ApplicationCommandStore[interaction.commandType]
                 .get(interaction.commandName)
-                ).pipe( 
+                ).pipe(
+                   map ( plug => {
+                       if(plug === undefined) {
+                            return throwError(() => SernError.UndefinedModule)
+                       }
+                       const eventPlugins = plug.plugins.filter(isEventPlugin);
+                       match(interaction)
+                           .when( interaction.isChatInputCommand, (i : ChatInputCommandInteraction) => {
+                                 console.log(i, eventPlugins) 
+                           }) 
+                           .when( () => _ , i => {
+                                console.log(i, eventPlugins) 
+                           })
+                       return "fsd"
+                   })
                 )
-                
             }
+            return of()
         })
-      );
+      ).subscribe();
 
                        
 
