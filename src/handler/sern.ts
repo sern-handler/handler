@@ -14,7 +14,8 @@ import { onReady } from './events/readyEvent';
 import { onMessageCreate } from './events/messageEvent';
 import { onInteractionCreate } from './events/interactionCreate';
 import { match } from 'ts-pattern';
-import { _ } from 'ts-pattern/dist/patterns';
+import { P } from 'ts-pattern';
+import { Sern } from '..';
 
 export function init( wrapper : Wrapper ) {
    const { events, client } = wrapper; 
@@ -50,7 +51,8 @@ export function cmdTypeToDjs(ty: CommandType) {
       .with(CommandType.Slash, () => ApplicationCommandType.ChatInput)
       .with(CommandType.MenuUser, () => ApplicationCommandType.User)
       .with(CommandType.MenuMsg, ()=> ApplicationCommandType.Message)
-      .with(_, () => { throw new Error(SernError.NonValidModuleType) })
+      .with(CommandType.Both, () => ApplicationCommandType.ChatInput )
+      .with(P._, () => { throw new Error(SernError.NonValidModuleType) })
       .exhaustive()
 }
 

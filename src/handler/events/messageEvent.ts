@@ -7,7 +7,7 @@ import Context from '../structures/context';
 import type Wrapper from '../structures/wrapper';
 import { fmt } from '../utilities/messageHelpers';
 import * as Files from '../utilities/readFile';
-import { filterCorrectModule, ignoreNonBot, match } from './observableHandling';
+import { filterCorrectModule, ignoreNonBot, correctModuleType } from './observableHandling';
 import { isEventPlugin } from './readyEvent';
 
 export const onMessageCreate = (wrapper : Wrapper) => {

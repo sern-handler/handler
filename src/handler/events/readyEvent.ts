@@ -5,7 +5,7 @@ import type Wrapper from '../structures/wrapper';
 import type {  HandlerCallback,   ModuleHandlers, ModuleStates, ModuleType} from '../structures/modules/commands/moduleHandler';
 import { CommandType } from '../sern';
 import { CommandPlugin, EventPlugin, PluginType, SernPlugin } from '../plugins/plugin';
-import { match, partition } from './observableHandling';
+import { correctModuleType, partition } from './observableHandling';
 import { Err, Ok, Result } from 'ts-results';
 import type { PluggedModule } from '../structures/modules/module';
 import type { Awaitable } from 'discord.js';
@@ -74,7 +74,7 @@ function handler( name : string ) : ModuleHandlers {
     return  {
         [CommandType.Text] : (mod, plugins) => {
             mod.alias.forEach ( a => Files.TextCommandStore.aliases.set(a,{ mod, plugins}));
-            Files.ApplicationCommandStore[1].set( name,  { mod, plugins } );
+            Files.TextCommandStore.text.set( name,  { mod, plugins } );
         },
         [CommandType.Slash]: (mod, plugins) => {
             Files.ApplicationCommandStore[1].set( name ,  { mod, plugins });

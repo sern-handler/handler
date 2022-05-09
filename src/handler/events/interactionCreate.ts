@@ -1,16 +1,12 @@
 
-import { ApplicationCommandType, ChatInputCommandInteraction, Interaction } from 'discord.js';
-import { fromEvent,  Observable, of,  concatMap, map, filter, throwError } from 'rxjs';
-import { CommandType } from '../sern';
-import Context from '../structures/context';
-import type { ModuleDefs } from '../structures/modules/commands/moduleHandler';
-import type { PluggedModule } from '../structures/modules/module';
+import type { ApplicationCommandType, ChatInputCommandInteraction, CommandInteraction, Interaction } from 'discord.js';
+import { fromEvent,  Observable, of,  concatMap, map, throwError } from 'rxjs';
 import type Wrapper from '../structures/wrapper';
 import * as Files from '../utilities/readFile';
-import { match } from 'ts-pattern';
 import { isEventPlugin } from './readyEvent';
-import { _ } from 'ts-pattern/dist/patterns';
+import { P, match } from 'ts-pattern';
 import { SernError } from '../structures/errors';
+import { correctModuleType } from './observableHandling';
 
 
 
@@ -18,34 +14,33 @@ export const onInteractionCreate = ( wrapper : Wrapper ) => {
       const { client } = wrapper;  
 
       const interactionEvent$ = (<Observable<Interaction>> fromEvent(client, 'interactionCreate'))
-      
 
       interactionEvent$.pipe(
         concatMap( interaction => {
             if(interaction.isCommand()) {
-                return of( Files
-                .ApplicationCommandStore[interaction.commandType]
-                .get(interaction.commandName)
-                ).pipe(
+                const modul = 
+                Files.ApplicationCommandStore[interaction.commandType].get(interaction.commandName)
+                ?? Files.BothCommand.get(interaction.commandName);
+                return of(modul).pipe(
                    map ( plug => {
+                       console.log('a');
                        if(plug === undefined) {
                             return throwError(() => SernError.UndefinedModule)
                        }
                        const eventPlugins = plug.plugins.filter(isEventPlugin);
                        match(interaction)
-                           .when( interaction.isChatInputCommand, (i : ChatInputCommandInteraction) => {
-                                 console.log(i, eventPlugins) 
+                           .when(i => i.isChatInputCommand(), (i : ChatInputCommandInteraction) => {
+                                 console.log("chatI", eventPlugins) 
                            }) 
-                           .when( () => _ , i => {
-                                console.log(i, eventPlugins) 
+                           .when(() => P._, i => {
+                                console.log("other I", eventPlugins) 
                            })
-                       return "fsd"
                    })
                 )
             }
             return of()
         })
-      ).subscribe();
+      ).subscribe(console.log);
 
                        
 

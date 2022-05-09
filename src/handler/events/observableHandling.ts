@@ -7,7 +7,7 @@ import type { PluggedModule } from '../structures/modules/module';
 import type { EventPlugin, SernPlugin } from '../plugins/plugin';
 
 
-export function match<T extends keyof ModuleDefs>(
+export function correctModuleType<T extends keyof ModuleDefs>(
     plug: PluggedModule | undefined, type : T 
 ) : plug is { mod: ModuleDefs[T], plugins : SernPlugin[] } {
     return plug !== undefined && plug.mod.type === type;
@@ -18,7 +18,7 @@ export function filterCorrectModule<T extends keyof ModuleDefs>(cmdType : T) {
         new Observable<{ mod : ModuleDefs[T], plugins : SernPlugin[] }>( subscriber => { 
             return src.subscribe({ 
                 next(plug) {
-                    if(match(plug, cmdType)) {
+                    if(correctModuleType(plug, cmdType)) {
                        subscriber.next({ mod : plug.mod, plugins : plug.plugins });
                     } else {
                        if (plug === undefined) { 
