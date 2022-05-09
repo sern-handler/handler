@@ -13,7 +13,7 @@ import { correctModuleType } from './observableHandling';
 export const onInteractionCreate = ( wrapper : Wrapper ) => {
       const { client } = wrapper;  
 
-      const interactionEvent$ = (<Observable<Interaction>> fromEvent(client, 'interactionCreate'))
+      const interactionEvent$ = (<Observable<Interaction>> fromEvent(client, 'interactionCreate'));
 
       interactionEvent$.pipe(
         concatMap( interaction => {
@@ -25,20 +25,20 @@ export const onInteractionCreate = ( wrapper : Wrapper ) => {
                    map ( plug => {
                        console.log('a');
                        if(plug === undefined) {
-                            return throwError(() => SernError.UndefinedModule)
+                            return throwError(() => SernError.UndefinedModule);
                        }
                        const eventPlugins = plug.plugins.filter(isEventPlugin);
                        match(interaction)
                            .when(i => i.isChatInputCommand(), (i : ChatInputCommandInteraction) => {
-                                 console.log("chatI", eventPlugins) 
+                                 console.log('chatI', eventPlugins);
                            }) 
                            .when(() => P._, i => {
-                                console.log("other I", eventPlugins) 
-                           })
+                                console.log('other I', eventPlugins); 
+                           });
                    })
-                )
+                );
             }
-            return of()
+            return of(null);
         })
       ).subscribe(console.log);
 

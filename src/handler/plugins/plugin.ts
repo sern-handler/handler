@@ -11,12 +11,12 @@
 // Plugins are reminisce of middleware in express.
 //
 
-import type { Awaitable, Client } from "discord.js";
-import type { Err, Ok, Result } from "ts-results";
-import type { Module, Override, Wrapper } from "../..";
-import type { CommandType } from "../sern";
-import type { ModuleDefs } from "../structures/modules/commands/moduleHandler";
-import type { BaseModule, PluggedModule } from "../structures/modules/module";
+import type { Awaitable, Client } from 'discord.js';
+import type { Err, Ok, Result } from 'ts-results';
+import type { Module, Override, Wrapper } from '../..';
+import type { CommandType } from '../sern';
+import type { ModuleDefs } from '../structures/modules/commands/moduleHandler';
+import type { BaseModule, PluggedModule } from '../structures/modules/module';
 
 export enum PluginType {
     Command = 0b01,
@@ -71,7 +71,7 @@ export function sernModule
         return {
             mod,
             plugins 
-        }
+        };
 }
 
 

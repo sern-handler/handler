@@ -52,8 +52,8 @@ export function cmdTypeToDjs(ty: CommandType) {
       .with(CommandType.MenuUser, () => ApplicationCommandType.User)
       .with(CommandType.MenuMsg, ()=> ApplicationCommandType.Message)
       .with(CommandType.Both, () => ApplicationCommandType.ChatInput )
-      .with(P._, () => { throw new Error(SernError.NonValidModuleType) })
-      .exhaustive()
+      .with(P._, () => { throw new Error(SernError.NonValidModuleType); })
+      .exhaustive();
 }
 
 

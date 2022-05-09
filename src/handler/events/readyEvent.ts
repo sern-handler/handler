@@ -33,9 +33,9 @@ export const onReady = ( wrapper : Wrapper ) => {
                             next : () => Ok.EMPTY,
                             stop : () => Err.EMPTY
                         })
-                    }
+                    };
                });
-                return of({ plugged : <PluggedModule>{ mod , plugins : eventPlugins }, cmdPluginsRes }) 
+                return of({ plugged : <PluggedModule>{ mod , plugins : eventPlugins }, cmdPluginsRes }); 
             }),
         );
 
@@ -63,12 +63,12 @@ export const onReady = ( wrapper : Wrapper ) => {
             registerModule(mod.name!, mod, plugins);
         }
         else {
-            console.log(`Failed to load command ${mod.name!}`)
-            console.log(mod)
+            console.log(`Failed to load command ${mod.name!}`);
+            console.log(mod);
         }
-    }) 
+    }); 
     
-}
+};
 
 function handler( name : string ) : ModuleHandlers {
     return  {
@@ -95,7 +95,7 @@ function handler( name : string ) : ModuleHandlers {
         [CommandType.MenuSelect] : ( mod, plugins ) => {
             Files.MessageCompCommandStore[2].set(name, { mod, plugins });
         },
-    }
+    };
 
 }
 

@@ -26,7 +26,7 @@ export const onMessageCreate = (wrapper : Wrapper) => {
                 mod : Files.ApplicationCommandStore[1].get(prefix) 
                       ?? Files.BothCommand.get(prefix)
                       ?? Files.TextCommandStore.aliases.get(prefix)
-            }
+            };
         }));
     const ensureModuleType$ = processMessage$.pipe(
             concatMap(payload => of(payload.mod)
@@ -47,18 +47,18 @@ export const onMessageCreate = (wrapper : Wrapper) => {
                             stop : () => Err.EMPTY
                     });
                }));
-               return from(res).pipe(map(res => ({ plugged, ctx, args, res })))
+               return from(res).pipe(map(res => ({ plugged, ctx, args, res })));
             }));
 
     processEventPlugins$.subscribe( ( { plugged, ctx, args, res } ) => {
         if(res.every( pl => pl.ok)) {
             Promise.resolve(plugged.mod.execute(ctx, args)).then(() =>
                 console.log(plugged)
-            )
+            );
         }
         else {
-            console.log(plugged, "failed");
+            console.log(plugged, 'failed');
         }
 
-    })
+    });
 };

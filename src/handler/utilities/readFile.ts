@@ -11,16 +11,16 @@ export const ApplicationCommandStore = {
     [ApplicationCommandType.User] : new Map<string, PluggedModule>(),
     [ApplicationCommandType.Message] : new Map<string, PluggedModule>(),
     [ApplicationCommandType.ChatInput] : new Map<string, PluggedModule>(), 
-} as {[K in ApplicationCommandType] : Map<string, PluggedModule> }
+} as {[K in ApplicationCommandType] : Map<string, PluggedModule> };
 
 export const MessageCompCommandStore = {
     [ComponentType.Button] : new Map<string, PluggedModule>(),
     [ComponentType.SelectMenu] : new Map<string, PluggedModule>()
-}
+};
 export const TextCommandStore = {
     text : new Map<string, PluggedModule>(),
     aliases : new Map<string, PluggedModule>()
-}
+};
 
 // Courtesy @Townsy45
 function readPath(dir: string, arrayOfFiles: string[] = []): string[] {
@@ -52,8 +52,8 @@ export function buildData(commandDir: string ): Observable<
   }> {
   return from(getCommands(commandDir).map(absPath => { 
        const plugged = (<PluggedModule> require(absPath).module);
-       return { plugged, absPath }
-  }))
+       return { plugged, absPath };
+  }));
 }
 
 export function getCommands(dir: string): string[] {

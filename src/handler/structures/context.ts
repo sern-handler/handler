@@ -136,10 +136,10 @@ export default class Context {
       return firstSome(
         this.oInterac.map(async i => { 
           await i.reply( content as InteractionReplyOptions);
-          return new Context(Some(await i.fetchReply() as Message), Some(i))
+          return new Context(Some(await i.fetchReply() as Message), Some(i));
         }),
         this.oMsg.map(async m => {
-           const reply = await m.reply( content as ReplyMessageOptions )
+           const reply = await m.reply( content as ReplyMessageOptions );
            return new Context(Some(reply), this.oInterac);
         })
       )!;

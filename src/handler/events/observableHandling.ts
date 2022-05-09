@@ -91,9 +91,9 @@ export function partition<T,U extends T>(
     const uArr : U[] = [];
     const vArr : T[] = [];
     for (const el of array ) {
-        (condition(el) ? uArr : vArr).push(el)
+        (condition(el) ? uArr : vArr).push(el);
     }
-    return [ uArr, vArr ]
+    return [ uArr, vArr ];
 }
 
 
