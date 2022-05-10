@@ -291,7 +291,7 @@ convey the exclusion of warranty; and each file should have at least
 the "copyright" line and a pointer to where the full notice is found.
 
     A discord.js wrapper to make easier to use discord.js
-    Copyright (C) 2022 Sern, Inc.
+    Copyright (C) 2022 Sern.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
