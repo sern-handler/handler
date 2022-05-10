@@ -1,15 +1,4 @@
-import { ChannelType, Message } from 'discord.js';
-
-/**
- * @param message The message object
- * @returns `true` if message comes from DM, `false` otherwise
- * @example isNotFromDM(message) ? 'Not From DM' : 'from DM'
- *
- */
-
-export function isNotFromDM ( message: Message ) { 
-   return message.channel.type !== ChannelType.DM;
-}
+import type { Message } from 'discord.js';
 
 /**
  * Checks if the author of message is a bot or not
@@ -34,7 +23,7 @@ export function hasPrefix(message: Message, prefix?: string) {
 }
 /**
  * Removes the first character(s) _[depending on prefix length]_ of the message
- * @param message The message to remove the prefix from
+ * @param msg
  * @param prefix The prefix to remove
  * @returns The message without the prefix
  * @example

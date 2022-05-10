@@ -40,9 +40,9 @@ function readPath(dir: string, arrayOfFiles: string[] = []): string[] {
 export const fmtFileName = (n: string) => n.substring(0, n.length - 3);
 
 /**
- * 
- * @param {commandsDir} Relative path to commands directory
- * @returns {Promise<{ mod: PluggedModule; absPath: string; }[]>} data from command files
+ *
+ * @returns {Observable<{ mod: PluggedModule; absPath: string; }[]>} data from command files
+ * @param commandDir
  */
 
 export function buildData(commandDir: string ): Observable<
@@ -51,6 +51,7 @@ export function buildData(commandDir: string ): Observable<
     absPath: string;
   }> {
   return from(getCommands(commandDir).map(absPath => { 
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
        const plugged = (<PluggedModule> require(absPath).module);
        return { plugged, absPath };
   }));
