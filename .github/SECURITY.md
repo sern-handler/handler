@@ -2,11 +2,13 @@
 
 ## Supported Versions
 
-Project is currently in development and is not yet ready to be used.
+Project is currently under heavy development but you can try out our [npm package](https://npmjs.com/package/@sern/handler) 
 
 | Version | Supported          |
 | ------- | ------------------ |
 | 0.1.0 @ dev | :white_check_mark: |
+
+* Dev versions might include bugs, use it with your own risk.
 
 ## Reporting a Vulnerability
 
