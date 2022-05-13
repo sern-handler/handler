@@ -1,50 +1,78 @@
-
-import type { ApplicationCommandType, ChatInputCommandInteraction, CommandInteraction, Interaction } from 'discord.js';
-import { fromEvent,  Observable, of,  concatMap, map, throwError } from 'rxjs';
+import type {
+    ChatInputCommandInteraction,
+    CommandInteraction,
+    Interaction,
+    MessageContextMenuCommandInteraction as MessageCtxInt,
+    UserContextMenuCommandInteraction as UserCtxInt,
+} from 'discord.js';
+import { concatMap, fromEvent, Observable, of, throwError } from 'rxjs';
 import type Wrapper from '../structures/wrapper';
 import * as Files from '../utilities/readFile';
 import { isEventPlugin } from './readyEvent';
-import { P, match } from 'ts-pattern';
+import { match, P } from 'ts-pattern';
 import { SernError } from '../structures/errors';
-import { correctModuleType } from './observableHandling';
+import Context from '../structures/context';
+import type { Result } from 'ts-results';
+import type { PluggedModule } from '../structures/modules/module';
+import { CommandType, controller } from '../sern';
+import type { EventPlugin } from '../plugins/plugin';
 
+function applicationCommandHandler<
+    T extends CommandType.Both | CommandType.MenuUser | CommandType.MenuMsg | CommandType.Slash,
+>(mod: PluggedModule | undefined, interaction: CommandInteraction) {
+    if (mod === undefined) {
+        return throwError(() => SernError.UndefinedModule);
+    }
+    const eventPlugins = mod.plugins.filter(isEventPlugin);
+    return match(interaction)
+        .when(
+            i => i.isChatInputCommand(),
+            (i: ChatInputCommandInteraction) => {
+                const ctx = Context.wrap(i);
+                const res = eventPlugins.map((e: EventPlugin) => {
+                    if (![CommandType.Slash, CommandType.Both].includes(e.modType)) {
+                        return throwError(() => SernError.NonValidModuleType);
+                    }
+                    return e.execute([ctx, ['slash', i.options]], controller);
+                }) as Awaited<Result<void, void>>[];
+                //Possible unsafe cast
+                // could result in the promises not being resolved
+                return of({ res, mod, ctx });
+            },
+        )
+        .when(
+            () => P._,
+            (i: MessageCtxInt | UserCtxInt) => {
+                // const res = eventPlugins.map(e => {
+                //
+                //
+                // });
+                return of({});
+            },
+        )
+        .run();
+}
 
+export const onInteractionCreate = (wrapper: Wrapper) => {
+    const { client } = wrapper;
 
-export const onInteractionCreate = ( wrapper : Wrapper ) => {
-      const { client } = wrapper;  
+    const interactionEvent$ = <Observable<Interaction>>fromEvent(client, 'interactionCreate');
 
-      const interactionEvent$ = (<Observable<Interaction>> fromEvent(client, 'interactionCreate'));
+    interactionEvent$
+        .pipe(
+            concatMap(interaction => {
+                if (interaction.isCommand()) {
+                    const modul =
+                        Files.ApplicationCommandStore[interaction.commandType].get(interaction.commandName) ??
+                        Files.BothCommand.get(interaction.commandName);
+                    return applicationCommandHandler(modul, interaction);
+                }
+                return of({});
+            }),
+        )
+        .subscribe(console.log);
 
-      interactionEvent$.pipe(
-        concatMap( interaction => {
-            if(interaction.isCommand()) {
-                const modul = 
-                Files.ApplicationCommandStore[interaction.commandType].get(interaction.commandName)
-                ?? Files.BothCommand.get(interaction.commandName);
-                return of(modul).pipe(
-                   map ( plug => {
-                       console.log('a');
-                       if(plug === undefined) {
-                            return throwError(() => SernError.UndefinedModule);
-                       }
-                       const eventPlugins = plug.plugins.filter(isEventPlugin);
-                       match(interaction)
-                           .when(i => i.isChatInputCommand(), (i : ChatInputCommandInteraction) => {
-                                 console.log('chatI', eventPlugins);
-                           }) 
-                           .when(() => P._, i => {
-                                console.log('other I', eventPlugins); 
-                           });
-                   })
-                );
-            }
-            return of(null);
-        })
-      ).subscribe(console.log);
-
-                       
-
-/**       concatMap (async interaction => {
+    /**       concatMap (async interaction => {
             if (interaction.isChatInputCommand()) {
                 return of(Files.Commands.get(interaction.commandName))
                 .pipe(
@@ -89,7 +117,7 @@ export const onInteractionCreate = ( wrapper : Wrapper ) => {
             else return of();
 
         })
-      ).subscribe({
+     ).subscribe({
        error(e){
         throw e;
        },
@@ -98,6 +126,5 @@ export const onInteractionCreate = ( wrapper : Wrapper ) => {
         //console.log(command);
        },
    });
-   **/
+     **/
 };
-
