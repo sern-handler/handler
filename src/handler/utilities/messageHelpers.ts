@@ -10,6 +10,7 @@ import type { Message } from 'discord.js';
 export function isNotFromBot(message: Message) {
     return !message.author.bot;
 }
+
 /**
  * Checks if the message **starts** with the prefix
  * @param message The message to check
@@ -21,6 +22,7 @@ export function isNotFromBot(message: Message) {
 export function hasPrefix(message: Message, prefix?: string) {
     return message.content.startsWith(prefix!);
 }
+
 /**
  * Removes the first character(s) _[depending on prefix length]_ of the message
  * @param msg

@@ -14,7 +14,7 @@ interface Wrapper {
     readonly client: Client;
     readonly defaultPrefix?: string;
     readonly commands: string;
-    readonly events? : DiscordEvent[];
+    readonly events?: DiscordEvent[];
 }
 
 export default Wrapper;
