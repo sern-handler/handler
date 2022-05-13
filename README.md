@@ -1,7 +1,6 @@
-# Sern Handler
-
-<a href="https://www.npmjs.com/package/@sern/handler">
-<img src="https://img.shields.io/npm/v/@sern/handler?maxAge=3600" alt="NPM version" /></a> <a href="https://www.npmjs.com/package/@sern/handler"><img src="https://img.shields.io/npm/dt/@sern/handler?maxAge=3600" alt="NPM downloads" /></a> <a href="https://www.npmjs.com/package/@sern/handler"><img src="https://img.shields.io/badge/builds-stable" alt="Builds Passing"></a>
+# SernHandler <a href="https://www.npmjs.com/package/@sern/handler"><img src="https://img.shields.io/npm/v/@sern/handler?maxAge=3600" alt="NPM version" /></a>
+<a href="https://www.npmjs.com/package/@sern/handler"><img src="https://img.shields.io/npm/dt/@sern/handler?maxAge=3600" alt="NPM downloads" /></a>
+[![License: MIT](https://img.shields.io/badge/License-MIT-blavk.svg)](https://opensource.org/licenses/MIT)
 
 A customizable, batteries-included, powerful discord.js framework to automate and streamline your bot development.
 
@@ -70,7 +69,11 @@ module.exports = {
 };
 ```
 
-See [documentation](https://sern-handler.js.org) for TypeScript examples and more
+See out [templates](https://github.com/sern-handler/tenplated) for TypeScript examples and more
+
+## CLI
+
+We are providing a [command line interface](https://github.com/sern-handler/cli) for better & easier bot developement. Don't forget to view it.
 
 ## Links
 
@@ -82,7 +85,7 @@ See [documentation](https://sern-handler.js.org) for TypeScript examples and mor
 
 - Read our contribution [guidelines](https://github.com/sern-handler/handler) carefully
 - Pull up on [issues](https://github.com/sern-handler/handler/issues) and tell us, if there are bugs
-- All kinds of contributions are welcomed!
+- All kinds of contributions are welcomed.
 
 ## Roadmap
 
