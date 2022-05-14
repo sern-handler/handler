@@ -28,6 +28,6 @@ export type ModuleStates = {
     [K in ModuleType]: { type: K } & ModuleDefs[K];
 };
 // A handler callback that is called on each ModuleDef
-export type HandlerCallback<K extends ModuleType> = (mod: ModuleStates[K], plugins: SernPlugin<K>[]) => unknown;
+export type HandlerCallback<K extends ModuleType> = (mod: ModuleStates[K], plugins: SernPlugin[]) => unknown;
 //An object that acts as the mapped object to handler
 export type ModuleHandlers = { [K in ModuleType]: HandlerCallback<K> };

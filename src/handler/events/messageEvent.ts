@@ -9,6 +9,7 @@ import { fmt } from '../utilities/messageHelpers';
 import * as Files from '../utilities/readFile';
 import { filterCorrectModule, ignoreNonBot } from './observableHandling';
 import { isEventPlugin } from './readyEvent';
+import { resolveParameters } from '../utilities/resolveParameters';
 
 export const onMessageCreate = (wrapper: Wrapper) => {
     const { client, defaultPrefix } = wrapper;
@@ -47,7 +48,7 @@ export const onMessageCreate = (wrapper: Wrapper) => {
                     if ((ePlug.modType & plugged.mod.type) === 0) {
                         return Err.EMPTY;
                     }
-                    return ePlug.execute([ctx, args], controller);
+                    return ePlug.execute(resolveParameters<CommandType.Both>([ctx, args]), controller);
                 }),
             );
             return from(res).pipe(map(res => ({ plugged, ctx, args, res })));

@@ -9,6 +9,7 @@ import type {
 import type { Override } from '../../../../types/handler';
 import type { CommandType } from '../../../sern';
 import type { BaseModule } from '../module';
+import type { UserContextMenuCommandInteraction } from 'discord.js';
 
 //possible refactoring to interfaces and not types
 export type TextCommand = {
@@ -29,7 +30,7 @@ export type BothCommand = {
 
 export type ContextMenuUser = {
     type: CommandType.MenuUser;
-} & Override<BaseModule, { execute: (ctx: ContextMenuCommandInteraction) => Awaitable<void> }>;
+} & Override<BaseModule, { execute: (ctx: UserContextMenuCommandInteraction) => Awaitable<void> }>;
 export type ContextMenuMsg = {
     type: CommandType.MenuMsg;
 } & Override<BaseModule, { execute: (ctx: MessageContextMenuCommandInteraction) => Awaitable<void> }>;
