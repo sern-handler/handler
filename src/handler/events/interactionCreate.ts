@@ -54,7 +54,7 @@ function applicationCommandHandler<
                         resolveParameters<CommandType.MenuMsg | CommandType.MenuUser>(args
                         ), controller);
 
-                });
+                }) as Awaited<Result<void, void>>[];
                 return of({ res, mod, ctx });
             },
         )
@@ -73,13 +73,13 @@ function messageComponentInteractionHandler(
         .with({ componentType : ComponentType.Button }, (i : ButtonInteraction) => {
             const res = eventPlugins.map(e => {
                 return e.execute(resolveParameters<CommandType.Button>([i]), controller);
-            });
+            }) as Awaited<Result<void, void>>[];
             return of({ res, mod, i});
         })
         .with( { componentType : ComponentType.SelectMenu }, (i : SelectMenuInteraction) => {
             const res = eventPlugins.map(e => {
                 return e.execute(resolveParameters<CommandType.MenuSelect>([i]), controller);
-            });
+            }) as Awaited<Result<void, void>>[];
             return of({ res, mod, i});
         })
         .with( { componentType : ComponentType.TextInput },  _ => {
