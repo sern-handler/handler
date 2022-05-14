@@ -18,6 +18,8 @@ import { CommandType, controller } from '../sern';
 import { resolveParameters } from '../utilities/resolveParameters';
 import type { Args } from '../../types/handler';
 import type { MessageComponentInteraction } from 'discord.js';
+import { ButtonInteraction, ComponentType, SelectMenuInteraction } from 'discord.js';
+
 
 function applicationCommandHandler<
     T extends CommandType.Both | CommandType.MenuUser | CommandType.MenuMsg | CommandType.Slash,
@@ -60,10 +62,33 @@ function applicationCommandHandler<
 }
 
 function messageComponentInteractionHandler(
-    modul: PluggedModule | undefined,
+    mod: PluggedModule | undefined,
     interaction: MessageComponentInteraction,
 ) {
-    return of(modul);
+    if (mod === undefined) {
+        return throwError(() => SernError.UndefinedModule);
+    }
+    const eventPlugins = mod.plugins.filter(isEventPlugin);
+    return match(interaction)
+        .with({ componentType : ComponentType.Button }, (i : ButtonInteraction) => {
+            const res = eventPlugins.map(e => {
+                return e.execute(resolveParameters<CommandType.Button>([i]), controller);
+            });
+            return of({ res, mod, i});
+        })
+        .with( { componentType : ComponentType.SelectMenu }, (i : SelectMenuInteraction) => {
+            const res = eventPlugins.map(e => {
+                return e.execute(resolveParameters<CommandType.MenuSelect>([i]), controller);
+            });
+            return of({ res, mod, i});
+        })
+        .with( { componentType : ComponentType.TextInput },  _ => {
+            return throwError(() => SernError.NotImplemented);
+        } )
+        .with( { componentType : P._ }, i => {
+            return throwError(() => SernError.NotSupportedInteraction);
+        })
+        .exhaustive();
 }
 
 export const onInteractionCreate = (wrapper: Wrapper) => {
