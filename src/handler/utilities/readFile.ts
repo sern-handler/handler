@@ -14,6 +14,7 @@ export const ApplicationCommandStore = {
 export const MessageCompCommandStore = {
     [ComponentType.Button]: new Map<string, PluggedModule>(),
     [ComponentType.SelectMenu]: new Map<string, PluggedModule>(),
+    [ComponentType.TextInput] : new Map<string, PluggedModule>()
 };
 export const TextCommandStore = {
     text: new Map<string, PluggedModule>(),

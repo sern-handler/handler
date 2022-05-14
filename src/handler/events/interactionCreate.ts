@@ -15,9 +15,9 @@ import Context from '../structures/context';
 import type { Result } from 'ts-results';
 import type { PluggedModule } from '../structures/modules/module';
 import { CommandType, controller } from '../sern';
-import type { EventPlugin } from '../plugins/plugin';
 import { resolveParameters } from '../utilities/resolveParameters';
 import type { Args } from '../../types/handler';
+import type { MessageComponentInteraction } from 'discord.js';
 
 function applicationCommandHandler<
     T extends CommandType.Both | CommandType.MenuUser | CommandType.MenuMsg | CommandType.Slash,
@@ -59,6 +59,13 @@ function applicationCommandHandler<
         .run();
 }
 
+function messageComponentInteractionHandler(
+    modul: PluggedModule | undefined,
+    interaction: MessageComponentInteraction,
+) {
+    return of(modul);
+}
+
 export const onInteractionCreate = (wrapper: Wrapper) => {
     const { client } = wrapper;
 
@@ -72,6 +79,12 @@ export const onInteractionCreate = (wrapper: Wrapper) => {
                         Files.ApplicationCommandStore[interaction.commandType].get(interaction.commandName) ??
                         Files.BothCommand.get(interaction.commandName);
                     return applicationCommandHandler(modul, interaction);
+                }
+                if (interaction.isMessageComponent()) {
+                    const modul = Files
+                        .MessageCompCommandStore[interaction.componentType]
+                        .get(interaction.customId);
+                    return messageComponentInteractionHandler(modul, interaction);
                 }
                 return of({});
             }),
