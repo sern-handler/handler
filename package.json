@@ -11,7 +11,8 @@
     "release": "standard-version && git push --follow-tags",
     "test": "jest --coverage --verbose",
     "commit": "cz",
-    "docs" : "typedoc src/index.ts --out docs"
+    "docs" : "typedoc src/index.ts --out docs",
+    "format": "prettier --check ."
   },
   "keywords": [
     "sern-handler",
@@ -28,21 +29,23 @@
     "@typescript-eslint/parser": "^5.10.2",
     "dayjs": "^1.10.7",
     "discord.js": "^13.6.0",
-    "eslint": "^8.8.0",
-    "prettier": "^2.5.1",
     "ts-results": "^3.3.0"
   },
   "devDependencies": {
-    "@babel/core": "7.17.10",
-    "@babel/preset-env": "7.17.10",
-    "@babel/preset-typescript": "7.16.7",
-    "@types/jest": "27.5.0",
-    "babel-jest": "27.5.1",
-    "cz-conventional-changelog": "3.3.0",
-    "jest": "27.5.1",
-    "standard-version": "9.3.2",
-    "typedoc": "0.22.15",
-    "typescript": "4.6.4"
+    "eslint": "^8.8.0",
+    "@typescript-eslint/parser": "^5.10.2",
+    "@typescript-eslint/eslint-plugin": "^5.10.2",
+    "@babel/core": "^7.17.2",
+    "@babel/preset-env": "^7.16.11",
+    "@babel/preset-typescript": "^7.16.7",
+    "@types/jest": "^27.4.0",
+    "babel-jest": "^27.5.1",
+    "cz-conventional-changelog": "^3.0.1",
+    "jest": "^27.5.1",
+    "prettier": "2.6.2",
+    "standard-version": "^9.3.2",
+    "typedoc": "^0.22.11",
+    "typescript": "^4.5.5"
   },
   "config": {
     "commitizen": {
