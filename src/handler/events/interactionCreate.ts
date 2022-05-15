@@ -5,7 +5,7 @@ import type {
     MessageContextMenuCommandInteraction as MessageCtxInt,
     UserContextMenuCommandInteraction as UserCtxInt,
 } from 'discord.js';
-import { concatMap, fromEvent, Observable, of, throwError, map } from 'rxjs';
+import { concatMap, fromEvent, Observable, of, throwError } from 'rxjs';
 import type Wrapper from '../structures/wrapper';
 import * as Files from '../utilities/readFile';
 import { isEventPlugin } from './readyEvent';
@@ -100,9 +100,7 @@ export const onInteractionCreate = (wrapper: Wrapper) => {
                 else return throwError(() => SernError.NotSupportedInteraction);
             }),
         )
-        .subscribe(modul => {
-
-        });
+        .subscribe(console.log);
 
 
 };

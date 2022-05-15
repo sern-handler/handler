@@ -61,9 +61,9 @@ export function plugins<T extends CommandType, V extends EventPlugin<T> | Comman
     return plug;
 }
 
-export function sernModule(plugins: { command: CommandPlugin[]; onEvent: EventPlugin[] }, mod: Module): PluggedModule {
+export function sernModule(plugins: SernPlugin[] , mod: Module): PluggedModule {
     return {
         mod,
-        plugins: [...plugins.command, ...plugins.onEvent],
+        plugins,
     };
 }
