@@ -1,3 +1,11 @@
+/*
+ * ---------------------------------------------------------------------
+ *  Copyright (C) 2022 Sern
+ *  This software is licensed under the MIT License.
+ *  See LICENSE.md in the project root for license information.
+ * ---------------------------------------------------------------------
+ */
+
 import {  first, from, fromEvent } from 'rxjs';
 import { basename } from 'path';
 import * as Files from '../utilities/readFile';
