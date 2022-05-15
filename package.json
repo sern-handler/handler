@@ -12,7 +12,7 @@
     "test": "jest --coverage --verbose",
     "commit": "cz",
     "docs" : "typedoc src/index.ts --out docs",
-    "format": "prettier --check ."
+    "format": "prettier --check ./src ./tests ./README.md"
   },
   "keywords": [
     "sern-handler",
