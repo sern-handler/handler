@@ -1,11 +1,18 @@
+/*
+ * ---------------------------------------------------------------------
+ *  Copyright (C) 2022 Sern
+ *  This software is licensed under the MIT License.
+ *  See LICENSE.md in the project root for license information.
+ * ---------------------------------------------------------------------
+ */
 
 export enum sEvent {
-    GLOBAL_SLASH,
-    LOCAL_SLASH,
-    MISUSE_CMD,
-    DM,
-    CRASH,
-    TEXT_CMD,
+  GLOBAL_SLASH,
+  LOCAL_SLASH,
+  MISUSE_CMD,
+  DM,
+  CRASH,
+  TEXT_CMD,
 }
 
 export default class Logger {
