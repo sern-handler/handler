@@ -1,9 +1,16 @@
+/*
+ * ---------------------------------------------------------------------
+ *  Copyright (C) 2022 Sern
+ *  This software is licensed under the MIT License.
+ *  See LICENSE.md in the project root for license information.
+ * ---------------------------------------------------------------------
+ */
+
 import { readdirSync, statSync } from 'fs';
 import { join } from 'path';
 import type { Module } from '../structures/modules/commands/module';
 import { SernError } from '../structures/errors';
 
-//We can look into lazily loading modules once everything is set
 export const ContextMenuUser = new Map<string, Module>();
 export const ContextMenuMsg = new Map<string, Module>();
 export const Commands = new Map<string, Module>();
@@ -11,8 +18,7 @@ export const Alias = new Map<string, Module>();
 export const Buttons = new Map<string, Module>();
 export const SelectMenus = new Map<string, Module>();
 
-
-// Courtesy @Townsy45
+// Thanks to @Townsy45
 function readPath(dir: string, arrayOfFiles: string[] = []): string[] {
   try {
     const files = readdirSync(dir);
