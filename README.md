@@ -69,7 +69,7 @@ module.exports = {
 };
 ```
 
-See out [templates](https://github.com/sern-handler/tenplated) for TypeScript examples and more
+See our [templates](https://github.com/sern-handler/tenplated) for TypeScript examples and more
 
 ## CLI
 
