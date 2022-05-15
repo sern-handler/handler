@@ -31,9 +31,11 @@ export type BothCommand = {
 export type ContextMenuUser = {
     type: CommandType.MenuUser;
 } & Override<BaseModule, { execute: (ctx: UserContextMenuCommandInteraction) => Awaitable<void> }>;
+
 export type ContextMenuMsg = {
     type: CommandType.MenuMsg;
 } & Override<BaseModule, { execute: (ctx: MessageContextMenuCommandInteraction) => Awaitable<void> }>;
+
 export type ButtonCommand = {
     type: CommandType.Button;
 } & Override<BaseModule, { execute: (ctx: ButtonInteraction) => Awaitable<void> }>;

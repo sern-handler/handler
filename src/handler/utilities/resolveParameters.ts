@@ -1,18 +1,7 @@
-import type { CommandType } from '../sern';
-import type { ModuleDefs } from '../structures/modules/commands/moduleHandler';
-import type { ParseType } from '../../types/handler';
-
-type ParamMap<T extends CommandType> = {
-    [K in T] : Parameters<ModuleDefs[K]['execute']>
-}[T]
-
-
-/**
- * Identity function x => x to narrow type of parameters
- * @param params
- */
-export function resolveParameters<T extends CommandType>
-    ( params: ParamMap<T> )
-    {
-    return params;
-}
+export type UnionToTuple<T> = T extends readonly [ infer V, infer S ]
+    ? V extends V
+        ? S extends S
+            ? [ V, S ]
+            : [ V ]
+        : never
+    : never;
