@@ -14,18 +14,19 @@
 import type { Awaitable, Client } from 'discord.js';
 import type { Err, Ok, Result } from 'ts-results';
 import type { Module, Override, Wrapper } from '../..';
-import type { CommandType } from '../sern';
 import type { ModuleDefs } from '../structures/modules/commands/moduleHandler';
 import type { BaseModule } from '../structures/modules/module';
+import type { CommandType } from '../sern';
 
-export enum PluginType {
-    Command = 0b01,
-    Event = 0b10,
-}
 
 export interface Controller {
     next: () => Ok<void>;
     stop: () => Err<void>;
+}
+
+export enum PluginType {
+    Command = 0b01,
+    Event = 0b10,
 }
 
 type executeCmdPlugin = { execute: (wrapper: Wrapper, controller: Controller) => Result<void, void> };
