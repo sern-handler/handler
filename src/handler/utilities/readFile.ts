@@ -2,23 +2,23 @@ import { ApplicationCommandType, ComponentType } from 'discord.js';
 import { readdirSync, statSync } from 'fs';
 import { join } from 'path';
 import { from, Observable } from 'rxjs';
-import type { PluggedModule } from '../structures/modules/module';
+import type { Module } from '../structures/modules/commands/module';
 
-export const BothCommand = new Map<string, PluggedModule>();
+export const BothCommand = new Map<string, Module>();
 export const ApplicationCommandStore = {
-    [ApplicationCommandType.User]: new Map<string, PluggedModule>(),
-    [ApplicationCommandType.Message]: new Map<string, PluggedModule>(),
-    [ApplicationCommandType.ChatInput]: new Map<string, PluggedModule>(),
-} as { [K in ApplicationCommandType]: Map<string, PluggedModule> };
+    [ApplicationCommandType.User]: new Map<string, Module>(),
+    [ApplicationCommandType.Message]: new Map<string, Module>(),
+    [ApplicationCommandType.ChatInput]: new Map<string, Module>(),
+} as { [K in ApplicationCommandType]: Map<string, Module> };
 
 export const MessageCompCommandStore = {
-    [ComponentType.Button]: new Map<string, PluggedModule>(),
-    [ComponentType.SelectMenu]: new Map<string, PluggedModule>(),
-    [ComponentType.TextInput] : new Map<string, PluggedModule>()
+    [ComponentType.Button]: new Map<string, Module>(),
+    [ComponentType.SelectMenu]: new Map<string, Module>(),
+    [ComponentType.TextInput] : new Map<string, Module>()
 };
 export const TextCommandStore = {
-    text: new Map<string, PluggedModule>(),
-    aliases: new Map<string, PluggedModule>(),
+    text: new Map<string, Module>(),
+    aliases: new Map<string, Module>(),
 };
 
 // Courtesy @Townsy45
@@ -40,19 +40,19 @@ export const fmtFileName = (n: string) => n.substring(0, n.length - 3);
 
 /**
  *
- * @returns {Observable<{ mod: PluggedModule; absPath: string; }[]>} data from command files
+ * @returns {Observable<{ mod: Module; absPath: string; }[]>} data from command files
  * @param commandDir
  */
 
 export function buildData(commandDir: string): Observable<{
-    plugged: PluggedModule;
+    mod: Module;
     absPath: string;
 }> {
     return from(
         getCommands(commandDir).map(absPath => {
             // eslint-disable-next-line @typescript-eslint/no-var-requires
-            const plugged = <PluggedModule>require(absPath).module;
-            return { plugged, absPath };
+            const mod = <Module>require(absPath).module;
+            return { mod, absPath };
         }),
     );
 }

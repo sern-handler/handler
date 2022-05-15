@@ -7,8 +7,8 @@
 // The goal of plugins is to organize commands and
 // provide extensions to repetitive patterns
 // examples include refreshing modules,
-// categorizing commands, cooldowns, permissions, etc
-// Plugins are reminisce of middleware in express.
+// categorizing commands, cooldowns, permissions, etc.
+// Plugins are reminiscent of middleware in express.
 //
 
 import type { Awaitable, Client } from 'discord.js';
@@ -16,7 +16,7 @@ import type { Err, Ok, Result } from 'ts-results';
 import type { Module, Override, Wrapper } from '../..';
 import type { CommandType } from '../sern';
 import type { ModuleDefs } from '../structures/modules/commands/moduleHandler';
-import type { BaseModule, PluggedModule } from '../structures/modules/module';
+import type { BaseModule } from '../structures/modules/module';
 
 export enum PluginType {
     Command = 0b01,
@@ -45,7 +45,7 @@ export type CommandPlugin = {
 
 //TODO: rn adding the modType check a little hackish. Find better way to determine the
 // module type of the event plugin
-export type EventPlugin<T extends CommandType = CommandType> = {
+export type EventPlugin<T extends CommandType> = {
     type: PluginType.Event;
     modType: T;
 } & Override<
@@ -54,16 +54,13 @@ export type EventPlugin<T extends CommandType = CommandType> = {
         execute: (event: Parameters<ModuleDefs[T]['execute']>, controller: Controller) => Awaitable<Result<void, void>>;
     }
 >;
+export function plugins(...plug: CommandPlugin[]) : CommandPlugin[];
+export function plugins<T extends CommandType>(...plug: EventPlugin<T>[]): EventPlugin<T>[];
 
-export type SernPlugin = CommandPlugin | EventPlugin;
-
-export function plugins(...plug: SernPlugin[]) {
+export function plugins<T extends CommandType>(...plug : CommandPlugin[] | EventPlugin<T>[]) {
     return plug;
 }
 
-export function sernModule(plugins: SernPlugin[] , mod: Module): PluggedModule {
-    return {
-        mod,
-        plugins,
-    };
+export function sernModule(mod: Module): Module {
+    return mod;
 }

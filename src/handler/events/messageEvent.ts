@@ -8,7 +8,6 @@ import type Wrapper from '../structures/wrapper';
 import { fmt } from '../utilities/messageHelpers';
 import * as Files from '../utilities/readFile';
 import { filterCorrectModule, ignoreNonBot } from './observableHandling';
-import { isEventPlugin } from './readyEvent';
 
 export const onMessageCreate = (wrapper: Wrapper) => {
     const { client, defaultPrefix } = wrapper;
@@ -40,25 +39,24 @@ export const onMessageCreate = (wrapper: Wrapper) => {
     );
 
     const processEventPlugins$ = ensureModuleType$.pipe(
-        concatMap(({ ctx, args, mod: plugged }) => {
-            const eventPlugins = plugged.plugins.filter(isEventPlugin);
+        concatMap(({ ctx, args, mod }) => {
             const res = Promise.all(
-                eventPlugins.map(ePlug => {
-                    if ((ePlug.modType & plugged.mod.type) === 0) {
+                mod.onEvent.map(ePlug => {
+                    if ((ePlug.modType & mod.type) === 0) {
                         return Err.EMPTY;
                     }
                     return ePlug.execute([ctx, args], controller);
                 }),
             );
-            return from(res).pipe(map(res => ({ plugged, ctx, args, res })));
+            return from(res).pipe(map(res => ({ mod, ctx, args, res })));
         }),
     );
 
-    processEventPlugins$.subscribe(({ plugged, ctx, args, res }) => {
+    processEventPlugins$.subscribe(({ mod, ctx, args, res }) => {
         if (res.every(pl => pl.ok)) {
-            Promise.resolve(plugged.mod.execute(ctx, args)).then(() => console.log(plugged));
+            Promise.resolve(mod.execute(ctx, args)).then(() => console.log(mod));
         } else {
-            console.log(plugged, 'failed');
+            console.log(mod, 'failed');
         }
     });
 };

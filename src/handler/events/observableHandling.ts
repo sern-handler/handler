@@ -3,25 +3,24 @@ import { Observable, throwError } from 'rxjs';
 import type { ModuleDefs } from '../structures/modules/commands/moduleHandler';
 import { SernError } from '../structures/errors';
 import { isNotFromBot } from '../utilities/messageHelpers';
-import type { PluggedModule } from '../structures/modules/module';
-import type { SernPlugin } from '../plugins/plugin';
+import type { Module } from '../structures/modules/commands/module';
 
 export function correctModuleType<T extends keyof ModuleDefs>(
-    plug: PluggedModule | undefined,
+    plug: Module | undefined,
     type: T,
-): plug is { mod: ModuleDefs[T]; plugins: SernPlugin[] } {
-    return plug !== undefined && plug.mod.type === type;
+): plug is ModuleDefs[T] {
+    return plug !== undefined && plug.type === type;
 }
 
 export function filterCorrectModule<T extends keyof ModuleDefs>(cmdType: T) {
-    return (src: Observable<PluggedModule | undefined>) =>
-        new Observable<{ mod: ModuleDefs[T]; plugins: SernPlugin[] }>(subscriber => {
+    return (src: Observable<Module | undefined>) =>
+        new Observable<ModuleDefs[T]>(subscriber => {
             return src.subscribe({
-                next(plug) {
-                    if (correctModuleType(plug, cmdType)) {
-                        subscriber.next({ mod: plug.mod, plugins: plug.plugins });
+                next(mod) {
+                    if (correctModuleType(mod, cmdType)) {
+                        subscriber.next(mod);
                     } else {
-                        if (plug === undefined) {
+                        if (mod === undefined) {
                             return throwError(() => SernError.UndefinedModule);
                         }
                         return throwError(() => SernError.MismatchModule);

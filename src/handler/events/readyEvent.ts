@@ -9,28 +9,26 @@ import type {
     ModuleType,
 } from '../structures/modules/commands/moduleHandler';
 import { CommandType } from '../sern';
-import { CommandPlugin, EventPlugin, PluginType, SernPlugin } from '../plugins/plugin';
-import { partition } from '../utilities/partition';
+import type { PluginType } from '../plugins/plugin';
 import { Err, Ok, Result } from 'ts-results';
-import type { PluggedModule } from '../structures/modules/module';
 import type { Awaitable } from 'discord.js';
+import type { Module } from '../structures/modules/commands/module';
 
 export const onReady = (wrapper: Wrapper) => {
     const { client, commands } = wrapper;
     const ready$ = fromEvent(client, 'ready').pipe(take(1), skip(1));
     const processCommandFiles$ = Files.buildData(commands).pipe(
-        map(({ plugged, absPath }) => {
-            const name = plugged.mod?.name ?? Files.fmtFileName(basename(absPath));
-            if (plugged.mod?.name === undefined) {
-                return { mod: { name, ...plugged.mod }, plugins: plugged.plugins };
+        map(({ mod, absPath }) => {
+            const name = mod?.name ?? Files.fmtFileName(basename(absPath));
+            if (mod?.name === undefined) {
+                return  { name, ...mod } ;
             }
-            return plugged;
+            return mod;
         }),
     );
     const processPlugins$ = processCommandFiles$.pipe(
-        concatMap(({ mod, plugins: allPlugins }) => {
-            const [cmdPlugins, eventPlugins] = partition(isCmdPlugin, allPlugins);
-            const cmdPluginsRes = cmdPlugins.map(plug => {
+        concatMap(( mod ) => {
+            const cmdPluginsRes = mod.plugins.map(plug => {
                 return {
                     ...plug,
                     name: plug?.name ?? 'Unnamed Plugin',
@@ -40,13 +38,13 @@ export const onReady = (wrapper: Wrapper) => {
                     }),
                 };
             });
-            return of({ plugged: <PluggedModule>{ mod, plugins: eventPlugins }, cmdPluginsRes });
+            return of({ mod , cmdPluginsRes });
         }),
     );
 
     (
         concat(ready$, processPlugins$) as Observable<{
-            plugged: PluggedModule;
+            mod: Module;
             cmdPluginsRes: {
                 execute: Awaitable<Result<void, void>>;
                 type: PluginType.Command;
@@ -62,11 +60,10 @@ export const onReady = (wrapper: Wrapper) => {
                 ),
             ),
         )
-        .subscribe(({ plugged, cmdPluginsRes }) => {
+        .subscribe(({ mod, cmdPluginsRes }) => {
             const loadedPluginsCorrectly = cmdPluginsRes.every(res => res.execute.ok);
-            const { mod, plugins } = plugged;
             if (loadedPluginsCorrectly) {
-                registerModule(mod.name!, mod, plugins);
+                registerModule(mod.name!, mod);
             } else {
                 console.log(`Failed to load command ${mod.name!}`);
                 console.log(mod);
@@ -76,40 +73,32 @@ export const onReady = (wrapper: Wrapper) => {
 
 function handler(name: string): ModuleHandlers {
     return {
-        [CommandType.Text]: (mod, plugins) => {
-            mod.alias.forEach(a => Files.TextCommandStore.aliases.set(a, { mod, plugins }));
-            Files.TextCommandStore.text.set(name, { mod, plugins });
+        [CommandType.Text]: (mod) => {
+            mod.alias.forEach(a => Files.TextCommandStore.aliases.set(a, mod));
+            Files.TextCommandStore.text.set(name, mod);
         },
-        [CommandType.Slash]: (mod, plugins) => {
-            Files.ApplicationCommandStore[1].set(name, { mod, plugins });
+        [CommandType.Slash]: (mod) => {
+            Files.ApplicationCommandStore[1].set(name, mod);
         },
-        [CommandType.Both]: (mod, plugins) => {
-            Files.BothCommand.set(name, { mod, plugins });
-            mod.alias.forEach(a => Files.TextCommandStore.aliases.set(a, { mod, plugins }));
+        [CommandType.Both]: (mod) => {
+            Files.BothCommand.set(name, mod);
+            mod.alias.forEach(a => Files.TextCommandStore.aliases.set(a, mod));
         },
-        [CommandType.MenuUser]: (mod, plugins) => {
-            Files.ApplicationCommandStore[2].set(name, { mod, plugins });
+        [CommandType.MenuUser]: (mod) => {
+            Files.ApplicationCommandStore[2].set(name, mod);
         },
-        [CommandType.MenuMsg]: (mod, plugins) => {
-            Files.ApplicationCommandStore[3].set(name, { mod, plugins });
+        [CommandType.MenuMsg]: (mod) => {
+            Files.ApplicationCommandStore[3].set(name, mod);
         },
-        [CommandType.Button]: (mod, plugins) => {
-            Files.MessageCompCommandStore[2].set(name, { mod, plugins });
+        [CommandType.Button]: (mod) => {
+            Files.MessageCompCommandStore[2].set(name, mod);
         },
-        [CommandType.MenuSelect]: (mod, plugins) => {
-            Files.MessageCompCommandStore[2].set(name, { mod, plugins });
+        [CommandType.MenuSelect]: (mod) => {
+            Files.MessageCompCommandStore[2].set(name, mod);
         },
     };
 }
 
-function isCmdPlugin(p: SernPlugin): p is CommandPlugin {
-    return (p.type & PluginType.Command) !== 0;
-}
-
-export function isEventPlugin<T extends CommandType>(p: SernPlugin): p is EventPlugin {
-    return (p.type & PluginType.Event) !== 0;
-}
-
-function registerModule<T extends ModuleType>(name: string, mod: ModuleStates[T], plugins: SernPlugin[]) {
-    return (<HandlerCallback<CommandType>>handler(name)[mod.type])(mod, plugins);
+function registerModule<T extends ModuleType>(name: string, mod: ModuleStates[T]) {
+    return (<HandlerCallback<CommandType>>handler(name)[mod.type])(mod);
 }
