@@ -21,13 +21,13 @@ export const onReady = (wrapper: Wrapper) => {
         map(({ mod, absPath }) => {
             const name = mod?.name ?? Files.fmtFileName(basename(absPath));
             if (mod?.name === undefined) {
-                return  { name, ...mod } ;
+                return { name, ...mod };
             }
             return mod;
         }),
     );
     const processPlugins$ = processCommandFiles$.pipe(
-        concatMap(( mod ) => {
+        concatMap((mod) => {
             const cmdPluginsRes = mod.plugins.map(plug => {
                 return {
                     ...plug,
@@ -38,7 +38,7 @@ export const onReady = (wrapper: Wrapper) => {
                     }),
                 };
             });
-            return of({ mod , cmdPluginsRes });
+            return of({ mod, cmdPluginsRes });
         }),
     );
 

@@ -21,9 +21,10 @@ import type { Module } from '../structures/modules/commands/module';
 import type { EventPlugin } from '../plugins/plugin';
 
 
-function isChatInputCommand(i : CommandInteraction) : i is ChatInputCommandInteraction {
+function isChatInputCommand(i: CommandInteraction): i is ChatInputCommandInteraction {
     return i.isChatInputCommand();
 }
+
 function applicationCommandHandler(mod: Module | undefined, interaction: CommandInteraction) {
     if (mod === undefined) {
         return throwError(() => SernError.UndefinedModule);
@@ -32,27 +33,27 @@ function applicationCommandHandler(mod: Module | undefined, interaction: Command
 
     return match(interaction)
         .when(isChatInputCommand, i => {
-            const ctx = Context.wrap(i);
-            const res  = eventPlugins.map(e => {
+                const ctx = Context.wrap(i);
+                const res = eventPlugins.map(e => {
                     return (<EventPlugin<CommandType.Both>>e).execute(
-                       [ctx, <Args>['slash', i.options]]
+                        [ctx, <Args>['slash', i.options]]
                         , controller);
                 }) as Awaited<Result<void, void>>[];
                 //Possible unsafe cast
                 // could result in the promises not being resolved
-                return of({ type : mod.type, res, plugged: mod, ctx });
+                return of({ type: mod.type, res, plugged: mod, ctx });
             },
         )
         .when(
             () => P._,
-            (ctx : UserCtxInt | MessageCtxInt) => {
+            (ctx: UserCtxInt | MessageCtxInt) => {
                 //Kinda hackish
                 const res = eventPlugins.map(e => {
                     return e.execute(
-                            [ctx] as UnionToTuple<CommandType.MenuMsg | CommandType.MenuUser>
+                        [ctx] as UnionToTuple<CommandType.MenuMsg | CommandType.MenuUser>
                         , controller);
                 }) as Awaited<Result<void, void>>[];
-                return of({ type : mod.type,  res,  plugged: mod, ctx });
+                return of({ type: mod.type, res, plugged: mod, ctx });
             },
         )
         .run();
@@ -68,14 +69,14 @@ function messageComponentInteractionHandler(
     const eventPlugins = mod.onEvent;
     return match(interaction)
         .with({
-                componentType : P.union(ComponentType.Button, ComponentType.SelectMenu)
-            },(ctx ) => {
+            componentType: P.union(ComponentType.Button, ComponentType.SelectMenu),
+        }, (ctx) => {
             const res = eventPlugins.map(e => {
                 return e.execute([ctx] as UnionToTuple<CommandType.Button | CommandType.MenuSelect>, controller);
             }) as Awaited<Result<void, void>>[];
-            return of({ type : mod.type, res,  plugged: mod, ctx });
+            return of({ type: mod.type, res, plugged: mod, ctx });
         })
-        .otherwise(() => throwError( () => SernError.NotSupportedInteraction) );
+        .otherwise(() => throwError(() => SernError.NotSupportedInteraction));
 }
 
 export const onInteractionCreate = (wrapper: Wrapper) => {
@@ -98,8 +99,7 @@ export const onInteractionCreate = (wrapper: Wrapper) => {
                         .MessageCompCommandStore[interaction.componentType]
                         .get(interaction.customId);
                     return messageComponentInteractionHandler(modul, interaction);
-                }
-                else return throwError(() => SernError.NotSupportedInteraction);
+                } else return throwError(() => SernError.NotSupportedInteraction);
             }),
         )
         .subscribe(console.log);

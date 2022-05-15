@@ -36,28 +36,25 @@ interface BasePlugin extends Override<BaseModule, executeCmdPlugin> {
 
 export type CommandPlugin = {
     type: PluginType.Command;
-} & Override<
-    BasePlugin,
+} & Override<BasePlugin,
     {
         execute: (wrapper: Client, module: Module, controller: Controller) => Awaitable<Result<void, void>>;
-    }
->;
+    }>;
 
 //TODO: rn adding the modType check a little hackish. Find better way to determine the
 // module type of the event plugin
 export type EventPlugin<T extends CommandType> = {
     type: PluginType.Event;
     modType: T;
-} & Override<
-    BasePlugin,
+} & Override<BasePlugin,
     {
         execute: (event: Parameters<ModuleDefs[T]['execute']>, controller: Controller) => Awaitable<Result<void, void>>;
-    }
->;
-export function plugins(...plug: CommandPlugin[]) : CommandPlugin[];
+    }>;
+
+export function plugins(...plug: CommandPlugin[]): CommandPlugin[];
 export function plugins<T extends CommandType>(...plug: EventPlugin<T>[]): EventPlugin<T>[];
 
-export function plugins<T extends CommandType>(...plug : CommandPlugin[] | EventPlugin<T>[]) {
+export function plugins<T extends CommandType>(...plug: CommandPlugin[] | EventPlugin<T>[]) {
     return plug;
 }
 
