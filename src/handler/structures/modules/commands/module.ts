@@ -2,7 +2,6 @@ import type {
     ApplicationCommandOptionData,
     Awaitable,
     ButtonInteraction,
-    ContextMenuCommandInteraction,
     MessageContextMenuCommandInteraction,
     SelectMenuInteraction,
 } from 'discord.js';

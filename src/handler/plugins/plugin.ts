@@ -57,7 +57,7 @@ export type EventPlugin<T extends CommandType = CommandType> = {
 
 export type SernPlugin = CommandPlugin | EventPlugin;
 
-export function plugins<T extends CommandType, V extends EventPlugin<T> | CommandPlugin>(...plug: V[]) {
+export function plugins(...plug: SernPlugin[]) {
     return plug;
 }
 

@@ -23,15 +23,15 @@ import type { UnionToTuple } from '../utilities/resolveParameters';
 function isChatInputCommand(i : CommandInteraction) : i is ChatInputCommandInteraction {
     return i.isChatInputCommand();
 }
-function applicationCommandHandler(plugged: PluggedModule | undefined, interaction: CommandInteraction) {
+function applicationCommandHandler(plugged: PluggedModule| undefined, interaction: CommandInteraction) {
     if (plugged === undefined) {
         return throwError(() => SernError.UndefinedModule);
     }
     const eventPlugins = plugged.plugins.filter(isEventPlugin);
     return match(interaction)
         .when(isChatInputCommand, i => {
-                const ctx = Context.wrap(i);
-                const res = eventPlugins.map(e => {
+            const ctx = Context.wrap(i);
+            const res = eventPlugins.map(e => {
                     return e.execute(
                        [ctx, <Args>['slash', i.options]]
                         , controller);
@@ -73,7 +73,7 @@ function messageComponentInteractionHandler(
             }) as Awaited<Result<void, void>>[];
             return of({ type : plugged.mod.type, res,  plugged, ctx });
         })
-        .otherwise(_ => throwError( () => SernError.NotSupportedInteraction) );
+        .otherwise(() => throwError( () => SernError.NotSupportedInteraction) );
 }
 
 export const onInteractionCreate = (wrapper: Wrapper) => {

@@ -10,7 +10,7 @@ import type {
 } from '../structures/modules/commands/moduleHandler';
 import { CommandType } from '../sern';
 import { CommandPlugin, EventPlugin, PluginType, SernPlugin } from '../plugins/plugin';
-import { partition } from './observableHandling';
+import { partition } from '../utilities/partition';
 import { Err, Ok, Result } from 'ts-results';
 import type { PluggedModule } from '../structures/modules/module';
 import type { Awaitable } from 'discord.js';
@@ -106,7 +106,7 @@ function isCmdPlugin(p: SernPlugin): p is CommandPlugin {
     return (p.type & PluginType.Command) !== 0;
 }
 
-export function isEventPlugin(p: SernPlugin): p is EventPlugin {
+export function isEventPlugin<T extends CommandType>(p: SernPlugin): p is EventPlugin {
     return (p.type & PluginType.Event) !== 0;
 }
 
