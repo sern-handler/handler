@@ -23,9 +23,9 @@ export const onMessageCreate = (wrapper: Wrapper) => {
                 ctx: Context.wrap(message), //TODO : check for BothCommand
                 args: <Args>['text', rest],
                 mod:
-                    Files.ApplicationCommandStore[1].get(prefix) ??
-                    Files.BothCommand.get(prefix) ??
-                    Files.TextCommandStore.aliases.get(prefix),
+                    Files.ApplicationCommands[1].get(prefix) ??
+                    Files.BothCommands.get(prefix) ??
+                    Files.TextCommands.aliases.get(prefix),
             };
         }),
     );

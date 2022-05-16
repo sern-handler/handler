@@ -17,7 +17,7 @@ import type { Args } from '../../types/handler';
 import type { MessageComponentInteraction } from 'discord.js';
 import { ComponentType } from 'discord.js';
 import type { UnionToTuple } from '../utilities/resolveParameters';
-import type { Module } from '../structures/modules/commands/module';
+import type { Module } from '../structures/module';
 import type { EventPlugin } from '../plugins/plugin';
 
 
@@ -90,13 +90,13 @@ export const onInteractionCreate = (wrapper: Wrapper) => {
             concatMap(interaction => {
                 if (interaction.isCommand()) {
                     const modul =
-                        Files.ApplicationCommandStore[interaction.commandType].get(interaction.commandName) ??
-                        Files.BothCommand.get(interaction.commandName);
+                        Files.ApplicationCommands[interaction.commandType].get(interaction.commandName) ??
+                        Files.BothCommands.get(interaction.commandName);
                     return applicationCommandHandler(modul, interaction);
                 }
                 if (interaction.isMessageComponent()) {
                     const modul = Files
-                        .MessageCompCommandStore[interaction.componentType]
+                        .MessageCompCommands[interaction.componentType]
                         .get(interaction.customId);
                     return messageComponentInteractionHandler(modul, interaction);
                 } else return throwError(() => SernError.NotSupportedInteraction);

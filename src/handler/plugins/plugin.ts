@@ -14,9 +14,8 @@
 import type { Awaitable, Client } from 'discord.js';
 import type { Err, Ok, Result } from 'ts-results';
 import type { Module, Override, Wrapper } from '../..';
-import type { ModuleDefs } from '../structures/modules/commands/moduleHandler';
-import type { BaseModule } from '../structures/modules/module';
 import type { CommandType } from '../sern';
+import type { BaseModule, ModuleDefs } from '../structures/module';
 
 
 export interface Controller {

@@ -1,9 +1,8 @@
 import type { Message } from 'discord.js';
 import { Observable, throwError } from 'rxjs';
-import type { ModuleDefs } from '../structures/modules/commands/moduleHandler';
 import { SernError } from '../structures/errors';
 import { isNotFromBot } from '../utilities/messageHelpers';
-import type { Module } from '../structures/modules/commands/module';
+import type { Module, ModuleDefs } from '../structures/module';
 
 export function correctModuleType<T extends keyof ModuleDefs>(
     plug: Module | undefined,

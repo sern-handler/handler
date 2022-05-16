@@ -2,21 +2,21 @@ import { ApplicationCommandType, ComponentType } from 'discord.js';
 import { readdirSync, statSync } from 'fs';
 import { join } from 'path';
 import { from, Observable } from 'rxjs';
-import type { Module } from '../structures/modules/commands/module';
+import type { Module } from '../structures/module';
 
-export const BothCommand = new Map<string, Module>();
-export const ApplicationCommandStore = {
+export const BothCommands = new Map<string, Module>();
+export const ApplicationCommands = {
     [ApplicationCommandType.User]: new Map<string, Module>(),
     [ApplicationCommandType.Message]: new Map<string, Module>(),
     [ApplicationCommandType.ChatInput]: new Map<string, Module>(),
 } as { [K in ApplicationCommandType]: Map<string, Module> };
 
-export const MessageCompCommandStore = {
+export const MessageCompCommands = {
     [ComponentType.Button]: new Map<string, Module>(),
     [ComponentType.SelectMenu]: new Map<string, Module>(),
     [ComponentType.TextInput]: new Map<string, Module>(),
 };
-export const TextCommandStore = {
+export const TextCommands = {
     text: new Map<string, Module>(),
     aliases: new Map<string, Module>(),
 };

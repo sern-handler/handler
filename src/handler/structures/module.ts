@@ -4,12 +4,19 @@ import type {
     ButtonInteraction,
     MessageContextMenuCommandInteraction,
     SelectMenuInteraction,
+    UserContextMenuCommandInteraction,
 } from 'discord.js';
-import type { Override } from '../../../../types/handler';
-import type { CommandType } from '../../../sern';
-import type { BaseModule } from '../module';
-import type { UserContextMenuCommandInteraction } from 'discord.js';
-import type { CommandPlugin, EventPlugin } from '../../../plugins/plugin';
+import type { Override } from '../../types/handler';
+import type { Args } from '../../types/handler';
+import type { CommandType } from '../sern';
+import type { CommandPlugin, EventPlugin } from '../plugins/plugin';
+import type Context from './context';
+
+export interface BaseModule {
+    name?: string;
+    description: string;
+    execute: (ctx: Context, args: Args) => Awaitable<void>;
+}
 
 //possible refactoring types into interfaces and not types
 export type TextCommand = {
@@ -66,3 +73,15 @@ export type Module =
     | ContextMenuMsg
     | ButtonCommand
     | SelectMenuCommand;
+
+//https://stackoverflow.com/questions/64092736/alternative-to-switch-statement-for-typescript-discriminated-union
+// Explicit Module Definitions for mapping
+export type ModuleDefs = {
+    [CommandType.Text]: TextCommand;
+    [CommandType.Slash]: SlashCommand;
+    [CommandType.Both]: BothCommand;
+    [CommandType.MenuMsg]: ContextMenuMsg;
+    [CommandType.MenuUser]: ContextMenuUser;
+    [CommandType.Button]: ButtonCommand;
+    [CommandType.MenuSelect]: SelectMenuCommand;
+};
