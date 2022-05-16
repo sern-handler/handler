@@ -61,7 +61,11 @@ exports.default = {
   };
 ```
 
-See [documentation](https://sern-handler.js.org) for TypeScript examples and more
+See our [templates](https://github.com/sern-handler/templates) for TypeScript examples and more
+
+## CLI
+
+We are providing a [command line interface](https://github.com/sern-handler/cli) for better & easier bot developement. Don't forget to view it.
 
 ## Links
 
