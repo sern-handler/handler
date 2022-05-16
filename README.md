@@ -90,8 +90,3 @@ We are providing a [command line interface](https://github.com/sern-handler/cli)
 ## Roadmap
 
 You can check our [roadmap](https://github.com/sern-handler/roadmap) to see what's going to be added or patched in the future.
-
-## Stats
-
-![Alt](https://repobeats.axiom.co/api/embed/db7210a5cae806c7e54c0c5942b6be25e63ca5e4.svg "Feel free to contribute")
-
