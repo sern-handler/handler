@@ -13,10 +13,9 @@ import { SernError } from '../structures/errors';
 import Context from '../structures/context';
 import type { Result } from 'ts-results';
 import { CommandType, controller } from '../sern';
-import type { Args } from '../../types/handler';
+import type { Args, UnionToTuple } from '../../types/handler';
 import type { MessageComponentInteraction } from 'discord.js';
 import { ComponentType } from 'discord.js';
-import type { UnionToTuple } from '../utilities/resolveParameters';
 import type { Module } from '../structures/module';
 import type { EventPlugin } from '../plugins/plugin';
 
