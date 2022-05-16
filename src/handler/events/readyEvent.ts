@@ -7,7 +7,7 @@ import type { PluginType } from '../plugins/plugin';
 import type { Result } from 'ts-results';
 import type { Awaitable } from 'discord.js';
 import type { Module } from '../structures/module';
-import { match, P } from 'ts-pattern';
+import { match } from 'ts-pattern';
 import { ApplicationCommandType, ComponentType } from 'discord.js';
 
 export const onReady = (wrapper: Wrapper) => {
@@ -64,30 +64,30 @@ export const onReady = (wrapper: Wrapper) => {
         });
 };
 
-function registerModule(mod : Module) {
+function registerModule(mod: Module) {
     const name = mod.name!;
     match<Module>(mod)
-        .with({type : CommandType.Text }, mod => {
+        .with({ type: CommandType.Text }, mod => {
             mod.alias.forEach(a => Files.TextCommands.aliases.set(a, mod));
             Files.TextCommands.text.set(name, mod);
         })
-        .with({ type : CommandType.Slash }, mod => {
+        .with({ type: CommandType.Slash }, mod => {
             Files.ApplicationCommands[ApplicationCommandType.ChatInput].set(name, mod);
         })
-        .with( { type : CommandType.Both }, mod => {
+        .with({ type: CommandType.Both }, mod => {
             Files.BothCommands.set(name, mod);
             mod.alias.forEach(a => Files.TextCommands.aliases.set(a, mod));
         })
-        .with( { type  : CommandType.MenuUser }, mod => {
+        .with({ type: CommandType.MenuUser }, mod => {
             Files.ApplicationCommands[ApplicationCommandType.User].set(name, mod);
         })
-        .with( { type  : CommandType.MenuMsg }, mod => {
+        .with({ type: CommandType.MenuMsg }, mod => {
             Files.ApplicationCommands[ApplicationCommandType.Message].set(name, mod);
         })
-        .with( { type : CommandType.Button }, mod => {
+        .with({ type: CommandType.Button }, mod => {
             Files.ApplicationCommands[ComponentType.Button].set(name, mod);
         })
-        .with( { type: CommandType.MenuSelect }, mod => {
+        .with({ type: CommandType.MenuSelect }, mod => {
             Files.MessageCompCommands[ComponentType.SelectMenu].set(name, mod);
-        })
+        });
 }

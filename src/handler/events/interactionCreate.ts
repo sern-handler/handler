@@ -30,7 +30,6 @@ function applicationCommandHandler(mod: Module | undefined, interaction: Command
         return throwError(() => SernError.UndefinedModule);
     }
     const eventPlugins = mod.onEvent;
-
     return match(interaction)
         .when(isChatInputCommand, i => {
                 const ctx = Context.wrap(i);
