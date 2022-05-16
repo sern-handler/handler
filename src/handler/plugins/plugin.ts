@@ -50,6 +50,9 @@ export type EventPlugin<T extends CommandType> = {
     {
         execute: (event: Parameters<ModuleDefs[T]['execute']>, controller: Controller) => Awaitable<Result<void, void>>;
     }>;
+export type EventPluginType = {
+    [K in CommandType] : EventPlugin<K>
+}
 
 export function plugins(...plug: CommandPlugin[]): CommandPlugin[];
 export function plugins<T extends CommandType>(...plug: EventPlugin<T>[]): EventPlugin<T>[];
@@ -58,6 +61,6 @@ export function plugins<T extends CommandType>(...plug: CommandPlugin[] | EventP
     return plug;
 }
 
-export function sernModule(mod: Module): Module {
+export function sernModule<T extends CommandType>(mod: ModuleDefs[T]): Module {
     return mod;
 }

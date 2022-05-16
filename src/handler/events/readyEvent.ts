@@ -15,8 +15,8 @@ export const onReady = (wrapper: Wrapper) => {
     const ready$ = fromEvent(client, 'ready').pipe(take(1), skip(1));
     const processCommandFiles$ = Files.buildData(commands).pipe(
         map(({ mod, absPath }) => {
-            const name = mod?.name ?? Files.fmtFileName(basename(absPath));
             if (mod?.name === undefined) {
+                const name = Files.fmtFileName(basename(absPath));
                 return { name, ...mod };
             }
             return mod;
