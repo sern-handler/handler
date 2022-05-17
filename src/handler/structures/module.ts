@@ -11,59 +11,67 @@ import type { Args } from '../../types/handler';
 import type { CommandType } from '../sern';
 import type { CommandPlugin, EventPlugin } from '../plugins/plugin';
 import type Context from './context';
+import { Base } from 'discord.js';
+import type { PluginType } from '../plugins/plugin';
 
 export interface BaseModule {
+    type : CommandType | PluginType
     name?: string;
     description: string;
     execute: (ctx: Context, args: Args) => Awaitable<void>;
 }
 
 //possible refactoring types into interfaces and not types
-export type TextCommand = {
+export type TextCommand = Override<BaseModule, {
     type: CommandType.Text;
     onEvent?: EventPlugin<CommandType.Text>[]
     plugins?: CommandPlugin[];
     alias?: string[];
-} & BaseModule;
+}>;
 
-export type SlashCommand = {
+export type SlashCommand = Override<BaseModule, {
     type: CommandType.Slash;
     onEvent?: EventPlugin<CommandType.Slash>[]
     plugins?: (CommandPlugin)[];
     options: ApplicationCommandOptionData[] | [];
-} & BaseModule;
 
-export type BothCommand = {
+}>;
+
+export type BothCommand = Override<BaseModule, {
     type: CommandType.Both;
     onEvent?: EventPlugin<CommandType.Both>[]
     plugins?: (CommandPlugin)[]
     alias?: string[];
     options: ApplicationCommandOptionData[] | [];
-} & BaseModule;
+}>;
 
-export type ContextMenuUser = {
+export type ContextMenuUser = Override<BaseModule, {
     type: CommandType.MenuUser;
     onEvent?: EventPlugin<CommandType.MenuUser>[];
     plugins?: (CommandPlugin)[];
-} & Override<BaseModule, { execute: (ctx: UserContextMenuCommandInteraction) => Awaitable<void> }>;
+    execute: (ctx: UserContextMenuCommandInteraction) => Awaitable<void>
+}>
 
-export type ContextMenuMsg = {
+export type ContextMenuMsg = Override<BaseModule, {
     type: CommandType.MenuMsg;
     onEvent?: EventPlugin<CommandType.MenuMsg>[];
     plugins?: CommandPlugin[];
-} & Override<BaseModule, { execute: (ctx: MessageContextMenuCommandInteraction) => Awaitable<void> }>;
+    execute: (ctx: MessageContextMenuCommandInteraction) => Awaitable<void>
+}>;
 
-export type ButtonCommand = {
+export type ButtonCommand = Override<BaseModule,{
     type: CommandType.Button;
     onEvent?: EventPlugin<CommandType.Button>[];
     plugins?: CommandPlugin[];
-} & Override<BaseModule, { execute: (ctx: ButtonInteraction) => Awaitable<void> }>;
+    execute: (ctx: ButtonInteraction) => Awaitable<void>
+}>;
 
-export type SelectMenuCommand = {
+export type SelectMenuCommand = Override<BaseModule, {
     type: CommandType.MenuSelect;
     onEvent?: EventPlugin<CommandType.MenuSelect>[];
     plugins?: CommandPlugin[];
-} & Override<BaseModule, { execute: (ctx: SelectMenuInteraction) => Awaitable<void> }>;
+    execute: (ctx: SelectMenuInteraction) => Awaitable<void>
+}>;
 
 export type Module =
     | TextCommand

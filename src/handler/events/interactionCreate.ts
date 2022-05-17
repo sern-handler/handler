@@ -5,10 +5,8 @@ import * as Files from '../utilities/readFile';
 import { match } from 'ts-pattern';
 import { SernError } from '../structures/errors';
 import Context from '../structures/context';
-import type { Result } from 'ts-results';
 import { CommandType, controller } from '../sern';
-import type { Module, ModuleDefs} from '../structures/module';
-import type { EventPlugin } from '../plugins/plugin';
+import type { Module } from '../structures/module';
 import {
     isButton,
     isChatInputCommand,
