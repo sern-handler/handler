@@ -31,7 +31,8 @@ export const onMessageCreate = (wrapper: Wrapper) => {
     const ensureModuleType$ = processMessage$.pipe(
         concatMap(payload =>
             of(payload.mod).pipe(
-                filterCorrectModule(CommandType.Text), // fix for BothCommand
+                //SUPPORT COMMANDTYPE.BOTH
+                filterCorrectModule(CommandType.Text),
                 map(mod => ({ ...payload, mod })),
             ),
         ),

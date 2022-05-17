@@ -18,8 +18,6 @@ import {
 } from '../utilities/predicates';
 import { filterCorrectModule } from './observableHandling';
 
-//TODO : atm, i have to cast for every interaction. is there a way to not cast?
-// maybe pass it through an observable
 function applicationCommandHandler(mod: Module | undefined, interaction: CommandInteraction) {
     const mod$ = <T extends CommandType>(cmdTy : T) => of(mod).pipe(
         filterCorrectModule(cmdTy)
@@ -28,9 +26,9 @@ function applicationCommandHandler(mod: Module | undefined, interaction: Command
     return match(interaction)
         .when(isChatInputCommand, i => {
             const ctx = Context.wrap(i);
+            //SUPPORT COMMANDTYPE.BOTH
             return mod$(CommandType.Slash).pipe(
                 concatMap(m => {
-                    console.log(m);
                     return of(m.onEvent.map(e => e.execute(
                         [ctx, ['slash', i.options]],
                         controller

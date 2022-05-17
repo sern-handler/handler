@@ -11,6 +11,7 @@ import { match } from 'ts-pattern';
 import { ApplicationCommandType, ComponentType } from 'discord.js';
 import { Err, Ok } from 'ts-results';
 import { SernError } from '../structures/errors';
+import type { DefinetlyDefined, Override } from '../../types/handler';
 
 export const onReady = (wrapper: Wrapper) => {
     const { client, commands } = wrapper;
@@ -39,7 +40,7 @@ export const onReady = (wrapper: Wrapper) => {
 
     (
         concat(ready$, processPlugins$) as Observable<{
-            mod: Module;
+            mod: DefinetlyDefined<Module, { name : string }>;
             cmdPluginsRes: {
                 execute: Awaitable<Result<void, void>>;
                 type: PluginType.Command;
@@ -69,8 +70,8 @@ export const onReady = (wrapper: Wrapper) => {
         });
 };
 
-function registerModule(mod: Module) : Result<void, void> {
-    const name = mod.name!;
+function registerModule(mod: DefinetlyDefined<Module, { name: string }>) : Result<void, void> {
+    const name = mod.name;
     return match<Module>(mod)
         .with({ type: CommandType.Text }, mod => {
             mod.alias.forEach(a => Files.TextCommands.aliases.set(a, mod));
