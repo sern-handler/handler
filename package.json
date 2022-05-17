@@ -1,9 +1,9 @@
 {
-  "name": "sern-handler",
-  "version": "0.1.0",
-  "description": "",
+  "name": "@sern/handler",
+  "version": "1.0.0",
+  "description": "Powerful DiscordJS framework for better & easier bot development.",
   "main": "dist/index.js",
-  "scripts": {  
+  "scripts": {
     "compile": "tsc",
     "watch": "tsc -w",
     "lint": "eslint src/**/*.ts",
@@ -11,31 +11,42 @@
     "release": "standard-version && git push --follow-tags",
     "test": "jest --coverage --verbose",
     "commit": "cz",
-    "docs": "typedoc src/index.ts --out .typedoc"
+    "docs" : "typedoc src/index.ts --out docs",
+    "format": "prettier --check ./src ./tests ./README.md"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "sern-handler",
+    "sern",
+    "handler",
+    "sern handler",
+    "wrapper",
+    "discord.js",
+    "framework"
+  ],
+  "author": "SernDevs",
+  "license": "MIT",
   "dependencies": {
     "@typescript-eslint/eslint-plugin": "^5.10.2",
     "@typescript-eslint/parser": "^5.10.2",
-    "discord.js": "^14.0.0-dev.1647259751.2297c2b",
-    "eslint": "^8.8.0",
-    "prettier": "^2.5.1",
-    "rxjs": "^7.5.5",
+    "dayjs": "^1.10.7",
+    "discord.js": "^13.6.0",
     "ts-results": "^3.3.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.17.2",
-    "@babel/preset-env": "^7.16.11",
-    "@babel/preset-typescript": "^7.16.7",
-    "@types/jest": "^27.4.0",
-    "babel-jest": "^27.5.1",
-    "cz-conventional-changelog": "^3.0.1",
-    "jest": "^27.5.1",
-    "standard-version": "^9.3.2",
-    "typedoc": "^0.22.11",
-    "typescript": "^4.5.5"
+    "eslint": "8.15.0",
+    "@typescript-eslint/parser": "5.24.0",
+    "@typescript-eslint/eslint-plugin": "5.24.0",
+    "@babel/core": "7.17.12",
+    "@babel/preset-env": "7.17.12",
+    "@babel/preset-typescript": "7.17.12",
+    "@types/jest": "27.5.1",
+    "babel-jest": "27.5.1",
+    "cz-conventional-changelog": "3.3.0",
+    "jest": "27.5.1",
+    "prettier": "2.6.2",
+    "standard-version": "9.5.0",
+    "typedoc": "0.22.15",
+    "typescript": "4.6.4"
   },
   "config": {
     "commitizen": {
