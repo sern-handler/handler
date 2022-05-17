@@ -1,5 +1,5 @@
 import type { Message } from 'discord.js';
-import { concatMap, from, fromEvent, map, Observable, of } from 'rxjs';
+import { concatMap, filter, from, fromEvent, map, Observable, of } from 'rxjs';
 import { Err } from 'ts-results';
 import type { Args } from '../..';
 import { CommandType, controller } from '../sern';
@@ -32,7 +32,7 @@ export const onMessageCreate = (wrapper: Wrapper) => {
         concatMap(payload =>
             of(payload.mod).pipe(
                 filterCorrectModule(CommandType.Text), // fix for BothCommand
-                map(textCommand => ({ ...payload, mod: textCommand })),
+                map(mod => ({ ...payload, mod })),
             ),
         ),
     );

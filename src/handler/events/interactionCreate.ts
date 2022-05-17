@@ -21,9 +21,6 @@ import { filterCorrectModule } from './observableHandling';
 //TODO : atm, i have to cast for every interaction. is there a way to not cast?
 // maybe pass it through an observable
 function applicationCommandHandler(mod: Module | undefined, interaction: CommandInteraction) {
-    if (mod === undefined) {
-        return throwError(() => SernError.UndefinedModule);
-    }
     const mod$ = <T extends CommandType>(cmdTy : T) => of(mod).pipe(
         filterCorrectModule(cmdTy)
     );
@@ -33,10 +30,11 @@ function applicationCommandHandler(mod: Module | undefined, interaction: Command
             const ctx = Context.wrap(i);
             return mod$(CommandType.Slash).pipe(
                 concatMap(m => {
+                    console.log(m);
                     return of(m.onEvent.map(e => e.execute(
                         [ctx, ['slash', i.options]],
                         controller
-                    ))).pipe(map(res => ({ m, res, execute() { m.execute(ctx, ['slash', i.options]); } }) ));
+                    ))).pipe(map(res => ({ m, res, execute() { return m.execute(ctx, ['slash', i.options]); } }) ));
                 }),
             );
             },
@@ -49,7 +47,7 @@ function applicationCommandHandler(mod: Module | undefined, interaction: Command
                     return of(m.onEvent.map(e => e.execute(
                         [ctx],
                         controller
-                    ))).pipe(map(res => ({ m, res, execute() { m.execute(ctx); } }) ));
+                    ))).pipe(map(res => ({ m, res, execute() { return m.execute(ctx); } }) ));
                 }),
             );
             },
@@ -60,7 +58,7 @@ function applicationCommandHandler(mod: Module | undefined, interaction: Command
                     return of(m.onEvent.map(e => e.execute(
                         [ctx],
                         controller
-                    ))).pipe(map(res => ({ m, res, execute() { m.execute(ctx); } }) ));
+                    ))).pipe(map(res => ({ m, res, execute() { return m.execute(ctx); } }) ));
                 }),
             );
         })
@@ -71,9 +69,7 @@ function messageComponentInteractionHandler(
     mod: Module | undefined,
     interaction: MessageComponentInteraction,
 ) {
-    if (mod === undefined) {
-        return throwError(() => SernError.UndefinedModule);
-    }
+
     const mod$ = <T extends CommandType>(ty : T) => of(mod).pipe( filterCorrectModule(ty));
     //Todo: refactor so that we dont have to have two separate branches. They're near identical!!
     //Only thing that differs is type of interaction
@@ -84,7 +80,7 @@ function messageComponentInteractionHandler(
                     return of(m.onEvent.map(e => e.execute(
                         [ctx],
                         controller
-                    ))).pipe(map(res => ({ m, res, execute() { m.execute(ctx); } }) ));
+                    ))).pipe(map(res => ({ m, res, execute() { return m.execute(ctx); } }) ));
                 }),
             );
         })
@@ -94,7 +90,7 @@ function messageComponentInteractionHandler(
                     return of(m.onEvent.map(e => e.execute(
                         [ctx],
                         controller
-                    ))).pipe(map(res => ({ m, res, execute() { m.execute(ctx); } }) ));
+                    ))).pipe(map(res => ({ m, res, execute() { return m.execute(ctx); } }) ));
                 }),
             );
         })
@@ -125,10 +121,10 @@ export function onInteractionCreate (wrapper: Wrapper) {
             }),
         ).subscribe({
             next({m, res, execute}) {
-           //     execute();
+                 console.log(res);
             },
             error(err) {
-                return;
+                console.log(err);
             }
         });
 

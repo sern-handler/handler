@@ -1,5 +1,5 @@
 import type { Module, ModuleDefs } from '../structures/module';
-import type { ChatInputCommandInteraction, CommandInteraction } from 'discord.js';
+import type { Awaitable, ChatInputCommandInteraction, CommandInteraction } from 'discord.js';
 import type { ButtonInteraction, MessageComponentInteraction, SelectMenuInteraction } from 'discord.js';
 import type { MessageContextMenuCommandInteraction, UserContextMenuCommandInteraction } from 'discord.js';
 
@@ -27,4 +27,9 @@ export function isMessageCtxMenuCmd(i : CommandInteraction) : i is MessageContex
 
 export function isUserContextMenuCmd(i : CommandInteraction) : i is UserContextMenuCommandInteraction {
     return i.isUserContextMenuCommand();
+}
+
+function isPromise<T>(promiseLike : Awaitable<T>) : promiseLike is Promise<T> {
+    const keys = new Set(Object.keys(promiseLike));
+    return keys.has('then') && keys.has('catch');
 }
