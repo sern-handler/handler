@@ -58,6 +58,10 @@ export function plugins<T extends CommandType>(...plug: CommandPlugin[] | EventP
     return plug;
 }
 
-export function sernModule<T extends CommandType>(mod: ModuleDefs[T]): Module {
-    return mod;
+export function sernModule<T extends CommandType>(plugins : CommandPlugin[], onEvent: EventPlugin<T>[], mod: Omit<ModuleDefs[T], 'onEvent' | 'plugins' >) {
+    // return {
+    //     plugins,
+    //     onEvent,
+    //     ...mod,
+    // };
 }

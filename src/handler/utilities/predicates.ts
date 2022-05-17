@@ -1,7 +1,15 @@
 import type { Module, ModuleDefs } from '../structures/module';
-import type { Awaitable, ChatInputCommandInteraction, CommandInteraction } from 'discord.js';
-import type { ButtonInteraction, MessageComponentInteraction, SelectMenuInteraction } from 'discord.js';
-import type { MessageContextMenuCommandInteraction, UserContextMenuCommandInteraction } from 'discord.js';
+import type {
+    Awaitable,
+    ButtonInteraction,
+    ChatInputCommandInteraction,
+    CommandInteraction,
+    MessageComponentInteraction,
+    MessageContextMenuCommandInteraction,
+    SelectMenuInteraction,
+    UserContextMenuCommandInteraction,
+} from 'discord.js';
+
 
 
 export function correctModuleType<T extends keyof ModuleDefs>(

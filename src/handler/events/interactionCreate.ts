@@ -29,10 +29,10 @@ function applicationCommandHandler(mod: Module | undefined, interaction: Command
             //SUPPORT COMMANDTYPE.BOTH
             return mod$(CommandType.Slash).pipe(
                 concatMap(m => {
-                    return of(m.onEvent.map(e => e.execute(
+                    return of(m.onEvent?.map(e => e.execute(
                         [ctx, ['slash', i.options]],
                         controller
-                    ))).pipe(map(res => ({ m, res, execute() { return m.execute(ctx, ['slash', i.options]); } }) ));
+                    )) ?? []).pipe(map(res => ({ m, res, execute() { return m.execute(ctx, ['slash', i.options]); } }) ));
                 }),
             );
             },
@@ -42,10 +42,10 @@ function applicationCommandHandler(mod: Module | undefined, interaction: Command
         .when(isMessageCtxMenuCmd, ctx => {
             return mod$(CommandType.MenuMsg).pipe(
                 concatMap(m => {
-                    return of(m.onEvent.map(e => e.execute(
+                    return of(m.onEvent?.map(e => e.execute(
                         [ctx],
                         controller
-                    ))).pipe(map(res => ({ m, res, execute() { return m.execute(ctx); } }) ));
+                    )) ?? []).pipe(map(res => ({ m, res, execute() { return m.execute(ctx); } }) ));
                 }),
             );
             },
@@ -53,10 +53,10 @@ function applicationCommandHandler(mod: Module | undefined, interaction: Command
         .when(isUserContextMenuCmd, ctx => {
             return mod$(CommandType.MenuUser).pipe(
                 concatMap(m => {
-                    return of(m.onEvent.map(e => e.execute(
+                    return of(m.onEvent?.map(e => e.execute(
                         [ctx],
                         controller
-                    ))).pipe(map(res => ({ m, res, execute() { return m.execute(ctx); } }) ));
+                    )) ?? []).pipe(map(res => ({ m, res, execute() { return m.execute(ctx); } }) ));
                 }),
             );
         })
@@ -75,20 +75,20 @@ function messageComponentInteractionHandler(
         .when(isButton, ctx => {
             return mod$(CommandType.Button).pipe(
                 concatMap(m => {
-                    return of(m.onEvent.map(e => e.execute(
+                    return of(m.onEvent?.map(e => e.execute(
                         [ctx],
                         controller
-                    ))).pipe(map(res => ({ m, res, execute() { return m.execute(ctx); } }) ));
+                    )) ?? []).pipe(map(res => ({ m, res, execute() { return m.execute(ctx); } }) ));
                 }),
             );
         })
         .when(isSelectMenu, (ctx: SelectMenuInteraction) => {
            return mod$(CommandType.MenuSelect).pipe(
                 concatMap(m => {
-                    return of(m.onEvent.map(e => e.execute(
+                    return of(m.onEvent?.map(e => e.execute(
                         [ctx],
                         controller
-                    ))).pipe(map(res => ({ m, res, execute() { return m.execute(ctx); } }) ));
+                    )) ?? []).pipe(map(res => ({ m, res, execute() { return m.execute(ctx); } }) ));
                 }),
             );
         })
