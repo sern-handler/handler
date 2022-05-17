@@ -28,40 +28,41 @@ export enum PluginType {
     Event = 0b10,
 }
 
-type executeCmdPlugin = { execute: (wrapper: Wrapper, controller: Controller) => Result<void, void> };
+type executeCmdPlugin =  (controller: Controller) => Result<void, void> ;
 
-interface BasePlugin extends Override<BaseModule, executeCmdPlugin> {
-    type: PluginType;
-}
+type BasePlugin = Override<BaseModule, {
+    type : PluginType,
+    execute : executeCmdPlugin
+}>;
 
-export type CommandPlugin = {
+export type CommandPlugin = Override<BasePlugin, {
     type: PluginType.Command;
-} & Override<BasePlugin,
-    {
-        execute: (wrapper: Client, module: Module, controller: Controller) => Awaitable<Result<void, void>>;
-    }>;
+    execute: (wrapper: Client, module: Module, controller: Controller) => Awaitable<Result<void, void>>;
+}>;
 
 //TODO: rn adding the modType check a little hackish. Find better way to determine the
 // module type of the event plugin
-export type EventPlugin<T extends CommandType> = {
+export type EventPlugin<T extends CommandType> = Override<BasePlugin, {
     type: PluginType.Event;
     modType: T;
-} & Override<BasePlugin,
-    {
-        execute: (event: Parameters<ModuleDefs[T]['execute']>, controller: Controller) => Awaitable<Result<void, void>>;
-    }>;
+    execute: (event: Parameters<ModuleDefs[T]['execute']>, controller: Controller) => Awaitable<Result<void, void>>;
+}>;
 
-export function plugins(...plug: CommandPlugin[]): CommandPlugin[];
-export function plugins<T extends CommandType>(...plug: EventPlugin<T>[]): EventPlugin<T>[];
 
-export function plugins<T extends CommandType>(...plug: CommandPlugin[] | EventPlugin<T>[]) {
+export function plugins<T extends CommandType>(...plug: (CommandPlugin | EventPlugin<T>)[]) {
     return plug;
 }
 
-export function sernModule<T extends CommandType>(plugins : CommandPlugin[], onEvent: EventPlugin<T>[], mod: Omit<ModuleDefs[T], 'onEvent' | 'plugins' >) {
-    // return {
-    //     plugins,
-    //     onEvent,
-    //     ...mod,
-    // };
+export function sernModule<T extends CommandType>(
+    plugs: (CommandPlugin | EventPlugin<T>)[], mod : ModuleDefs[T]
+) : ModuleDefs[T] {
+    //mod.plugins if defined, warn user to use first parameter
+    //mod.onEvent if defined, warn user to use first parameter
+    const plugins = plugs.filter(el => el.type === PluginType.Command);
+    const onEvent = plugs.filter(el => el.type === PluginType.Event);
+    return {
+        plugins,
+        onEvent,
+        ...mod
+    } as unknown as ModuleDefs[T];
 }
