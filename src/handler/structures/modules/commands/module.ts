@@ -3,7 +3,7 @@ import type { Override } from '../../../../types/handler';
 import type { CommandType } from '../../../sern';
 import type { BaseModule } from '../module';
 
-//possible refactoring to interfaces and not types
+// TODO: Possible refactoring to interfaces and not types
 export type TextCommand = {
     type : CommandType.TEXT;
     alias : string[] | [],
