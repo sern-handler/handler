@@ -11,7 +11,6 @@ import type { Args } from '../../types/handler';
 import type { CommandType } from '../sern';
 import type { CommandPlugin, EventPlugin } from '../plugins/plugin';
 import type Context from './context';
-import { Base } from 'discord.js';
 import type { PluginType } from '../plugins/plugin';
 
 export interface BaseModule {
@@ -33,8 +32,7 @@ export type SlashCommand = Override<BaseModule, {
     type: CommandType.Slash;
     onEvent?: EventPlugin<CommandType.Slash>[]
     plugins?: (CommandPlugin)[];
-    options: ApplicationCommandOptionData[] | [];
-
+    options?: ApplicationCommandOptionData[];
 }>;
 
 export type BothCommand = Override<BaseModule, {
@@ -42,7 +40,7 @@ export type BothCommand = Override<BaseModule, {
     onEvent?: EventPlugin<CommandType.Both>[]
     plugins?: (CommandPlugin)[]
     alias?: string[];
-    options: ApplicationCommandOptionData[] | [];
+    options?: ApplicationCommandOptionData[];
 }>;
 
 export type ContextMenuUser = Override<BaseModule, {

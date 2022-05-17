@@ -23,12 +23,6 @@ export type SlashOptions = Omit<CommandInteractionOptionResolver, 'getMessage' |
 //https://dev.to/vborodulin/ts-how-to-override-properties-with-type-intersection-554l
 export type Override<T1, T2> = Omit<T1, keyof T2> & T2;
 
-export type UnionToTuple<T> = T extends readonly [infer V, infer S]
-    ? V extends V
-        ? S extends S
-            ? [V, S]
-            : [V]
-        : never
-    : never;
+export type DefinitelyDefined<T, K> = T & Override<T, K>;
 
-export type DefinitelyDefined<T, K> = T & Override<T, K>
+
