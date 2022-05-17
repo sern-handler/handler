@@ -30,14 +30,14 @@ export type TextCommand = Override<BaseModule, {
 export type SlashCommand = Override<BaseModule, {
     type: CommandType.Slash;
     onEvent?: EventPlugin<CommandType.Slash>[]
-    plugins?: (CommandPlugin)[];
+    plugins?: CommandPlugin[];
     options?: ApplicationCommandOptionData[];
 }>;
 
 export type BothCommand = Override<BaseModule, {
     type: CommandType.Both;
     onEvent?: EventPlugin<CommandType.Both>[]
-    plugins?: (CommandPlugin)[]
+    plugins?: CommandPlugin[]
     alias?: string[];
     options?: ApplicationCommandOptionData[];
 }>;
@@ -45,7 +45,7 @@ export type BothCommand = Override<BaseModule, {
 export type ContextMenuUser = Override<BaseModule, {
     type: CommandType.MenuUser;
     onEvent?: EventPlugin<CommandType.MenuUser>[];
-    plugins?: (CommandPlugin)[];
+    plugins?: CommandPlugin[];
     execute: (ctx: UserContextMenuCommandInteraction) => Awaitable<void>
 }>
 

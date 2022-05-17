@@ -15,8 +15,8 @@ import type { Awaitable, Client } from 'discord.js';
 import type { Err, Ok, Result } from 'ts-results';
 import type { Module, Override } from '../..';
 import type { BaseModule, ModuleDefs } from '../structures/module';
-import type { CommandType } from '../structures/enums';
-import { PluginType } from '../structures/enums';
+import type { PluginType } from '../structures/enums';
+import type { ValueOf } from 'ts-pattern/dist/types/helpers';
 
 
 export interface Controller {
@@ -24,11 +24,8 @@ export interface Controller {
     stop: () => Err<void>;
 }
 
-type executeCmdPlugin =  (controller: Controller) => Result<void, void> ;
-
 type BasePlugin = Override<BaseModule, {
     type : PluginType,
-    execute : executeCmdPlugin
 }>;
 
 export type CommandPlugin = Override<BasePlugin, {
@@ -38,25 +35,25 @@ export type CommandPlugin = Override<BasePlugin, {
 
 //TODO: rn adding the modType check a little hackish. Find better way to determine the
 // module type of the event plugin
-export type EventPlugin<T extends CommandType> = Override<BasePlugin, {
-    type: PluginType.Event;
+export type EventPlugin<T extends keyof ModuleDefs> = Override<BasePlugin, {
     modType: T;
+    type: PluginType.Event;
     execute: (event: Parameters<ModuleDefs[T]['execute']>, controller: Controller) => Awaitable<Result<void, void>>;
 }>;
 
-
-export function plugins<T extends CommandType>(...plug: (CommandPlugin | EventPlugin<T>)[]) {
+export function plugins(...plug: CommandPlugin[]) {
     return plug;
 }
 
-export function sernModule<T extends CommandType>(
-    plugs: (CommandPlugin | EventPlugin<T>)[], mod : ModuleDefs[T]
-) : ModuleDefs[T] {
-    const plugins = plugs.filter(el => el.type === PluginType.Command);
-    const onEvent = plugs.filter(el => el.type === PluginType.Event);
+type ModuleNoPlugins = ValueOf<{
+    [T in keyof ModuleDefs] : Omit<ModuleDefs[T], 'plugins'>
+}>
+
+export function sernModule(
+    plugins: (CommandPlugin)[], mod : ModuleNoPlugins
+) : Module {
     return {
         plugins,
-        onEvent,
         ...mod
     };
 }
