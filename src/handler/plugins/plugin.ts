@@ -13,19 +13,15 @@
 
 import type { Awaitable, Client } from 'discord.js';
 import type { Err, Ok, Result } from 'ts-results';
-import type { Module, Override, Wrapper } from '../..';
-import type { CommandType } from '../sern';
+import type { Module, Override } from '../..';
 import type { BaseModule, ModuleDefs } from '../structures/module';
+import type { CommandType } from '../structures/enums';
+import { PluginType } from '../structures/enums';
 
 
 export interface Controller {
     next: () => Ok<void>;
     stop: () => Err<void>;
-}
-
-export enum PluginType {
-    Command = 0b01,
-    Event = 0b10,
 }
 
 type executeCmdPlugin =  (controller: Controller) => Result<void, void> ;
@@ -56,13 +52,11 @@ export function plugins<T extends CommandType>(...plug: (CommandPlugin | EventPl
 export function sernModule<T extends CommandType>(
     plugs: (CommandPlugin | EventPlugin<T>)[], mod : ModuleDefs[T]
 ) : ModuleDefs[T] {
-    //mod.plugins if defined, warn user to use first parameter
-    //mod.onEvent if defined, warn user to use first parameter
     const plugins = plugs.filter(el => el.type === PluginType.Command);
     const onEvent = plugs.filter(el => el.type === PluginType.Event);
     return {
         plugins,
         onEvent,
         ...mod
-    } as unknown as ModuleDefs[T];
+    };
 }

@@ -2,8 +2,7 @@ import { concat, concatMap, from, fromEvent, map, Observable, of, skip, take } f
 import { basename } from 'path';
 import * as Files from '../utilities/readFile';
 import type Wrapper from '../structures/wrapper';
-import { CommandType, controller } from '../sern';
-import type { PluginType } from '../plugins/plugin';
+import { controller } from '../sern';
 import type { Result } from 'ts-results';
 import type { Awaitable } from 'discord.js';
 import type { Module } from '../structures/module';
@@ -12,6 +11,7 @@ import { ApplicationCommandType, ComponentType } from 'discord.js';
 import { Err, Ok } from 'ts-results';
 import { SernError } from '../structures/errors';
 import type { DefinitelyDefined } from '../../types/handler';
+import { CommandType, PluginType } from '../structures/enums';
 
 export const onReady = (wrapper: Wrapper) => {
     const { client, commands } = wrapper;

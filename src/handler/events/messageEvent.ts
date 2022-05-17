@@ -2,12 +2,13 @@ import type { Message } from 'discord.js';
 import { concatMap, filter, from, fromEvent, map, Observable, of } from 'rxjs';
 import { Err } from 'ts-results';
 import type { Args } from '../..';
-import { CommandType, controller } from '../sern';
+import { controller } from '../sern';
 import Context from '../structures/context';
 import type Wrapper from '../structures/wrapper';
 import { fmt } from '../utilities/messageHelpers';
 import * as Files from '../utilities/readFile';
 import { filterCorrectModule, ignoreNonBot } from './observableHandling';
+import { CommandType } from '../structures/enums';
 
 export const onMessageCreate = (wrapper: Wrapper) => {
     const { client, defaultPrefix } = wrapper;

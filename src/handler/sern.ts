@@ -10,6 +10,7 @@ import { onMessageCreate } from './events/messageEvent';
 import { onInteractionCreate } from './events/interactionCreate';
 import { match, P } from 'ts-pattern';
 import { Err, Ok } from 'ts-results';
+import { CommandType } from './structures/enums';
 
 export function init(wrapper: Wrapper) {
     const { events, client } = wrapper;
@@ -25,19 +26,6 @@ function eventObserver(client: Client, events: DiscordEvent[]) {
         if (event === 'ready') throw Error(SernError.ReservedEvent);
         fromEvent(client, event, cb).subscribe();
     });
-}
-
-/**
- * @enum { number };
- */
-export enum CommandType {
-    Text = 0b0000001,
-    Slash = 0b0000010,
-    MenuUser = 0b0000100,
-    MenuMsg = 0b0001000,
-    Button = 0b0010000,
-    MenuSelect = 0b0100000,
-    Both = 0b0000011,
 }
 
 export function cmdTypeToDjs(ty: CommandType) {

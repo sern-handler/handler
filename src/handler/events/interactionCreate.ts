@@ -5,7 +5,7 @@ import * as Files from '../utilities/readFile';
 import { match } from 'ts-pattern';
 import { SernError } from '../structures/errors';
 import Context from '../structures/context';
-import { CommandType, controller } from '../sern';
+import { controller } from '../sern';
 import type { Module } from '../structures/module';
 import {
     isButton,
@@ -15,6 +15,7 @@ import {
     isUserContextMenuCmd,
 } from '../utilities/predicates';
 import { filterCorrectModule } from './observableHandling';
+import { CommandType } from '../structures/enums';
 
 function applicationCommandHandler(mod: Module | undefined, interaction: CommandInteraction) {
     const mod$ = <T extends CommandType>(cmdTy : T) => of(mod).pipe(

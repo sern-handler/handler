@@ -8,10 +8,9 @@ import type {
 } from 'discord.js';
 import type { Override } from '../../types/handler';
 import type { Args } from '../../types/handler';
-import type { CommandType } from '../sern';
 import type { CommandPlugin, EventPlugin } from '../plugins/plugin';
 import type Context from './context';
-import type { PluginType } from '../plugins/plugin';
+import { CommandType, PluginType } from './enums';
 
 export interface BaseModule {
     type : CommandType | PluginType
@@ -47,7 +46,6 @@ export type ContextMenuUser = Override<BaseModule, {
     type: CommandType.MenuUser;
     onEvent?: EventPlugin<CommandType.MenuUser>[];
     plugins?: (CommandPlugin)[];
-    description? : string;
     execute: (ctx: UserContextMenuCommandInteraction) => Awaitable<void>
 }>
 
@@ -55,7 +53,6 @@ export type ContextMenuMsg = Override<BaseModule, {
     type: CommandType.MenuMsg;
     onEvent?: EventPlugin<CommandType.MenuMsg>[];
     plugins?: CommandPlugin[];
-    description? : string;
     execute: (ctx: MessageContextMenuCommandInteraction) => Awaitable<void>
 }>;
 
