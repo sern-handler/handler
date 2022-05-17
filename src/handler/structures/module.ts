@@ -23,7 +23,7 @@ export type TextCommand = {
     type: CommandType.Text;
     onEvent: EventPlugin<CommandType.Text>[];
     plugins: CommandPlugin[];
-    alias: string[] | [];
+    alias?: string[];
 } & BaseModule;
 
 export type SlashCommand = {
@@ -37,7 +37,7 @@ export type BothCommand = {
     type: CommandType.Both;
     onEvent: EventPlugin<CommandType.Both>[]
     plugins: CommandPlugin[]
-    alias: string[] | [];
+    alias?: string[];
     options: ApplicationCommandOptionData[] | [];
 } & BaseModule;
 

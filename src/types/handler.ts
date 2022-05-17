@@ -31,4 +31,4 @@ export type UnionToTuple<T> = T extends readonly [infer V, infer S]
         : never
     : never;
 
-export type DefinetlyDefined<T, K> = T & Override<T, K>
+export type DefinitelyDefined<T, K> = T & Override<T, K>

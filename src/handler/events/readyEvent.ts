@@ -11,7 +11,7 @@ import { match } from 'ts-pattern';
 import { ApplicationCommandType, ComponentType } from 'discord.js';
 import { Err, Ok } from 'ts-results';
 import { SernError } from '../structures/errors';
-import type { DefinetlyDefined, Override } from '../../types/handler';
+import type { DefinitelyDefined } from '../../types/handler';
 
 export const onReady = (wrapper: Wrapper) => {
     const { client, commands } = wrapper;
@@ -40,7 +40,7 @@ export const onReady = (wrapper: Wrapper) => {
 
     (
         concat(ready$, processPlugins$) as Observable<{
-            mod: DefinetlyDefined<Module, { name : string }>;
+            mod: DefinitelyDefined<Module, { name : string }>;
             cmdPluginsRes: {
                 execute: Awaitable<Result<void, void>>;
                 type: PluginType.Command;
@@ -70,11 +70,11 @@ export const onReady = (wrapper: Wrapper) => {
         });
 };
 
-function registerModule(mod: DefinetlyDefined<Module, { name: string }>) : Result<void, void> {
+function registerModule(mod: DefinitelyDefined<Module, { name: string }>) : Result<void, void> {
     const name = mod.name;
     return match<Module>(mod)
         .with({ type: CommandType.Text }, mod => {
-            mod.alias.forEach(a => Files.TextCommands.aliases.set(a, mod));
+            mod.alias?.forEach(a => Files.TextCommands.aliases.set(a, mod));
             Files.TextCommands.text.set(name, mod);
             return Ok.EMPTY;
         })
@@ -84,7 +84,7 @@ function registerModule(mod: DefinetlyDefined<Module, { name: string }>) : Resul
         })
         .with({ type: CommandType.Both }, mod => {
             Files.BothCommands.set(name, mod);
-            mod.alias.forEach(a => Files.TextCommands.aliases.set(a, mod));
+            mod.alias?.forEach(a => Files.TextCommands.aliases.set(a, mod));
             return Ok.EMPTY;
         })
         .with({ type: CommandType.MenuUser }, mod => {
