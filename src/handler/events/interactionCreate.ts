@@ -1,5 +1,5 @@
 import type { CommandInteraction, Interaction, MessageComponentInteraction, SelectMenuInteraction } from 'discord.js';
-import { concatMap, from, fromEvent, map, Observable, of, throwError } from 'rxjs';
+import { concatMap, fromEvent, map, Observable, of, throwError } from 'rxjs';
 import type Wrapper from '../structures/wrapper';
 import * as Files from '../utilities/readFile';
 import { match } from 'ts-pattern';
@@ -7,7 +7,7 @@ import { SernError } from '../structures/errors';
 import Context from '../structures/context';
 import type { Result } from 'ts-results';
 import { CommandType, controller } from '../sern';
-import type { Module } from '../structures/module';
+import type { Module, ModuleDefs} from '../structures/module';
 import type { EventPlugin } from '../plugins/plugin';
 import {
     isButton,
@@ -27,48 +27,42 @@ function applicationCommandHandler(mod: Module | undefined, interaction: Command
     const mod$ = <T extends CommandType>(cmdTy : T) => of(mod).pipe(
         filterCorrectModule(cmdTy)
     );
-    const eventPlugins = mod.onEvent;
+
     return match(interaction)
         .when(isChatInputCommand, i => {
-                return mod$(CommandType.Slash).pipe(
-                    concatMap(m => {
-                        const ctx = Context.wrap(i);
-                        return from(m.onEvent.map(e => e.execute(
-                            [ctx, ['slash', i.options]],
-                            controller
-                        )));
-                    }),
-                    map( res => ({ mod,  res }))
-                );
+            const ctx = Context.wrap(i);
+            return mod$(CommandType.Slash).pipe(
+                concatMap(m => {
+                    return of(m.onEvent.map(e => e.execute(
+                        [ctx, ['slash', i.options]],
+                        controller
+                    ))).pipe(map(res => ({ m, res, execute() { m.execute(ctx, ['slash', i.options]); } }) ));
+                }),
+            );
             },
         )
         //Todo: refactor so that we dont have to have two separate branches. They're near identical!!
+        //Only thing that differs is type of interaction
         .when(isMessageCtxMenuCmd, ctx => {
             return mod$(CommandType.MenuMsg).pipe(
                 concatMap(m => {
-                    return from(m.onEvent.map(e => e.execute(
+                    return of(m.onEvent.map(e => e.execute(
                         [ctx],
                         controller
-                    )));
+                    ))).pipe(map(res => ({ m, res, execute() { m.execute(ctx); } }) ));
                 }),
-                map( res => ({ mod,  res }))
             );
-            const res = eventPlugins.map(e => {
-                    return (<EventPlugin<CommandType.MenuMsg>>e).execute([ctx]
-                        , controller);
-                }) as Awaited<Result<void, void>>[];
-                //Possible unsafe cast
-                // could result in the promises not being resolved
-                return of({ type: mod.type, res, mod, ctx });
             },
         )
         .when(isUserContextMenuCmd, ctx => {
-            const res = eventPlugins.map( e=> (<EventPlugin<CommandType.MenuUser>>e).execute([ctx]
-                    , controller)
-            ) as Awaited<Result<void, void>>[];
-            //Possible unsafe cast
-            // could result in the promises not being resolved
-            return of({ type: mod.type, res, mod, ctx });
+            return mod$(CommandType.MenuUser).pipe(
+                concatMap(m => {
+                    return of(m.onEvent.map(e => e.execute(
+                        [ctx],
+                        controller
+                    ))).pipe(map(res => ({ m, res, execute() { m.execute(ctx); } }) ));
+                }),
+            );
         })
         .run();
 }
@@ -80,24 +74,34 @@ function messageComponentInteractionHandler(
     if (mod === undefined) {
         return throwError(() => SernError.UndefinedModule);
     }
-    const eventPlugins = mod.onEvent;
+    const mod$ = <T extends CommandType>(ty : T) => of(mod).pipe( filterCorrectModule(ty));
+    //Todo: refactor so that we dont have to have two separate branches. They're near identical!!
+    //Only thing that differs is type of interaction
     return match(interaction)
         .when(isButton, ctx => {
-            const res = eventPlugins.map(e => {
-                return (<EventPlugin<CommandType.Button>>e).execute([ctx], controller);
-            }) as Awaited<Result<void, void>>[];
-            return of({ type: mod.type, res, mod, ctx });
+            return mod$(CommandType.Button).pipe(
+                concatMap(m => {
+                    return of(m.onEvent.map(e => e.execute(
+                        [ctx],
+                        controller
+                    ))).pipe(map(res => ({ m, res, execute() { m.execute(ctx); } }) ));
+                }),
+            );
         })
         .when(isSelectMenu, (ctx: SelectMenuInteraction) => {
-            const res = eventPlugins.map(e => {
-                return (<EventPlugin<CommandType.MenuSelect>>e).execute([ctx], controller);
-            }) as Awaited<Result<void, void>>[];
-            return of({ type: mod.type, res, mod, ctx });
+           return mod$(CommandType.MenuSelect).pipe(
+                concatMap(m => {
+                    return of(m.onEvent.map(e => e.execute(
+                        [ctx],
+                        controller
+                    ))).pipe(map(res => ({ m, res, execute() { m.execute(ctx); } }) ));
+                }),
+            );
         })
         .otherwise(() => throwError(() => SernError.NotSupportedInteraction));
 }
 
-export const onInteractionCreate = (wrapper: Wrapper) => {
+export function onInteractionCreate (wrapper: Wrapper) {
     const { client } = wrapper;
 
     const interactionEvent$ = <Observable<Interaction>>fromEvent(client, 'interactionCreate');
@@ -119,10 +123,14 @@ export const onInteractionCreate = (wrapper: Wrapper) => {
                     return messageComponentInteractionHandler(modul, interaction);
                 } else return throwError(() => SernError.NotSupportedInteraction);
             }),
-        )
-        .subscribe(m => {
-            m;
+        ).subscribe({
+            next({m, res, execute}) {
+           //     execute();
+            },
+            error(err) {
+                return;
+            }
         });
 
 
-};
+}

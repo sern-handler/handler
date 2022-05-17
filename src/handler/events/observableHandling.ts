@@ -13,9 +13,6 @@ export function filterCorrectModule<T extends keyof ModuleDefs>(cmdType: T) {
                     if (correctModuleType(mod, cmdType)) {
                         subscriber.next(mod);
                     } else {
-                        if (mod === undefined) {
-                            return throwError(() => SernError.UndefinedModule);
-                        }
                         return throwError(() => SernError.MismatchModule);
                     }
                 },
