@@ -49,7 +49,7 @@ export type ContextMenuUser = {
 
 export type ContextMenuMsg = {
     type: CommandType.MenuMsg;
-    onEvent: EventPlugin<CommandType.MenuUser>[];
+    onEvent: EventPlugin<CommandType.MenuMsg>[];
     plugins: CommandPlugin[];
 } & Override<BaseModule, { execute: (ctx: MessageContextMenuCommandInteraction) => Awaitable<void> }>;
 

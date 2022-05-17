@@ -6,7 +6,7 @@ import type { Module, ModuleDefs } from '../structures/module';
 import { correctModuleType } from '../utilities/predicates';
 
 export function filterCorrectModule<T extends keyof ModuleDefs>(cmdType: T) {
-    return (src: Observable<Module | undefined>) =>
+    return (src: Observable<Module>) =>
         new Observable<ModuleDefs[T]>(subscriber => {
             return src.subscribe({
                 next(mod) {

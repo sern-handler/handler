@@ -1,9 +1,7 @@
 import type { Module, ModuleDefs } from '../structures/module';
 import type { ChatInputCommandInteraction, CommandInteraction } from 'discord.js';
-import type { EventPlugin } from '../../../dist';
-import { CommandType } from '../sern';
-import type { EventPluginType } from '../plugins/plugin';
 import type { ButtonInteraction, MessageComponentInteraction, SelectMenuInteraction } from 'discord.js';
+import type { MessageContextMenuCommandInteraction, UserContextMenuCommandInteraction } from 'discord.js';
 
 
 export function correctModuleType<T extends keyof ModuleDefs>(
@@ -22,4 +20,11 @@ export function isButton(i : MessageComponentInteraction) : i is ButtonInteracti
 }
 export function isSelectMenu(i : MessageComponentInteraction) : i is SelectMenuInteraction {
     return i.isSelectMenu();
+}
+export function isMessageCtxMenuCmd(i : CommandInteraction) : i is MessageContextMenuCommandInteraction {
+    return i.isMessageContextMenuCommand();
+}
+
+export function isUserContextMenuCmd(i : CommandInteraction) : i is UserContextMenuCommandInteraction {
+    return i.isUserContextMenuCommand();
 }

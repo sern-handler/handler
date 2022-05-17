@@ -1,55 +1,75 @@
-import type {
-    CommandInteraction,
-    Interaction,
-    MessageComponentInteraction,
-    MessageContextMenuCommandInteraction as MessageCtxInt,
-    UserContextMenuCommandInteraction as UserCtxInt,
-} from 'discord.js';
-import type { SelectMenuInteraction } from 'discord.js';
-import { concatMap, fromEvent, Observable, of, throwError } from 'rxjs';
+import type { CommandInteraction, Interaction, MessageComponentInteraction, SelectMenuInteraction } from 'discord.js';
+import { concatMap, from, fromEvent, map, Observable, of, throwError } from 'rxjs';
 import type Wrapper from '../structures/wrapper';
 import * as Files from '../utilities/readFile';
-import { match, P } from 'ts-pattern';
+import { match } from 'ts-pattern';
 import { SernError } from '../structures/errors';
 import Context from '../structures/context';
 import type { Result } from 'ts-results';
 import { CommandType, controller } from '../sern';
-import type { Args, UnionToTuple } from '../../types/handler';
 import type { Module } from '../structures/module';
 import type { EventPlugin } from '../plugins/plugin';
-import { isButton, isChatInputCommand, isSelectMenu } from '../utilities/predicates';
+import {
+    isButton,
+    isChatInputCommand,
+    isMessageCtxMenuCmd,
+    isSelectMenu,
+    isUserContextMenuCmd,
+} from '../utilities/predicates';
+import { filterCorrectModule } from './observableHandling';
 
-
+//TODO : atm, i have to cast for every interaction. is there a way to not cast?
+// maybe pass it through an observable
 function applicationCommandHandler(mod: Module | undefined, interaction: CommandInteraction) {
     if (mod === undefined) {
         return throwError(() => SernError.UndefinedModule);
     }
+    const mod$ = <T extends CommandType>(cmdTy : T) => of(mod).pipe(
+        filterCorrectModule(cmdTy)
+    );
     const eventPlugins = mod.onEvent;
     return match(interaction)
         .when(isChatInputCommand, i => {
-                const ctx = Context.wrap(i);
-                const res = eventPlugins.map(e => {
-                    return (<EventPlugin<CommandType.Slash>>e).execute(
-                        [ctx, <Args>['slash', i.options]]
+                return mod$(CommandType.Slash).pipe(
+                    concatMap(m => {
+                        const ctx = Context.wrap(i);
+                        return from(m.onEvent.map(e => e.execute(
+                            [ctx, ['slash', i.options]],
+                            controller
+                        )));
+                    }),
+                    map( res => ({ mod,  res }))
+                );
+            },
+        )
+        //Todo: refactor so that we dont have to have two separate branches. They're near identical!!
+        .when(isMessageCtxMenuCmd, ctx => {
+            return mod$(CommandType.MenuMsg).pipe(
+                concatMap(m => {
+                    return from(m.onEvent.map(e => e.execute(
+                        [ctx],
+                        controller
+                    )));
+                }),
+                map( res => ({ mod,  res }))
+            );
+            const res = eventPlugins.map(e => {
+                    return (<EventPlugin<CommandType.MenuMsg>>e).execute([ctx]
                         , controller);
                 }) as Awaited<Result<void, void>>[];
                 //Possible unsafe cast
                 // could result in the promises not being resolved
-                return of({ type: CommandType.Slash, res, mod, ctx });
-            },
-        )
-        .when(
-            () => P._,
-            (ctx: UserCtxInt | MessageCtxInt) => {
-                //Kinda hackish
-                const res = eventPlugins.map(e => {
-                    return e.execute(
-                        [ctx] as UnionToTuple<CommandType.MenuMsg | CommandType.MenuUser>
-                        , controller);
-                }) as Awaited<Result<void, void>>[];
                 return of({ type: mod.type, res, mod, ctx });
             },
         )
+        .when(isUserContextMenuCmd, ctx => {
+            const res = eventPlugins.map( e=> (<EventPlugin<CommandType.MenuUser>>e).execute([ctx]
+                    , controller)
+            ) as Awaited<Result<void, void>>[];
+            //Possible unsafe cast
+            // could result in the promises not being resolved
+            return of({ type: mod.type, res, mod, ctx });
+        })
         .run();
 }
 
