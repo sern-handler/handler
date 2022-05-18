@@ -43,9 +43,6 @@ export const onMessageCreate = (wrapper: Wrapper) => {
         concatMap(({ ctx, args, mod }) => {
             const res = Promise.all(
                 mod.onEvent?.map(ePlug => {
-                    if ((ePlug.modType & mod.type) === 0) {
-                        return Err.EMPTY;
-                    }
                     return ePlug.execute([ctx, args], controller);
                 }) ?? [],
             );

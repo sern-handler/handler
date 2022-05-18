@@ -37,7 +37,7 @@ export function isUserContextMenuCmd(i : CommandInteraction) : i is UserContextM
     return i.isUserContextMenuCommand();
 }
 
-function isPromise<T>(promiseLike : Awaitable<T>) : promiseLike is Promise<T> {
+export function isPromise<T>(promiseLike : Awaitable<T>) : promiseLike is Promise<T> {
     const keys = new Set(Object.keys(promiseLike));
     return keys.has('then') && keys.has('catch');
 }

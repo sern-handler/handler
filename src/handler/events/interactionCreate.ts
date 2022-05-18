@@ -118,7 +118,7 @@ export function onInteractionCreate (wrapper: Wrapper) {
             }),
         ).subscribe({
             next({m, res, execute}) {
-                 console.log(res);
+
             },
             error(err) {
                 console.log(err);
