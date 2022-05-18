@@ -79,7 +79,8 @@ typings/
 # TypeScript build output
 dist
 
-# VisualStudio config file
+# VisualStudio Config file
 .vs
 
-.idea
+# IntelliJ IDEA Config file
+.idea/
