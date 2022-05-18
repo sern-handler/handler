@@ -36,7 +36,6 @@ export type CommandPlugin = Override<BasePlugin, {
 //TODO: rn adding the modType check a little hackish. Find better way to determine the
 // module type of the event plugin
 export type EventPlugin<T extends keyof ModuleDefs> = Override<BasePlugin, {
-    modType: T;
     type: PluginType.Event;
     execute: (event: Parameters<ModuleDefs[T]['execute']>, controller: Controller) => Awaitable<Result<void, void>>;
 }>;
@@ -48,6 +47,7 @@ export function plugins(...plug: CommandPlugin[]) {
 type ModuleNoPlugins = ValueOf<{
     [T in keyof ModuleDefs] : Omit<ModuleDefs[T], 'plugins'>
 }>
+//TODO: I WANT BETTER TYPINGS AHHHHHHHHHHHHHHH
 
 export function sernModule(
     plugins: (CommandPlugin)[], mod : ModuleNoPlugins
