@@ -83,3 +83,4 @@ dist
 .vs
 
 # IntelliJ IDEA Config file
+.idea
