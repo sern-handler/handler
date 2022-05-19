@@ -1,4 +1,4 @@
-import type { DiscordEvent } from '../types/handler';
+import type { DiscordEvent, EventEmitterRegister } from '../types/handler';
 
 import { ApplicationCommandType, Client } from 'discord.js';
 
@@ -11,20 +11,25 @@ import { onInteractionCreate } from './events/interactionCreate';
 import { match, P } from 'ts-pattern';
 import { Err, Ok } from 'ts-results';
 import { CommandType } from './structures/enums';
+import { isDiscordEvent } from './utilities/predicates';
 
 export function init(wrapper: Wrapper) {
     const { events, client } = wrapper;
-    if (events !== undefined) eventObserver(client, events);
+    if (events !== undefined)  {
+      eventObserver(client, events);
+    }  
     onReady(wrapper);
     onMessageCreate(wrapper);
     onInteractionCreate(wrapper);
 }
 
-//TODO : Add event listener for any other generic node js event emitter
-function eventObserver(client: Client, events: DiscordEvent[]) {
-    events.forEach(([event, cb]) => {
-        if (event === 'ready') throw Error(SernError.ReservedEvent);
-        fromEvent(client, event, cb).subscribe();
+function eventObserver(client: Client, events: (DiscordEvent | EventEmitterRegister)[]) {
+    events.forEach((event) => {
+        if(isDiscordEvent(event)) {
+          fromEvent(client, event[0], event[1]).subscribe();
+        } else {
+          fromEvent(event[0], event[1], event[2]).subscribe();
+        }
     });
 }
 

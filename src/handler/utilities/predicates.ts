@@ -9,6 +9,7 @@ import type {
     SelectMenuInteraction,
     UserContextMenuCommandInteraction,
 } from 'discord.js';
+import type { DiscordEvent, EventEmitterRegister } from '../..';
 
 
 
@@ -41,3 +42,8 @@ export function isPromise<T>(promiseLike : Awaitable<T>) : promiseLike is Promis
     const keys = new Set(Object.keys(promiseLike));
     return keys.has('then') && keys.has('catch');
 }
+
+export function isDiscordEvent(el : DiscordEvent | EventEmitterRegister) : el is DiscordEvent {
+    return el.length === 2;
+}
+

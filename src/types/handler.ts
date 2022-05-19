@@ -5,7 +5,7 @@ import type {
     MessageOptions,
     MessagePayload,
 } from 'discord.js';
-
+import type { EventEmitter } from 'events';
 // Anything that can be sent in a `<TextChannel>#send` or `<CommandInteraction>#reply`
 export type possibleOutput<T = string> = T | (MessagePayload & MessageOptions);
 export type Nullish<T> = T | undefined | null;
@@ -17,6 +17,9 @@ export type ParseType<T> = {
 export type Args = ParseType<{ text: string[]; slash: SlashOptions }>;
 
 export type DiscordEvent = ParseType<{ [K in keyof ClientEvents]: (...args: ClientEvents[K]) => Awaitable<void> }>;
+export type EventEmitterRegister = [ emitter: EventEmitter, k : string, cb : (...args: unknown[]) => Awaitable<void>];
+
+
 
 export type SlashOptions = Omit<CommandInteractionOptionResolver, 'getMessage' | 'getFocused'>;
 
