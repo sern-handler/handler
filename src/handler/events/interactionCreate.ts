@@ -1,4 +1,10 @@
-import type { CommandInteraction, Interaction, MessageComponentInteraction, SelectMenuInteraction } from 'discord.js';
+import type {
+    Awaitable,
+    CommandInteraction,
+    Interaction,
+    MessageComponentInteraction,
+    SelectMenuInteraction,
+} from 'discord.js';
 import { concatMap, fromEvent, map, Observable, of, throwError } from 'rxjs';
 import type Wrapper from '../structures/wrapper';
 import * as Files from '../utilities/readFile';
@@ -10,12 +16,13 @@ import type { Module } from '../structures/module';
 import {
     isButton,
     isChatInputCommand,
-    isMessageCtxMenuCmd,
+    isMessageCtxMenuCmd, isPromise,
     isSelectMenu,
     isUserContextMenuCmd,
 } from '../utilities/predicates';
 import { filterCorrectModule } from './observableHandling';
 import { CommandType } from '../structures/enums';
+import type { Result } from 'ts-results';
 
 function applicationCommandHandler(mod: Module | undefined, interaction: CommandInteraction) {
     const mod$ = <T extends CommandType>(cmdTy : T) => of(mod).pipe(
@@ -31,7 +38,7 @@ function applicationCommandHandler(mod: Module | undefined, interaction: Command
                     return of(m.onEvent?.map(e => e.execute(
                         [ctx, ['slash', i.options]],
                         controller
-                    )) ?? []).pipe(map(res => ({ m, res, execute() { return m.execute(ctx, ['slash', i.options]); } }) ));
+                    )) ?? []).pipe(map(res => ({ mod, res, execute() { return m.execute(ctx, ['slash', i.options]); } }) ));
                 }),
             );
             },
@@ -44,7 +51,7 @@ function applicationCommandHandler(mod: Module | undefined, interaction: Command
                     return of(m.onEvent?.map(e => e.execute(
                         [ctx],
                         controller
-                    )) ?? []).pipe(map(res => ({ m, res, execute() { return m.execute(ctx); } }) ));
+                    )) ?? []).pipe(map(res => ({ mod, res, execute() { return m.execute(ctx); } }) ));
                 }),
             );
             },
@@ -55,7 +62,7 @@ function applicationCommandHandler(mod: Module | undefined, interaction: Command
                     return of(m.onEvent?.map(e => e.execute(
                         [ctx],
                         controller
-                    )) ?? []).pipe(map(res => ({ m, res, execute() { return m.execute(ctx); } }) ));
+                    )) ?? []).pipe(map(res => ({ mod, res, execute() { return m.execute(ctx); } }) ));
                 }),
             );
         })
@@ -77,7 +84,7 @@ function messageComponentInteractionHandler(
                     return of(m.onEvent?.map(e => e.execute(
                         [ctx],
                         controller
-                    )) ?? []).pipe(map(res => ({ m, res, execute() { return m.execute(ctx); } }) ));
+                    )) ?? []).pipe(map(res => ({ mod, res, execute() { return m.execute(ctx); } }) ));
                 }),
             );
         })
@@ -87,7 +94,7 @@ function messageComponentInteractionHandler(
                     return of(m.onEvent?.map(e => e.execute(
                         [ctx],
                         controller
-                    )) ?? []).pipe(map(res => ({ m, res, execute() { return m.execute(ctx); } }) ));
+                    )) ?? []).pipe(map(res => ({ mod, res, execute() { return m.execute(ctx); } }) ));
                 }),
             );
         })
@@ -117,13 +124,23 @@ export function onInteractionCreate (wrapper: Wrapper) {
                 } else return throwError(() => SernError.NotSupportedInteraction);
             }),
         ).subscribe({
-            next({m, res, execute}) {
-
-            },
+            async next({ mod, res : eventPluginRes, execute}) {
+                const ePlugArr : Result<void, void>[] = [];
+                for await ( const res of eventPluginRes) {
+                   if(isPromise(res)) {
+                       ePlugArr.push(res);
+                   }
+                    ePlugArr.push(res as Awaited<Result<void, void>>);
+                }
+                if(ePlugArr.every(e => e.ok)) {
+                    await execute();
+                } else {
+                    console.log(ePlugArr);
+                    console.log(mod, 'failed');
+                }
+             },
             error(err) {
                 console.log(err);
             }
         });
-
-
 }
