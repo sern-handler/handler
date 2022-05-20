@@ -33,17 +33,6 @@ export default class Context {
         this.oInterac = oInterac;
     }
 
-    static wrap(wrappable: ChatInputCommandInteraction | Message): Context {
-        if ('token' in wrappable) {
-            return new Context(None, Some(wrappable));
-        }
-        return new Context(Some(wrappable), None);
-    }
-
-    public isEmpty() {
-        return this.oMsg.none && this.oInterac.none;
-    }
-
     public get message() {
         return this.oMsg.unwrap();
     }
@@ -102,6 +91,17 @@ export default class Context {
             this.oMsg.map(m => m.member),
             this.oInterac.map(i => i.member),
         );
+    }
+
+    static wrap(wrappable: ChatInputCommandInteraction | Message): Context {
+        if ('token' in wrappable) {
+            return new Context(None, Some(wrappable));
+        }
+        return new Context(Some(wrappable), None);
+    }
+
+    public isEmpty() {
+        return this.oMsg.none && this.oInterac.none;
     }
 
     /*

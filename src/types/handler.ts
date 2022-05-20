@@ -17,8 +17,7 @@ export type ParseType<T> = {
 export type Args = ParseType<{ text: string[]; slash: SlashOptions }>;
 
 export type DiscordEvent = ParseType<{ [K in keyof ClientEvents]: (...args: ClientEvents[K]) => Awaitable<void> }>;
-export type EventEmitterRegister = [ emitter: EventEmitter, k : string, cb : (...args: unknown[]) => Awaitable<void>];
-
+export type EventEmitterRegister = [emitter: EventEmitter, k: string, cb: (...args: unknown[]) => Awaitable<void>];
 
 
 export type SlashOptions = Omit<CommandInteractionOptionResolver, 'getMessage' | 'getFocused'>;

@@ -4,11 +4,11 @@ import * as Files from '../utilities/readFile';
 import type Wrapper from '../structures/wrapper';
 import { controller } from '../sern';
 import type { Result } from 'ts-results';
+import { Err, Ok } from 'ts-results';
 import type { Awaitable } from 'discord.js';
+import { ApplicationCommandType, ComponentType } from 'discord.js';
 import type { Module } from '../structures/module';
 import { match } from 'ts-pattern';
-import { ApplicationCommandType, ComponentType } from 'discord.js';
-import { Err, Ok } from 'ts-results';
 import { SernError } from '../structures/errors';
 import type { DefinitelyDefined } from '../../types/handler';
 import { CommandType, PluginType } from '../structures/enums';
@@ -40,7 +40,7 @@ export const onReady = (wrapper: Wrapper) => {
 
     (
         concat(ready$, processPlugins$) as Observable<{
-            mod: DefinitelyDefined<Module, { name : string }>;
+            mod: DefinitelyDefined<Module, { name: string }>;
             cmdPluginsRes: {
                 execute: Awaitable<Result<void, void>>;
                 type: PluginType.Command;
@@ -60,17 +60,21 @@ export const onReady = (wrapper: Wrapper) => {
             const loadedPluginsCorrectly = cmdPluginsRes.every(res => res.execute.ok);
             if (loadedPluginsCorrectly) {
                 const res = registerModule(mod);
-                if(res.err) {
+                if (res.err) {
                     throw Error(SernError.NonValidModuleType);
                 }
-                wrapper.sernEmitter?.emit('module.register', { success : true,  module : mod } );
+                wrapper.sernEmitter?.emit('module.register', { success: true, module: mod });
             } else {
-                wrapper.sernEmitter?.emit('module.register', { success : false,  module : mod, reason : SernError.PluginFailure } );
+                wrapper.sernEmitter?.emit('module.register', {
+                    success: false,
+                    module: mod,
+                    reason: SernError.PluginFailure,
+                });
             }
         });
 };
 
-function registerModule(mod: DefinitelyDefined<Module, { name: string }>) : Result<void, void> {
+function registerModule(mod: DefinitelyDefined<Module, { name: string }>): Result<void, void> {
     const name = mod.name;
     return match<Module>(mod)
         .with({ type: CommandType.Text }, mod => {

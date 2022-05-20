@@ -270,6 +270,10 @@ class FormatInner {
         this.raw = raw;
     }
 
+    static wrap(raw: string, what: string) {
+        return `${what}${raw}${what}`;
+    }
+
     toString() {
         return this.raw;
     }
@@ -327,10 +331,6 @@ class FormatInner {
         const escaped = Escape[key](w, key);
         const ret = this.static.wrap(escaped, Strings[key]);
         return new this.static(ret);
-    }
-
-    static wrap(raw: string, what: string) {
-        return `${what}${raw}${what}`;
     }
 }
 

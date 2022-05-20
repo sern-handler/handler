@@ -17,7 +17,6 @@ import type { Module, Override } from '../..';
 import type { BaseModule, ModuleDefs } from '../structures/module';
 import type { PluginType } from '../structures/enums';
 import type { ValueOf } from 'ts-pattern/dist/types/helpers';
-import type { CommandType } from '../..';
 
 
 export interface Controller {
@@ -26,7 +25,7 @@ export interface Controller {
 }
 
 type BasePlugin = Override<BaseModule, {
-    type : PluginType,
+    type: PluginType,
 }>;
 
 export type CommandPlugin = Override<BasePlugin, {
@@ -41,22 +40,23 @@ export type EventPlugin<T extends keyof ModuleDefs> = Override<BasePlugin, {
     execute: (event: Parameters<ModuleDefs[T]['execute']>, controller: Controller) => Awaitable<Result<void, void>>;
 }>;
 
-export function plugins(...plug: CommandPlugin[]) : CommandPlugin[];
-export function plugins<T extends keyof ModuleDefs>(...plug: EventPlugin<T>[]) : EventPlugin<T>[];
+export function plugins(...plug: CommandPlugin[]): CommandPlugin[];
+export function plugins<T extends keyof ModuleDefs>(...plug: EventPlugin<T>[]): EventPlugin<T>[];
 export function plugins<T extends keyof ModuleDefs>(...plug: EventPlugin<T>[] | CommandPlugin[]) {
     return plug;
 }
 
 type ModuleNoPlugins = ValueOf<{
-    [T in keyof ModuleDefs] : Omit<ModuleDefs[T], 'plugins'>
+    [T in keyof ModuleDefs]: Omit<ModuleDefs[T], 'plugins'>
 }>
+
 //TODO: I WANT BETTER TYPINGS AHHHHHHHHHHHHHHH
 
 export function sernModule(
-    plugins: (CommandPlugin)[], mod : ModuleNoPlugins
-) : Module {
+    plugins: (CommandPlugin)[], mod: ModuleNoPlugins,
+): Module {
     return {
         plugins,
-        ...mod
+        ...mod,
     };
 }

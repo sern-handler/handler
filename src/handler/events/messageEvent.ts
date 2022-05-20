@@ -1,6 +1,5 @@
 import type { Message } from 'discord.js';
-import { concatMap, filter, from, fromEvent, map, Observable, of } from 'rxjs';
-import { Err } from 'ts-results';
+import { concatMap, from, fromEvent, map, Observable, of } from 'rxjs';
 import type { Args } from '../..';
 import { controller } from '../sern';
 import Context from '../structures/context';
@@ -52,17 +51,21 @@ export const onMessageCreate = (wrapper: Wrapper) => {
     );
 
     processEventPlugins$.subscribe({
-         next({ mod, ctx, args, res })  {
+        next({ mod, ctx, args, res }) {
             if (res.every(pl => pl.ok)) {
                 Promise.resolve(mod.execute(ctx, args)).then(() => {
                     wrapper.sernEmitter?.emit('module.activate', { success: true, module: mod! });
-                    });
-                } else {
-                    wrapper.sernEmitter?.emit('module.activate', { success: false, module: mod!, reason: SernError.PluginFailure });
-                }
-            },
-            error(e) {
-                 wrapper.sernEmitter?.emit('error', e);
+                });
+            } else {
+                wrapper.sernEmitter?.emit('module.activate', {
+                    success: false,
+                    module: mod!,
+                    reason: SernError.PluginFailure,
+                });
             }
-        });
-    };
+        },
+        error(e) {
+            wrapper.sernEmitter?.emit('error', e);
+        },
+    });
+};

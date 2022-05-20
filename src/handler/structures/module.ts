@@ -6,14 +6,13 @@ import type {
     SelectMenuInteraction,
     UserContextMenuCommandInteraction,
 } from 'discord.js';
-import type { Override } from '../../types/handler';
-import type { Args } from '../../types/handler';
+import type { Args, Override } from '../../types/handler';
 import type { CommandPlugin, EventPlugin } from '../plugins/plugin';
 import type Context from './context';
 import { CommandType, PluginType } from './enums';
 
 export interface BaseModule {
-    type : CommandType | PluginType
+    type: CommandType | PluginType;
     name?: string;
     description: string;
     execute: (ctx: Context, args: Args) => Awaitable<void>;
@@ -56,7 +55,7 @@ export type ContextMenuMsg = Override<BaseModule, {
     execute: (ctx: MessageContextMenuCommandInteraction) => Awaitable<void>
 }>;
 
-export type ButtonCommand = Override<BaseModule,{
+export type ButtonCommand = Override<BaseModule, {
     type: CommandType.Button;
     onEvent?: EventPlugin<CommandType.Button>[];
     plugins?: CommandPlugin[];

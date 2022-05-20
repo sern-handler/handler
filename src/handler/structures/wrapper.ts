@@ -12,7 +12,7 @@ import type SernEmitter from '../sernEmitter';
  */
 interface Wrapper {
     readonly client: Client;
-    readonly sernEmitter? : SernEmitter
+    readonly sernEmitter?: SernEmitter;
     readonly defaultPrefix?: string;
     readonly commands: string;
     readonly events?: (DiscordEvent | EventEmitterRegister)[];

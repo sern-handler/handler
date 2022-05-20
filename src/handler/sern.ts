@@ -15,9 +15,9 @@ import { isDiscordEvent } from './utilities/predicates';
 
 export function init(wrapper: Wrapper) {
     const { events, client } = wrapper;
-    if (events !== undefined)  {
-      eventObserver(client, events);
-    }  
+    if (events !== undefined) {
+        eventObserver(client, events);
+    }
     onReady(wrapper);
     onMessageCreate(wrapper);
     onInteractionCreate(wrapper);
@@ -25,10 +25,10 @@ export function init(wrapper: Wrapper) {
 
 function eventObserver(client: Client, events: (DiscordEvent | EventEmitterRegister)[]) {
     events.forEach((event) => {
-        if(isDiscordEvent(event)) {
-          fromEvent(client, event[0], event[1]).subscribe();
+        if (isDiscordEvent(event)) {
+            fromEvent(client, event[0], event[1]).subscribe();
         } else {
-          fromEvent(event[0], event[1], event[2]).subscribe();
+            fromEvent(event[0], event[1], event[2]).subscribe();
         }
     });
 }
