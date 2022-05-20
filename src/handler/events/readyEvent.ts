@@ -63,9 +63,9 @@ export const onReady = (wrapper: Wrapper) => {
                 if(res.err) {
                     throw Error(SernError.NonValidModuleType);
                 }
+                wrapper.sernEmitter?.emit('module.register', { success : true,  module : mod } );
             } else {
-                console.log(`Failed to load command ${mod.name!}`);
-                console.log(mod);
+                wrapper.sernEmitter?.emit('module.register', { success : false,  module : mod, reason : SernError.PluginFailure } );
             }
         });
 };

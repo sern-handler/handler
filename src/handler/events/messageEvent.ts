@@ -9,6 +9,7 @@ import { fmt } from '../utilities/messageHelpers';
 import * as Files from '../utilities/readFile';
 import { filterCorrectModule, ignoreNonBot } from './observableHandling';
 import { CommandType } from '../structures/enums';
+import { SernError } from '../structures/errors';
 
 export const onMessageCreate = (wrapper: Wrapper) => {
     const { client, defaultPrefix } = wrapper;
@@ -50,11 +51,18 @@ export const onMessageCreate = (wrapper: Wrapper) => {
         }),
     );
 
-    processEventPlugins$.subscribe(({ mod, ctx, args, res }) => {
-        if (res.every(pl => pl.ok)) {
-            Promise.resolve(mod.execute(ctx, args)).then(() => console.log(mod));
-        } else {
-            console.log(mod, 'failed');
-        }
-    });
-};
+    processEventPlugins$.subscribe({
+         next({ mod, ctx, args, res })  {
+            if (res.every(pl => pl.ok)) {
+                Promise.resolve(mod.execute(ctx, args)).then(() => {
+                    wrapper.sernEmitter?.emit('module.activate', { success: true, module: mod! });
+                    });
+                } else {
+                    wrapper.sernEmitter?.emit('module.activate', { success: false, module: mod!, reason: SernError.PluginFailure });
+                }
+            },
+            error(e) {
+                 wrapper.sernEmitter?.emit('error', e);
+            }
+        });
+    };

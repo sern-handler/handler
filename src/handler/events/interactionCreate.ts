@@ -131,16 +131,14 @@ export function onInteractionCreate (wrapper: Wrapper) {
                     ePlugArr.push(res as Awaited<Result<void, void>>);
                 }
                 if(ePlugArr.every(e => e.ok)) {
-                    wrapper.sernEmitter?.emit('sern.command.success', [mod!]);
                     await execute();
+                    wrapper.sernEmitter?.emit('module.activate', { success: true, module: mod! });
                 } else {
-                    wrapper.sernEmitter?.emit('sern.command.fail', [mod!]);
-                    console.log(ePlugArr);
-                    console.log(mod, 'failed');
+                    wrapper.sernEmitter?.emit('module.activate', { success: false, module: mod!, reason : SernError.PluginFailure });
                 }
              },
             error(err) {
-                wrapper.sernEmitter?.emit('sern.error', err);
+                wrapper.sernEmitter?.emit('error', err);
             }
         });
 }

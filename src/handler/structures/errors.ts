@@ -7,4 +7,5 @@ export enum SernError {
     NotImplemented = 'This feature has not yet been implemented',
     NotSupportedInteraction = `This interaction is not supported.`,
     NotValidEventName = `Supplied a non valid event name`,
+    PluginFailure = `A plugin failed to call controller.next()`,
 }

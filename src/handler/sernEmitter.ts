@@ -1,12 +1,15 @@
 import { EventEmitter } from 'events';
 import type { Module } from './structures/module';
-import type { Nullish } from '../types/handler';
+import type { Err } from 'ts-results';
+
+type Payload =
+    { success : true,  module : Module }
+    | { success : false, module: Module | undefined, reason : string | Error }
 
 type SernEventsMapping = {
-    ['sern.command.registered'] : [ Module ];
-    ['sern.command.success'] : [ Module ];
-    ['sern.command.fail'] : [ Nullish<Module> ];
-    ['sern.error'] : [ Error ];
+    ['module.register'] : [ Payload ];
+    ['module.activate'] : [ Payload ];
+    ['error'] : [ Error | string ];
 }
 
 export default class SernEmitter extends EventEmitter {
@@ -17,7 +20,7 @@ export default class SernEmitter extends EventEmitter {
     public override once<T extends keyof SernEventsMapping>(eventName: T, listener: (...args: SernEventsMapping[T][]) => void): this {
        return super.once(eventName,listener);
     }
-    public override emit<T extends keyof SernEventsMapping>(eventName: T, args : SernEventsMapping[T]): boolean {
+    public override emit<T extends keyof SernEventsMapping>(eventName: T, ...args : SernEventsMapping[T]): boolean {
        return super.emit(eventName, ...args);
     }
 }
