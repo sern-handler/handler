@@ -39,12 +39,12 @@ const client = new Client({
 });
 
 new Sern.Handler({
-    client,   
-    prefix,   
-    commands : 'dist/commands', 
-    privateServers : [           
+    client,
+    prefix,
+    commands: 'dist/commands',
+    privateServers: [
         {
-            test : true,
+            test: true,
             id: 'server-id'
         }
     ],
@@ -63,13 +63,13 @@ client.login(token);
 import { Sern, Types } from 'sern-handler';
 import { Ok } from 'ts-results';
 
-export default  {
+export default {
     alias: [],
-    desc : 'A ping pong command',
-    visibility : 'private',
-    test : false,
+    desc: 'A ping pong command',
+    visibility: 'private',
+    test: false,
     type: Sern.CommandType.SLASH | Sern.CommandType.TEXT,
-    execute : async ({ message, interaction }, args) => 'pong!'
+    execute: async ({ message, interaction }, args) => 'pong!'
 };
 ```
 
