@@ -1,5 +1,6 @@
 import type { Client } from 'discord.js';
 import type { DiscordEvent, EventEmitterRegister } from '../../types/handler';
+import type SernEmitter from '../sernEmitter';
 
 /**
  * An object to be passed into Sern.Handler constructor.
@@ -7,11 +8,11 @@ import type { DiscordEvent, EventEmitterRegister } from '../../types/handler';
  * @property {readonly Client} client
  * @property {readonly string} defaultPrefix
  * @property {readonly string} commands
- * @prop {(handler : Handler) => void)} init
  * @prop { readonly DiscordEvent[] } events
  */
 interface Wrapper {
     readonly client: Client;
+    readonly sernEmitter? : SernEmitter
     readonly defaultPrefix?: string;
     readonly commands: string;
     readonly events?: (DiscordEvent | EventEmitterRegister)[];

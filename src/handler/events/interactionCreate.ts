@@ -1,5 +1,4 @@
 import type {
-    Awaitable,
     CommandInteraction,
     Interaction,
     MessageComponentInteraction,
@@ -28,7 +27,6 @@ function applicationCommandHandler(mod: Module | undefined, interaction: Command
     const mod$ = <T extends CommandType>(cmdTy : T) => of(mod).pipe(
         filterCorrectModule(cmdTy)
     );
-
     return match(interaction)
         .when(isChatInputCommand, i => {
             const ctx = Context.wrap(i);
@@ -133,14 +131,16 @@ export function onInteractionCreate (wrapper: Wrapper) {
                     ePlugArr.push(res as Awaited<Result<void, void>>);
                 }
                 if(ePlugArr.every(e => e.ok)) {
+                    wrapper.sernEmitter?.emit('sern.command.success', [mod!]);
                     await execute();
                 } else {
+                    wrapper.sernEmitter?.emit('sern.command.fail', [mod!]);
                     console.log(ePlugArr);
                     console.log(mod, 'failed');
                 }
              },
             error(err) {
-                console.log(err);
+                wrapper.sernEmitter?.emit('sern.error', err);
             }
         });
 }

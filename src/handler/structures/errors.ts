@@ -6,4 +6,5 @@ export enum SernError {
     MismatchModule = `A module type mismatched with event emitted!`,
     NotImplemented = 'This feature has not yet been implemented',
     NotSupportedInteraction = `This interaction is not supported.`,
+    NotValidEventName = `Supplied a non valid event name`,
 }
