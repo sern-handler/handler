@@ -1,19 +1,22 @@
 # Sern Handler
+
 <a href="https://www.npmjs.com/package/sern-handler">
 <img src="https://img.shields.io/npm/v/sern_handler?maxAge=3600" alt="NPM version" /></a> <a href="https://www.npmjs.com/package/sern-handler"><img src="https://img.shields.io/npm/dt/sern_handler?maxAge=3600" alt="NPM downloads" /></a> <a href="https://www.npmjs.com/package/sern-handler"><img src="https://img.shields.io/badge/builds-stable" alt="Builds Passing"></a>
 
 Sern can automate and streamline development of your discord bot with new version compatibility and full customization.
 
--   A reincarnation of [this old project](https://github.com/jacoobes/sern_handler)
+- A reincarnation of [this old project](https://github.com/jacoobes/sern_handler)
 
 ## Installation
 
 ```sh
 npm install sern-handler
 ```
+
 ```sh
 yarn add sern-handler
 ```
+
 ```sh
 pnpm add sern-handler
 ```
@@ -21,6 +24,7 @@ pnpm add sern-handler
 ## Basic Usage
 
 #### ` index.js `
+
 ```js
 import { Client, Intents } from 'discord.js';
 import { Sern } from 'sern-handler';
@@ -54,6 +58,7 @@ client.login(token);
 ```
 
 #### ` ping.js `
+
 ```js
 import { Sern, Types } from 'sern-handler';
 import { Ok } from 'ts-results';
@@ -78,8 +83,8 @@ See [documentation](https://sern-handler.js.org) for TypeScript examples and mor
 
 ## Contribute
 
--   Pull up on [issues](https://github.com/sern-handler/Sern/issues) and tell us, if there are bugs
--   All kinds of contributions are welcomed!
+- Pull up on [issues](https://github.com/sern-handler/Sern/issues) and tell us, if there are bugs
+- All kinds of contributions are welcomed!
 
 ## TODO
 

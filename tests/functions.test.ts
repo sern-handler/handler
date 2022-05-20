@@ -1,4 +1,5 @@
-import { hasPrefix, fmt, isNotFromBot } from '../src/handler/utilities/messageHelpers';
+import { fmt, hasPrefix, isNotFromBot } from '../src/handler/utilities/messageHelpers';
+
 describe('FUNCTIONS', () => {
     test('If hasPrefix is a function', () => {
         expect(typeof hasPrefix).toBe('function');
@@ -9,5 +10,4 @@ describe('FUNCTIONS', () => {
     test('if isBot is a function', () => {
         expect(typeof isNotFromBot).toBe('function');
     });
-
 });
