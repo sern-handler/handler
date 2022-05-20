@@ -23,16 +23,14 @@ export const onMessageCreate = (wrapper: Wrapper) => {
             return {
                 ctx: Context.wrap(message), //TODO : check for BothCommand
                 args: <Args>['text', rest],
-                mod:
-                    Files.BothCommands.get(prefix) ??
-                    Files.TextCommands.aliases.get(prefix),
+                mod: Files.BothCommands.get(prefix) ?? Files.TextCommands.aliases.get(prefix),
             };
         }),
     );
     const ensureModuleType$ = processMessage$.pipe(
         concatMap(payload =>
             of(payload.mod).pipe(
-                //SUPPORT COMMANDTYPE.BOTH
+                //SUPPORT COMMAND TYPE.BOTH
                 filterCorrectModule(CommandType.Text),
                 map(mod => ({ ...payload, mod })),
             ),

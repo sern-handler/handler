@@ -47,4 +47,3 @@ export function ignoreNonBot(prefix: string) {
             });
         });
 }
-

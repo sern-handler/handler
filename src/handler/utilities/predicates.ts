@@ -11,7 +11,6 @@ import type {
 } from 'discord.js';
 import type { DiscordEvent, EventEmitterRegister } from '../..';
 
-
 export function correctModuleType<T extends keyof ModuleDefs>(
     plug: Module | undefined,
     type: T,
@@ -47,4 +46,3 @@ export function isPromise<T>(promiseLike: Awaitable<T>): promiseLike is Promise<
 export function isDiscordEvent(el: DiscordEvent | EventEmitterRegister): el is DiscordEvent {
     return el.length === 2;
 }
-

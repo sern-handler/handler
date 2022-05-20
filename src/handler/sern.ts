@@ -24,7 +24,7 @@ export function init(wrapper: Wrapper) {
 }
 
 function eventObserver(client: Client, events: (DiscordEvent | EventEmitterRegister)[]) {
-    events.forEach((event) => {
+    events.forEach(event => {
         if (isDiscordEvent(event)) {
             fromEvent(client, event[0], event[1]).subscribe();
         } else {

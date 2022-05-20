@@ -26,14 +26,15 @@ export const onReady = (wrapper: Wrapper) => {
         }),
     );
     const processPlugins$ = processCommandFiles$.pipe(
-        concatMap((mod) => {
-            const cmdPluginsRes = mod.plugins?.map(plug => {
-                return {
-                    ...plug,
-                    name: plug?.name ?? 'Unnamed Plugin',
-                    execute: plug.execute(client, mod, controller),
-                };
-            }) ?? [];
+        concatMap(mod => {
+            const cmdPluginsRes =
+                mod.plugins?.map(plug => {
+                    return {
+                        ...plug,
+                        name: plug?.name ?? 'Unnamed Plugin',
+                        execute: plug.execute(client, mod, controller),
+                    };
+                }) ?? [];
             return of({ mod, cmdPluginsRes });
         }),
     );
