@@ -215,7 +215,7 @@ function toTimeString<T extends string | number | symbol>(
     if (unix === 0n) return '0 milliseconds';
 
     const formatted: Map<T, number> = new Map();
-    const unitList: ObjectEntries<T, bigint> = Object.entries(units) as any;
+    const unitList: ObjectEntries<T, bigint> = Object.entries(units) as ObjectEntries<T, bigint>;
     let run = unix;
 
     for (const [unit, value] of unitList) {
