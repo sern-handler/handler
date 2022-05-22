@@ -1,4 +1,9 @@
-import type { CommandInteraction, Interaction, MessageComponentInteraction, SelectMenuInteraction } from 'discord.js';
+import type {
+    CommandInteraction,
+    Interaction,
+    MessageComponentInteraction,
+    SelectMenuInteraction,
+} from 'discord.js';
 import { concatMap, fromEvent, map, Observable, of, throwError } from 'rxjs';
 import type Wrapper from '../structures/wrapper';
 import * as Files from '../utilities/readFile';
@@ -27,7 +32,11 @@ function applicationCommandHandler(mod: Module | undefined, interaction: Command
                 const ctx = Context.wrap(i);
                 return mod$(CommandType.Slash).pipe(
                     concatMap(m => {
-                        return of(m.onEvent?.map(e => e.execute([ctx, ['slash', i.options]], controller)) ?? []).pipe(
+                        return of(
+                            m.onEvent?.map(e =>
+                                e.execute([ctx, ['slash', i.options]], controller),
+                            ) ?? [],
+                        ).pipe(
                             map(res => ({
                                 mod,
                                 res,
@@ -75,7 +84,10 @@ function applicationCommandHandler(mod: Module | undefined, interaction: Command
     );
 }
 
-function messageComponentInteractionHandler(mod: Module | undefined, interaction: MessageComponentInteraction) {
+function messageComponentInteractionHandler(
+    mod: Module | undefined,
+    interaction: MessageComponentInteraction,
+) {
     const mod$ = <T extends CommandType>(ty: T) => of(mod).pipe(filterCorrectModule(ty));
     //Todo: refactor so that we dont have to have two separate branches. They're near identical!!
     //Only thing that differs is type of interaction
@@ -124,12 +136,15 @@ export function onInteractionCreate(wrapper: Wrapper) {
             concatMap(interaction => {
                 if (interaction.isCommand()) {
                     const modul =
-                        Files.ApplicationCommands[interaction.commandType].get(interaction.commandName) ??
-                        Files.BothCommands.get(interaction.commandName);
+                        Files.ApplicationCommands[interaction.commandType].get(
+                            interaction.commandName,
+                        ) ?? Files.BothCommands.get(interaction.commandName);
                     return applicationCommandHandler(modul, interaction);
                 }
                 if (interaction.isMessageComponent()) {
-                    const modul = Files.MessageCompCommands[interaction.componentType].get(interaction.customId);
+                    const modul = Files.MessageCompCommands[interaction.componentType].get(
+                        interaction.customId,
+                    );
                     return messageComponentInteractionHandler(modul, interaction);
                 } else return throwError(() => SernError.NotSupportedInteraction);
             }),

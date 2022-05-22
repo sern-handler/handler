@@ -32,11 +32,15 @@ export function isSelectMenu(i: MessageComponentInteraction): i is SelectMenuInt
     return i.isSelectMenu();
 }
 
-export function isMessageCtxMenuCmd(i: CommandInteraction): i is MessageContextMenuCommandInteraction {
+export function isMessageCtxMenuCmd(
+    i: CommandInteraction,
+): i is MessageContextMenuCommandInteraction {
     return i.isMessageContextMenuCommand();
 }
 
-export function isUserContextMenuCmd(i: CommandInteraction): i is UserContextMenuCommandInteraction {
+export function isUserContextMenuCmd(
+    i: CommandInteraction,
+): i is UserContextMenuCommandInteraction {
     return i.isUserContextMenuCommand();
 }
 

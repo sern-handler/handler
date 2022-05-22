@@ -26,7 +26,10 @@ export default class SernEmitter extends EventEmitter {
         return super.once(eventName, listener);
     }
 
-    public override emit<T extends keyof SernEventsMapping>(eventName: T, ...args: SernEventsMapping[T]): boolean {
+    public override emit<T extends keyof SernEventsMapping>(
+        eventName: T,
+        ...args: SernEventsMapping[T]
+    ): boolean {
         return super.emit(eventName, ...args);
     }
 }

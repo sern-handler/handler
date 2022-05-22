@@ -52,9 +52,11 @@ export const onReady = (wrapper: Wrapper) => {
     )
         .pipe(
             concatMap(pl =>
-                from(Promise.all(pl.cmdPluginsRes.map(async e => ({ ...e, execute: await e.execute })))).pipe(
-                    map(res => ({ ...pl, cmdPluginsRes: res })),
-                ),
+                from(
+                    Promise.all(
+                        pl.cmdPluginsRes.map(async e => ({ ...e, execute: await e.execute })),
+                    ),
+                ).pipe(map(res => ({ ...pl, cmdPluginsRes: res }))),
             ),
         )
         .subscribe(({ mod, cmdPluginsRes }) => {

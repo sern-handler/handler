@@ -657,43 +657,37 @@ class MatchInner {
         while ((match = regex.exec(this.raw))) {
             const result: DiscordRegexMatch = { matched: match[0], species: type };
             switch (type) {
-                case DiscordRegexNames.EMOJI:
-                    {
-                        result.name = match[1] as string;
-                        result.id = match[2] as string;
-                        result.animated = this.raw.startsWith('<a:');
-                    }
+                case DiscordRegexNames.EMOJI: {
+                    result.name = match[1] as string;
+                    result.id = match[2] as string;
+                    result.animated = this.raw.startsWith('<a:');
+                }
                     break;
-                case DiscordRegexNames.JUMP_CHANNEL:
-                    {
-                        result.guildId = match[1] as string;
-                        result.channelId = match[2] as string;
-                    }
+                case DiscordRegexNames.JUMP_CHANNEL: {
+                    result.guildId = match[1] as string;
+                    result.channelId = match[2] as string;
+                }
                     break;
-                case DiscordRegexNames.JUMP_CHANNEL_MESSAGE:
-                    {
-                        result.guildId = match[1] as string;
-                        result.channelId = match[2] as string;
-                        result.messageId = match[3] as string;
-                    }
+                case DiscordRegexNames.JUMP_CHANNEL_MESSAGE: {
+                    result.guildId = match[1] as string;
+                    result.channelId = match[2] as string;
+                    result.messageId = match[3] as string;
+                }
                     break;
                 case DiscordRegexNames.MENTION_CHANNEL:
-                case DiscordRegexNames.MENTION_ROLE:
-                    {
-                        result.id = match[1] as string;
-                    }
+                case DiscordRegexNames.MENTION_ROLE: {
+                    result.id = match[1] as string;
+                }
                     break;
-                case DiscordRegexNames.MENTION_USER:
-                    {
-                        result.id = match[2] as string;
-                        result.mentionType = match[1] as string;
-                    }
+                case DiscordRegexNames.MENTION_USER: {
+                    result.id = match[2] as string;
+                    result.mentionType = match[1] as string;
+                }
                     break;
-                case DiscordRegexNames.TEXT_CODEBLOCK:
-                    {
-                        result.language = match[2] as string;
-                        result.text = match[3] as string;
-                    }
+                case DiscordRegexNames.TEXT_CODEBLOCK: {
+                    result.language = match[2] as string;
+                    result.text = match[3] as string;
+                }
                     break;
                 case DiscordRegexNames.TEXT_BOLD:
                 case DiscordRegexNames.TEXT_CODESTRING:
@@ -702,10 +696,9 @@ class MatchInner {
                 case DiscordRegexNames.TEXT_SPOILER:
                 case DiscordRegexNames.TEXT_STRIKE:
                 case DiscordRegexNames.TEXT_UNDERLINE:
-                case DiscordRegexNames.TEXT_URL:
-                    {
-                        result.text = match[1] as string;
-                    }
+                case DiscordRegexNames.TEXT_URL: {
+                    result.text = match[1] as string;
+                }
                     break;
                 default: {
                     throw new global.Error(`Unknown regex type: ${type}`);

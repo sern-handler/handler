@@ -34,7 +34,11 @@ export type CommandPlugin = Override<
     BasePlugin,
     {
         type: PluginType.Command;
-        execute: (wrapper: Client, module: Module, controller: Controller) => Awaitable<Result<void, void>>;
+        execute: (
+            wrapper: Client,
+            module: Module,
+            controller: Controller,
+        ) => Awaitable<Result<void, void>>;
     }
 >;
 
@@ -44,7 +48,10 @@ export type EventPlugin<T extends keyof ModuleDefs> = Override<
     BasePlugin,
     {
         type: PluginType.Event;
-        execute: (event: Parameters<ModuleDefs[T]['execute']>, controller: Controller) => Awaitable<Result<void, void>>;
+        execute: (
+            event: Parameters<ModuleDefs[T]['execute']>,
+            controller: Controller,
+        ) => Awaitable<Result<void, void>>;
     }
 >;
 

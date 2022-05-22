@@ -1,6 +1,7 @@
 import type { APIGuildMember } from 'discord-api-types/v9';
 import type {
     ChatInputCommandInteraction,
+    Client,
     Guild,
     GuildMember,
     InteractionReplyOptions,
@@ -12,7 +13,6 @@ import type {
 } from 'discord.js';
 import { None, Option, Some } from 'ts-results';
 import type { Nullish } from '../../types/handler';
-import type { Client } from 'discord.js';
 import { ExternallyUsed } from '../utilities/externallyUsed';
 
 function firstSome<T>(...args: Option<T>[]): Nullish<T> {
@@ -21,6 +21,7 @@ function firstSome<T>(...args: Option<T>[]): Nullish<T> {
     }
     return null;
 }
+
 //Could I refactor with Either monad?
 /**
  * The Context class will provide values that are shared between
@@ -35,14 +36,17 @@ export default class Context {
         this.oMsg = oMsg;
         this.oInterac = oInterac;
     }
+
     @ExternallyUsed
     public get message() {
         return this.oMsg.unwrap();
     }
+
     @ExternallyUsed
     public get interaction() {
         return this.oInterac.unwrap();
     }
+
     @ExternallyUsed
     public get id(): Snowflake {
         return firstSome(
@@ -50,6 +54,7 @@ export default class Context {
             this.oMsg.map(m => m.id),
         )!;
     }
+
     @ExternallyUsed
     public get channel(): Nullish<TextBasedChannel> {
         return firstSome(
@@ -57,6 +62,7 @@ export default class Context {
             this.oInterac.map(i => i.channel),
         );
     }
+
     @ExternallyUsed
     public get user(): User {
         return firstSome(
@@ -64,6 +70,7 @@ export default class Context {
             this.oInterac.map(i => i.user),
         )!;
     }
+
     @ExternallyUsed
     public get createdTimestamp(): number {
         return firstSome(
@@ -71,6 +78,7 @@ export default class Context {
             this.oInterac.map(i => i.createdTimestamp),
         )!;
     }
+
     @ExternallyUsed
     public get guild(): Guild {
         return firstSome(
@@ -78,6 +86,7 @@ export default class Context {
             this.oInterac.map(i => i.guild),
         )!;
     }
+
     @ExternallyUsed
     public get guildId(): Snowflake {
         return firstSome(
@@ -97,12 +106,29 @@ export default class Context {
         );
     }
 
+    @ExternallyUsed
+    public get client(): Client {
+        return firstSome(
+            this.oMsg.map(m => m.client),
+            this.oInterac.map(i => i.client),
+        )!;
+    }
+
+    @ExternallyUsed
+    public get inGuild(): boolean {
+        return firstSome(
+            this.oMsg.map(m => m.inGuild()),
+            this.oInterac.map(i => i.inGuild()),
+        )!;
+    }
+
     static wrap(wrappable: ChatInputCommandInteraction | Message): Context {
         if ('token' in wrappable) {
             return new Context(None, Some(wrappable));
         }
         return new Context(Some(wrappable), None);
     }
+
     @ExternallyUsed
     public isEmpty() {
         return this.oMsg.none && this.oInterac.none;
@@ -118,20 +144,6 @@ export default class Context {
             this.oMsg.map(m => {
                 return m.reply(content as ReplyMessageOptions);
             }),
-        )!;
-    }
-    @ExternallyUsed
-    public get client(): Client {
-        return firstSome(
-            this.oMsg.map(m => m.client),
-            this.oInterac.map(i => i.client),
-        )!;
-    }
-    @ExternallyUsed
-    public get inGuild(): boolean {
-        return firstSome(
-            this.oMsg.map(m => m.inGuild()),
-            this.oInterac.map(i => i.inGuild()),
         )!;
     }
 }
