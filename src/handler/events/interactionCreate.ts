@@ -25,7 +25,6 @@ function applicationCommandHandler(mod: Module | undefined, interaction: Command
         match(interaction)
             .when(isChatInputCommand, i => {
                 const ctx = Context.wrap(i);
-                //SUPPORT COMMANDTYPE.BOTH
                 return mod$(CommandType.Slash).pipe(
                     concatMap(m => {
                         return of(m.onEvent?.map(e => e.execute([ctx, ['slash', i.options]], controller)) ?? []).pipe(
