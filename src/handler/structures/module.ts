@@ -1,4 +1,5 @@
 import type {
+    ApplicationCommandAutocompleteOption,
     ApplicationCommandOptionData,
     Awaitable,
     ButtonInteraction,
@@ -11,6 +12,8 @@ import type { Args, Override } from '../../types/handler';
 import type { CommandPlugin, EventPlugin } from '../plugins/plugin';
 import type Context from './context';
 import { CommandType, PluginType } from './enums';
+import type { AutocompleteInteraction } from 'discord.js';
+import type { ApplicationCommandOptionType } from 'discord.js';
 
 export interface BaseModule {
     type: CommandType | PluginType;
@@ -36,7 +39,7 @@ export type SlashCommand = Override<
         type: CommandType.Slash;
         onEvent?: EventPlugin<CommandType.Slash>[];
         plugins?: CommandPlugin[];
-        options?: ApplicationCommandOptionData[];
+        options?: OptionsData[];
     }
 >;
 
@@ -47,7 +50,7 @@ export type BothCommand = Override<
         onEvent?: EventPlugin<CommandType.Both>[];
         plugins?: CommandPlugin[];
         alias?: string[];
-        options?: ApplicationCommandOptionData[];
+        options?: OptionsData[];
     }
 >;
 
@@ -94,12 +97,24 @@ export type SelectMenuCommand = Override<
 export type ModalSubmitCommand = Override<
     BaseModule,
     {
-        type : CommandType.Modal;
+        type: CommandType.Modal;
         onEvent?: EventPlugin<CommandType.Modal>[];
         plugins?: CommandPlugin[];
-        execute : (ctx: ModalSubmitInteraction) => Awaitable<void>;
+        execute: (ctx: ModalSubmitInteraction) => Awaitable<void>;
     }
+>;
 
+// Autocomplete commands are a little different
+// They can't have command plugins as they are
+// in conjunction with chat input commands
+// TODO: possibly in future, allow Autocmp commands in separate files?
+export type AutocompleteCommand = Override<
+    BaseModule,
+    {
+        type: CommandType.Autocomplete;
+        onEvent?: EventPlugin<CommandType.Autocomplete>[];
+        execute: (ctx: AutocompleteInteraction) => Awaitable<void>;
+    }
 >;
 
 export type Module =
@@ -110,7 +125,8 @@ export type Module =
     | ContextMenuMsg
     | ButtonCommand
     | SelectMenuCommand
-    | ModalSubmitCommand;
+    | ModalSubmitCommand
+    | AutocompleteCommand;
 
 //https://stackoverflow.com/questions/64092736/alternative-to-switch-statement-for-typescript-discriminated-union
 // Explicit Module Definitions for mapping
@@ -122,5 +138,18 @@ export type ModuleDefs = {
     [CommandType.MenuUser]: ContextMenuUser;
     [CommandType.Button]: ButtonCommand;
     [CommandType.MenuSelect]: SelectMenuCommand;
-    [CommandType.Modal] : ModalSubmitCommand;
+    [CommandType.Modal]: ModalSubmitCommand;
+    [CommandType.Autocomplete]: AutocompleteCommand;
 };
+
+type OptionsData =
+    | Exclude<ApplicationCommandOptionData, ApplicationCommandAutocompleteOption>
+    | {
+          required?: boolean;
+          autocomplete: true;
+          type:
+              | ApplicationCommandOptionType.String
+              | ApplicationCommandOptionType.Number
+              | ApplicationCommandOptionType.Integer;
+          command: AutocompleteCommand;
+      };

@@ -14,6 +14,7 @@
 import type { Awaitable, Client } from 'discord.js';
 import type { Err, Ok, Result } from 'ts-results';
 import type { Module, Override } from '../..';
+import { CommandType } from '../..';
 import type { BaseModule, ModuleDefs } from '../structures/module';
 import type { PluginType } from '../structures/enums';
 import type { ValueOf } from 'ts-pattern/dist/types/helpers';
@@ -68,8 +69,10 @@ type ModuleNoPlugins = ValueOf<{
 //TODO: I WANT BETTER TYPINGS AHHHHHHHHHHHHHHH
 
 export function sernModule(plugins: CommandPlugin[], mod: ModuleNoPlugins): Module {
-    return {
-        plugins,
-        ...mod,
-    };
+    if (mod.type !== CommandType.Autocomplete)
+        return {
+            plugins,
+            ...mod,
+        };
+    else return mod;
 }

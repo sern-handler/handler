@@ -12,7 +12,7 @@ import { match } from 'ts-pattern';
 import { SernError } from '../structures/errors';
 import Context from '../structures/context';
 import { controller } from '../sern';
-import type { Module } from '../structures/module';
+import type { AutocompleteCommand, Module, SlashCommand } from '../structures/module';
 import {
     isButton,
     isChatInputCommand,
@@ -24,6 +24,7 @@ import {
 import { filterCorrectModule } from './observableHandling';
 import { CommandType } from '../structures/enums';
 import type { Result } from 'ts-results';
+import type { AutocompleteInteraction } from 'discord.js';
 
 function applicationCommandHandler(mod: Module | undefined, interaction: CommandInteraction) {
     const mod$ = <T extends CommandType>(cmdTy: T) => of(mod).pipe(filterCorrectModule(cmdTy));
@@ -126,21 +127,53 @@ function messageComponentInteractionHandler(
         .otherwise(() => throwError(() => SernError.NotSupportedInteraction));
 }
 
-function modalHandler(modul : Module|undefined, ctx: ModalSubmitInteraction) {
-        return of(modul).pipe(
-            filterCorrectModule(CommandType.Modal),
-            concatMap(mod => {
-                    return of(mod.onEvent?.map(e => e.execute([ctx], controller)) ?? []).pipe(
-                        map(res => ({
-                            mod,
-                            res,
-                            execute() {
-                                return mod.execute(ctx);
-                            },
-                        })),
-                    ); 
-            })
-        )
+function modalHandler(modul: Module | undefined, ctx: ModalSubmitInteraction) {
+    return of(modul).pipe(
+        filterCorrectModule(CommandType.Modal),
+        concatMap(mod => {
+            return of(mod.onEvent?.map(e => e.execute([ctx], controller)) ?? []).pipe(
+                map(res => ({
+                    mod,
+                    res,
+                    execute() {
+                        return mod.execute(ctx);
+                    },
+                })),
+            );
+        }),
+    );
+}
+
+function autoCmpHandler(mod: Module | undefined, interaction: AutocompleteInteraction) {
+    return of(mod).pipe(
+        filterCorrectModule(CommandType.Slash),
+        concatMap(mod => {
+            const choice = interaction.options.getFocused(true);
+            const selectedOption = mod.options?.find(
+                o => o.autocomplete && o.command.name === choice.name,
+            );
+            if (selectedOption !== undefined && selectedOption.autocomplete) {
+                return of(
+                    selectedOption.command.onEvent?.map(e =>
+                        e.execute([interaction], controller),
+                    ) ?? [],
+                ).pipe(
+                    map(res => ({
+                        mod,
+                        res,
+                        execute() {
+                            return selectedOption.command.execute(interaction);
+                        },
+                    })),
+                );
+            }
+            return throwError(
+                () =>
+                    SernError.NotSupportedInteraction +
+                    ` There is probably no autocomplete tag for this option`,
+            );
+        }),
+    );
 }
 
 export function onInteractionCreate(wrapper: Wrapper) {
@@ -171,6 +204,7 @@ export function onInteractionCreate(wrapper: Wrapper) {
                 }
                 if (interaction.isAutocomplete()) {
                     const modul = Files.ApplicationCommands[1].get(interaction.commandName);
+                    return autoCmpHandler(modul, interaction);
                 }
                 return of();
             }),

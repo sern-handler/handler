@@ -2,13 +2,14 @@
  * @enum { number };
  */
 enum CommandType {
-    Text = 0b0000001,
-    Slash = 0b0000010,
-    MenuUser = 0b0000100,
-    MenuMsg = 0b0001000,
-    Button = 0b0010000,
-    MenuSelect = 0b0100000,
-    Modal = 0b1000000,
+    Text = 0b00000001,
+    Slash = 0b00000010,
+    MenuUser = 0b00000100,
+    MenuMsg = 0b00001000,
+    Button = 0b00010000,
+    MenuSelect = 0b00100000,
+    Modal = 0b01000000,
+    Autocomplete = 0b10000000,
     Both = 0b0000011,
 }
 
