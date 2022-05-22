@@ -15,7 +15,9 @@ export function correctModuleType<T extends keyof ModuleDefs>(
     plug: Module | undefined,
     type: T,
 ): plug is ModuleDefs[T] {
-    return plug !== undefined && plug.type === type;
+    // Another way to check if type is equivalent,
+    // It will check based on flag system instead
+    return plug !== undefined && (plug.type & type) !== 0;
 }
 
 export function isChatInputCommand(i: CommandInteraction): i is ChatInputCommandInteraction {
