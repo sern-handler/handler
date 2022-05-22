@@ -4,6 +4,7 @@ import { join } from 'path';
 import { from, Observable } from 'rxjs';
 import type { Module } from '../structures/module';
 
+//Maybe move this? this probably doesnt belong in utlities/
 export const BothCommands = new Map<string, Module>();
 export const ApplicationCommands = {
     [ApplicationCommandType.User]: new Map<string, Module>(),
@@ -20,7 +21,7 @@ export const TextCommands = {
     text: new Map<string, Module>(),
     aliases: new Map<string, Module>(),
 };
-
+export const ModalSubmitCommands = new Map<string, Module>();
 // Courtesy @Townsy45
 function readPath(dir: string, arrayOfFiles: string[] = []): string[] {
     try {

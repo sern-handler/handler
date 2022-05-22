@@ -2,6 +2,7 @@ import type {
     CommandInteraction,
     Interaction,
     MessageComponentInteraction,
+    ModalSubmitInteraction,
     SelectMenuInteraction,
 } from 'discord.js';
 import { concatMap, fromEvent, map, Observable, of, throwError } from 'rxjs';
@@ -125,6 +126,23 @@ function messageComponentInteractionHandler(
         .otherwise(() => throwError(() => SernError.NotSupportedInteraction));
 }
 
+function modalHandler(modul : Module|undefined, ctx: ModalSubmitInteraction) {
+        return of(modul).pipe(
+            filterCorrectModule(CommandType.Modal),
+            concatMap(mod => {
+                    return of(mod.onEvent?.map(e => e.execute([ctx], controller)) ?? []).pipe(
+                        map(res => ({
+                            mod,
+                            res,
+                            execute() {
+                                return mod.execute(ctx);
+                            },
+                        })),
+                    ); 
+            })
+        )
+}
+
 export function onInteractionCreate(wrapper: Wrapper) {
     const { client } = wrapper;
 
@@ -146,7 +164,15 @@ export function onInteractionCreate(wrapper: Wrapper) {
                         interaction.customId,
                     );
                     return messageComponentInteractionHandler(modul, interaction);
-                } else return throwError(() => SernError.NotSupportedInteraction);
+                }
+                if (interaction.isModalSubmit()) {
+                    const modul = Files.ModalSubmitCommands.get(interaction.customId);
+                    return modalHandler(modul, interaction);
+                }
+                if (interaction.isAutocomplete()) {
+                    const modul = Files.ApplicationCommands[1].get(interaction.commandName);
+                }
+                return of();
             }),
         )
         .subscribe({

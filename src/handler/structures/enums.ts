@@ -8,6 +8,7 @@ enum CommandType {
     MenuMsg = 0b0001000,
     Button = 0b0010000,
     MenuSelect = 0b0100000,
+    Modal = 0b1000000,
     Both = 0b0000011,
 }
 

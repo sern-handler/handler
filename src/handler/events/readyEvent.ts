@@ -110,5 +110,9 @@ function registerModule(mod: DefinitelyDefined<Module, { name: string }>): Resul
             Files.MessageCompCommands[ComponentType.SelectMenu].set(name, mod);
             return Ok.EMPTY;
         })
+        .with({ type : CommandType.Modal }, mod => {
+            Files.ModalSubmitCommands.set(name, mod);
+            return Ok.EMPTY;
+        })
         .otherwise(() => Err.EMPTY);
 }

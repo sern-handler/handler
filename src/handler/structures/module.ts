@@ -3,6 +3,7 @@ import type {
     Awaitable,
     ButtonInteraction,
     MessageContextMenuCommandInteraction,
+    ModalSubmitInteraction,
     SelectMenuInteraction,
     UserContextMenuCommandInteraction,
 } from 'discord.js';
@@ -90,6 +91,17 @@ export type SelectMenuCommand = Override<
     }
 >;
 
+export type ModalSubmitCommand = Override<
+    BaseModule,
+    {
+        type : CommandType.Modal;
+        onEvent?: EventPlugin<CommandType.Modal>[];
+        plugins?: CommandPlugin[];
+        execute : (ctx: ModalSubmitInteraction) => Awaitable<void>;
+    }
+
+>;
+
 export type Module =
     | TextCommand
     | SlashCommand
@@ -97,7 +109,8 @@ export type Module =
     | ContextMenuUser
     | ContextMenuMsg
     | ButtonCommand
-    | SelectMenuCommand;
+    | SelectMenuCommand
+    | ModalSubmitCommand;
 
 //https://stackoverflow.com/questions/64092736/alternative-to-switch-statement-for-typescript-discriminated-union
 // Explicit Module Definitions for mapping
@@ -109,4 +122,5 @@ export type ModuleDefs = {
     [CommandType.MenuUser]: ContextMenuUser;
     [CommandType.Button]: ButtonCommand;
     [CommandType.MenuSelect]: SelectMenuCommand;
+    [CommandType.Modal] : ModalSubmitCommand;
 };
