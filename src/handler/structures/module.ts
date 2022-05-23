@@ -111,6 +111,7 @@ export type ModalSubmitCommand = Override<
 export type AutocompleteCommand = Override<
     BaseModule,
     {
+        name : string,
         type: CommandType.Autocomplete;
         onEvent?: EventPlugin<CommandType.Autocomplete>[];
         execute: (ctx: AutocompleteInteraction) => Awaitable<void>;

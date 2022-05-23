@@ -1,4 +1,4 @@
-import { concat, concatMap, from, fromEvent, map, Observable, of, skip, take } from 'rxjs';
+import { concat, concatMap, from, fromEvent, map, Observable, of, skip, take, throwError } from 'rxjs';
 import { basename } from 'path';
 import * as Files from '../utilities/readFile';
 import type Wrapper from '../structures/wrapper';
@@ -27,6 +27,9 @@ export const onReady = (wrapper: Wrapper) => {
     );
     const processPlugins$ = processCommandFiles$.pipe(
         concatMap(mod => {
+            if(mod.type === CommandType.Autocomplete) {
+                return throwError(() => SernError.NonValidModuleType + `. You cannot use command plugins and Autocomplete.`);
+            }
             const cmdPluginsRes =
                 mod.plugins?.map(plug => {
                     return {
