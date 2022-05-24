@@ -3,10 +3,10 @@
 	"extends": ["config:base", "group:allNonMajor"],
 	"major": {
 		"dependencyDashboardApproval": true,
-		"reviewers": ["EvolutionX-10", "jacoobes"]
+		"reviewers": ["EvolutionX-10", "jacoobes", "Murtatrxx"]
 	},
 	"minor": {
-		"reviewers": ["jacoobes"]
+		"reviewers": ["jacoobes", "Murtatrxx"]
 	},
 	"schedule": ["every weekend"],
 	"lockFileMaintenance": {
