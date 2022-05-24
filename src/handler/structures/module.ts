@@ -111,7 +111,7 @@ export type ModalSubmitCommand = Override<
 export type AutocompleteCommand = Override<
     BaseModule,
     {
-        name : string,
+        name: string;
         type: CommandType.Autocomplete;
         onEvent?: EventPlugin<CommandType.Autocomplete>[];
         execute: (ctx: AutocompleteInteraction) => Awaitable<void>;
@@ -143,14 +143,16 @@ export type ModuleDefs = {
     [CommandType.Autocomplete]: AutocompleteCommand;
 };
 
-type OptionsData =
+export type OptionsData =
     | Exclude<ApplicationCommandOptionData, ApplicationCommandAutocompleteOption>
     | {
-          required?: boolean;
+          name: string;
+          description: string;
           autocomplete: true;
+          required?: boolean;
           type:
               | ApplicationCommandOptionType.String
               | ApplicationCommandOptionType.Number
               | ApplicationCommandOptionType.Integer;
-          command: AutocompleteCommand;
+          command: Omit<AutocompleteCommand, 'type' | 'name' | 'description'>;
       };

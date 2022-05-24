@@ -149,9 +149,7 @@ function autoCmpHandler(mod: Module | undefined, interaction: AutocompleteIntera
         filterCorrectModule(CommandType.Slash),
         concatMap(mod => {
             const choice = interaction.options.getFocused(true);
-            const selectedOption = mod.options?.find(
-                o => o.autocomplete && o.command.name === choice.name,
-            );
+            const selectedOption = mod.options?.find(o => o.autocomplete && o.name === choice.name);
             if (selectedOption !== undefined && selectedOption.autocomplete) {
                 return of(
                     selectedOption.command.onEvent?.map(e =>

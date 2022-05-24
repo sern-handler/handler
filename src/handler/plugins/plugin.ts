@@ -67,7 +67,6 @@ type ModuleNoPlugins = ValueOf<{
 }>;
 
 //TODO: I WANT BETTER TYPINGS AHHHHHHHHHHHHHHH
-
 export function sernModule(plugins: CommandPlugin[], mod: ModuleNoPlugins): Module {
     if (mod.type !== CommandType.Autocomplete)
         return {
