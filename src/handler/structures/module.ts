@@ -1,7 +1,14 @@
 import type {
     ApplicationCommandAutocompleteOption,
+    ApplicationCommandChannelOptionData,
+    ApplicationCommandChoicesData,
+    ApplicationCommandNonOptionsData,
+    ApplicationCommandNumericOptionData,
     ApplicationCommandOptionData,
+    ApplicationCommandSubCommandData,
+    ApplicationCommandSubGroupData,
     Awaitable,
+    BaseApplicationCommandOptionsData,
     ButtonInteraction,
     MessageContextMenuCommandInteraction,
     ModalSubmitInteraction,
@@ -39,7 +46,7 @@ export type SlashCommand = Override<
         type: CommandType.Slash;
         onEvent?: EventPlugin<CommandType.Slash>[];
         plugins?: CommandPlugin[];
-        options?: OptionsData[];
+        options?: SernOptionsData[];
     }
 >;
 
@@ -50,7 +57,7 @@ export type BothCommand = Override<
         onEvent?: EventPlugin<CommandType.Both>[];
         plugins?: CommandPlugin[];
         alias?: string[];
-        options?: OptionsData[];
+        options?: SernOptionsData[];
     }
 >;
 
@@ -143,16 +150,52 @@ export type ModuleDefs = {
     [CommandType.Autocomplete]: AutocompleteCommand;
 };
 
-export type OptionsData =
-    | Exclude<ApplicationCommandOptionData, ApplicationCommandAutocompleteOption>
-    | {
-          name: string;
-          description: string;
-          autocomplete: true;
-          required?: boolean;
-          type:
-              | ApplicationCommandOptionType.String
-              | ApplicationCommandOptionType.Number
-              | ApplicationCommandOptionType.Integer;
-          command: Omit<AutocompleteCommand, 'type' | 'name' | 'description'>;
-      };
+//TODO: support deeply nested Autocomplete
+// objective: construct union of ApplicationCommandOptionData change any Autocomplete data
+// into Sern autocomplete data.
+
+export type SernAutocompleteData = Override<
+    BaseApplicationCommandOptionsData,
+    {
+        autocomplete: true;
+        type:
+            | ApplicationCommandOptionType.String
+            | ApplicationCommandOptionType.Number
+            | ApplicationCommandOptionType.Integer;
+        command: Omit<AutocompleteCommand, 'type' | 'name' | 'description'>;
+    }
+>;
+
+/**
+ * Type that just uses SernAutocompleteData and not regular autocomplete
+ */
+export type BaseOptions =
+    | ApplicationCommandChoicesData
+    | ApplicationCommandNonOptionsData
+    | ApplicationCommandChannelOptionData
+    | ApplicationCommandAutocompleteOption
+    | ApplicationCommandNumericOptionData
+    | SernAutocompleteData;
+
+export type SernSubCommandData = Override<
+    Omit<BaseApplicationCommandOptionsData, 'required'>,
+    {
+        type: ApplicationCommandOptionType.Subcommand;
+        options?: BaseOptions[];
+    }
+>;
+
+export type SernSubCommandGroupData = Override<
+    Omit<BaseApplicationCommandOptionsData, 'required'>,
+    {
+        type: ApplicationCommandOptionType.SubcommandGroup;
+        options?: SernSubCommandData[];
+    }
+>;
+
+export type SernOptionsData<U extends ApplicationCommandOptionData = ApplicationCommandOptionData> =
+    U extends ApplicationCommandSubCommandData
+        ? SernSubCommandData
+        : U extends ApplicationCommandSubGroupData
+        ? SernSubCommandGroupData
+        : BaseOptions;
