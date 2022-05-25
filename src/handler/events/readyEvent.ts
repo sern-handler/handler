@@ -104,7 +104,6 @@ function registerModule(mod: DefinitelyDefined<Module, { name: string }>): Resul
             return Ok.EMPTY;
         })
         .with({ type: CommandType.Slash }, mod => {
-            console.log(mod);
             Files.ApplicationCommands[ApplicationCommandType.ChatInput].set(name, mod);
             return Ok.EMPTY;
         })

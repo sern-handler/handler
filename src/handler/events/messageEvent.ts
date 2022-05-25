@@ -23,7 +23,10 @@ export const onMessageCreate = (wrapper: Wrapper) => {
             return {
                 ctx: Context.wrap(message), //TODO : check for BothCommand
                 args: <Args>['text', rest],
-                mod: Files.BothCommands.get(prefix) ?? Files.TextCommands.aliases.get(prefix),
+                mod:
+                    Files.TextCommands.text.get(prefix) ??
+                    Files.BothCommands.get(prefix) ??
+                    Files.TextCommands.aliases.get(prefix),
             };
         }),
     );

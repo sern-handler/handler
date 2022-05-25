@@ -201,7 +201,9 @@ export function onInteractionCreate(wrapper: Wrapper) {
                     return modalHandler(modul, interaction);
                 }
                 if (interaction.isAutocomplete()) {
-                    const modul = Files.ApplicationCommands['1'].get(interaction.commandName);
+                    const modul =
+                        Files.ApplicationCommands['1'].get(interaction.commandName) ??
+                        Files.BothCommands.get(interaction.commandName);
                     return autoCmpHandler(modul, interaction);
                 }
                 return of();

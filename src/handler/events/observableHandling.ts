@@ -30,15 +30,12 @@ export function ignoreNonBot(prefix: string) {
         new Observable<Message>(subscriber => {
             return src.subscribe({
                 next(m) {
-                    const passAll = [
-                        isNotFromBot,
-                        (m: Message) =>
-                            m.content
-                                .slice(0, prefix.length)
-                                .localeCompare(prefix, undefined, { sensitivity: 'accent' }) === 0,
-                    ].every(fn => fn(m));
-
-                    if (passAll) {
+                    const messageFromHumanAndHasPrefix =
+                        !m.author.bot &&
+                        m.content
+                            .slice(0, prefix.length)
+                            .localeCompare(prefix, undefined, { sensitivity: 'accent' }) === 0;
+                    if (messageFromHumanAndHasPrefix) {
                         subscriber.next(m);
                     }
                 },

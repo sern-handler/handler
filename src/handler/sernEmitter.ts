@@ -11,6 +11,9 @@ type SernEventsMapping = {
     ['error']: [Error | string];
 };
 
+/**
+ *
+ */
 export default class SernEmitter extends EventEmitter {
     public override on<T extends keyof SernEventsMapping>(
         eventName: T,
