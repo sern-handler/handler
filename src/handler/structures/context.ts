@@ -24,9 +24,8 @@ function firstSome<T>(...args: Option<T>[]): Nullish<T> {
 
 //Could I refactor with Either monad?
 /**
- * The Context class will provide values that are shared between
+ * Provides values shared between
  * Message and ChatInputCommandInteraction
- *
  */
 export default class Context {
     private constructor(
@@ -37,11 +36,20 @@ export default class Context {
         this.oInterac = oInterac;
     }
 
+    /**
+     * Getting the Message object. Crashes if module type is
+     * CommandType.Slash or the event fired in a Both command was
+     * ChatInputCommandInteraction
+     */
     @ExternallyUsed
     public get message() {
         return this.oMsg.unwrap();
     }
-
+    /**
+     * Getting the ChatInputCommandInteraction object. Crashes if module type is
+     * CommandType.Text or the event fired in a Both command was
+     * Message
+     */
     @ExternallyUsed
     public get interaction() {
         return this.oInterac.unwrap();

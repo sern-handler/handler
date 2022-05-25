@@ -1,8 +1,8 @@
 //
 // Plugins can be inserted on all commands and are emitted
 //
-// 1.) on ready event, where all commands are loaded.
-// 2.) on corresponding observable (command triggers)
+// 1. on ready event, where all commands are loaded.
+// 2. on corresponding observable (command triggers)
 //
 // The goal of plugins is to organize commands and
 // provide extensions to repetitive patterns
@@ -68,10 +68,11 @@ type ModuleNoPlugins = ValueOf<{
 
 //TODO: I WANT BETTER TYPINGS AHHHHHHHHHHHHHHH
 export function sernModule(plugins: CommandPlugin[], mod: ModuleNoPlugins): Module {
-    if (mod.type !== CommandType.Autocomplete)
+    if (mod.type === CommandType.Autocomplete) {
+        return mod;
+    } else
         return {
             plugins,
             ...mod,
         };
-    else return mod;
 }

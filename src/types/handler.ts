@@ -1,6 +1,5 @@
 import type { Awaitable, ClientEvents, CommandInteractionOptionResolver } from 'discord.js';
 import type { EventEmitter } from 'events';
-// Anything that can be sent in a `<TextChannel>#send` or `<CommandInteraction>#reply`
 export type Nullish<T> = T | undefined | null;
 // Thanks @cursorsdottsx
 export type ParseType<T> = {

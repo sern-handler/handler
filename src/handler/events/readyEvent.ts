@@ -82,7 +82,11 @@ export const onReady = (wrapper: Wrapper) => {
             if (loadedPluginsCorrectly) {
                 const res = registerModule(mod);
                 if (res.err) {
-                    throw Error(SernError.NonValidModuleType);
+                    throw Error(
+                        SernError.NonValidModuleType +
+                            ', or loading modules was handled incorrectly. ' +
+                            'Check commands path and command files!',
+                    );
                 }
                 wrapper.sernEmitter?.emit('module.register', { success: true, module: mod });
             } else {

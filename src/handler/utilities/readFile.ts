@@ -52,7 +52,7 @@ export function buildData(commandDir: string): Observable<{
     return from(
         getCommands(commandDir).map(absPath => {
             // eslint-disable-next-line @typescript-eslint/no-var-requires
-            const mod = <Module>require(absPath).module;
+            const mod = <Module>require(absPath).default;
             return { mod, absPath };
         }),
     );

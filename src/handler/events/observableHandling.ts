@@ -1,7 +1,6 @@
 import type { Message } from 'discord.js';
 import { Observable, throwError } from 'rxjs';
 import { SernError } from '../structures/errors';
-import { isNotFromBot } from '../utilities/messageHelpers';
 import type { Module, ModuleDefs } from '../structures/module';
 import { correctModuleType } from '../utilities/predicates';
 
