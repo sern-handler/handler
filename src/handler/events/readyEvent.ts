@@ -1,4 +1,15 @@
-import { concat, concatMap, from, fromEvent, map, Observable, of, skip, take, throwError } from 'rxjs';
+import {
+    concat,
+    concatMap,
+    from,
+    fromEvent,
+    map,
+    Observable,
+    of,
+    skip,
+    take,
+    throwError,
+} from 'rxjs';
 import { basename } from 'path';
 import * as Files from '../utilities/readFile';
 import type Wrapper from '../structures/wrapper';
@@ -27,8 +38,12 @@ export const onReady = (wrapper: Wrapper) => {
     );
     const processPlugins$ = processCommandFiles$.pipe(
         concatMap(mod => {
-            if(mod.type === CommandType.Autocomplete) {
-                return throwError(() => SernError.NonValidModuleType + `. You cannot use command plugins and Autocomplete.`);
+            if (mod.type === CommandType.Autocomplete) {
+                return throwError(
+                    () =>
+                        SernError.NonValidModuleType +
+                        `. You cannot use command plugins and Autocomplete.`,
+                );
             }
             const cmdPluginsRes =
                 mod.plugins?.map(plug => {
@@ -89,6 +104,7 @@ function registerModule(mod: DefinitelyDefined<Module, { name: string }>): Resul
             return Ok.EMPTY;
         })
         .with({ type: CommandType.Slash }, mod => {
+            console.log(mod);
             Files.ApplicationCommands[ApplicationCommandType.ChatInput].set(name, mod);
             return Ok.EMPTY;
         })
@@ -113,7 +129,7 @@ function registerModule(mod: DefinitelyDefined<Module, { name: string }>): Resul
             Files.MessageCompCommands[ComponentType.SelectMenu].set(name, mod);
             return Ok.EMPTY;
         })
-        .with({ type : CommandType.Modal }, mod => {
+        .with({ type: CommandType.Modal }, mod => {
             Files.ModalSubmitCommands.set(name, mod);
             return Ok.EMPTY;
         })

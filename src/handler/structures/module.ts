@@ -1,5 +1,5 @@
 import type {
-    ApplicationCommandAutocompleteOption,
+    ApplicationCommandAttachmentOption,
     ApplicationCommandChannelOptionData,
     ApplicationCommandChoicesData,
     ApplicationCommandNonOptionsData,
@@ -173,8 +173,8 @@ export type BaseOptions =
     | ApplicationCommandChoicesData
     | ApplicationCommandNonOptionsData
     | ApplicationCommandChannelOptionData
-    | ApplicationCommandAutocompleteOption
     | ApplicationCommandNumericOptionData
+    | ApplicationCommandAttachmentOption
     | SernAutocompleteData;
 
 export type SernSubCommandData = Override<
