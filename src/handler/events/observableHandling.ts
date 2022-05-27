@@ -1,8 +1,9 @@
 import type { Message } from 'discord.js';
 import { Observable, throwError } from 'rxjs';
 import { SernError } from '../structures/errors';
-import type { Module, ModuleDefs } from '../structures/module';
+import type { InteractionDefs, Module, ModuleDefs } from '../structures/module';
 import { correctModuleType } from '../utilities/predicates';
+import type { CommandType } from '../structures/enums';
 
 export function filterCorrectModule<T extends keyof ModuleDefs>(cmdType: T) {
     return (src: Observable<Module | undefined>) =>
@@ -38,6 +39,17 @@ export function ignoreNonBot(prefix: string) {
                         subscriber.next(m);
                     }
                 },
+                error: e => subscriber.error(e),
+                complete: () => subscriber.complete(),
+            });
+        });
+}
+
+export function processOnEvents<T extends CommandType>(interaction: InteractionDefs[T]) {
+    return (src: Observable<ModuleDefs[CommandType]>) =>
+        new Observable<Message>(subscriber => {
+            return src.subscribe({
+                next(m) {},
                 error: e => subscriber.error(e),
                 complete: () => subscriber.complete(),
             });

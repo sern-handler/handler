@@ -21,6 +21,7 @@ import type Context from './context';
 import { CommandType, PluginType } from './enums';
 import type { AutocompleteInteraction } from 'discord.js';
 import type { ApplicationCommandOptionType } from 'discord.js';
+import { ChatInputCommandInteraction, Message } from 'discord.js';
 
 export interface BaseModule {
     type: CommandType | PluginType;
@@ -148,6 +149,18 @@ export type ModuleDefs = {
     [CommandType.MenuSelect]: SelectMenuCommand;
     [CommandType.Modal]: ModalSubmitCommand;
     [CommandType.Autocomplete]: AutocompleteCommand;
+};
+
+export type InteractionDefs = {
+    [CommandType.Text]: Context;
+    [CommandType.Slash]: Context;
+    [CommandType.Both]: Context;
+    [CommandType.MenuMsg]: MessageContextMenuCommandInteraction;
+    [CommandType.MenuUser]: UserContextMenuCommandInteraction;
+    [CommandType.Button]: ButtonInteraction;
+    [CommandType.MenuSelect]: SelectMenuInteraction;
+    [CommandType.Modal]: ModalSubmitInteraction;
+    [CommandType.Autocomplete]: AutocompleteInteraction;
 };
 
 //TODO: support deeply nested Autocomplete

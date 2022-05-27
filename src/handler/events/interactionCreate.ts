@@ -206,7 +206,7 @@ export function onInteractionCreate(wrapper: Wrapper) {
                         Files.BothCommands.get(interaction.commandName);
                     return autoCmpHandler(modul, interaction);
                 }
-                return of();
+                return throwError(() => SernError.NotSupportedInteraction);
             }),
         )
         .subscribe({
