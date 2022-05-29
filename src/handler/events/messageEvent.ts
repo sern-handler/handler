@@ -42,9 +42,9 @@ export const onMessageCreate = (wrapper: Wrapper) => {
     const processEventPlugins$ = ensureModuleType$.pipe(
         concatMap(({ ctx, args, mod }) => {
             const res = Promise.all(
-                mod.onEvent?.map(ePlug => {
+                mod.onEvent.map(ePlug => {
                     return ePlug.execute([ctx, args], controller);
-                }) ?? [],
+                }),
             );
             return from(res).pipe(map(res => ({ mod, ctx, args, res })));
         }),
