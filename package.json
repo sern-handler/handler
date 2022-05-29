@@ -33,10 +33,10 @@
   },
   "devDependencies": {
     "eslint": "8.16.0",
-    "@typescript-eslint/parser": "5.25.0",
-    "@typescript-eslint/eslint-plugin": "5.25.0",
-    "@babel/core": "7.18.0",
-    "@babel/preset-env": "7.18.0",
+    "@typescript-eslint/parser": "5.26.0",
+    "@typescript-eslint/eslint-plugin": "5.26.0",
+    "@babel/core": "7.18.2",
+    "@babel/preset-env": "7.18.2",
     "@babel/preset-typescript": "7.17.12",
     "@types/jest": "27.5.1",
     "babel-jest": "27.5.1",
@@ -45,7 +45,7 @@
     "prettier": "2.6.2",
     "standard-version": "9.5.0",
     "typedoc": "0.22.15",
-    "typescript": "4.6.4"
+    "typescript": "4.7.2"
   },
   "config": {
     "commitizen": {
