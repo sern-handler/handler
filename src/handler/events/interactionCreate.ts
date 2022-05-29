@@ -12,7 +12,7 @@ import { match } from 'ts-pattern';
 import { SernError } from '../structures/errors';
 import Context from '../structures/context';
 import { controller } from '../sern';
-import type { AutocompleteCommand, Module, SlashCommand } from '../structures/module';
+import type { Module } from '../structures/module';
 import {
     isButton,
     isChatInputCommand,

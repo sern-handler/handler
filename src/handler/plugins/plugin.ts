@@ -45,16 +45,29 @@ export type CommandPlugin = Override<
 
 //TODO: rn adding the modType check a little hackish. Find better way to determine the
 // module type of the event plugin
-export type EventPlugin<T extends keyof ModuleDefs> = Override<
-    BasePlugin,
-    {
-        type: PluginType.Event;
-        execute: (
-            event: Parameters<ModuleDefs[T]['execute']>,
-            controller: Controller,
-        ) => Awaitable<Result<void, void>>;
-    }
->;
+// export type EventPlugin<T extends keyof ModuleDefs> = Override<
+//     BasePlugin,
+//     {
+//         type: PluginType.Event;
+//         execute: (
+//             event: Parameters<ModuleDefs[T]['execute']>,
+//             controller: Controller,
+//         ) => Awaitable<Result<void, void>>;
+//     }
+// >;
+
+export type EventPlugin<T extends keyof ModuleDefs = keyof ModuleDefs> = {
+    [K in T]: Override<
+        BasePlugin,
+        {
+            type: PluginType.Event;
+            execute: (
+                event: Parameters<ModuleDefs[K]['execute']>,
+                controller: Controller,
+            ) => Awaitable<Result<void, void>>;
+        }
+    >;
+}[T];
 
 export function plugins(...plug: CommandPlugin[]): CommandPlugin[];
 export function plugins<T extends keyof ModuleDefs>(...plug: EventPlugin<T>[]): EventPlugin<T>[];

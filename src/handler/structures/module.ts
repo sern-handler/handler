@@ -21,7 +21,7 @@ import type Context from './context';
 import { CommandType, PluginType } from './enums';
 import type { AutocompleteInteraction } from 'discord.js';
 import type { ApplicationCommandOptionType } from 'discord.js';
-import { ChatInputCommandInteraction, Message } from 'discord.js';
+import { ChatInputCommandInteraction, Message, User } from 'discord.js';
 
 export interface BaseModule {
     type: CommandType | PluginType;
@@ -119,8 +119,8 @@ export type ModalSubmitCommand = Override<
 export type AutocompleteCommand = Override<
     BaseModule,
     {
-        name: string;
         type: CommandType.Autocomplete;
+        name: string;
         onEvent?: EventPlugin<CommandType.Autocomplete>[];
         execute: (ctx: AutocompleteInteraction) => Awaitable<void>;
     }
@@ -150,7 +150,6 @@ export type ModuleDefs = {
     [CommandType.Modal]: ModalSubmitCommand;
     [CommandType.Autocomplete]: AutocompleteCommand;
 };
-
 export type InteractionDefs = {
     [CommandType.Text]: Context;
     [CommandType.Slash]: Context;

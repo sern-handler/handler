@@ -21,7 +21,7 @@ export const onMessageCreate = (wrapper: Wrapper) => {
         map(message => {
             const [prefix, ...rest] = fmt(message, defaultPrefix);
             return {
-                ctx: Context.wrap(message), //TODO : check for BothCommand
+                ctx: Context.wrap(message),
                 args: <Args>['text', rest],
                 mod:
                     Files.TextCommands.text.get(prefix) ??
