@@ -35,9 +35,7 @@ function applicationCommandHandler(mod: Module | undefined, interaction: Command
                 return mod$(CommandType.Slash).pipe(
                     concatMap(m => {
                         return of(
-                            m.onEvent?.map(e =>
-                                e.execute([ctx, ['slash', i.options]], controller),
-                            ) ?? [],
+                            m.onEvent.map(e => e.execute([ctx, ['slash', i.options]], controller)),
                         ).pipe(
                             map(res => ({
                                 mod,
@@ -55,7 +53,7 @@ function applicationCommandHandler(mod: Module | undefined, interaction: Command
             .when(isMessageCtxMenuCmd, ctx => {
                 return mod$(CommandType.MenuMsg).pipe(
                     concatMap(m => {
-                        return of(m.onEvent?.map(e => e.execute([ctx], controller)) ?? []).pipe(
+                        return of(m.onEvent.map(e => e.execute([ctx], controller))).pipe(
                             map(res => ({
                                 mod,
                                 res,
@@ -70,7 +68,7 @@ function applicationCommandHandler(mod: Module | undefined, interaction: Command
             .when(isUserContextMenuCmd, ctx => {
                 return mod$(CommandType.MenuUser).pipe(
                     concatMap(m => {
-                        return of(m.onEvent?.map(e => e.execute([ctx], controller)) ?? []).pipe(
+                        return of(m.onEvent.map(e => e.execute([ctx], controller))).pipe(
                             map(res => ({
                                 mod,
                                 res,
@@ -97,7 +95,7 @@ function messageComponentInteractionHandler(
         .when(isButton, ctx => {
             return mod$(CommandType.Button).pipe(
                 concatMap(m => {
-                    return of(m.onEvent?.map(e => e.execute([ctx], controller)) ?? []).pipe(
+                    return of(m.onEvent.map(e => e.execute([ctx], controller))).pipe(
                         map(res => ({
                             mod,
                             res,
@@ -112,7 +110,7 @@ function messageComponentInteractionHandler(
         .when(isSelectMenu, (ctx: SelectMenuInteraction) => {
             return mod$(CommandType.MenuSelect).pipe(
                 concatMap(m => {
-                    return of(m.onEvent?.map(e => e.execute([ctx], controller)) ?? []).pipe(
+                    return of(m.onEvent.map(e => e.execute([ctx], controller))).pipe(
                         map(res => ({
                             mod,
                             res,
@@ -131,7 +129,7 @@ function modalHandler(modul: Module | undefined, ctx: ModalSubmitInteraction) {
     return of(modul).pipe(
         filterCorrectModule(CommandType.Modal),
         concatMap(mod => {
-            return of(mod.onEvent?.map(e => e.execute([ctx], controller)) ?? []).pipe(
+            return of(mod.onEvent.map(e => e.execute([ctx], controller))).pipe(
                 map(res => ({
                     mod,
                     res,
@@ -152,9 +150,7 @@ function autoCmpHandler(mod: Module | undefined, interaction: AutocompleteIntera
             const selectedOption = mod.options?.find(o => o.autocomplete && o.name === choice.name);
             if (selectedOption !== undefined && selectedOption.autocomplete) {
                 return of(
-                    selectedOption.command.onEvent?.map(e =>
-                        e.execute([interaction], controller),
-                    ) ?? [],
+                    selectedOption.command.onEvent.map(e => e.execute([interaction], controller)),
                 ).pipe(
                     map(res => ({
                         mod,
