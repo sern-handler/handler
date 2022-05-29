@@ -21,7 +21,6 @@ import type Context from './context';
 import { CommandType, PluginType } from './enums';
 import type { AutocompleteInteraction } from 'discord.js';
 import type { ApplicationCommandOptionType } from 'discord.js';
-import { ChatInputCommandInteraction, Message, User } from 'discord.js';
 
 export interface BaseModule {
     type: CommandType | PluginType;
@@ -35,8 +34,8 @@ export type TextCommand = Override<
     BaseModule,
     {
         type: CommandType.Text;
-        onEvent?: EventPlugin<CommandType.Text>[];
-        plugins?: CommandPlugin[];
+        onEvent: EventPlugin<CommandType.Text>[];
+        plugins: CommandPlugin[];
         alias?: string[];
     }
 >;
@@ -45,8 +44,8 @@ export type SlashCommand = Override<
     BaseModule,
     {
         type: CommandType.Slash;
-        onEvent?: EventPlugin<CommandType.Slash>[];
-        plugins?: CommandPlugin[];
+        onEvent: EventPlugin<CommandType.Slash>[];
+        plugins: CommandPlugin[];
         options?: SernOptionsData[];
     }
 >;
@@ -55,8 +54,8 @@ export type BothCommand = Override<
     BaseModule,
     {
         type: CommandType.Both;
-        onEvent?: EventPlugin<CommandType.Both>[];
-        plugins?: CommandPlugin[];
+        onEvent: EventPlugin<CommandType.Both>[];
+        plugins: CommandPlugin[];
         alias?: string[];
         options?: SernOptionsData[];
     }
@@ -66,8 +65,8 @@ export type ContextMenuUser = Override<
     BaseModule,
     {
         type: CommandType.MenuUser;
-        onEvent?: EventPlugin<CommandType.MenuUser>[];
-        plugins?: CommandPlugin[];
+        onEvent: EventPlugin<CommandType.MenuUser>[];
+        plugins: CommandPlugin[];
         execute: (ctx: UserContextMenuCommandInteraction) => Awaitable<void>;
     }
 >;
@@ -76,8 +75,8 @@ export type ContextMenuMsg = Override<
     BaseModule,
     {
         type: CommandType.MenuMsg;
-        onEvent?: EventPlugin<CommandType.MenuMsg>[];
-        plugins?: CommandPlugin[];
+        onEvent: EventPlugin<CommandType.MenuMsg>[];
+        plugins: CommandPlugin[];
         execute: (ctx: MessageContextMenuCommandInteraction) => Awaitable<void>;
     }
 >;
@@ -86,8 +85,8 @@ export type ButtonCommand = Override<
     BaseModule,
     {
         type: CommandType.Button;
-        onEvent?: EventPlugin<CommandType.Button>[];
-        plugins?: CommandPlugin[];
+        onEvent: EventPlugin<CommandType.Button>[];
+        plugins: CommandPlugin[];
         execute: (ctx: ButtonInteraction) => Awaitable<void>;
     }
 >;
@@ -96,8 +95,8 @@ export type SelectMenuCommand = Override<
     BaseModule,
     {
         type: CommandType.MenuSelect;
-        onEvent?: EventPlugin<CommandType.MenuSelect>[];
-        plugins?: CommandPlugin[];
+        onEvent: EventPlugin<CommandType.MenuSelect>[];
+        plugins: CommandPlugin[];
         execute: (ctx: SelectMenuInteraction) => Awaitable<void>;
     }
 >;
@@ -106,8 +105,8 @@ export type ModalSubmitCommand = Override<
     BaseModule,
     {
         type: CommandType.Modal;
-        onEvent?: EventPlugin<CommandType.Modal>[];
-        plugins?: CommandPlugin[];
+        onEvent: EventPlugin<CommandType.Modal>[];
+        plugins: CommandPlugin[];
         execute: (ctx: ModalSubmitInteraction) => Awaitable<void>;
     }
 >;
@@ -121,7 +120,7 @@ export type AutocompleteCommand = Override<
     {
         type: CommandType.Autocomplete;
         name: string;
-        onEvent?: EventPlugin<CommandType.Autocomplete>[];
+        onEvent: EventPlugin<CommandType.Autocomplete>[];
         execute: (ctx: AutocompleteInteraction) => Awaitable<void>;
     }
 >;
@@ -149,17 +148,6 @@ export type ModuleDefs = {
     [CommandType.MenuSelect]: SelectMenuCommand;
     [CommandType.Modal]: ModalSubmitCommand;
     [CommandType.Autocomplete]: AutocompleteCommand;
-};
-export type InteractionDefs = {
-    [CommandType.Text]: Context;
-    [CommandType.Slash]: Context;
-    [CommandType.Both]: Context;
-    [CommandType.MenuMsg]: MessageContextMenuCommandInteraction;
-    [CommandType.MenuUser]: UserContextMenuCommandInteraction;
-    [CommandType.Button]: ButtonInteraction;
-    [CommandType.MenuSelect]: SelectMenuInteraction;
-    [CommandType.Modal]: ModalSubmitInteraction;
-    [CommandType.Autocomplete]: AutocompleteInteraction;
 };
 
 //TODO: support deeply nested Autocomplete

@@ -15,9 +15,8 @@ import type { Awaitable, Client } from 'discord.js';
 import type { Err, Ok, Result } from 'ts-results';
 import type { Module, Override } from '../..';
 import { CommandType } from '../..';
-import type { BaseModule, ModuleDefs } from '../structures/module';
-import type { PluginType } from '../structures/enums';
-import type { ValueOf } from 'ts-pattern/dist/types/helpers';
+import type { AutocompleteCommand, BaseModule, ModuleDefs } from '../structures/module';
+import { PluginType } from '../structures/enums';
 
 export interface Controller {
     next: () => Ok<void>;
@@ -31,31 +30,19 @@ type BasePlugin = Override<
     }
 >;
 
-export type CommandPlugin = Override<
-    BasePlugin,
-    {
-        type: PluginType.Command;
-        execute: (
-            wrapper: Client,
-            module: Module,
-            controller: Controller,
-        ) => Awaitable<Result<void, void>>;
-    }
->;
-
-//TODO: rn adding the modType check a little hackish. Find better way to determine the
-// module type of the event plugin
-// export type EventPlugin<T extends keyof ModuleDefs> = Override<
-//     BasePlugin,
-//     {
-//         type: PluginType.Event;
-//         execute: (
-//             event: Parameters<ModuleDefs[T]['execute']>,
-//             controller: Controller,
-//         ) => Awaitable<Result<void, void>>;
-//     }
-// >;
-
+export type CommandPlugin<T extends keyof ModuleDefs = keyof ModuleDefs> = {
+    [K in T]: Override<
+        BasePlugin,
+        {
+            type: PluginType.Command;
+            execute: (
+                wrapper: Client,
+                module: ModuleDefs[T],
+                controller: Controller,
+            ) => Awaitable<Result<void, void>>;
+        }
+    >;
+}[T];
 export type EventPlugin<T extends keyof ModuleDefs = keyof ModuleDefs> = {
     [K in T]: Override<
         BasePlugin,
@@ -69,23 +56,53 @@ export type EventPlugin<T extends keyof ModuleDefs = keyof ModuleDefs> = {
     >;
 }[T];
 
-export function plugins(...plug: CommandPlugin[]): CommandPlugin[];
-export function plugins<T extends keyof ModuleDefs>(...plug: EventPlugin<T>[]): EventPlugin<T>[];
-export function plugins<T extends keyof ModuleDefs>(...plug: EventPlugin<T>[] | CommandPlugin[]) {
-    return plug;
+//Syntactic sugar on hold
+// export function plugins<T extends keyof ModuleDefs>(
+//     ...plug: (EventPlugin<T> | CommandPlugin<T>)[]
+// ) {
+//     return plug;
+// }
+
+type ModuleNoPlugins = {
+    [T in keyof ModuleDefs]: Omit<ModuleDefs[T], 'plugins' | 'onEvent'>;
+};
+
+function isEventPlugin<T extends CommandType>(
+    e: CommandPlugin<T> | EventPlugin<T>,
+): e is EventPlugin<T> {
+    return e.type === PluginType.Event;
 }
-
-type ModuleNoPlugins = ValueOf<{
-    [T in keyof ModuleDefs]: Omit<ModuleDefs[T], 'plugins'>;
-}>;
-
+function isCommandPlugin<T extends CommandType>(
+    e: CommandPlugin<T> | EventPlugin<T>,
+): e is CommandPlugin<T> {
+    return !isEventPlugin(e);
+}
 //TODO: I WANT BETTER TYPINGS AHHHHHHHHHHHHHHH
-export function sernModule(plugins: CommandPlugin[], mod: ModuleNoPlugins): Module {
+export function sernModule<T extends CommandType>(
+    plugin: (CommandPlugin<T> | EventPlugin<T>)[],
+    mod: ModuleNoPlugins[T],
+): Module {
+    const onEvent = plugin.filter(isEventPlugin);
+    const plugins = plugin.filter(isCommandPlugin);
     if (mod.type === CommandType.Autocomplete) {
-        return mod;
+        throw new Error(
+            'You cannot use this function declaration for Autocomplete Interactions! use the raw object for options or' +
+                'sernAutoComplete function',
+        );
     } else
         return {
+            onEvent,
             plugins,
             ...mod,
-        };
+        } as Module;
+}
+
+export function sernAutocomplete(
+    onEvent: EventPlugin<CommandType.Autocomplete>[],
+    mod: Omit<AutocompleteCommand, 'type' | 'name' | 'description' | 'onEvent'>,
+): Omit<AutocompleteCommand, 'type' | 'name' | 'description'> {
+    return {
+        onEvent,
+        ...mod,
+    };
 }
