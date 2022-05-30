@@ -1,7 +1,8 @@
 import type { Awaitable, ClientEvents, CommandInteractionOptionResolver } from 'discord.js';
 import type { EventEmitter } from 'events';
 export type Nullish<T> = T | undefined | null;
-// Thanks @cursorsdottsx
+
+// Thanks to @kelsny
 export type ParseType<T> = {
     [K in keyof T]: T[K] extends unknown ? [k: K, args: T[K]] : never;
 }[keyof T];
@@ -19,7 +20,7 @@ export type EventEmitterRegister = [
 
 export type SlashOptions = Omit<CommandInteractionOptionResolver, 'getMessage' | 'getFocused'>;
 
-//https://dev.to/vborodulin/ts-how-to-override-properties-with-type-intersection-554l
+// Source: https://dev.to/vborodulin/ts-how-to-override-properties-with-type-intersection-554l
 export type Override<T1, T2> = Omit<T1, keyof T2> & T2;
 
 export type DefinitelyDefined<T, K> = T & Override<T, K>;

@@ -1,7 +1,7 @@
 {
   "name": "@sern/handler",
-  "version": "0.0.1",
-  "description": "",
+  "version": "1.0.0-beta",
+  "description": "A customizable, batteries-included, powerful discord.js framework to automate and streamline bot development.",
   "main": "dist/index.js",
   "scripts": {
     "compile": "tsc",
@@ -10,12 +10,19 @@
     "format": "eslint src/**/*.ts --fix",
     "release": "standard-version && git push --follow-tags",
     "test": "jest --coverage --verbose",
-    "commit": "cz",
-    "docs": "typedoc src/index.ts --out docs"
+    "commit": "cz"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "sern-handler",
+    "sern",
+    "handler",
+    "sern handler",
+    "wrapper",
+    "discord.js",
+    "framework"
+  ],
+  "author": "SernDevs",
+  "license": "MIT",
   "dependencies": {
     "discord.js": "^14.0.0-dev.1647259751.2297c2b",
     "rxjs": "^7.5.5",
