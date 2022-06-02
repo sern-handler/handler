@@ -65,7 +65,7 @@ See our [templates](https://github.com/sern-handler/templates) for TypeScript ex
 
 ## CLI
 
-We are providing a [command line interface](https://github.com/sern-handler/cli) for better & easier bot developement. Don't forget to view it.
+**It is highly encouraged to use the [command line interface](https://github.com/sern-handler/cli) for your project. Don't forget to view it.
 
 ## Links
 
