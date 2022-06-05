@@ -38,6 +38,11 @@
     "typedoc": "^0.22.11",
     "typescript": "^4.5.5"
   },
+   "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sern-handler/handler.git"
+  },
+  "homepage": "https://sern-handler.js.org",
   "config": {
     "commitizen": {
       "path": "cz-conventional-changelog"
