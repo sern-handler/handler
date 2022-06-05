@@ -37,7 +37,7 @@ export type TextCommand = Override<
         onEvent: EventPlugin<CommandType.Text>[]; //maybe allow BothPlugins for this also?
         plugins: CommandPlugin[]; //maybe allow BothPlugins for this also?
         alias?: string[];
-        execute: (ctx: Context, args: Args) => Awaitable<void | unknown>;
+        execute: (ctx: Context, args: ['text', string[]]) => Awaitable<void | unknown>;
     }
 >;
 
@@ -48,7 +48,7 @@ export type SlashCommand = Override<
         onEvent: EventPlugin<CommandType.Slash>[]; //maybe allow BothPlugins for this also?
         plugins: CommandPlugin[]; //maybe allow BothPlugins for this also?
         options?: SernOptionsData[];
-        execute: (ctx: Context, args: Args) => Awaitable<void | unknown>;
+        execute: (ctx: Context, args: ['slash', SlashOptions]) => Awaitable<void | unknown>;
     }
 >;
 
