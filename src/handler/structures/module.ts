@@ -15,7 +15,7 @@ import type {
     SelectMenuInteraction,
     UserContextMenuCommandInteraction,
 } from 'discord.js';
-import type { Args, Override } from '../../types/handler';
+import type { Args, Override, SlashOptions } from '../../types/handler';
 import type { CommandPlugin, EventPlugin } from '../plugins/plugin';
 import type Context from './context';
 import { CommandType, PluginType } from './enums';
@@ -37,6 +37,7 @@ export type TextCommand = Override<
         onEvent: EventPlugin<CommandType.Text>[];
         plugins: CommandPlugin[];
         alias?: string[];
+        execute: (ctx: Context, args: ['text', string[]]) => Awaitable<void | unknown>;
     }
 >;
 
@@ -47,6 +48,7 @@ export type SlashCommand = Override<
         onEvent: EventPlugin<CommandType.Slash>[];
         plugins: CommandPlugin[];
         options?: SernOptionsData[];
+        execute: (ctx: Context, args: ['slash', SlashOptions]) => Awaitable<void | unknown>;
     }
 >;
 
