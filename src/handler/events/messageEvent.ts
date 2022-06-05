@@ -1,6 +1,5 @@
 import type { Message } from 'discord.js';
 import { concatMap, from, fromEvent, map, Observable, of } from 'rxjs';
-import type { Args } from '../..';
 import { controller } from '../sern';
 import Context from '../structures/context';
 import type Wrapper from '../structures/wrapper';
