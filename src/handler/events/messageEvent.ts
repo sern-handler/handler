@@ -22,7 +22,7 @@ export const onMessageCreate = (wrapper: Wrapper) => {
             const [prefix, ...rest] = fmt(message, defaultPrefix);
             return {
                 ctx: Context.wrap(message),
-                args: <Args>['text', rest],
+                args: <['text', string[]]>['text', rest],
                 mod:
                     Files.TextCommands.text.get(prefix) ??
                     Files.BothCommands.get(prefix) ??
