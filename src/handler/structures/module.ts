@@ -26,7 +26,7 @@ export interface BaseModule {
     type: CommandType | PluginType;
     name?: string;
     description: string;
-    execute: (...args: unknown[]) => Awaitable<void | unknown>;
+    execute: (ctx: Context, args: Args) => Awaitable<void | unknown>;
 }
 
 //possible refactoring types into interfaces and not types
@@ -35,9 +35,9 @@ export type TextCommand = Override<
     {
         type: CommandType.Text;
         onEvent: EventPlugin<CommandType.Text>[]; //maybe allow BothPlugins for this also?
-        plugins: CommandPlugin<CommandType.Text>[]; //maybe allow BothPlugins for this also?
+        plugins: CommandPlugin[]; //maybe allow BothPlugins for this also?
         alias?: string[];
-        execute: (ctx: Context, args: ['text', string[]]) => Awaitable<void | unknown>;
+        execute: (ctx: Context, args: Args) => Awaitable<void | unknown>;
     }
 >;
 
@@ -46,9 +46,9 @@ export type SlashCommand = Override<
     {
         type: CommandType.Slash;
         onEvent: EventPlugin<CommandType.Slash>[]; //maybe allow BothPlugins for this also?
-        plugins: CommandPlugin<CommandType.Slash>[]; //maybe allow BothPlugins for this also?
+        plugins: CommandPlugin[]; //maybe allow BothPlugins for this also?
         options?: SernOptionsData[];
-        execute: (ctx: Context, args: ['slash', SlashOptions]) => Awaitable<void | unknown>;
+        execute: (ctx: Context, args: Args) => Awaitable<void | unknown>;
     }
 >;
 
@@ -57,7 +57,7 @@ export type BothCommand = Override<
     {
         type: CommandType.Both;
         onEvent: EventPlugin<CommandType.Both>[];
-        plugins: CommandPlugin<CommandType.Both>[];
+        plugins: CommandPlugin[];
         alias?: string[];
         options?: SernOptionsData[];
         execute: (ctx: Context, args: Args) => Awaitable<void | unknown>;
@@ -69,7 +69,7 @@ export type ContextMenuUser = Override<
     {
         type: CommandType.MenuUser;
         onEvent: EventPlugin<CommandType.MenuUser>[];
-        plugins: CommandPlugin<CommandType.MenuUser>[];
+        plugins: CommandPlugin[];
         execute: (ctx: UserContextMenuCommandInteraction) => Awaitable<void | unknown>;
     }
 >;
@@ -79,7 +79,7 @@ export type ContextMenuMsg = Override<
     {
         type: CommandType.MenuMsg;
         onEvent: EventPlugin<CommandType.MenuMsg>[];
-        plugins: CommandPlugin<CommandType.MenuMsg>[];
+        plugins: CommandPlugin[];
         execute: (ctx: MessageContextMenuCommandInteraction) => Awaitable<void | unknown>;
     }
 >;
@@ -89,7 +89,7 @@ export type ButtonCommand = Override<
     {
         type: CommandType.Button;
         onEvent: EventPlugin<CommandType.Button>[];
-        plugins: CommandPlugin<CommandType.Button>[];
+        plugins: CommandPlugin[];
         execute: (ctx: ButtonInteraction) => Awaitable<void | unknown>;
     }
 >;
@@ -99,7 +99,7 @@ export type SelectMenuCommand = Override<
     {
         type: CommandType.MenuSelect;
         onEvent: EventPlugin<CommandType.MenuSelect>[];
-        plugins: CommandPlugin<CommandType.MenuSelect>[];
+        plugins: CommandPlugin[];
         execute: (ctx: SelectMenuInteraction) => Awaitable<void | unknown>;
     }
 >;
@@ -109,7 +109,7 @@ export type ModalSubmitCommand = Override<
     {
         type: CommandType.Modal;
         onEvent: EventPlugin<CommandType.Modal>[];
-        plugins: CommandPlugin<CommandType.Modal>[];
+        plugins: CommandPlugin[];
         execute: (ctx: ModalSubmitInteraction) => Awaitable<void | unknown>;
     }
 >;
