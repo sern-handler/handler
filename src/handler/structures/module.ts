@@ -25,7 +25,7 @@ import type { ApplicationCommandOptionType } from 'discord.js';
 export interface BaseModule {
     type: CommandType | PluginType;
     name?: string;
-    description: string;
+    description?: string;
     execute: (ctx: Context, args: Args) => Awaitable<void | unknown>;
 }
 
