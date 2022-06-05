@@ -29,11 +29,11 @@ export const onReady = (wrapper: Wrapper) => {
     const ready$ = fromEvent(client, 'ready').pipe(take(1), skip(1));
     const processCommandFiles$ = Files.buildData(commands).pipe(
         map(({ mod, absPath }) => {
-            if (mod?.name === undefined) {
-                const name = Files.fmtFileName(basename(absPath));
-                return { name, ...mod };
-            }
-            return mod;
+            return {
+                name: mod?.name ?? Files.fmtFileName(basename(absPath)),
+                description: mod?.description ?? '...',
+                ...mod,
+            };
         }),
     );
     const processPlugins$ = processCommandFiles$.pipe(
@@ -59,7 +59,7 @@ export const onReady = (wrapper: Wrapper) => {
 
     (
         concat(ready$, processPlugins$) as Observable<{
-            mod: DefinitelyDefined<Module, { name: string }>;
+            mod: DefinitelyDefined<Module, { name: string; description: string }>;
             cmdPluginsRes: {
                 execute: Awaitable<Result<void, void>>;
                 type: PluginType.Command;
