@@ -14,6 +14,7 @@ import type {
 import { None, Option, Some } from 'ts-results';
 import type { Nullish } from '../../types/handler';
 import { ExternallyUsed } from '../utilities/externallyUsed';
+import { SernError } from './errors';
 
 function firstSome<T>(...args: Option<T>[]): Nullish<T> {
     for (const op of args) {
@@ -43,7 +44,7 @@ export default class Context {
      */
     @ExternallyUsed
     public get message() {
-        return this.oMsg.unwrap();
+        return this.oMsg.expect(SernError.MismatchEvent);
     }
     /**
      * Getting the ChatInputCommandInteraction object. Crashes if module type is
@@ -52,7 +53,7 @@ export default class Context {
      */
     @ExternallyUsed
     public get interaction() {
-        return this.oInterac.unwrap();
+        return this.oInterac.expect(SernError.MismatchEvent);
     }
 
     @ExternallyUsed

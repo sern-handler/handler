@@ -4,4 +4,5 @@ export enum SernError {
     MismatchModule = `A module type mismatched with event emitted!`,
     NotSupportedInteraction = `This interaction is not supported.`,
     PluginFailure = `A plugin failed to call controller.next()`,
+    MismatchEvent = `You cannot use message when an interaction fired or vice versa`,
 }
