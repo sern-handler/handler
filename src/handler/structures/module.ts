@@ -26,7 +26,7 @@ export interface BaseModule {
     type: CommandType | PluginType;
     name?: string;
     description: string;
-    execute: (ctx: Context, args: Args) => Awaitable<void>;
+    execute: (ctx: Context, args: Args) => Awaitable<void | unknown>;
 }
 
 //possible refactoring types into interfaces and not types
@@ -67,7 +67,7 @@ export type ContextMenuUser = Override<
         type: CommandType.MenuUser;
         onEvent: EventPlugin<CommandType.MenuUser>[];
         plugins: CommandPlugin[];
-        execute: (ctx: UserContextMenuCommandInteraction) => Awaitable<void>;
+        execute: (ctx: UserContextMenuCommandInteraction) => Awaitable<void | unknown>;
     }
 >;
 
@@ -77,7 +77,7 @@ export type ContextMenuMsg = Override<
         type: CommandType.MenuMsg;
         onEvent: EventPlugin<CommandType.MenuMsg>[];
         plugins: CommandPlugin[];
-        execute: (ctx: MessageContextMenuCommandInteraction) => Awaitable<void>;
+        execute: (ctx: MessageContextMenuCommandInteraction) => Awaitable<void | unknown>;
     }
 >;
 
@@ -87,7 +87,7 @@ export type ButtonCommand = Override<
         type: CommandType.Button;
         onEvent: EventPlugin<CommandType.Button>[];
         plugins: CommandPlugin[];
-        execute: (ctx: ButtonInteraction) => Awaitable<void>;
+        execute: (ctx: ButtonInteraction) => Awaitable<void | unknown>;
     }
 >;
 
@@ -97,7 +97,7 @@ export type SelectMenuCommand = Override<
         type: CommandType.MenuSelect;
         onEvent: EventPlugin<CommandType.MenuSelect>[];
         plugins: CommandPlugin[];
-        execute: (ctx: SelectMenuInteraction) => Awaitable<void>;
+        execute: (ctx: SelectMenuInteraction) => Awaitable<void | unknown>;
     }
 >;
 
@@ -107,7 +107,7 @@ export type ModalSubmitCommand = Override<
         type: CommandType.Modal;
         onEvent: EventPlugin<CommandType.Modal>[];
         plugins: CommandPlugin[];
-        execute: (ctx: ModalSubmitInteraction) => Awaitable<void>;
+        execute: (ctx: ModalSubmitInteraction) => Awaitable<void | unknown>;
     }
 >;
 
@@ -121,7 +121,7 @@ export type AutocompleteCommand = Override<
         type: CommandType.Autocomplete;
         name: string;
         onEvent: EventPlugin<CommandType.Autocomplete>[];
-        execute: (ctx: AutocompleteInteraction) => Awaitable<void>;
+        execute: (ctx: AutocompleteInteraction) => Awaitable<void | unknown>;
     }
 >;
 
