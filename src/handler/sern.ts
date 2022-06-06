@@ -1,14 +1,12 @@
 import type { DiscordEvent, EventEmitterRegister, SernEvent } from '../types/handler';
 
 import type Wrapper from './structures/wrapper';
-import { from, fromEvent } from 'rxjs';
+import { fromEvent } from 'rxjs';
 import { onReady } from './events/readyEvent';
 import { onMessageCreate } from './events/messageEvent';
 import { onInteractionCreate } from './events/interactionCreate';
 import { Err, Ok } from 'ts-results';
 import { isDiscordEvent, isSernEvent } from './utilities/predicates';
-import type { Client } from 'discord.js';
-import wrapper from './structures/wrapper';
 
 export function init(wrapper: Wrapper) {
     const { events, client } = wrapper;
