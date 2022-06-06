@@ -1,5 +1,6 @@
 import type { Awaitable, ClientEvents, CommandInteractionOptionResolver } from 'discord.js';
 import type { EventEmitter } from 'events';
+import type { SernEventsMapping } from '../handler/sernEmitter';
 export type Nullish<T> = T | undefined | null;
 
 // Thanks to @kelsny
@@ -11,6 +12,10 @@ export type Args = ParseType<{ text: string[]; slash: SlashOptions }>;
 
 export type DiscordEvent = ParseType<{
     [K in keyof ClientEvents]: (...args: ClientEvents[K]) => Awaitable<void>;
+}>;
+
+export type SernEvent = ParseType<{
+    [K in keyof SernEventsMapping]: (...args: SernEventsMapping[K]) => Awaitable<void>;
 }>;
 export type EventEmitterRegister = [
     emitter: EventEmitter,
