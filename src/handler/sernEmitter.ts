@@ -5,7 +5,7 @@ type Payload =
     | { success: true; module: Module }
     | { success: false; module: Module | undefined; reason: string | Error };
 
-type SernEventsMapping = {
+export type SernEventsMapping = {
     ['module.register']: [Payload];
     ['module.activate']: [Payload];
     ['error']: [Error | string];
