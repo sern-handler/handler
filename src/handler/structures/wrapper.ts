@@ -1,5 +1,5 @@
 import type { Client } from 'discord.js';
-import type { DiscordEvent, EventEmitterRegister } from '../../types/handler';
+import type { DiscordEvent, EventEmitterRegister, SernEvent } from '../../types/handler';
 import type SernEmitter from '../sernEmitter';
 
 /**
@@ -15,7 +15,7 @@ interface Wrapper {
     readonly sernEmitter?: SernEmitter;
     readonly defaultPrefix?: string;
     readonly commands: string;
-    readonly events?: (DiscordEvent | EventEmitterRegister)[];
+    readonly events?: (DiscordEvent | EventEmitterRegister | SernEvent)[];
 }
 
 export default Wrapper;

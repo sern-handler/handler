@@ -9,7 +9,7 @@ import { Err, Ok } from 'ts-results';
 import { isDiscordEvent, isSernEvent } from './utilities/predicates';
 
 export function init(wrapper: Wrapper) {
-    const { events, client } = wrapper;
+    const { events } = wrapper;
     if (events !== undefined) {
         eventObserver(wrapper, events);
     }
