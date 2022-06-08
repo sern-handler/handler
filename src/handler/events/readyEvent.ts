@@ -50,6 +50,7 @@ export const onReady = (wrapper: Wrapper) => {
                     return {
                         ...plug,
                         name: plug?.name ?? 'Unnamed Plugin',
+                        description: plug?.description ?? '...',
                         execute: plug.execute(client, mod, controller),
                     };
                 }) ?? [];
@@ -59,7 +60,7 @@ export const onReady = (wrapper: Wrapper) => {
 
     (
         concat(ready$, processPlugins$) as Observable<{
-            mod: DefinitelyDefined<Module, { name: string; description: string }>;
+            mod: DefinitelyDefined<Module, 'name' | 'description'>;
             cmdPluginsRes: {
                 execute: Awaitable<Result<void, void>>;
                 type: PluginType.Command;
@@ -99,7 +100,9 @@ export const onReady = (wrapper: Wrapper) => {
         });
 };
 
-function registerModule(mod: DefinitelyDefined<Module, { name: string }>): Result<void, void> {
+function registerModule(
+    mod: DefinitelyDefined<Module, 'name' | 'description'>,
+): Result<void, void> {
     const name = mod.name;
     return match<Module>(mod)
         .with({ type: CommandType.Text }, mod => {

@@ -13,7 +13,7 @@
 
 import type { Awaitable, Client } from 'discord.js';
 import type { Err, Ok, Result } from 'ts-results';
-import type { Module, Override } from '../..';
+import type { DefinitelyDefined, Module, Override } from '../..';
 import { CommandType } from '../..';
 import type { AutocompleteCommand, BaseModule, ModuleDefs } from '../structures/module';
 import { PluginType } from '../structures/enums';
@@ -37,7 +37,7 @@ export type CommandPlugin<T extends keyof ModuleDefs = keyof ModuleDefs> = {
             type: PluginType.Command;
             execute: (
                 wrapper: Client,
-                module: ModuleDefs[T],
+                module: DefinitelyDefined<ModuleDefs[T], 'name' | 'description'>,
                 controller: Controller,
             ) => Awaitable<Result<void, void>>;
         }
@@ -63,7 +63,7 @@ export type EventPlugin<T extends keyof ModuleDefs = keyof ModuleDefs> = {
 //     return plug;
 // }
 
-type ModuleNoPlugins = {
+export type ModuleNoPlugins = {
     [T in keyof ModuleDefs]: Omit<ModuleDefs[T], 'plugins' | 'onEvent'>;
 };
 

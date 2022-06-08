@@ -6,6 +6,7 @@ import type SernEmitter from '../sernEmitter';
  * An object to be passed into Sern.Handler constructor.
  * @typedef {object} Wrapper
  * @property {readonly Client} client
+ * @prop { readonly SernEmitter } sernEmitter
  * @property {readonly string} defaultPrefix
  * @property {readonly string} commands
  * @prop { readonly DiscordEvent[] } events
