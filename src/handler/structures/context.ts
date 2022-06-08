@@ -6,20 +6,16 @@ import type {
     GuildMember,
     InteractionReplyOptions,
     Message,
-    MessageEditOptions,
     ReplyMessageOptions,
     Snowflake,
     TextBasedChannel,
     User,
-    WebhookEditMessageOptions,
 } from 'discord.js';
 import { None, Option, Some } from 'ts-results';
 import type { ConformedEditOptions, Nullish } from '../../types/handler';
 import { ExternallyUsed } from '../utilities/externallyUsed';
 import { SernError } from './errors';
 import { MessagePayload } from 'discord.js';
-import { first } from 'rxjs';
-import { type } from 'typedoc/dist/lib/output/themes/default/partials/type';
 
 function firstSome<T>(...args: Option<T>[]): Nullish<T> {
     for (const op of args) {
