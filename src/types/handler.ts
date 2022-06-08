@@ -28,7 +28,11 @@ export type SlashOptions = Omit<CommandInteractionOptionResolver, 'getMessage' |
 // Source: https://dev.to/vborodulin/ts-how-to-override-properties-with-type-intersection-554l
 export type Override<T1, T2> = Omit<T1, keyof T2> & T2;
 
-export type DefinitelyDefined<T, K> = T & Override<T, K>;
+export type DefinitelyDefined<T, K extends keyof T> = {
+    [L in K]-?: T[L] extends Record<string, unknown>
+        ? DefinitelyDefined<T[L], keyof T[L]>
+        : Required<T>[L];
+} & T;
 
 type Reconstruct<T> = T extends Omit<infer O, infer _> ? O & Reconstruct<O> : T;
 
