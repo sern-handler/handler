@@ -1,4 +1,4 @@
-import type { APIGuildMember } from 'discord-api-types/v9';
+import type { APIGuildMember } from 'discord-api-types/v10';
 import type {
     ChatInputCommandInteraction,
     Client,
@@ -6,15 +6,20 @@ import type {
     GuildMember,
     InteractionReplyOptions,
     Message,
+    MessageEditOptions,
     ReplyMessageOptions,
     Snowflake,
     TextBasedChannel,
     User,
+    WebhookEditMessageOptions,
 } from 'discord.js';
 import { None, Option, Some } from 'ts-results';
-import type { Nullish } from '../../types/handler';
+import type { ConformedEditOptions, Nullish } from '../../types/handler';
 import { ExternallyUsed } from '../utilities/externallyUsed';
 import { SernError } from './errors';
+import { MessagePayload } from 'discord.js';
+import { first } from 'rxjs';
+import { type } from 'typedoc/dist/lib/output/themes/default/partials/type';
 
 function firstSome<T>(...args: Option<T>[]): Nullish<T> {
     for (const op of args) {
@@ -142,16 +147,34 @@ export default class Context {
     public isEmpty() {
         return this.oMsg.none && this.oInterac.none;
     }
-
-    //TODO: make this queueable
+    //Hopefully this is safe and doesnt crash!!
     @ExternallyUsed
-    public reply(content: Omit<InteractionReplyOptions, 'fetchReply'> | ReplyMessageOptions) {
+    public edit(payload: string | ConformedEditOptions) {
+        const msgPayload = new MessagePayload(
+            this.oInterac.unwrapOr(this.message),
+            typeof payload === 'string'
+                ? {
+                      content: payload,
+                  }
+                : payload,
+        );
+        return msgPayload.isMessage
+            ? this.message.edit(msgPayload)
+            : this.interaction.editReply(msgPayload);
+    }
+
+    @ExternallyUsed
+    public reply(
+        content: string | Omit<InteractionReplyOptions, 'fetchReply'> | ReplyMessageOptions,
+    ) {
         return firstSome(
             this.oInterac.map(i => {
-                return i.reply(content as InteractionReplyOptions).then(() => i.fetchReply());
+                return i
+                    .reply(content as string | InteractionReplyOptions)
+                    .then(() => i.fetchReply());
             }),
             this.oMsg.map(m => {
-                return m.reply(content as ReplyMessageOptions);
+                return m.reply(content as string | ReplyMessageOptions);
             }),
         )!;
     }
