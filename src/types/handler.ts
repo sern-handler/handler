@@ -1,6 +1,14 @@
-import type { Awaitable, ClientEvents, CommandInteractionOptionResolver } from 'discord.js';
+import type {
+    APIEmbed,
+    Awaitable,
+    ClientEvents,
+    CommandInteractionOptionResolver,
+    MessageEditOptions,
+    WebhookEditMessageOptions,
+} from 'discord.js';
 import type { EventEmitter } from 'events';
 import type { SernEventsMapping } from '../handler/sernEmitter';
+import type { JSONEncodable } from '@discordjs/builders';
 export type Nullish<T> = T | undefined | null;
 
 // Thanks to @kelsny
@@ -45,3 +53,9 @@ export type UnionToIntersection<T> = (T extends unknown ? (x: T) => unknown : ne
 ) => unknown
     ? R
     : never;
+export type ConformedEditOptions = Override<
+    MessageEditOptions | WebhookEditMessageOptions,
+    {
+        embeds?: (JSONEncodable<APIEmbed> | APIEmbed)[];
+    }
+>;
