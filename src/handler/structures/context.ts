@@ -143,22 +143,7 @@ export default class Context {
     public isEmpty() {
         return this.oMsg.none && this.oInterac.none;
     }
-    //Hopefully this is safe and doesnt crash!!
-    @ExternallyUsed
-    public edit(payload: string | ConformedEditOptions) {
-        const msgPayload = new MessagePayload(
-            this.oInterac.unwrapOr(this.message),
-            typeof payload === 'string'
-                ? {
-                      content: payload,
-                  }
-                : payload,
-        );
-        return msgPayload.isMessage
-            ? this.message.edit(msgPayload)
-            : this.interaction.editReply(msgPayload);
-    }
-
+    //Make queueable
     @ExternallyUsed
     public reply(
         content: string | Omit<InteractionReplyOptions, 'fetchReply'> | ReplyMessageOptions,
