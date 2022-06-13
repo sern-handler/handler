@@ -1,8 +1,11 @@
 import { ApplicationCommandType, ComponentType } from 'discord.js';
 import { readdirSync, statSync } from 'fs';
 import { join } from 'path';
-import { from, Observable } from 'rxjs';
+import { from, Observable, throwError } from 'rxjs';
 import type { Module } from '../structures/module';
+import { SernError } from '../structures/errors';
+import type { Result } from 'ts-results';
+import { Err, Ok } from 'ts-results';
 
 //Maybe move this? this probably doesnt belong in utlities/
 export const BothCommands = new Map<string, Module>();
@@ -45,15 +48,22 @@ export const fmtFileName = (n: string) => n.substring(0, n.length - 3);
  * @param commandDir
  */
 
-export function buildData(commandDir: string): Observable<{
-    mod: Module;
-    absPath: string;
-}> {
+export function buildData(commandDir: string): Observable<
+    Result<
+        {
+            mod: Module;
+            absPath: string;
+        },
+        SernError.UndefinedModule
+    >
+> {
     return from(
         getCommands(commandDir).map(absPath => {
             // eslint-disable-next-line @typescript-eslint/no-var-requires
-            const mod = <Module>require(absPath).default;
-            return { mod, absPath };
+            const mod = <Module | undefined>require(absPath).default;
+            if (mod !== undefined) {
+                return Ok({ mod, absPath });
+            } else return Err(SernError.UndefinedModule as const);
         }),
     );
 }

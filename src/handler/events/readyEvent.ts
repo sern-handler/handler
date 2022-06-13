@@ -23,11 +23,20 @@ import { match } from 'ts-pattern';
 import { SernError } from '../structures/errors';
 import type { DefinitelyDefined } from '../../types/handler';
 import { CommandType, PluginType } from '../structures/enums';
+import { elseMap, elseMapTo, resultMap } from 'ts-results/rxjs-operators';
+import { errTap } from './observableHandling';
 
 export const onReady = (wrapper: Wrapper) => {
     const { client, commands } = wrapper;
     const ready$ = fromEvent(client, 'ready').pipe(take(1), skip(1));
     const processCommandFiles$ = Files.buildData(commands).pipe(
+        errTap(reason => {
+            wrapper.sernEmitter?.emit('module.register', {
+                type: 'failure',
+                module: undefined,
+                reason,
+            });
+        }),
         map(({ mod, absPath }) => {
             return {
                 name: mod?.name ?? Files.fmtFileName(basename(absPath)),
@@ -83,16 +92,12 @@ export const onReady = (wrapper: Wrapper) => {
             if (loadedPluginsCorrectly) {
                 const res = registerModule(mod);
                 if (res.err) {
-                    throw Error(
-                        SernError.NonValidModuleType +
-                            ', or loading modules was handled incorrectly. ' +
-                            'Check commands path and command files!',
-                    );
+                    throw Error(SernError.NonValidModuleType);
                 }
-                wrapper.sernEmitter?.emit('module.register', { success: true, module: mod });
+                wrapper.sernEmitter?.emit('module.register', { type: 'success', module: mod });
             } else {
                 wrapper.sernEmitter?.emit('module.register', {
-                    success: false,
+                    type: 'failure',
                     module: mod,
                     reason: SernError.PluginFailure,
                 });
