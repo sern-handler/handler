@@ -12,10 +12,9 @@ import type {
     User,
 } from 'discord.js';
 import { None, Option, Some } from 'ts-results';
-import type { ConformedEditOptions, Nullish } from '../../types/handler';
+import type { Nullish } from '../../types/handler';
 import { ExternallyUsed } from '../utilities/externallyUsed';
 import { SernError } from './errors';
-import { MessagePayload } from 'discord.js';
 
 function firstSome<T>(...args: Option<T>[]): Nullish<T> {
     for (const op of args) {
