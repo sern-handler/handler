@@ -23,7 +23,6 @@ import { match } from 'ts-pattern';
 import { SernError } from '../structures/errors';
 import type { DefinitelyDefined } from '../../types/handler';
 import { CommandType, PluginType } from '../structures/enums';
-import { elseMap, elseMapTo, resultMap } from 'ts-results/rxjs-operators';
 import { errTap } from './observableHandling';
 
 export const onReady = (wrapper: Wrapper) => {

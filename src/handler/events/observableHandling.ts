@@ -3,6 +3,7 @@ import { Observable, throwError } from 'rxjs';
 import { SernError } from '../structures/errors';
 import type { Module, ModuleDefs } from '../structures/module';
 import { correctModuleType } from '../utilities/predicates';
+import type { Result } from 'ts-results';
 export function filterCorrectModule<T extends keyof ModuleDefs>(cmdType: T) {
     return (src: Observable<Module | undefined>) =>
         new Observable<ModuleDefs[T]>(subscriber => {
@@ -35,6 +36,27 @@ export function ignoreNonBot(prefix: string) {
                             .localeCompare(prefix, undefined, { sensitivity: 'accent' }) === 0;
                     if (messageFromHumanAndHasPrefix) {
                         subscriber.next(m);
+                    }
+                },
+                error: e => subscriber.error(e),
+                complete: () => subscriber.complete(),
+            });
+        });
+}
+
+/**
+ * If the current value in Result stream is an error, calls callback.
+ * @param cb
+ */
+export function errTap(cb: (err: SernError) => void) {
+    return (src: Observable<Result<{ mod: Module; absPath: string }, SernError>>) =>
+        new Observable<{ mod: Module; absPath: string }>(subscriber => {
+            return src.subscribe({
+                next(value) {
+                    if (value.err) {
+                        cb(value.val);
+                    } else {
+                        subscriber.next(value.val);
                     }
                 },
                 error: e => subscriber.error(e),

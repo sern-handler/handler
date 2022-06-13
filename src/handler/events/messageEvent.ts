@@ -53,11 +53,11 @@ export const onMessageCreate = (wrapper: Wrapper) => {
         next({ mod, ctx, args, res }) {
             if (res.every(pl => pl.ok)) {
                 Promise.resolve(mod.execute(ctx, args)).then(() => {
-                    wrapper.sernEmitter?.emit('module.activate', { success: true, module: mod! });
+                    wrapper.sernEmitter?.emit('module.activate', { type: 'success', module: mod! });
                 });
             } else {
                 wrapper.sernEmitter?.emit('module.activate', {
-                    success: false,
+                    type: 'failure',
                     module: mod!,
                     reason: SernError.PluginFailure,
                 });
