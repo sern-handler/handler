@@ -216,10 +216,10 @@ export function onInteractionCreate(wrapper: Wrapper) {
                 }
                 if (ePlugArr.every(e => e.ok)) {
                     await execute();
-                    wrapper.sernEmitter?.emit('module.activate', { success: true, module: mod! });
+                    wrapper.sernEmitter?.emit('module.activate', { type: 'success', module: mod! });
                 } else {
                     wrapper.sernEmitter?.emit('module.activate', {
-                        success: false,
+                        type: 'failure',
                         module: mod!,
                         reason: SernError.PluginFailure,
                     });

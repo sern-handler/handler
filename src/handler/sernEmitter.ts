@@ -2,9 +2,8 @@ import { EventEmitter } from 'events';
 import type { Module } from './structures/module';
 
 type Payload =
-    | { success: true; module: Module }
-    | { success: false; module: Module | undefined; reason: string | Error };
-
+    | { type: 'success'; module: Module }
+    | { type: 'failure'; module: Module | undefined; reason: string | Error };
 export type SernEventsMapping = {
     ['module.register']: [Payload];
     ['module.activate']: [Payload];
