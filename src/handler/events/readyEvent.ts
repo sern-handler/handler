@@ -28,7 +28,7 @@ import { errTap } from './observableHandling';
 export const onReady = (wrapper: Wrapper) => {
     const { client, commands } = wrapper;
     const ready$ = fromEvent(client, 'ready').pipe(take(1), skip(1));
-    const processCommandFiles$ = Files.buildData(commands).pipe(
+    const processCommandFiles$ = Files.buildData<Module>(commands).pipe(
         errTap(reason => {
             wrapper.sernEmitter?.emit('module.register', {
                 type: 'failure',

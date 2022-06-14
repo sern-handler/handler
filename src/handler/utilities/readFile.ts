@@ -48,10 +48,10 @@ export const fmtFileName = (n: string) => n.substring(0, n.length - 3);
  * @param commandDir
  */
 
-export function buildData(commandDir: string): Observable<
+export function buildData<T>(commandDir: string): Observable<
     Result<
         {
-            mod: Module;
+            mod: T;
             absPath: string;
         },
         SernError.UndefinedModule
@@ -60,7 +60,7 @@ export function buildData(commandDir: string): Observable<
     return from(
         getCommands(commandDir).map(absPath => {
             // eslint-disable-next-line @typescript-eslint/no-var-requires
-            const mod = <Module | undefined>require(absPath).default;
+            const mod = <T | undefined>require(absPath).default;
             if (mod !== undefined) {
                 return Ok({ mod, absPath });
             } else return Err(SernError.UndefinedModule as const);
