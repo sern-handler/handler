@@ -1,4 +1,4 @@
-import type { Module, ModuleDefs } from '../structures/module';
+import type { EventModule, Module, ModuleDefs } from '../structures/module';
 import type {
     Awaitable,
     ButtonInteraction,
@@ -10,6 +10,7 @@ import type {
     UserContextMenuCommandInteraction,
 } from 'discord.js';
 import type { DiscordEvent, EventEmitterRegister, SernEvent } from '../..';
+import { CommandType } from '../..';
 
 export function correctModuleType<T extends keyof ModuleDefs>(
     plug: Module | undefined,
@@ -56,4 +57,8 @@ export function isDiscordEvent(
 }
 export function isSernEvent(el: DiscordEvent | EventEmitterRegister | SernEvent): el is SernEvent {
     return !isDiscordEvent(el);
+}
+
+export function isEventModule(module: Module): module is EventModule {
+    return [CommandType.Discord, CommandType.Sern, CommandType.External].includes(module.type);
 }
