@@ -18,17 +18,19 @@ import type { Result } from 'ts-results';
 import { Err, Ok } from 'ts-results';
 import type { Awaitable } from 'discord.js';
 import { ApplicationCommandType, ComponentType } from 'discord.js';
-import type { Module } from '../structures/module';
+import type { CommandModule, Module } from '../structures/module';
 import { match } from 'ts-pattern';
 import { SernError } from '../structures/errors';
 import type { DefinitelyDefined } from '../../types/handler';
 import { CommandType, PluginType } from '../structures/enums';
 import { errTap } from './observableHandling';
 
-export const onReady = (wrapper: Wrapper) => {
+export function onReady(wrapper: Wrapper) {
     const { client, commands } = wrapper;
     const ready$ = fromEvent(client, 'ready').pipe(take(1), skip(1));
-    const processCommandFiles$ = Files.buildData<Module>(commands).pipe(
+
+    //Using sernModule function already checks if module is not EventModule
+    const processCommandFiles$ = Files.buildData<CommandModule>(commands).pipe(
         errTap(reason => {
             wrapper.sernEmitter?.emit('module.register', {
                 type: 'failure',
@@ -37,7 +39,7 @@ export const onReady = (wrapper: Wrapper) => {
             });
         }),
         map(({ mod, absPath }) => {
-            return {
+            return <DefinitelyDefined<CommandModule, 'name' | 'description'>>{
                 name: mod?.name ?? Files.fmtFileName(basename(absPath)),
                 description: mod?.description ?? '...',
                 ...mod,
@@ -68,7 +70,7 @@ export const onReady = (wrapper: Wrapper) => {
 
     (
         concat(ready$, processPlugins$) as Observable<{
-            mod: DefinitelyDefined<Module, 'name' | 'description'>;
+            mod: DefinitelyDefined<CommandModule, 'name' | 'description'>;
             cmdPluginsRes: {
                 execute: Awaitable<Result<void, void>>;
                 type: PluginType.Command;
@@ -102,7 +104,7 @@ export const onReady = (wrapper: Wrapper) => {
                 });
             }
         });
-};
+}
 
 function registerModule(
     mod: DefinitelyDefined<Module, 'name' | 'description'>,
