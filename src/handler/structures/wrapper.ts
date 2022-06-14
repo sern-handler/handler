@@ -16,7 +16,10 @@ interface Wrapper {
     readonly sernEmitter?: SernEmitter;
     readonly defaultPrefix?: string;
     readonly commands: string;
-    readonly events?: (DiscordEvent | EventEmitterRegister | SernEvent)[];
+    readonly events?:
+        | (DiscordEvent | EventEmitterRegister | SernEvent)[]
+        | string
+        | (() => (DiscordEvent | EventEmitterRegister | SernEvent)[]);
 }
 
 export default Wrapper;
