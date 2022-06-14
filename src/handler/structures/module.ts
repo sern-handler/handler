@@ -5,8 +5,10 @@ import type {
     ApplicationCommandNonOptionsData,
     ApplicationCommandNumericOptionData,
     ApplicationCommandOptionData,
+    ApplicationCommandOptionType,
     ApplicationCommandSubCommandData,
     ApplicationCommandSubGroupData,
+    AutocompleteInteraction,
     Awaitable,
     BaseApplicationCommandOptionsData,
     ButtonInteraction,
@@ -19,8 +21,7 @@ import type { Args, Override, SlashOptions } from '../../types/handler';
 import type { CommandPlugin, EventPlugin } from '../plugins/plugin';
 import type Context from './context';
 import { CommandType, PluginType } from './enums';
-import type { AutocompleteInteraction } from 'discord.js';
-import type { ApplicationCommandOptionType } from 'discord.js';
+import type { DiscordEventCommand, ExternalEventCommand, SernEventCommand } from './events';
 
 export interface BaseModule {
     type: CommandType | PluginType;
@@ -127,8 +128,8 @@ export type AutocompleteCommand = Override<
         execute: (ctx: AutocompleteInteraction) => Awaitable<void | unknown>;
     }
 >;
-
-export type Module =
+export type EventModule = DiscordEventCommand | SernEventCommand | ExternalEventCommand;
+export type CommandModule =
     | TextCommand
     | SlashCommand
     | BothCommand
@@ -138,6 +139,8 @@ export type Module =
     | SelectMenuCommand
     | ModalSubmitCommand
     | AutocompleteCommand;
+
+export type Module = CommandModule | EventModule;
 
 //https://stackoverflow.com/questions/64092736/alternative-to-switch-statement-for-typescript-discriminated-union
 // Explicit Module Definitions for mapping
@@ -151,6 +154,9 @@ export type ModuleDefs = {
     [CommandType.MenuSelect]: SelectMenuCommand;
     [CommandType.Modal]: ModalSubmitCommand;
     [CommandType.Autocomplete]: AutocompleteCommand;
+    [CommandType.Sern]: SernEventCommand;
+    [CommandType.Discord]: DiscordEventCommand;
+    [CommandType.External]: ExternalEventCommand;
 };
 
 //TODO: support deeply nested Autocomplete
