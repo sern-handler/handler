@@ -1,15 +1,15 @@
-//
-// Plugins can be inserted on all commands and are emitted
-//
-// 1. on ready event, where all commands are loaded.
-// 2. on corresponding observable (command triggers)
-//
-// The goal of plugins is to organize commands and
-// provide extensions to repetitive patterns
-// examples include refreshing modules,
-// categorizing commands, cooldowns, permissions, etc.
-// Plugins are reminiscent of middleware in express.
-//
+/*
+ * Plugins can be inserted on all commands and are emitted
+ *
+ * 1. on ready event, where all commands are loaded.
+ * 2. on corresponding observable (command triggers)
+ *
+ * The goal of plugins is to organize commands and
+ * provide extensions to repetitive patterns
+ * examples include refreshing modules,
+ * categorizing commands, cooldowns, permissions, etc.
+ * Plugins are reminiscent of middleware in express.
+*/
 
 import type { Awaitable, Client } from 'discord.js';
 import type { Err, Ok, Result } from 'ts-results';
@@ -56,7 +56,7 @@ export type EventPlugin<T extends keyof ModuleDefs = keyof ModuleDefs> = {
     >;
 }[T];
 
-//Syntactic sugar on hold
+// Syntactic sugar on hold
 // export function plugins<T extends keyof ModuleDefs>(
 //     ...plug: (EventPlugin<T> | CommandPlugin<T>)[]
 // ) {
@@ -77,7 +77,8 @@ function isCommandPlugin<T extends CommandType>(
 ): e is CommandPlugin<T> {
     return !isEventPlugin(e);
 }
-//TODO: I WANT BETTER TYPINGS AHHHHHHHHHHHHHHH
+
+// TODO: Do better typings
 export function sernModule<T extends CommandType>(
     plugin: (CommandPlugin<T> | EventPlugin<T>)[],
     mod: ModuleNoPlugins[T],
