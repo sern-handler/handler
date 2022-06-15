@@ -9,7 +9,7 @@ import type {
     SelectMenuInteraction,
     UserContextMenuCommandInteraction,
 } from 'discord.js';
-import type { DiscordEvent, EventEmitterRegister, SernEvent } from '../..';
+import type { DiscordEventCommand, SernEventCommand } from '../structures/events';
 import { CommandType } from '../..';
 
 export function correctModuleType<T extends keyof ModuleDefs>(
@@ -50,12 +50,10 @@ export function isPromise<T>(promiseLike: Awaitable<T>): promiseLike is Promise<
     return keys.has('then') && keys.has('catch');
 }
 
-export function isDiscordEvent(
-    el: DiscordEvent | EventEmitterRegister | SernEvent,
-): el is DiscordEvent {
-    return el.length === 2 && !['module.register', 'module.activates'].includes(el[0]);
+export function isDiscordEvent(el: EventModule): el is DiscordEventCommand {
+    return el.type === CommandType.Discord;
 }
-export function isSernEvent(el: DiscordEvent | EventEmitterRegister | SernEvent): el is SernEvent {
+export function isSernEvent(el: EventModule): el is SernEventCommand {
     return !isDiscordEvent(el);
 }
 

@@ -48,9 +48,9 @@ export function ignoreNonBot(prefix: string) {
  * If the current value in Result stream is an error, calls callback.
  * @param cb
  */
-export function errTap(cb: (err: SernError) => void) {
-    return (src: Observable<Result<{ mod: Module; absPath: string }, SernError>>) =>
-        new Observable<{ mod: Module; absPath: string }>(subscriber => {
+export function errTap<T extends Module>(cb: (err: SernError) => void) {
+    return (src: Observable<Result<{ mod: T; absPath: string }, SernError>>) =>
+        new Observable<{ mod: T; absPath: string }>(subscriber => {
             return src.subscribe({
                 next(value) {
                     if (value.err) {
