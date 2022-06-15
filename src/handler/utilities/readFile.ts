@@ -54,7 +54,7 @@ export function buildData<T>(commandDir: string): Observable<
             mod: T;
             absPath: string;
         },
-        SernError.UndefinedModule
+        SernError
     >
 > {
     return from(
@@ -63,7 +63,7 @@ export function buildData<T>(commandDir: string): Observable<
             const mod = <T | undefined>require(absPath).default;
             if (mod !== undefined) {
                 return Ok({ mod, absPath });
-            } else return Err(SernError.UndefinedModule as const);
+            } else return Err(SernError.UndefinedModule);
         }),
     );
 }
