@@ -1,8 +1,8 @@
 /*
  * Plugins can be inserted on all commands and are emitted
  *
- * 1. on ready event, where all commands are loaded.
- * 2. on corresponding observable (command triggers)
+ * 1. On ready event, where all commands are loaded.
+ * 2. On corresponding observable (when command triggers)
  *
  * The goal of plugins is to organize commands and
  * provide extensions to repetitive patterns
