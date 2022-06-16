@@ -29,7 +29,7 @@ export function onReady(wrapper: Wrapper) {
     const { client, commands } = wrapper;
     const ready$ = fromEvent(client, 'ready').pipe(take(1), skip(1));
 
-    //Using sernModule function already checks if module is not EventModule
+    // Using sernModule function already checks if module is not EventModule
     const processCommandFiles$ = Files.buildData<CommandModule>(commands).pipe(
         errTap(reason => {
             wrapper.sernEmitter?.emit('module.register', {
