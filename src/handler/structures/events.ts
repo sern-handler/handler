@@ -4,6 +4,7 @@ import type { CommandPlugin, EventPlugin } from '../plugins/plugin';
 import type { CommandType } from './enums';
 import type { SernEventsMapping } from '../sernEmitter';
 import type { Awaitable, ClientEvents } from 'discord.js';
+import type { EventEmitter } from 'events';
 
 export type SernEventCommand<T extends keyof SernEventsMapping = keyof SernEventsMapping> =
     Override<
@@ -31,6 +32,7 @@ export type ExternalEventCommand = Override<
     BaseModule,
     {
         type: CommandType.External;
+        emitter: EventEmitter;
         onEvent: EventPlugin<CommandType.External>[];
         plugins: CommandPlugin[];
         execute(...args: unknown[]): Awaitable<void | unknown>;

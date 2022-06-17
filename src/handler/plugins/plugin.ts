@@ -36,7 +36,7 @@ export type CommandPlugin<T extends keyof ModuleDefs = keyof ModuleDefs> = {
         {
             type: PluginType.Command;
             execute: (
-                wrapper: Client,
+                wrapper: K extends CommandType.External ? EventEmitter : Client,
                 module: DefinitelyDefined<ModuleDefs[T], 'name' | 'description'>,
                 controller: Controller,
             ) => Awaitable<Result<void, void>>;
@@ -77,9 +77,8 @@ function isCommandPlugin<T extends CommandType>(
 ): e is CommandPlugin<T> {
     return !isEventPlugin(e);
 }
-
-// TODO: Do better typings
-export function sernModule<T extends CommandType>(
+//TODO: I WANT BETTER TYPINGS AHHHHHHHHHHHHHHH
+export function sernModule<T extends keyof ModuleDefs>(
     plugin: (CommandPlugin<T> | EventPlugin<T>)[],
     mod: ModuleNoPlugins[T],
 ): Module {
