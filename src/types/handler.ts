@@ -48,14 +48,16 @@ type IsOptional<T> = {
     [K in keyof T]-?: T[K] extends Required<T>[K] ? false : true;
 };
 
-export type UnionToIntersection<T> = (T extends unknown ? (x: T) => unknown : never) extends (
-    x: infer R,
-) => unknown
-    ? R
-    : never;
 export type ConformedEditOptions = Override<
     MessageEditOptions | WebhookEditMessageOptions,
     {
         embeds?: (JSONEncodable<APIEmbed> | APIEmbed)[];
     }
 >;
+/**
+ * Turns a function with a union of array of args into a single union
+ *  [ T , V , B ] | [ A ] => T | V | B | A
+ */
+export type SpreadParams<T extends (...args: any) => unknown> = (
+    args: Parameters<T>[number],
+) => unknown;

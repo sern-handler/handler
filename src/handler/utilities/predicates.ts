@@ -9,7 +9,11 @@ import type {
     SelectMenuInteraction,
     UserContextMenuCommandInteraction,
 } from 'discord.js';
-import type { DiscordEventCommand, SernEventCommand } from '../structures/events';
+import type {
+    DiscordEventCommand,
+    ExternalEventCommand,
+    SernEventCommand,
+} from '../structures/events';
 import { CommandType } from '../..';
 
 export function correctModuleType<T extends keyof ModuleDefs>(
@@ -55,6 +59,10 @@ export function isDiscordEvent(el: EventModule): el is DiscordEventCommand {
 }
 export function isSernEvent(el: EventModule): el is SernEventCommand {
     return !isDiscordEvent(el);
+}
+
+export function isExternalEvent(el: EventModule): el is ExternalEventCommand {
+    return !isDiscordEvent(el) && !isSernEvent(el);
 }
 
 export function isEventModule(module: Module): module is EventModule {
