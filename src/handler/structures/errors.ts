@@ -5,5 +5,5 @@ export enum SernError {
     NotSupportedInteraction = `This interaction is not supported.`,
     PluginFailure = `A plugin failed to call controller.next()`,
     MismatchEvent = `You cannot use message when an interaction fired or vice versa`,
-    UndefinedSernEmitter = `Could not find a Sern emitter`,
+    UndefinedSernEmitter = `Could not find an Emitter`,
 }

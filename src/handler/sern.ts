@@ -3,7 +3,7 @@ import { onReady } from './events/readyEvent';
 import { onMessageCreate } from './events/messageEvent';
 import { onInteractionCreate } from './events/interactionCreate';
 import { Err, Ok } from 'ts-results';
-import { buildData } from './utilities/readFile';
+import { buildData, ExternalEventEmitters } from './utilities/readFile';
 import type { EventModule } from './structures/module';
 import { from, fromEvent, map, throwError } from 'rxjs';
 import { match } from 'ts-pattern';
@@ -13,6 +13,7 @@ import { SernError } from './structures/errors';
 import type { SpreadParams } from '../types/handler';
 import * as Files from './utilities/readFile';
 import { basename } from 'path';
+import type { EventEmitter } from 'events';
 
 export function init(wrapper: Wrapper) {
     const { events } = wrapper;
@@ -22,6 +23,13 @@ export function init(wrapper: Wrapper) {
     onReady(wrapper);
     onMessageCreate(wrapper);
     onInteractionCreate(wrapper);
+}
+
+export function addExternal<T extends EventEmitter>(emitter: T) {
+    if (ExternalEventEmitters.has(emitter.constructor.name)) {
+        throw Error(`${emitter.constructor.name} already exists!`);
+    }
+    ExternalEventEmitters.set(emitter.constructor.name, emitter);
 }
 
 function processEvents(wrapper: Wrapper, events: string | EventModule[] | (() => EventModule[])) {
@@ -56,7 +64,16 @@ function processEvents(wrapper: Wrapper, events: string | EventModule[] | (() =>
                         m.execute as SpreadParams<typeof m.execute>,
                     ),
                 )
-                .when(isExternalEvent, m => fromEvent(m.emitter, m.name!, m.execute))
+                .when(isExternalEvent, m => {
+                    if (!ExternalEventEmitters.has(m.emitter)) {
+                        throw Error(
+                            SernError.UndefinedSernEmitter +
+                                `Could not locate 
+                        a dependency ${m.emitter} to call this event listener`,
+                        );
+                    }
+                    return fromEvent(ExternalEventEmitters.get(m.emitter)!, m.name!, m.execute);
+                })
                 .run();
         }),
     );

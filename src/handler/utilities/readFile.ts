@@ -6,6 +6,7 @@ import type { Module } from '../structures/module';
 import { SernError } from '../structures/errors';
 import type { Result } from 'ts-results';
 import { Err, Ok } from 'ts-results';
+import type { EventEmitter } from 'events';
 
 //Maybe move this? this probably doesnt belong in utlities/
 export const BothCommands = new Map<string, Module>();
@@ -25,6 +26,11 @@ export const TextCommands = {
     aliases: new Map<string, Module>(),
 };
 export const ModalSubmitCommands = new Map<string, Module>();
+/**
+ * keeps all external emitters stored here
+ */
+export const ExternalEventEmitters = new Map<string, EventEmitter>();
+
 // Courtesy @Townsy45
 function readPath(dir: string, arrayOfFiles: string[] = []): string[] {
     try {
