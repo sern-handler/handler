@@ -9,7 +9,7 @@
  * examples include refreshing modules,
  * categorizing commands, cooldowns, permissions, etc.
  * Plugins are reminiscent of middleware in express.
-*/
+ */
 
 import type { Awaitable, Client } from 'discord.js';
 import type { Err, Ok, Result } from 'ts-results';
@@ -17,6 +17,7 @@ import type { DefinitelyDefined, Module, Override } from '../..';
 import { CommandType } from '../..';
 import type { AutocompleteCommand, BaseModule, ModuleDefs } from '../structures/module';
 import { PluginType } from '../structures/enums';
+import type { EventEmitter } from 'events';
 
 export interface Controller {
     next: () => Ok<void>;
