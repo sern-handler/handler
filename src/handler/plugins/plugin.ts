@@ -18,6 +18,8 @@ import { CommandType } from '../..';
 import type { AutocompleteCommand, BaseModule, ModuleDefs } from '../structures/module';
 import { PluginType } from '../structures/enums';
 import type { EventEmitter } from 'events';
+import type { ExternalEventCommand, SernEventCommand } from '../structures/events';
+import type SernEmitter from '../sernEmitter';
 
 export interface Controller {
     next: () => Ok<void>;
@@ -37,13 +39,38 @@ export type CommandPlugin<T extends keyof ModuleDefs = keyof ModuleDefs> = {
         {
             type: PluginType.Command;
             execute: (
-                wrapper: K extends CommandType.External ? EventEmitter : Client,
+                wrapper: Client,
                 module: DefinitelyDefined<ModuleDefs[T], 'name' | 'description'>,
                 controller: Controller,
             ) => Awaitable<Result<void, void>>;
         }
     >;
 }[T];
+
+export type ExternalEmitterPlugin<T extends EventEmitter = EventEmitter> = Override<
+    BasePlugin,
+    {
+        type: PluginType.Command;
+        execute: (
+            wrapper: T,
+            module: DefinitelyDefined<ExternalEventCommand, 'name' | 'description'>,
+            controller: Controller,
+        ) => Awaitable<Result<void, void>>;
+    }
+>;
+
+export type SernEmitterPlugin = Override<
+    BasePlugin,
+    {
+        type: PluginType.Command;
+        execute: (
+            wrapper: SernEmitter,
+            module: DefinitelyDefined<SernEventCommand, 'name' | 'description'>,
+            controller: Controller,
+        ) => Awaitable<Result<void, void>>;
+    }
+>;
+
 export type EventPlugin<T extends keyof ModuleDefs = keyof ModuleDefs> = {
     [K in T]: Override<
         BasePlugin,
