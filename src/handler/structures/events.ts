@@ -1,6 +1,11 @@
 import type { Override } from '../../types/handler';
 import type { BaseModule } from './module';
-import type { CommandPlugin, EventPlugin } from '../plugins/plugin';
+import type {
+    CommandPlugin,
+    EventPlugin,
+    ExternalEmitterPlugin,
+    SernEmitterPlugin,
+} from '../plugins/plugin';
 import type { CommandType } from './enums';
 import type { SernEventsMapping } from '../sernEmitter';
 import type { Awaitable, ClientEvents } from 'discord.js';
@@ -13,7 +18,7 @@ export type SernEventCommand<T extends keyof SernEventsMapping = keyof SernEvent
             name?: T;
             type: CommandType.Sern;
             onEvent: EventPlugin<CommandType.Sern>[];
-            plugins: CommandPlugin[];
+            plugins: SernEmitterPlugin[];
             execute(...args: SernEventsMapping[T]): Awaitable<void | unknown>;
         }
     >;
@@ -31,10 +36,10 @@ export type DiscordEventCommand<T extends keyof ClientEvents = keyof ClientEvent
 export type ExternalEventCommand = Override<
     BaseModule,
     {
+        emitter: string;
         type: CommandType.External;
-        emitter: EventEmitter;
         onEvent: EventPlugin<CommandType.External>[];
-        plugins: CommandPlugin[];
+        plugins: ExternalEmitterPlugin[];
         execute(...args: unknown[]): Awaitable<void | unknown>;
     }
 >;
