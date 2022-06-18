@@ -1,14 +1,4 @@
-import type {
-    APIEmbed,
-    Awaitable,
-    ClientEvents,
-    CommandInteractionOptionResolver,
-    MessageEditOptions,
-    WebhookEditMessageOptions,
-} from 'discord.js';
-import type { EventEmitter } from 'events';
-import type { SernEventsMapping } from '../handler/sernEmitter';
-import type { JSONEncodable } from '@discordjs/builders';
+import type { CommandInteractionOptionResolver } from 'discord.js';
 export type Nullish<T> = T | undefined | null;
 
 // Thanks to @kelsny
@@ -18,25 +8,12 @@ export type ParseType<T> = {
 
 export type Args = ParseType<{ text: string[]; slash: SlashOptions }>;
 
-export type DiscordEvent = ParseType<{
-    [K in keyof ClientEvents]: (...args: ClientEvents[K]) => Awaitable<void>;
-}>;
-
-export type SernEvent = ParseType<{
-    [K in keyof SernEventsMapping]: (...args: SernEventsMapping[K]) => Awaitable<void>;
-}>;
-export type EventEmitterRegister = [
-    emitter: EventEmitter,
-    k: string,
-    cb: (...args: unknown[]) => Awaitable<void>,
-];
-
 export type SlashOptions = Omit<CommandInteractionOptionResolver, 'getMessage' | 'getFocused'>;
 
 // Source: https://dev.to/vborodulin/ts-how-to-override-properties-with-type-intersection-554l
 export type Override<T1, T2> = Omit<T1, keyof T2> & T2;
 
-export type DefinitelyDefined<T, K extends keyof T> = {
+export type DefinitelyDefined<T, K extends keyof T = keyof T> = {
     [L in K]-?: T[L] extends Record<string, unknown>
         ? DefinitelyDefined<T[L], keyof T[L]>
         : Required<T>[L];
@@ -48,12 +25,6 @@ type IsOptional<T> = {
     [K in keyof T]-?: T[K] extends Required<T>[K] ? false : true;
 };
 
-export type ConformedEditOptions = Override<
-    MessageEditOptions | WebhookEditMessageOptions,
-    {
-        embeds?: (JSONEncodable<APIEmbed> | APIEmbed)[];
-    }
->;
 /**
  * Turns a function with a union of array of args into a single union
  *  [ T , V , B ] | [ A ] => T | V | B | A
