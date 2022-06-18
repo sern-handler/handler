@@ -3,18 +3,15 @@ import { onReady } from './events/readyEvent';
 import { onMessageCreate } from './events/messageEvent';
 import { onInteractionCreate } from './events/interactionCreate';
 import { Err, Ok } from 'ts-results';
-import { buildData, ExternalEventEmitters } from './utilities/readFile';
-import type { EventModule } from './structures/module';
-import { from, fromEvent, map, throwError } from 'rxjs';
-import { match } from 'ts-pattern';
-import { errTap } from './events/observableHandling';
-import { isDiscordEvent, isExternalEvent, isSernEvent } from './utilities/predicates';
-import { SernError } from './structures/errors';
-import type { SpreadParams } from '../types/handler';
-import * as Files from './utilities/readFile';
-import { basename } from 'path';
+import { ExternalEventEmitters } from './utilities/readFile';
 import type { EventEmitter } from 'events';
+import { processEvents } from './events/userDefinedEventsHandling';
 
+/**
+ *
+ * @param wrapper options to pass into sern.
+ *  Function to start the handler up.
+ */
 export function init(wrapper: Wrapper) {
     const { events } = wrapper;
     if (events !== undefined) {
@@ -25,89 +22,18 @@ export function init(wrapper: Wrapper) {
     onInteractionCreate(wrapper);
 }
 
+/**
+ *
+ * @param emitter Any external event emitter.
+ * The object will be stored in a map, and then fetched by the name of the emitter provided.
+ * As there are infinite possibilities to adding external event emitters,
+ * Most types arent provided and are as narrow as possibly can.
+ */
 export function addExternal<T extends EventEmitter>(emitter: T) {
     if (ExternalEventEmitters.has(emitter.constructor.name)) {
         throw Error(`${emitter.constructor.name} already exists!`);
     }
     ExternalEventEmitters.set(emitter.constructor.name, emitter);
-}
-
-function processEvents(wrapper: Wrapper, events: string | EventModule[] | (() => EventModule[])) {
-    const eventStream = eventObservable$(wrapper, events);
-    const processPlugins$ = eventStream.pipe(map(mod => mod)); //for now, until i figure out what to do with how plugins are registered
-    const normalize$ = processPlugins$.pipe(
-        map(({ mod, absPath }) => {
-            return {
-                name: mod?.name ?? Files.fmtFileName(basename(absPath)),
-                description: mod?.description ?? '...',
-                ...mod,
-            };
-        }),
-    );
-    const processAndLoadEvents$ = normalize$.pipe(
-        map(mod => {
-            return match(mod as EventModule)
-                .when(isSernEvent, m => {
-                    if (wrapper.sernEmitter === undefined) {
-                        return throwError(() => SernError.UndefinedSernEmitter);
-                    }
-                    return fromEvent(
-                        wrapper.sernEmitter,
-                        m.name!,
-                        m.execute as SpreadParams<typeof m.execute>,
-                    );
-                })
-                .when(isDiscordEvent, m =>
-                    fromEvent(
-                        wrapper.client,
-                        mod.name!,
-                        m.execute as SpreadParams<typeof m.execute>,
-                    ),
-                )
-                .when(isExternalEvent, m => {
-                    if (!ExternalEventEmitters.has(m.emitter)) {
-                        throw Error(
-                            SernError.UndefinedSernEmitter +
-                                `Could not locate 
-                        a dependency ${m.emitter} to call this event listener`,
-                        );
-                    }
-                    return fromEvent(ExternalEventEmitters.get(m.emitter)!, m.name!, m.execute);
-                })
-                .run();
-        }),
-    );
-}
-
-function eventObservable$(
-    { sernEmitter }: Wrapper,
-    events: string | EventModule[] | (() => EventModule[]),
-) {
-    return match(events)
-        .when(Array.isArray, (arr: EventModule[]) => {
-            return from(arr.map(self => ({ mod: self, absPath: __filename })));
-        })
-        .when(
-            e => typeof e === 'string',
-            (eventsDir: string) => {
-                return buildData<EventModule>(eventsDir).pipe(
-                    errTap(reason =>
-                        sernEmitter?.emit('module.register', {
-                            type: 'failure',
-                            module: undefined,
-                            reason,
-                        }),
-                    ),
-                );
-            },
-        )
-        .when(
-            e => typeof e === 'function',
-            (evs: () => EventModule[]) => {
-                return from(evs().map(self => ({ mod: self, absPath: __filename })));
-            },
-        )
-        .run();
 }
 
 export const controller = {
