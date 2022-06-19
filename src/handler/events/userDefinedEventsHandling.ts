@@ -1,9 +1,9 @@
 import { CommandType } from '../structures/enums';
-import { from, fromEvent, map, throwError } from 'rxjs';
+import { concatMap, from, fromEvent, map, of, throwError } from 'rxjs';
 import { SernError } from '../structures/errors';
 import { buildData, ExternalEventEmitters } from '../utilities/readFile';
 import { controller } from '../sern';
-import type { DefinitelyDefined } from '../../types/handler';
+import type { DefinedModule, DefinitelyDefined } from '../../types/handler';
 import type { Module } from '../structures/module';
 import type Wrapper from '../structures/wrapper';
 import type { EventModule } from '../structures/module';
@@ -14,7 +14,7 @@ import { isDiscordEvent, isExternalEvent, isSernEvent } from '../utilities/predi
 import type { SpreadParams } from '../../types/handler';
 import { errTap } from './observableHandling';
 
-export function processCommandPlugins$<T extends DefinitelyDefined<Module, 'name' | 'description'>>(
+export function processCommandPlugins$<T extends DefinedModule>(
     { client, sernEmitter }: Wrapper,
     { mod, absPath }: { mod: T; absPath: string },
 ) {
@@ -58,8 +58,8 @@ export function processEvents(
     );
     const processPlugins$ = normalize$.pipe(map(mod => mod)); //for now, until i figure out what to do with how plugins are registered
 
-    const processAndLoadEvents$ = normalize$.pipe(
-        map(mod => {
+    const processAndLoadEvents$ = processPlugins$.pipe(
+        concatMap(mod => {
             return match(mod as EventModule)
                 .when(isSernEvent, m => {
                     if (wrapper.sernEmitter === undefined) {
@@ -71,13 +71,13 @@ export function processEvents(
                         m.execute as SpreadParams<typeof m.execute>,
                     );
                 })
-                .when(isDiscordEvent, m =>
-                    fromEvent(
+                .when(isDiscordEvent, m => {
+                    return fromEvent(
                         wrapper.client,
-                        mod.name!,
+                        m.name!,
                         m.execute as SpreadParams<typeof m.execute>,
-                    ),
-                )
+                    );
+                })
                 .when(isExternalEvent, m => {
                     if (!ExternalEventEmitters.has(m.emitter)) {
                         throw Error(
