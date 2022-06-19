@@ -1,5 +1,4 @@
 import type { Client } from 'discord.js';
-import type { DiscordEvent, EventEmitterRegister, SernEvent } from '../../types/handler';
 import type SernEmitter from '../sernEmitter';
 import type { EventModule } from './module';
 

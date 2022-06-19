@@ -1,4 +1,5 @@
 import type { CommandInteractionOptionResolver } from 'discord.js';
+import type { CommandModule, Module } from '../handler/structures/module';
 export type Nullish<T> = T | undefined | null;
 
 // Thanks to @kelsny
@@ -32,3 +33,10 @@ type IsOptional<T> = {
 export type SpreadParams<T extends (...args: any) => unknown> = (
     args: Parameters<T>[number],
 ) => unknown;
+
+/**
+ * After modules are transformed, name and description are given default values if none
+ * are provided to Module. This type represents that transformation
+ */
+export type DefinedModule = DefinitelyDefined<Module, 'name' | 'description'>;
+export type DefinedCommandModule = DefinitelyDefined<CommandModule, 'name' | 'description'>;

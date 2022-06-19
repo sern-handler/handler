@@ -21,7 +21,7 @@ import { ApplicationCommandType, ComponentType } from 'discord.js';
 import type { CommandModule, Module } from '../structures/module';
 import { match } from 'ts-pattern';
 import { SernError } from '../structures/errors';
-import type { DefinitelyDefined } from '../../types/handler';
+import type { DefinedCommandModule, DefinedModule } from '../../types/handler';
 import { CommandType, PluginType } from '../structures/enums';
 import { errTap } from './observableHandling';
 
@@ -39,7 +39,7 @@ export function onReady(wrapper: Wrapper) {
             });
         }),
         map(({ mod, absPath }) => {
-            return <DefinitelyDefined<CommandModule, 'name' | 'description'>>{
+            return <DefinedCommandModule>{
                 name: mod?.name ?? Files.fmtFileName(basename(absPath)),
                 description: mod?.description ?? '...',
                 ...mod,
@@ -70,7 +70,7 @@ export function onReady(wrapper: Wrapper) {
 
     (
         concat(ready$, processPlugins$) as Observable<{
-            mod: DefinitelyDefined<CommandModule, 'name' | 'description'>;
+            mod: DefinedCommandModule;
             cmdPluginsRes: {
                 execute: Awaitable<Result<void, void>>;
                 type: PluginType.Command;
@@ -106,9 +106,7 @@ export function onReady(wrapper: Wrapper) {
         });
 }
 
-function registerModule(
-    mod: DefinitelyDefined<Module, 'name' | 'description'>,
-): Result<void, void> {
+function registerModule(mod: DefinedModule): Result<void, void> {
     const name = mod.name;
     return match<Module>(mod)
         .with({ type: CommandType.Text }, mod => {

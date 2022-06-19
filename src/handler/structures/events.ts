@@ -9,7 +9,6 @@ import type {
 import type { CommandType } from './enums';
 import type { SernEventsMapping } from '../sernEmitter';
 import type { Awaitable, ClientEvents } from 'discord.js';
-import type { EventEmitter } from 'events';
 
 export type SernEventCommand<T extends keyof SernEventsMapping = keyof SernEventsMapping> =
     Override<
