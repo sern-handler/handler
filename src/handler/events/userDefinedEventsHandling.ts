@@ -1,17 +1,25 @@
 import { CommandType } from '../structures/enums';
-import { concatMap, from, fromEvent, map, throwError } from 'rxjs';
+import { concatMap, from, fromEvent, map, of, throwError } from 'rxjs';
 import { SernError } from '../structures/errors';
 import * as Files from '../utilities/readFile';
 import { buildData, ExternalEventEmitters } from '../utilities/readFile';
 import { controller } from '../sern';
-import type { DefinedModule, SpreadParams } from '../../types/handler';
+import type {
+    DefinedEventModule,
+    DefinedModule,
+    Override,
+    SpreadParams,
+} from '../../types/handler';
 import type { EventModule } from '../structures/module';
 import type Wrapper from '../structures/wrapper';
 import { basename } from 'path';
-import { match } from 'ts-pattern';
+import { match, P } from 'ts-pattern';
 import { isDiscordEvent, isExternalEvent, isSernEvent } from '../utilities/predicates';
 import { errTap } from './observableHandling';
-
+import type { CommandPlugin, Controller } from '../plugins/plugin';
+import type { Awaitable, Client } from 'discord.js';
+import type { Result } from 'ts-results';
+import { Err, Ok } from 'ts-results';
 /**
  * Utility function to process command plugins for all Modules
  * @param client
@@ -21,32 +29,53 @@ import { errTap } from './observableHandling';
  */
 export function processCommandPlugins$<T extends DefinedModule>(
     { client, sernEmitter }: Wrapper,
-    { mod, absPath }: { mod: T; absPath: string },
+    mod: T,
 ) {
-    const p = match(mod as DefinedModule)
-        .with({ type: CommandType.Autocomplete }, () =>
-            throwError(
-                () =>
-                    SernError.NonValidModuleType +
-                    `. You cannot use command plugins and Autocomplete.`,
+    return match(mod as DefinedModule)
+        .with({ type: CommandType.External }, m =>
+            Ok(
+                m.plugins.map(plug => ({
+                    ...plug,
+                    name: plug?.name ?? 'Unnamed Plugin',
+                    description: plug?.description ?? '...',
+                    execute: plug.execute(ExternalEventEmitters.get(m.emitter)!, m, controller),
+                })),
             ),
         )
-        .with({ type: CommandType.External }, m =>
-            m.plugins.map(plug => ({
-                ...plug,
-                name: plug?.name ?? 'Unnamed Plugin',
-                description: plug?.description ?? '...',
-                execute: plug.execute(ExternalEventEmitters.get(m.emitter)!, m, controller),
-            })),
+        .with({ type: CommandType.Sern }, m =>
+            Ok(
+                m.plugins.map(plug => ({
+                    ...plug,
+                    name: plug?.name ?? 'Unnamed Plugin',
+                    description: plug?.description ?? '...',
+                    execute: plug.execute(sernEmitter!, m, controller),
+                })),
+            ),
         )
-        .with({ type: CommandType.Sern }, m => {
-            m.plugins.map(plug => ({
-                ...plug,
-                name: plug?.name ?? 'Unnamed Plugin',
-                description: plug?.description ?? '...',
-                execute: plug.execute(sernEmitter!, m, controller),
-            }));
-        });
+        .with(
+            {
+                type: P.not(CommandType.Autocomplete),
+                plugins: P.array({} as P.infer<CommandPlugin>),
+            },
+            m =>
+                Ok(
+                    m.plugins.map(plug => ({
+                        ...plug,
+                        name: plug?.name ?? 'Unnamed Plugin',
+                        description: plug?.description ?? '...',
+                        execute: plug.execute(client, m, controller),
+                    })),
+                ),
+        )
+        .otherwise(() =>
+            Err(
+                throwError(
+                    () =>
+                        SernError.NonValidModuleType +
+                        `. You cannot use command plugins and Autocomplete.`,
+                ),
+            ),
+        );
 }
 
 export function processEvents(
@@ -56,18 +85,25 @@ export function processEvents(
     const eventStream$ = eventObservable$(wrapper, events);
     const normalize$ = eventStream$.pipe(
         map(({ mod, absPath }) => {
-            return {
+            return <DefinedEventModule>{
                 name: mod?.name ?? Files.fmtFileName(basename(absPath)),
                 description: mod?.description ?? '...',
                 ...mod,
             };
         }),
     );
-    const processPlugins$ = normalize$.pipe(map(mod => mod)); //for now, until i figure out what to do with how plugins are registered
-
-    const processAndLoadEvents$ = processPlugins$.pipe(
+    const processPlugins$ = normalize$.pipe(
         concatMap(mod => {
-            return match(mod as EventModule)
+            const cmdPluginRes = processCommandPlugins$(wrapper, mod);
+            if (cmdPluginRes.err) {
+                return cmdPluginRes.val;
+            }
+            return of({ mod, cmdPluginRes: cmdPluginRes.val });
+        }),
+    );
+    const processAndLoadEvents$ = processPlugins$.pipe(
+        concatMap(({ mod, cmdPluginRes }) => {
+            return match(mod as DefinedEventModule)
                 .when(isSernEvent, m => {
                     if (wrapper.sernEmitter === undefined) {
                         return throwError(() => SernError.UndefinedSernEmitter);
