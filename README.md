@@ -70,7 +70,7 @@ It is **highly encouraged** to use the [command line interface](https://github.c
 ## Links
 
 - [Official Documentation](https://sern-handler.js.org)
-- [Support Server](https://discord.com/invite/Yvb7DnqjXX)
+- [Support Server](https://discord.com/invite/mmyCTnYtbF)
 
 ## Contribute
 
