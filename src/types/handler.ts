@@ -1,5 +1,5 @@
 import type { CommandInteractionOptionResolver } from 'discord.js';
-import type { CommandModule, Module } from '../handler/structures/module';
+import type { CommandModule, EventModule, Module } from '../handler/structures/module';
 export type Nullish<T> = T | undefined | null;
 
 // Thanks to @kelsny
@@ -40,3 +40,4 @@ export type SpreadParams<T extends (...args: any) => unknown> = (
  */
 export type DefinedModule = DefinitelyDefined<Module, 'name' | 'description'>;
 export type DefinedCommandModule = DefinitelyDefined<CommandModule, 'name' | 'description'>;
+export type DefinedEventModule = DefinitelyDefined<EventModule, 'name' | 'description'>;

@@ -24,6 +24,7 @@ import { SernError } from '../structures/errors';
 import type { DefinedCommandModule, DefinedModule } from '../../types/handler';
 import { CommandType, PluginType } from '../structures/enums';
 import { errTap } from './observableHandling';
+import { processCommandPlugins$ } from './userDefinedEventsHandling';
 
 export function onReady(wrapper: Wrapper) {
     const { client, commands } = wrapper;
@@ -48,23 +49,11 @@ export function onReady(wrapper: Wrapper) {
     );
     const processPlugins$ = processCommandFiles$.pipe(
         concatMap(mod => {
-            if (mod.type === CommandType.Autocomplete) {
-                return throwError(
-                    () =>
-                        SernError.NonValidModuleType +
-                        `. You cannot use command plugins and Autocomplete.`,
-                );
+            const cmdPluginRes = processCommandPlugins$(wrapper, mod);
+            if (cmdPluginRes.err) {
+                return cmdPluginRes.val;
             }
-            const cmdPluginsRes =
-                mod.plugins?.map(plug => {
-                    return {
-                        ...plug,
-                        name: plug?.name ?? 'Unnamed Plugin',
-                        description: plug?.description ?? '...',
-                        execute: plug.execute(client, mod, controller),
-                    };
-                }) ?? [];
-            return of({ mod, cmdPluginsRes });
+            return of({ mod, cmdPluginRes: cmdPluginRes.unwrap() });
         }),
     );
 
