@@ -1,6 +1,6 @@
 {
   "name": "@sern/handler",
-  "version": "1.0.1-beta",
+  "version": "1.0.2-beta",
   "description": "A customizable, batteries-included, powerful discord.js framework to automate and streamline bot development.",
   "main": "dist/index.js",
   "scripts": {

@@ -51,15 +51,16 @@ export function processCommandPlugins$<T extends DefinedModule>(
                 type: P.not(CommandType.Autocomplete),
                 plugins: P.array({} as P.infer<CommandPlugin>),
             },
-            m =>
-                Ok(
+            m => {
+                return Ok(
                     m.plugins.map(plug => ({
                         ...plug,
                         name: plug?.name ?? 'Unnamed Plugin',
                         description: plug?.description ?? '...',
                         execute: plug.execute(client, m, controller),
                     })),
-                ),
+                );
+            },
         )
         .otherwise(() =>
             Err(
