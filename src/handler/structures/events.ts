@@ -1,4 +1,4 @@
-import type { Override } from '../../types/handler';
+import type { Override, SernEventsMapping } from '../../types/handler';
 import type { BaseModule } from './module';
 import type {
     CommandPlugin,
@@ -7,7 +7,6 @@ import type {
     SernEmitterPlugin,
 } from '../plugins/plugin';
 import type { CommandType } from './enums';
-import type { SernEventsMapping } from '../sernEmitter';
 import type { Awaitable, ClientEvents } from 'discord.js';
 
 export type SernEventCommand<T extends keyof SernEventsMapping = keyof SernEventsMapping> =
