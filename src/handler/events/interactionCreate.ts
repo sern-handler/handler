@@ -14,9 +14,13 @@ import Context from '../structures/context';
 import { controller } from '../sern';
 import type { Module } from '../structures/module';
 import {
+    isApplicationCommand,
+    isAutocomplete,
     isButton,
     isChatInputCommand,
+    isMessageComponent,
     isMessageCtxMenuCmd,
+    isModalSubmit,
     isPromise,
     isSelectMenu,
     isUserContextMenuCmd,
@@ -179,24 +183,24 @@ export function onInteractionCreate(wrapper: Wrapper) {
         .pipe(
             /*processing plugins*/
             concatMap(interaction => {
-                if (interaction.isCommand()) {
+                if (isApplicationCommand(interaction)) {
                     const modul =
                         Files.ApplicationCommands[interaction.commandType].get(
                             interaction.commandName,
                         ) ?? Files.BothCommands.get(interaction.commandName);
                     return applicationCommandHandler(modul, interaction);
                 }
-                if (interaction.isMessageComponent()) {
+                if (isMessageComponent(interaction)) {
                     const modul = Files.MessageCompCommands[interaction.componentType].get(
                         interaction.customId,
                     );
                     return messageComponentInteractionHandler(modul, interaction);
                 }
-                if (interaction.isModalSubmit()) {
+                if (isModalSubmit(interaction)) {
                     const modul = Files.ModalSubmitCommands.get(interaction.customId);
                     return modalHandler(modul, interaction);
                 }
-                if (interaction.isAutocomplete()) {
+                if (isAutocomplete(interaction)) {
                     const modul =
                         Files.ApplicationCommands['1'].get(interaction.commandName) ??
                         Files.BothCommands.get(interaction.commandName);

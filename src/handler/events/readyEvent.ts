@@ -1,19 +1,7 @@
-import {
-    concat,
-    concatMap,
-    from,
-    fromEvent,
-    map,
-    Observable,
-    of,
-    skip,
-    take,
-    throwError,
-} from 'rxjs';
+import { concat, concatMap, from, fromEvent, map, Observable, of, skip, take } from 'rxjs';
 import { basename } from 'path';
 import * as Files from '../utilities/readFile';
 import type Wrapper from '../structures/wrapper';
-import { controller } from '../sern';
 import type { Result } from 'ts-results';
 import { Err, Ok } from 'ts-results';
 import type { Awaitable } from 'discord.js';
@@ -53,7 +41,7 @@ export function onReady(wrapper: Wrapper) {
             if (cmdPluginRes.err) {
                 return cmdPluginRes.val;
             }
-            return of({ mod, cmdPluginRes: cmdPluginRes.unwrap() });
+            return of({ mod, cmdPluginRes: cmdPluginRes.val });
         }),
     );
 
@@ -71,6 +59,7 @@ export function onReady(wrapper: Wrapper) {
         .pipe(
             concatMap(pl =>
                 from(
+                    //refactor, this allocates too many objects
                     Promise.all(
                         pl.cmdPluginsRes.map(async e => ({ ...e, execute: await e.execute })),
                     ),
@@ -78,7 +67,7 @@ export function onReady(wrapper: Wrapper) {
             ),
         )
         .subscribe(({ mod, cmdPluginsRes }) => {
-            const loadedPluginsCorrectly = cmdPluginsRes.every(res => res.execute.ok);
+            const loadedPluginsCorrectly = cmdPluginsRes.every(({ execute }) => execute.ok);
             if (loadedPluginsCorrectly) {
                 const res = registerModule(mod);
                 if (res.err) {

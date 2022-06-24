@@ -15,6 +15,12 @@ import type {
     SernEventCommand,
 } from '../structures/events';
 import { CommandType } from '../..';
+import {
+    AutocompleteInteraction,
+    Interaction,
+    InteractionType,
+    ModalSubmitInteraction,
+} from 'discord.js';
 
 export function correctModuleType<T extends keyof ModuleDefs>(
     plug: Module | undefined,
@@ -49,7 +55,24 @@ export function isUserContextMenuCmd(
     return i.isUserContextMenuCommand();
 }
 
-export function isPromise<T>(promiseLike: Awaitable<T>): promiseLike is Promise<T> {
+export function isApplicationCommand(interaction: Interaction): interaction is CommandInteraction {
+    return interaction.type === InteractionType.ApplicationCommand;
+}
+
+export function isModalSubmit(interaction: Interaction): interaction is ModalSubmitInteraction {
+    return interaction.type === InteractionType.ModalSubmit;
+}
+export function isAutocomplete(interaction: Interaction): interaction is AutocompleteInteraction {
+    return interaction.type === InteractionType.ApplicationCommandAutocomplete;
+}
+
+export function isMessageComponent(
+    interaction: Interaction,
+): interaction is MessageComponentInteraction {
+    return interaction.type === InteractionType.MessageComponent;
+}
+
+export function isPromise<T>(promiseLike: Awaitable<T>): promiseLike is PromiseLike<T> {
     const keys = new Set(Object.keys(promiseLike));
     return keys.has('then') && keys.has('catch');
 }
