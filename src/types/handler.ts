@@ -41,3 +41,11 @@ export type SpreadParams<T extends (...args: any) => unknown> = (
 export type DefinedModule = DefinitelyDefined<Module, 'name' | 'description'>;
 export type DefinedCommandModule = DefinitelyDefined<CommandModule, 'name' | 'description'>;
 export type DefinedEventModule = DefinitelyDefined<EventModule, 'name' | 'description'>;
+export type Payload =
+    | { type: 'success'; module: Module }
+    | { type: 'failure'; module: Module | undefined; reason: string | Error };
+export type SernEventsMapping = {
+    ['module.register']: [Payload];
+    ['module.activate']: [Payload];
+    ['error']: [Error | string];
+};
