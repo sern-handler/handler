@@ -48,7 +48,7 @@ export function onReady(wrapper: Wrapper) {
     (
         concat(ready$, processPlugins$) as Observable<{
             mod: DefinedCommandModule;
-            cmdPluginsRes: {
+            cmdPluginRes: {
                 execute: Awaitable<Result<void, void>>;
                 type: PluginType.Command;
                 name: string;
@@ -57,14 +57,14 @@ export function onReady(wrapper: Wrapper) {
         }>
     )
         .pipe(
-            concatMap(pl =>
-                from(
+            concatMap(pl => {
+                return from(
                     //refactor, this allocates too many objects
                     Promise.all(
-                        pl.cmdPluginsRes.map(async e => ({ ...e, execute: await e.execute })),
+                        pl.cmdPluginRes.map(async e => ({ ...e, execute: await e.execute })),
                     ),
-                ).pipe(map(res => ({ ...pl, cmdPluginsRes: res }))),
-            ),
+                ).pipe(map(res => ({ ...pl, cmdPluginsRes: res })));
+            }),
         )
         .subscribe(({ mod, cmdPluginsRes }) => {
             const loadedPluginsCorrectly = cmdPluginsRes.every(({ execute }) => execute.ok);
