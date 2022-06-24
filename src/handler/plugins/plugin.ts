@@ -106,6 +106,7 @@ function isCommandPlugin<T extends CommandType>(
     return !isEventPlugin(e);
 }
 //TODO: I WANT BETTER TYPINGS AHHHHHHHHHHHHHHH
+// Maybe add overlaods
 export function sernModule<T extends keyof ModuleDefs>(
     plugin: (CommandPlugin<T> | EventPlugin<T>)[],
     mod: ModuleNoPlugins[T],

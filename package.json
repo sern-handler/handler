@@ -1,6 +1,6 @@
 {
   "name": "@sern/handler",
-  "version": "1.0.3-beta",
+  "version": "1.0.4-beta",
   "description": "A customizable, batteries-included, powerful discord.js framework to automate and streamline bot development.",
   "main": "dist/index.js",
   "scripts": {
@@ -35,7 +35,7 @@
     "cz-conventional-changelog": "3.0.1",
     "prettier": "2.6.2",
     "standard-version": "^9.3.2",
-    "typescript": "^4.5.5"
+    "typescript": "4.5.5"
   },
    "repository": {
     "type": "git",
