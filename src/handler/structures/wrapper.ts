@@ -16,7 +16,10 @@ interface Wrapper {
     readonly sernEmitter?: SernEmitter;
     readonly defaultPrefix?: string;
     readonly commands: string;
-    readonly events?: EventModule[] | string | (() => EventModule[]);
+    readonly events?:
+        | string
+        | { mod: EventModule; absPath: string }[]
+        | (() => { mod: EventModule; absPath: string }[]);
 }
 
 export default Wrapper;
