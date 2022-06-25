@@ -1,76 +1,27 @@
-import { CommandType } from '../structures/enums';
-import { from, fromEvent, map, throwError } from 'rxjs';
-import { SernError } from '../structures/errors';
+import { from, fromEvent, map } from 'rxjs';
 import * as Files from '../utilities/readFile';
 import { buildData, ExternalEventEmitters } from '../utilities/readFile';
 import { controller } from '../sern';
-import type { DefinedEventModule, DefinedModule, SpreadParams } from '../../types/handler';
+import type { DefinedCommandModule, DefinedEventModule, SpreadParams } from '../../types/handler';
 import type { EventModule } from '../structures/module';
 import type Wrapper from '../structures/wrapper';
 import { basename } from 'path';
 import { match, P } from 'ts-pattern';
 import { isDiscordEvent, isSernEvent } from '../utilities/predicates';
-import type { CommandPlugin } from '../plugins/plugin';
-import { Err, Ok } from 'ts-results';
 import { errTap } from './observableHandling';
 
 /**
  * Utility function to process command plugins for all Modules
  * @param client
- * @param sernEmitter
  * @param mod
- * @param absPath
  */
-export function processCommandPlugins$<T extends DefinedModule>(
-    { client, sernEmitter }: Wrapper,
-    mod: T,
-) {
-    return match(mod as DefinedModule)
-        .with({ type: CommandType.External }, m =>
-            Ok(
-                m.plugins.map(plug => ({
-                    ...plug,
-                    name: plug?.name ?? 'Unnamed Plugin',
-                    description: plug?.description ?? '...',
-                    execute: plug.execute(ExternalEventEmitters.get(m.emitter)!, m, controller),
-                })),
-            ),
-        )
-        .with({ type: CommandType.Sern }, m =>
-            Ok(
-                m.plugins.map(plug => ({
-                    ...plug,
-                    name: plug?.name ?? 'Unnamed Plugin',
-                    description: plug?.description ?? '...',
-                    execute: plug.execute(sernEmitter!, m, controller),
-                })),
-            ),
-        )
-        .with(
-            {
-                type: P.not(CommandType.Autocomplete),
-                plugins: P.array({} as P.infer<CommandPlugin>),
-            },
-            m => {
-                return Ok(
-                    m.plugins.map(plug => ({
-                        ...plug,
-                        name: plug?.name ?? 'Unnamed Plugin',
-                        description: plug?.description ?? '...',
-                        execute: plug.execute(client, m, controller),
-                    })),
-                );
-            },
-        )
-        .otherwise(() =>
-            Err(
-                throwError(
-                    () =>
-                        SernError.NonValidModuleType +
-                        `. You cannot use command plugins and Autocomplete.`,
-                ),
-            ),
-        );
+export function processCommandPlugins<T extends DefinedCommandModule>({ client }: Wrapper, mod: T) {
+    return mod.plugins.map(plug => ({
+        ...plug,
+        name: plug?.name ?? 'Unnamed Plugin',
+        description: plug?.description ?? '...',
+        execute: plug.execute(client, mod, controller),
+    }));
 }
 
 export function processEvents(

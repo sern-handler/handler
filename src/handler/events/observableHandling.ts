@@ -1,12 +1,12 @@
 import type { Message } from 'discord.js';
 import { Observable, throwError } from 'rxjs';
 import { SernError } from '../structures/errors';
-import type { Module, ModuleDefs } from '../structures/module';
+import type { Module, CommandModuleDefs } from '../structures/module';
 import { correctModuleType } from '../utilities/predicates';
 import type { Result } from 'ts-results';
-export function filterCorrectModule<T extends keyof ModuleDefs>(cmdType: T) {
+export function filterCorrectModule<T extends keyof CommandModuleDefs>(cmdType: T) {
     return (src: Observable<Module | undefined>) =>
-        new Observable<ModuleDefs[T]>(subscriber => {
+        new Observable<CommandModuleDefs[T]>(subscriber => {
             return src.subscribe({
                 next(mod) {
                     if (mod === undefined) {

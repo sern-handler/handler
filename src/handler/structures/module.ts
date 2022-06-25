@@ -18,9 +18,9 @@ import type {
     UserContextMenuCommandInteraction,
 } from 'discord.js';
 import type { Args, Override, SlashOptions } from '../../types/handler';
-import type { CommandPlugin, EventPlugin } from '../plugins/plugin';
+import type { AutocompletePlugin, CommandPlugin, EventPlugin } from '../plugins/plugin';
 import type Context from './context';
-import { CommandType, PluginType } from './enums';
+import { CommandType, EventType, PluginType } from './enums';
 import type { DiscordEventCommand, ExternalEventCommand, SernEventCommand } from './events';
 
 export interface BaseModule {
@@ -122,9 +122,10 @@ export type ModalSubmitCommand = Override<
 export type AutocompleteCommand = Override<
     BaseModule,
     {
-        type: CommandType.Autocomplete;
-        name: string;
-        onEvent: EventPlugin<CommandType.Autocomplete>[];
+        name?: never;
+        description?: never;
+        type?: never;
+        onEvent: AutocompletePlugin[];
         execute: (ctx: AutocompleteInteraction) => Awaitable<void | unknown>;
     }
 >;
@@ -137,14 +138,13 @@ export type CommandModule =
     | ContextMenuMsg
     | ButtonCommand
     | SelectMenuCommand
-    | ModalSubmitCommand
-    | AutocompleteCommand;
+    | ModalSubmitCommand;
 
 export type Module = CommandModule | EventModule;
 
 //https://stackoverflow.com/questions/64092736/alternative-to-switch-statement-for-typescript-discriminated-union
 // Explicit Module Definitions for mapping
-export type ModuleDefs = {
+export type CommandModuleDefs = {
     [CommandType.Text]: TextCommand;
     [CommandType.Slash]: SlashCommand;
     [CommandType.Both]: BothCommand;
@@ -153,10 +153,12 @@ export type ModuleDefs = {
     [CommandType.Button]: ButtonCommand;
     [CommandType.MenuSelect]: SelectMenuCommand;
     [CommandType.Modal]: ModalSubmitCommand;
-    [CommandType.Autocomplete]: AutocompleteCommand;
-    [CommandType.Sern]: SernEventCommand;
-    [CommandType.Discord]: DiscordEventCommand;
-    [CommandType.External]: ExternalEventCommand;
+};
+
+export type EventModuleDefs = {
+    [EventType.Sern]: SernEventCommand;
+    [EventType.Discord]: DiscordEventCommand;
+    [EventType.External]: ExternalEventCommand;
 };
 
 //TODO: support deeply nested Autocomplete
@@ -171,7 +173,7 @@ export type SernAutocompleteData = Override<
             | ApplicationCommandOptionType.String
             | ApplicationCommandOptionType.Number
             | ApplicationCommandOptionType.Integer;
-        command: Omit<AutocompleteCommand, 'type' | 'name' | 'description'>;
+        command: AutocompleteCommand;
     }
 >;
 

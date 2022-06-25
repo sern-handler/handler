@@ -14,12 +14,18 @@
 import type { Awaitable, Client } from 'discord.js';
 import type { Err, Ok, Result } from 'ts-results';
 import type { DefinitelyDefined, Module, Override } from '../..';
-import { CommandType } from '../..';
-import type { AutocompleteCommand, BaseModule, ModuleDefs } from '../structures/module';
+import type { CommandType } from '../..';
+import type {
+    BaseModule,
+    EventModule,
+    CommandModuleDefs,
+    CommandModule,
+} from '../structures/module';
 import { PluginType } from '../structures/enums';
 import type { EventEmitter } from 'events';
 import type { ExternalEventCommand, SernEventCommand } from '../structures/events';
 import type SernEmitter from '../sernEmitter';
+import type { AutocompleteInteraction } from 'discord.js';
 
 export interface Controller {
     next: () => Ok<void>;
@@ -33,14 +39,14 @@ type BasePlugin = Override<
     }
 >;
 
-export type CommandPlugin<T extends keyof ModuleDefs = keyof ModuleDefs> = {
+export type CommandPlugin<T extends keyof CommandModuleDefs = keyof CommandModuleDefs> = {
     [K in T]: Override<
         BasePlugin,
         {
             type: PluginType.Command;
             execute: (
                 wrapper: Client,
-                module: DefinitelyDefined<ModuleDefs[T], 'name' | 'description'>,
+                module: DefinitelyDefined<CommandModuleDefs[T], 'name' | 'description'>,
                 controller: Controller,
             ) => Awaitable<Result<void, void>>;
         }
@@ -71,13 +77,24 @@ export type SernEmitterPlugin = Override<
     }
 >;
 
-export type EventPlugin<T extends keyof ModuleDefs = keyof ModuleDefs> = {
+export type AutocompletePlugin = Override<
+    BaseModule,
+    {
+        type: PluginType.Event;
+        execute: (
+            autocmp: AutocompleteInteraction,
+            controlller: Controller,
+        ) => Awaitable<void | unknown>;
+    }
+>;
+
+export type EventPlugin<T extends keyof CommandModuleDefs = keyof CommandModuleDefs> = {
     [K in T]: Override<
         BasePlugin,
         {
             type: PluginType.Event;
             execute: (
-                event: Parameters<ModuleDefs[K]['execute']>,
+                event: Parameters<CommandModuleDefs[K]['execute']>,
                 controller: Controller,
             ) => Awaitable<Result<void, void>>;
         }
@@ -92,7 +109,7 @@ export type EventPlugin<T extends keyof ModuleDefs = keyof ModuleDefs> = {
 // }
 
 export type ModuleNoPlugins = {
-    [T in keyof ModuleDefs]: Omit<ModuleDefs[T], 'plugins' | 'onEvent'>;
+    [T in keyof CommandModuleDefs]: Omit<CommandModuleDefs[T], 'plugins' | 'onEvent'>;
 };
 
 function isEventPlugin<T extends CommandType>(
@@ -107,31 +124,54 @@ function isCommandPlugin<T extends CommandType>(
 }
 //TODO: I WANT BETTER TYPINGS AHHHHHHHHHHHHHHH
 // Maybe add overlaods
-export function sernModule<T extends keyof ModuleDefs>(
+
+export function sernModule<T extends CommandType.Slash = CommandType.Slash>(
+    plugin: (CommandPlugin<T> | EventPlugin<T>)[],
+    mod: ModuleNoPlugins[CommandType.Slash],
+): Module;
+export function sernModule<T extends CommandType.Text = CommandType.Text>(
+    plugin: (CommandPlugin<T> | EventPlugin<T>)[],
+    mod: ModuleNoPlugins[CommandType.Text],
+): Module;
+export function sernModule<T extends CommandType.Button = CommandType.Button>(
+    plugin: (CommandPlugin<T> | EventPlugin<T>)[],
+    mod: ModuleNoPlugins[CommandType.Button],
+): Module;
+export function sernModule<T extends CommandType.Both = CommandType.Both>(
+    plugin: (CommandPlugin<T> | EventPlugin<T>)[],
+    mod: ModuleNoPlugins[CommandType.Both],
+): Module;
+export function sernModule<T extends CommandType.MenuUser = CommandType.MenuUser>(
+    plugin: (CommandPlugin<T> | EventPlugin<T>)[],
+    mod: ModuleNoPlugins[CommandType.MenuMsg],
+): Module;
+export function sernModule<T extends CommandType.MenuSelect = CommandType.MenuSelect>(
+    plugin: (CommandPlugin<T> | EventPlugin<T>)[],
+    mod: ModuleNoPlugins[CommandType.MenuSelect],
+): Module;
+
+export function sernModule<T extends CommandType.Modal = CommandType.Modal>(
+    plugin: (CommandPlugin<T> | EventPlugin<T>)[],
+    mod: ModuleNoPlugins[CommandType.Modal],
+): Module;
+
+export function sernModule<T extends CommandType.MenuUser = CommandType.MenuUser>(
+    plugin: (CommandPlugin<T> | EventPlugin<T>)[],
+    mod: ModuleNoPlugins[CommandType.MenuUser],
+): Module;
+export function sernModule<T extends keyof CommandModuleDefs = keyof CommandModuleDefs>(
     plugin: (CommandPlugin<T> | EventPlugin<T>)[],
     mod: ModuleNoPlugins[T],
-): Module {
+): CommandModule {
     const onEvent = plugin.filter(isEventPlugin);
     const plugins = plugin.filter(isCommandPlugin);
-    if (mod.type === CommandType.Autocomplete) {
-        throw new Error(
-            'You cannot use this function declaration for Autocomplete Interactions! use the raw object for options or' +
-                'sernAutoComplete function',
-        );
-    } else
-        return {
-            onEvent,
-            plugins,
-            ...mod,
-        } as Module;
-}
-
-export function sernAutocomplete(
-    onEvent: EventPlugin<CommandType.Autocomplete>[],
-    mod: Omit<AutocompleteCommand, 'type' | 'name' | 'description' | 'onEvent'>,
-): Omit<AutocompleteCommand, 'type' | 'name' | 'description'> {
     return {
         onEvent,
+        plugins,
         ...mod,
-    };
+    } as CommandModule;
+}
+
+export function eventModule<T extends keyof EventModule>(): EventModule {
+    return {} as EventModule;
 }
