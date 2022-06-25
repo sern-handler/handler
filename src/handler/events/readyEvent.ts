@@ -6,13 +6,13 @@ import type { Result } from 'ts-results';
 import { Err, Ok } from 'ts-results';
 import type { Awaitable } from 'discord.js';
 import { ApplicationCommandType, ComponentType } from 'discord.js';
-import type { CommandModule, Module } from '../structures/module';
+import type { CommandModule } from '../structures/module';
 import { match } from 'ts-pattern';
 import { SernError } from '../structures/errors';
-import type { DefinedCommandModule, DefinedModule } from '../../types/handler';
+import type { DefinedCommandModule } from '../../types/handler';
 import { CommandType, PluginType } from '../structures/enums';
 import { errTap } from './observableHandling';
-import { processCommandPlugins$ } from './userDefinedEventsHandling';
+import { processCommandPlugins } from './userDefinedEventsHandling';
 
 export function onReady(wrapper: Wrapper) {
     const { client, commands } = wrapper;
@@ -37,11 +37,8 @@ export function onReady(wrapper: Wrapper) {
     );
     const processPlugins$ = processCommandFiles$.pipe(
         concatMap(mod => {
-            const cmdPluginRes = processCommandPlugins$(wrapper, mod);
-            if (cmdPluginRes.err) {
-                return cmdPluginRes.val;
-            }
-            return of({ mod, cmdPluginRes: cmdPluginRes.val });
+            const cmdPluginRes = processCommandPlugins(wrapper, mod);
+            return of({ mod, cmdPluginRes });
         }),
     );
 
@@ -84,9 +81,9 @@ export function onReady(wrapper: Wrapper) {
         });
 }
 
-function registerModule(mod: DefinedModule): Result<void, void> {
+function registerModule(mod: DefinedCommandModule): Result<void, void> {
     const name = mod.name;
-    return match<Module>(mod)
+    return match<DefinedCommandModule>(mod)
         .with({ type: CommandType.Text }, mod => {
             mod.alias?.forEach(a => Files.TextCommands.aliases.set(a, mod));
             Files.TextCommands.text.set(name, mod);

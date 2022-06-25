@@ -1,4 +1,4 @@
-import type { EventModule, Module, ModuleDefs } from '../structures/module';
+import type { CommandModuleDefs, EventModule, Module } from '../structures/module';
 import type {
     Awaitable,
     ButtonInteraction,
@@ -9,23 +9,23 @@ import type {
     SelectMenuInteraction,
     UserContextMenuCommandInteraction,
 } from 'discord.js';
-import type {
-    DiscordEventCommand,
-    ExternalEventCommand,
-    SernEventCommand,
-} from '../structures/events';
-import { CommandType } from '../..';
 import {
     AutocompleteInteraction,
     Interaction,
     InteractionType,
     ModalSubmitInteraction,
 } from 'discord.js';
+import type {
+    DiscordEventCommand,
+    ExternalEventCommand,
+    SernEventCommand,
+} from '../structures/events';
+import { EventType } from '../..';
 
-export function correctModuleType<T extends keyof ModuleDefs>(
+export function correctModuleType<T extends keyof CommandModuleDefs>(
     plug: Module | undefined,
     type: T,
-): plug is ModuleDefs[T] {
+): plug is CommandModuleDefs[T] {
     // Another way to check if type is equivalent,
     // It will check based on flag system instead
     return plug !== undefined && (plug.type & type) !== 0;
@@ -78,7 +78,7 @@ export function isPromise<T>(promiseLike: Awaitable<T>): promiseLike is PromiseL
 }
 
 export function isDiscordEvent(el: EventModule): el is DiscordEventCommand {
-    return el.type === CommandType.Discord;
+    return el.type === EventType.Discord;
 }
 export function isSernEvent(el: EventModule): el is SernEventCommand {
     return !isDiscordEvent(el);
@@ -89,5 +89,5 @@ export function isExternalEvent(el: EventModule): el is ExternalEventCommand {
 }
 
 export function isEventModule(module: Module): module is EventModule {
-    return [CommandType.Discord, CommandType.Sern, CommandType.External].includes(module.type);
+    return [EventType.Sern, EventType.Discord, EventType.External].includes(module.type);
 }
