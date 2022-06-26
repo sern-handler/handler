@@ -154,7 +154,7 @@ function autoCmpHandler(mod: Module | undefined, interaction: AutocompleteIntera
             const selectedOption = mod.options?.find(o => o.autocomplete && o.name === choice.name);
             if (selectedOption !== undefined && selectedOption.autocomplete) {
                 return of(
-                    selectedOption.command.onEvent.map(e => e.execute([interaction], controller)),
+                    selectedOption.command.onEvent.map(e => e.execute(interaction, controller)),
                 ).pipe(
                     map(res => ({
                         mod,
