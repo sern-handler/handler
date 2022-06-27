@@ -1,7 +1,8 @@
 import type { Override, SernEventsMapping } from '../../types/handler';
-import type { BaseModule, EventModuleDefs } from './module';
+import type { BaseModule } from './module';
 import type {
     DiscordEmitterPlugin,
+    DiscordEventPlugin,
     ExternalEmitterPlugin,
     ExternalEventPlugin,
     SernEmitterPlugin,
@@ -26,7 +27,7 @@ export type DiscordEventCommand<T extends keyof ClientEvents = keyof ClientEvent
     {
         name?: T;
         type: EventType.Discord;
-        onEvent: DiscordEventCommand[];
+        onEvent: DiscordEventPlugin[];
         plugins: DiscordEmitterPlugin[];
         execute(...args: ClientEvents[T]): Awaitable<void | unknown>;
     }
