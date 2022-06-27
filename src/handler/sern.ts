@@ -16,6 +16,7 @@ import type {
     InputCommandModule,
     InputEventModule,
 } from './plugins/plugin';
+import { SernError } from './structures/errors';
 
 /**
  *
@@ -71,14 +72,12 @@ export function commandModule(mod: InputCommandModule): CommandModule {
 export function eventModule(mod: InputEventModule): EventModule {
     const onEvent: EventModuleEventPluginDefs[EventType][] = [];
     const plugins: EventModuleCommandPluginDefs[EventType][] = [];
-    for (const pl of mod.plugins ?? []) {
-        if (pl.type === PluginType.Event) {
-            onEvent.push(pl);
-        } else {
-            plugins.push(pl);
-        }
+    const hasPlugins = mod.plugins && mod.plugins.length > 0;
+    if (hasPlugins) {
+        throw Error(
+            SernError.NotSupportedYet + `: Plugins on event listeners are not supported yet`,
+        );
     }
-
     return {
         ...mod,
         onEvent,
