@@ -21,7 +21,6 @@ import {
     isMessageComponent,
     isMessageCtxMenuCmd,
     isModalSubmit,
-    isPromise,
     isSelectMenu,
     isUserContextMenuCmd,
 } from '../utilities/predicates';
@@ -29,6 +28,7 @@ import { filterCorrectModule } from './observableHandling';
 import { CommandType } from '../structures/enums';
 import type { Result } from 'ts-results';
 import type { AutocompleteInteraction } from 'discord.js';
+import { asyncResolveArray } from '../utilities/asyncResolveArray';
 
 function applicationCommandHandler(mod: Module | undefined, interaction: CommandInteraction) {
     const mod$ = <T extends CommandType>(cmdTy: T) => of(mod).pipe(filterCorrectModule(cmdTy));
@@ -211,13 +211,7 @@ export function onInteractionCreate(wrapper: Wrapper) {
         )
         .subscribe({
             async next({ mod, res: eventPluginRes, execute }) {
-                const ePlugArr: Result<void, void>[] = [];
-                for await (const res of eventPluginRes) {
-                    if (isPromise(res)) {
-                        ePlugArr.push(res);
-                    }
-                    ePlugArr.push(res as Awaited<Result<void, void>>);
-                }
+                const ePlugArr: Result<void, void>[] = await asyncResolveArray(eventPluginRes);
                 if (ePlugArr.every(e => e.ok)) {
                     await execute();
                     wrapper.sernEmitter?.emit('module.activate', { type: 'success', module: mod! });

@@ -8,6 +8,7 @@ import * as Files from '../utilities/readFile';
 import { filterCorrectModule, ignoreNonBot } from './observableHandling';
 import { CommandType } from '../structures/enums';
 import { SernError } from '../structures/errors';
+import { asyncResolveArray } from '../utilities/asyncResolveArray';
 
 export const onMessageCreate = (wrapper: Wrapper) => {
     const { client, defaultPrefix } = wrapper;
@@ -40,7 +41,7 @@ export const onMessageCreate = (wrapper: Wrapper) => {
 
     const processEventPlugins$ = ensureModuleType$.pipe(
         concatMap(({ ctx, args, mod }) => {
-            const res = Promise.all(
+            const res = asyncResolveArray(
                 mod.onEvent.map(ePlug => {
                     return ePlug.execute([ctx, args], controller);
                 }),
