@@ -6,21 +6,21 @@ import type { DefinedCommandModule, DefinedEventModule, SpreadParams } from '../
 import type { EventModule } from '../structures/module';
 import type Wrapper from '../structures/wrapper';
 import { basename } from 'path';
-import { match, P } from 'ts-pattern';
+import { match } from 'ts-pattern';
 import { isDiscordEvent, isSernEvent } from '../utilities/predicates';
 import { errTap } from './observableHandling';
 
 /**
  * Utility function to process command plugins for all Modules
- * @param client
+ * @param wrapper
  * @param mod
  */
-export function processCommandPlugins<T extends DefinedCommandModule>({ client }: Wrapper, mod: T) {
+export function processCommandPlugins<T extends DefinedCommandModule>(wrapper: Wrapper, mod: T) {
     return mod.plugins.map(plug => ({
         ...plug,
         name: plug?.name ?? 'Unnamed Plugin',
         description: plug?.description ?? '...',
-        execute: plug.execute(client, mod, controller),
+        execute: plug.execute(wrapper, mod, controller),
     }));
 }
 
@@ -48,120 +48,10 @@ export function processEvents(
             ? wrapper.client
             : ExternalEventEmitters.get(e.emitter);
         if (emitter === undefined) {
-            throw new Error(`Cannot find ${emitter}`);
+            throw new Error(`Cannot find event emitter as it is undefined`);
         }
         fromEvent(emitter, e.name, e.execute as SpreadParams<typeof e.execute>).subscribe();
     });
-
-    // TODO
-    // const processPlugins$ = normalize$.pipe(
-    //     concatMap(mod => {
-    //         const cmdPluginRes = processCommandPlugins$(wrapper, mod);
-    //         if (cmdPluginRes.err) {
-    //             return cmdPluginRes.val;
-    //         }
-    //
-    //         return of({ mod, cmdPluginRes });
-    //     }),
-    // );
-    // const processAndLoadEvents$ = processPlugins$.pipe(
-    //     concatMap(async ({ mod, cmdPluginRes }) => {
-    //         return {
-    //             mod,
-    //             cmdPluginRes,
-    //             eventLoaded: match(mod as DefinedEventModule)
-    //                 .when(isSernEvent, m => {
-    //                     if (wrapper.sernEmitter === undefined) {
-    //                         return throwError(() => SernError.UndefinedSernEmitter);
-    //                     }
-    //                     return fromEvent(
-    //                         wrapper.sernEmitter,
-    //                         m.name!,
-    //                         m.execute as SpreadParams<typeof m.execute>,
-    //                     ).pipe(
-    //                         concatMap(event => {
-    //                             return of(
-    //                                 m.onEvent.map(plug => ({
-    //                                     ...plug,
-    //                                     name: plug?.name ?? 'Unnamed Plugin',
-    //                                     description: plug?.description ?? '..',
-    //                                     execute: plug.execute(
-    //                                         [event] as [string | Error] | [Payload],
-    //                                         controller,
-    //                                     ),
-    //                                 })),
-    //                             );
-    //                         }),
-    //                     );
-    //                 })
-    //                 .when(isDiscordEvent, m => {
-    //                     return fromEvent(
-    //                         wrapper.client,
-    //                         m.name!,
-    //                         m.execute as SpreadParams<typeof m.execute>,
-    //                     ).pipe(
-    //                         concatMap(event => {
-    //                             return of(
-    //                                 m.onEvent.map(plug => ({
-    //                                     ...plug,
-    //                                     name: plug?.name ?? 'Unnamed Plugin',
-    //                                     description: plug?.description ?? '..',
-    //                                     execute: plug.execute(
-    //                                         [event] as ClientEvents[keyof ClientEvents],
-    //                                         controller,
-    //                                     ),
-    //                                 })),
-    //                             );
-    //                         }),
-    //                     );
-    //                 })
-    //                 .when(isExternalEvent, m => {
-    //                     if (!ExternalEventEmitters.has(m.emitter)) {
-    //                         throw Error(
-    //                             SernError.UndefinedSernEmitter +
-    //                                 `Could not locate
-    //                     a dependency ${m.emitter} to call this event listener`,
-    //                         );
-    //                     }
-    //                     return fromEvent(
-    //                         ExternalEventEmitters.get(m.emitter)!,
-    //                         m.name!,
-    //                         m.execute,
-    //                     ).pipe(
-    //                         concatMap(event => {
-    //                             return of(
-    //                                 m.onEvent.map(plug => ({
-    //                                     ...plug,
-    //                                     name: plug?.name ?? 'Unnamed Plugin',
-    //                                     description: plug?.description ?? '..',
-    //                                     execute: plug.execute([event], controller),
-    //                                 })),
-    //                             );
-    //                         }),
-    //                     );
-    //                 })
-    //                 .run(),
-    //         };
-    //     }),
-    // );
-    // // Cannot send to Sern's emitter because it hasn't been turned on yet. Don't know if
-    // // this will be changed.
-    // processAndLoadEvents$.subscribe({
-    //     async next({ cmdPluginRes, eventLoaded, mod }) {
-    //         for (const pl of cmdPluginRes) {
-    //             const res = isPromise(pl.execute) ? await pl.execute : pl.execute;
-    //             if (res.err) {
-    //                 throw Error(
-    //                     'Could not load an event module correctly, a plugin called controller.stop()',
-    //                 );
-    //             }
-    //         }
-    //         eventLoaded.subscribe();
-    //     },
-    //     error(e) {
-    //         wrapper.sernEmitter?.emit('error', e);
-    //     },
-    // });
 }
 
 function eventObservable$(
