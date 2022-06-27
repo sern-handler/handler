@@ -23,6 +23,7 @@ import type {
     SernEventCommand,
 } from '../structures/events';
 import type SernEmitter from '../sernEmitter';
+import type Wrapper from '../structures/wrapper';
 
 export interface Controller {
     next: () => Ok<void>;
@@ -42,7 +43,7 @@ export type CommandPlugin<T extends keyof CommandModuleDefs = keyof CommandModul
         {
             type: PluginType.Command;
             execute: (
-                wrapper: Client,
+                wrapper: Wrapper,
                 module: DefinitelyDefined<CommandModuleDefs[T], 'name' | 'description'>,
                 controller: Controller,
             ) => Awaitable<Result<void, void>>;
