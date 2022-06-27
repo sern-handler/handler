@@ -1,7 +1,7 @@
 import { ApplicationCommandType, ComponentType } from 'discord.js';
 import { readdirSync, statSync } from 'fs';
 import { join } from 'path';
-import { from, Observable, throwError } from 'rxjs';
+import { from, Observable } from 'rxjs';
 import type { Module } from '../structures/module';
 import { SernError } from '../structures/errors';
 import type { Result } from 'ts-results';

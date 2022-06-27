@@ -26,7 +26,6 @@ import {
 } from '../utilities/predicates';
 import { filterCorrectModule } from './observableHandling';
 import { CommandType } from '../structures/enums';
-import type { Result } from 'ts-results';
 import type { AutocompleteInteraction } from 'discord.js';
 import { asyncResolveArray } from '../utilities/asyncResolveArray';
 
@@ -211,7 +210,7 @@ export function onInteractionCreate(wrapper: Wrapper) {
         )
         .subscribe({
             async next({ mod, res: eventPluginRes, execute }) {
-                const ePlugArr: Result<void, void>[] = await asyncResolveArray(eventPluginRes);
+                const ePlugArr = await asyncResolveArray(eventPluginRes);
                 if (ePlugArr.every(e => e.ok)) {
                     await execute();
                     wrapper.sernEmitter?.emit('module.activate', { type: 'success', module: mod! });
