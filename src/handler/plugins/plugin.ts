@@ -44,7 +44,10 @@ export type CommandPlugin<T extends keyof CommandModuleDefs = keyof CommandModul
             type: PluginType.Command;
             execute: (
                 wrapper: Wrapper,
-                module: DefinitelyDefined<CommandModuleDefs[T], 'name' | 'description'>,
+                payload: {
+                    mod: DefinitelyDefined<CommandModuleDefs[T], 'name' | 'description'>;
+                    absPath: string;
+                },
                 controller: Controller,
             ) => Awaitable<Result<void, void>>;
         }
