@@ -28,17 +28,20 @@ export function onReady(wrapper: Wrapper) {
             });
         }),
         map(({ mod, absPath }) => {
-            return <DefinedCommandModule>{
-                name: mod?.name ?? Files.fmtFileName(basename(absPath)),
-                description: mod?.description ?? '...',
-                ...mod,
+            return {
+                absPath,
+                mod: <DefinedCommandModule>{
+                    name: mod?.name ?? Files.fmtFileName(basename(absPath)),
+                    description: mod?.description ?? '...',
+                    ...mod,
+                },
             };
         }),
     );
     const processPlugins$ = processCommandFiles$.pipe(
-        concatMap(mod => {
-            const cmdPluginRes = processCommandPlugins(wrapper, mod);
-            return of({ mod, cmdPluginRes });
+        concatMap(payload => {
+            const cmdPluginRes = processCommandPlugins(wrapper, payload);
+            return of({ mod: payload.mod, cmdPluginRes });
         }),
     );
 
