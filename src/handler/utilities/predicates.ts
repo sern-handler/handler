@@ -88,6 +88,13 @@ export function isExternalEvent(el: EventModule): el is ExternalEventCommand {
     return !isDiscordEvent(el) && !isSernEvent(el);
 }
 
-export function isEventModule(module: Module): module is EventModule {
-    return [EventType.Sern, EventType.Discord, EventType.External].includes(module.type);
-}
+// export function isEventPlugin<T extends CommandType>(
+//     e: CommandModulePlugin<T>,
+// ): e is EventPlugin<T> {
+//     return e.type === PluginType.Event;
+// }
+// export function isCommandPlugin<T extends CommandType>(
+//     e: CommandModulePlugin<T>,
+// ): e is CommandPlugin<T> {
+//     return !isEventPlugin(e);
+// }
