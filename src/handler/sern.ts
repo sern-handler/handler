@@ -36,9 +36,23 @@ export function init(wrapper: Wrapper) {
 /**
  *
  * @param emitter Any external event emitter.
- * The object will be stored in a map, and then fetched by the name of the emitter provided.
+ * The object will be stored in a map, and then fetched by the name of the instance's class provided.
  * As there are infinite possibilities to adding external event emitters,
  * Most types aren't provided and are as narrow as possibly can.
+ * @example
+ * ```
+ *     Sern.addExternal(new Level())
+ * ```
+ * ```
+ *     // events/level.ts
+ *      export default eventModule({
+ *          emitter: 'Level',
+ *          name: 'error',
+ *          execute(args) {
+ *              console.log(args)
+ *          }
+ *      })
+ *
  */
 export function addExternal<T extends EventEmitter>(emitter: T) {
     if (ExternalEventEmitters.has(emitter.constructor.name)) {
