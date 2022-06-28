@@ -1,17 +1,7 @@
 import { EventEmitter } from 'events';
-import type { Module } from './structures/module';
+import type { SernEventsMapping } from '../types/handler';
 
-type Payload =
-    | { success: true; module: Module }
-    | { success: false; module: Module | undefined; reason: string | Error };
-
-type SernEventsMapping = {
-    ['module.register']: [Payload];
-    ['module.activate']: [Payload];
-    ['error']: [Error | string];
-};
-
-export default class SernEmitter extends EventEmitter {
+class SernEmitter extends EventEmitter {
     /**
      * Listening to sern events with on. This event stays on until a crash or a normal exit
      * @param eventName
@@ -46,3 +36,5 @@ export default class SernEmitter extends EventEmitter {
         return super.emit(eventName, ...args);
     }
 }
+
+export default SernEmitter;

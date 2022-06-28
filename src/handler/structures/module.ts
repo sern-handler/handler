@@ -5,8 +5,10 @@ import type {
     ApplicationCommandNonOptionsData,
     ApplicationCommandNumericOptionData,
     ApplicationCommandOptionData,
+    ApplicationCommandOptionType,
     ApplicationCommandSubCommandData,
     ApplicationCommandSubGroupData,
+    AutocompleteInteraction,
     Awaitable,
     BaseApplicationCommandOptionsData,
     ButtonInteraction,
@@ -15,18 +17,17 @@ import type {
     SelectMenuInteraction,
     UserContextMenuCommandInteraction,
 } from 'discord.js';
-import type { Args, Override } from '../../types/handler';
-import type { CommandPlugin, EventPlugin } from '../plugins/plugin';
+import type { Args, Override, SlashOptions } from '../../types/handler';
+import type { AutocompletePlugin, CommandPlugin, EventPlugin } from '../plugins/plugin';
 import type Context from './context';
-import { CommandType, PluginType } from './enums';
-import type { AutocompleteInteraction } from 'discord.js';
-import type { ApplicationCommandOptionType } from 'discord.js';
+import { CommandType, EventType, PluginType } from './enums';
+import type { DiscordEventCommand, ExternalEventCommand, SernEventCommand } from './events';
 
 export interface BaseModule {
     type: CommandType | PluginType;
     name?: string;
-    description: string;
-    execute: (ctx: Context, args: Args) => Awaitable<void>;
+    description?: string;
+    execute: (ctx: Context, args: Args) => Awaitable<void | unknown>;
 }
 
 //possible refactoring types into interfaces and not types
@@ -34,9 +35,10 @@ export type TextCommand = Override<
     BaseModule,
     {
         type: CommandType.Text;
-        onEvent: EventPlugin<CommandType.Text>[];
-        plugins: CommandPlugin[];
+        onEvent: EventPlugin<CommandType.Text>[]; //maybe allow BothPlugins for this also?
+        plugins: CommandPlugin[]; //maybe allow BothPlugins for this also?
         alias?: string[];
+        execute: (ctx: Context, args: ['text', string[]]) => Awaitable<void | unknown>;
     }
 >;
 
@@ -44,9 +46,10 @@ export type SlashCommand = Override<
     BaseModule,
     {
         type: CommandType.Slash;
-        onEvent: EventPlugin<CommandType.Slash>[];
-        plugins: CommandPlugin[];
+        onEvent: EventPlugin<CommandType.Slash>[]; //maybe allow BothPlugins for this also?
+        plugins: CommandPlugin[]; //maybe allow BothPlugins for this also?
         options?: SernOptionsData[];
+        execute: (ctx: Context, args: ['slash', SlashOptions]) => Awaitable<void | unknown>;
     }
 >;
 
@@ -58,6 +61,7 @@ export type BothCommand = Override<
         plugins: CommandPlugin[];
         alias?: string[];
         options?: SernOptionsData[];
+        execute: (ctx: Context, args: Args) => Awaitable<void | unknown>;
     }
 >;
 
@@ -67,7 +71,7 @@ export type ContextMenuUser = Override<
         type: CommandType.MenuUser;
         onEvent: EventPlugin<CommandType.MenuUser>[];
         plugins: CommandPlugin[];
-        execute: (ctx: UserContextMenuCommandInteraction) => Awaitable<void>;
+        execute: (ctx: UserContextMenuCommandInteraction) => Awaitable<void | unknown>;
     }
 >;
 
@@ -77,7 +81,7 @@ export type ContextMenuMsg = Override<
         type: CommandType.MenuMsg;
         onEvent: EventPlugin<CommandType.MenuMsg>[];
         plugins: CommandPlugin[];
-        execute: (ctx: MessageContextMenuCommandInteraction) => Awaitable<void>;
+        execute: (ctx: MessageContextMenuCommandInteraction) => Awaitable<void | unknown>;
     }
 >;
 
@@ -87,7 +91,7 @@ export type ButtonCommand = Override<
         type: CommandType.Button;
         onEvent: EventPlugin<CommandType.Button>[];
         plugins: CommandPlugin[];
-        execute: (ctx: ButtonInteraction) => Awaitable<void>;
+        execute: (ctx: ButtonInteraction) => Awaitable<void | unknown>;
     }
 >;
 
@@ -97,7 +101,7 @@ export type SelectMenuCommand = Override<
         type: CommandType.MenuSelect;
         onEvent: EventPlugin<CommandType.MenuSelect>[];
         plugins: CommandPlugin[];
-        execute: (ctx: SelectMenuInteraction) => Awaitable<void>;
+        execute: (ctx: SelectMenuInteraction) => Awaitable<void | unknown>;
     }
 >;
 
@@ -107,7 +111,7 @@ export type ModalSubmitCommand = Override<
         type: CommandType.Modal;
         onEvent: EventPlugin<CommandType.Modal>[];
         plugins: CommandPlugin[];
-        execute: (ctx: ModalSubmitInteraction) => Awaitable<void>;
+        execute: (ctx: ModalSubmitInteraction) => Awaitable<void | unknown>;
     }
 >;
 
@@ -118,14 +122,15 @@ export type ModalSubmitCommand = Override<
 export type AutocompleteCommand = Override<
     BaseModule,
     {
-        type: CommandType.Autocomplete;
-        name: string;
-        onEvent: EventPlugin<CommandType.Autocomplete>[];
-        execute: (ctx: AutocompleteInteraction) => Awaitable<void>;
+        name?: never;
+        description?: never;
+        type?: never;
+        onEvent: AutocompletePlugin[];
+        execute: (ctx: AutocompleteInteraction) => Awaitable<void | unknown>;
     }
 >;
-
-export type Module =
+export type EventModule = DiscordEventCommand | SernEventCommand | ExternalEventCommand;
+export type CommandModule =
     | TextCommand
     | SlashCommand
     | BothCommand
@@ -133,12 +138,13 @@ export type Module =
     | ContextMenuMsg
     | ButtonCommand
     | SelectMenuCommand
-    | ModalSubmitCommand
-    | AutocompleteCommand;
+    | ModalSubmitCommand;
+
+export type Module = CommandModule | EventModule;
 
 //https://stackoverflow.com/questions/64092736/alternative-to-switch-statement-for-typescript-discriminated-union
 // Explicit Module Definitions for mapping
-export type ModuleDefs = {
+export type CommandModuleDefs = {
     [CommandType.Text]: TextCommand;
     [CommandType.Slash]: SlashCommand;
     [CommandType.Both]: BothCommand;
@@ -147,7 +153,12 @@ export type ModuleDefs = {
     [CommandType.Button]: ButtonCommand;
     [CommandType.MenuSelect]: SelectMenuCommand;
     [CommandType.Modal]: ModalSubmitCommand;
-    [CommandType.Autocomplete]: AutocompleteCommand;
+};
+
+export type EventModuleDefs = {
+    [EventType.Sern]: SernEventCommand;
+    [EventType.Discord]: DiscordEventCommand;
+    [EventType.External]: ExternalEventCommand;
 };
 
 //TODO: support deeply nested Autocomplete
@@ -162,7 +173,7 @@ export type SernAutocompleteData = Override<
             | ApplicationCommandOptionType.String
             | ApplicationCommandOptionType.Number
             | ApplicationCommandOptionType.Integer;
-        command: Omit<AutocompleteCommand, 'type' | 'name' | 'description'>;
+        command: AutocompleteCommand;
     }
 >;
 

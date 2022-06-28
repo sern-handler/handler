@@ -1,4 +1,4 @@
-import type { APIGuildMember } from 'discord-api-types/v9';
+import type { APIGuildMember } from 'discord-api-types/v10';
 import type {
     ChatInputCommandInteraction,
     Client,
@@ -14,6 +14,7 @@ import type {
 import { None, Option, Some } from 'ts-results';
 import type { Nullish } from '../../types/handler';
 import { ExternallyUsed } from '../utilities/externallyUsed';
+import { SernError } from './errors';
 
 function firstSome<T>(...args: Option<T>[]): Nullish<T> {
     for (const op of args) {
@@ -43,7 +44,7 @@ export default class Context {
      */
     @ExternallyUsed
     public get message() {
-        return this.oMsg.unwrap();
+        return this.oMsg.expect(SernError.MismatchEvent);
     }
     /**
      * Getting the ChatInputCommandInteraction object. Crashes if module type is
@@ -52,7 +53,7 @@ export default class Context {
      */
     @ExternallyUsed
     public get interaction() {
-        return this.oInterac.unwrap();
+        return this.oInterac.expect(SernError.MismatchEvent);
     }
 
     @ExternallyUsed
@@ -141,16 +142,19 @@ export default class Context {
     public isEmpty() {
         return this.oMsg.none && this.oInterac.none;
     }
-
-    //TODO: make this queueable
+    //Make queueable
     @ExternallyUsed
-    public reply(content: Omit<InteractionReplyOptions, 'fetchReply'> | ReplyMessageOptions) {
+    public reply(
+        content: string | Omit<InteractionReplyOptions, 'fetchReply'> | ReplyMessageOptions,
+    ) {
         return firstSome(
             this.oInterac.map(i => {
-                return i.reply(content as InteractionReplyOptions).then(() => i.fetchReply());
+                return i
+                    .reply(content as string | InteractionReplyOptions)
+                    .then(() => i.fetchReply());
             }),
             this.oMsg.map(m => {
-                return m.reply(content as ReplyMessageOptions);
+                return m.reply(content as string | ReplyMessageOptions);
             }),
         )!;
     }

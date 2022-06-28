@@ -3,6 +3,10 @@ import { readdirSync, statSync } from 'fs';
 import { join } from 'path';
 import { from, Observable } from 'rxjs';
 import type { Module } from '../structures/module';
+import { SernError } from '../structures/errors';
+import type { Result } from 'ts-results';
+import { Err, Ok } from 'ts-results';
+import type { EventEmitter } from 'events';
 
 //Maybe move this? this probably doesnt belong in utlities/
 export const BothCommands = new Map<string, Module>();
@@ -22,6 +26,11 @@ export const TextCommands = {
     aliases: new Map<string, Module>(),
 };
 export const ModalSubmitCommands = new Map<string, Module>();
+/**
+ * keeps all external emitters stored here
+ */
+export const ExternalEventEmitters = new Map<string, EventEmitter>();
+
 // Courtesy @Townsy45
 function readPath(dir: string, arrayOfFiles: string[] = []): string[] {
     try {
@@ -45,15 +54,22 @@ export const fmtFileName = (n: string) => n.substring(0, n.length - 3);
  * @param commandDir
  */
 
-export function buildData(commandDir: string): Observable<{
-    mod: Module;
-    absPath: string;
-}> {
+export function buildData<T>(commandDir: string): Observable<
+    Result<
+        {
+            mod: T;
+            absPath: string;
+        },
+        SernError
+    >
+> {
     return from(
         getCommands(commandDir).map(absPath => {
             // eslint-disable-next-line @typescript-eslint/no-var-requires
-            const mod = <Module>require(absPath).default;
-            return { mod, absPath };
+            const mod = <T | undefined>require(absPath).default;
+            if (mod !== undefined) {
+                return Ok({ mod, absPath });
+            } else return Err(SernError.UndefinedModule);
         }),
     );
 }

@@ -1,66 +1,54 @@
-import {
-    concat,
-    concatMap,
-    from,
-    fromEvent,
-    map,
-    Observable,
-    of,
-    skip,
-    take,
-    throwError,
-} from 'rxjs';
+import { concat, concatMap, from, fromEvent, map, Observable, of, skip, take } from 'rxjs';
 import { basename } from 'path';
 import * as Files from '../utilities/readFile';
 import type Wrapper from '../structures/wrapper';
-import { controller } from '../sern';
 import type { Result } from 'ts-results';
 import { Err, Ok } from 'ts-results';
 import type { Awaitable } from 'discord.js';
 import { ApplicationCommandType, ComponentType } from 'discord.js';
-import type { Module } from '../structures/module';
+import type { CommandModule } from '../structures/module';
 import { match } from 'ts-pattern';
 import { SernError } from '../structures/errors';
-import type { DefinitelyDefined } from '../../types/handler';
+import type { DefinedCommandModule } from '../../types/handler';
 import { CommandType, PluginType } from '../structures/enums';
+import { errTap } from './observableHandling';
+import { processCommandPlugins } from './userDefinedEventsHandling';
 
-export const onReady = (wrapper: Wrapper) => {
+export function onReady(wrapper: Wrapper) {
     const { client, commands } = wrapper;
     const ready$ = fromEvent(client, 'ready').pipe(take(1), skip(1));
-    const processCommandFiles$ = Files.buildData(commands).pipe(
+
+    // Using sernModule function already checks if module is not EventModule
+    const processCommandFiles$ = Files.buildData<CommandModule>(commands).pipe(
+        errTap(reason => {
+            wrapper.sernEmitter?.emit('module.register', {
+                type: 'failure',
+                module: undefined,
+                reason,
+            });
+        }),
         map(({ mod, absPath }) => {
-            if (mod?.name === undefined) {
-                const name = Files.fmtFileName(basename(absPath));
-                return { name, ...mod };
-            }
-            return mod;
+            return {
+                absPath,
+                mod: <DefinedCommandModule>{
+                    name: mod?.name ?? Files.fmtFileName(basename(absPath)),
+                    description: mod?.description ?? '...',
+                    ...mod,
+                },
+            };
         }),
     );
     const processPlugins$ = processCommandFiles$.pipe(
-        concatMap(mod => {
-            if (mod.type === CommandType.Autocomplete) {
-                return throwError(
-                    () =>
-                        SernError.NonValidModuleType +
-                        `. You cannot use command plugins and Autocomplete.`,
-                );
-            }
-            const cmdPluginsRes =
-                mod.plugins?.map(plug => {
-                    return {
-                        ...plug,
-                        name: plug?.name ?? 'Unnamed Plugin',
-                        execute: plug.execute(client, mod, controller),
-                    };
-                }) ?? [];
-            return of({ mod, cmdPluginsRes });
+        concatMap(payload => {
+            const cmdPluginRes = processCommandPlugins(wrapper, payload);
+            return of({ mod: payload.mod, cmdPluginRes });
         }),
     );
 
     (
         concat(ready$, processPlugins$) as Observable<{
-            mod: DefinitelyDefined<Module, { name: string }>;
-            cmdPluginsRes: {
+            mod: DefinedCommandModule;
+            cmdPluginRes: {
                 execute: Awaitable<Result<void, void>>;
                 type: PluginType.Command;
                 name: string;
@@ -69,39 +57,36 @@ export const onReady = (wrapper: Wrapper) => {
         }>
     )
         .pipe(
-            concatMap(pl =>
-                from(
+            concatMap(pl => {
+                return from(
+                    //refactor, this allocates too many objects
                     Promise.all(
-                        pl.cmdPluginsRes.map(async e => ({ ...e, execute: await e.execute })),
+                        pl.cmdPluginRes.map(async e => ({ ...e, execute: await e.execute })),
                     ),
-                ).pipe(map(res => ({ ...pl, cmdPluginsRes: res }))),
-            ),
+                ).pipe(map(res => ({ ...pl, cmdPluginsRes: res })));
+            }),
         )
         .subscribe(({ mod, cmdPluginsRes }) => {
-            const loadedPluginsCorrectly = cmdPluginsRes.every(res => res.execute.ok);
+            const loadedPluginsCorrectly = cmdPluginsRes.every(({ execute }) => execute.ok);
             if (loadedPluginsCorrectly) {
                 const res = registerModule(mod);
                 if (res.err) {
-                    throw Error(
-                        SernError.NonValidModuleType +
-                            ', or loading modules was handled incorrectly. ' +
-                            'Check commands path and command files!',
-                    );
+                    throw Error(SernError.NonValidModuleType);
                 }
-                wrapper.sernEmitter?.emit('module.register', { success: true, module: mod });
+                wrapper.sernEmitter?.emit('module.register', { type: 'success', module: mod });
             } else {
                 wrapper.sernEmitter?.emit('module.register', {
-                    success: false,
+                    type: 'failure',
                     module: mod,
                     reason: SernError.PluginFailure,
                 });
             }
         });
-};
+}
 
-function registerModule(mod: DefinitelyDefined<Module, { name: string }>): Result<void, void> {
+function registerModule(mod: DefinedCommandModule): Result<void, void> {
     const name = mod.name;
-    return match<Module>(mod)
+    return match<DefinedCommandModule>(mod)
         .with({ type: CommandType.Text }, mod => {
             mod.alias?.forEach(a => Files.TextCommands.aliases.set(a, mod));
             Files.TextCommands.text.set(name, mod);

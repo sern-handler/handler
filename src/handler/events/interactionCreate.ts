@@ -14,17 +14,20 @@ import Context from '../structures/context';
 import { controller } from '../sern';
 import type { Module } from '../structures/module';
 import {
+    isApplicationCommand,
+    isAutocomplete,
     isButton,
     isChatInputCommand,
+    isMessageComponent,
     isMessageCtxMenuCmd,
-    isPromise,
+    isModalSubmit,
     isSelectMenu,
     isUserContextMenuCmd,
 } from '../utilities/predicates';
 import { filterCorrectModule } from './observableHandling';
 import { CommandType } from '../structures/enums';
-import type { Result } from 'ts-results';
 import type { AutocompleteInteraction } from 'discord.js';
+import { asyncResolveArray } from '../utilities/asyncResolveArray';
 
 function applicationCommandHandler(mod: Module | undefined, interaction: CommandInteraction) {
     const mod$ = <T extends CommandType>(cmdTy: T) => of(mod).pipe(filterCorrectModule(cmdTy));
@@ -150,7 +153,7 @@ function autoCmpHandler(mod: Module | undefined, interaction: AutocompleteIntera
             const selectedOption = mod.options?.find(o => o.autocomplete && o.name === choice.name);
             if (selectedOption !== undefined && selectedOption.autocomplete) {
                 return of(
-                    selectedOption.command.onEvent.map(e => e.execute([interaction], controller)),
+                    selectedOption.command.onEvent.map(e => e.execute(interaction, controller)),
                 ).pipe(
                     map(res => ({
                         mod,
@@ -179,24 +182,24 @@ export function onInteractionCreate(wrapper: Wrapper) {
         .pipe(
             /*processing plugins*/
             concatMap(interaction => {
-                if (interaction.isCommand()) {
+                if (isApplicationCommand(interaction)) {
                     const modul =
                         Files.ApplicationCommands[interaction.commandType].get(
                             interaction.commandName,
                         ) ?? Files.BothCommands.get(interaction.commandName);
                     return applicationCommandHandler(modul, interaction);
                 }
-                if (interaction.isMessageComponent()) {
+                if (isMessageComponent(interaction)) {
                     const modul = Files.MessageCompCommands[interaction.componentType].get(
                         interaction.customId,
                     );
                     return messageComponentInteractionHandler(modul, interaction);
                 }
-                if (interaction.isModalSubmit()) {
+                if (isModalSubmit(interaction)) {
                     const modul = Files.ModalSubmitCommands.get(interaction.customId);
                     return modalHandler(modul, interaction);
                 }
-                if (interaction.isAutocomplete()) {
+                if (isAutocomplete(interaction)) {
                     const modul =
                         Files.ApplicationCommands['1'].get(interaction.commandName) ??
                         Files.BothCommands.get(interaction.commandName);
@@ -207,19 +210,13 @@ export function onInteractionCreate(wrapper: Wrapper) {
         )
         .subscribe({
             async next({ mod, res: eventPluginRes, execute }) {
-                const ePlugArr: Result<void, void>[] = [];
-                for await (const res of eventPluginRes) {
-                    if (isPromise(res)) {
-                        ePlugArr.push(res);
-                    }
-                    ePlugArr.push(res as Awaited<Result<void, void>>);
-                }
+                const ePlugArr = await asyncResolveArray(eventPluginRes);
                 if (ePlugArr.every(e => e.ok)) {
                     await execute();
-                    wrapper.sernEmitter?.emit('module.activate', { success: true, module: mod! });
+                    wrapper.sernEmitter?.emit('module.activate', { type: 'success', module: mod! });
                 } else {
                     wrapper.sernEmitter?.emit('module.activate', {
-                        success: false,
+                        type: 'failure',
                         module: mod!,
                         reason: SernError.PluginFailure,
                     });

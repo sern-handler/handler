@@ -1,6 +1,5 @@
 import type { Message } from 'discord.js';
 import { concatMap, from, fromEvent, map, Observable, of } from 'rxjs';
-import type { Args } from '../..';
 import { controller } from '../sern';
 import Context from '../structures/context';
 import type Wrapper from '../structures/wrapper';
@@ -9,6 +8,7 @@ import * as Files from '../utilities/readFile';
 import { filterCorrectModule, ignoreNonBot } from './observableHandling';
 import { CommandType } from '../structures/enums';
 import { SernError } from '../structures/errors';
+import { asyncResolveArray } from '../utilities/asyncResolveArray';
 
 export const onMessageCreate = (wrapper: Wrapper) => {
     const { client, defaultPrefix } = wrapper;
@@ -22,7 +22,7 @@ export const onMessageCreate = (wrapper: Wrapper) => {
             const [prefix, ...rest] = fmt(message, defaultPrefix);
             return {
                 ctx: Context.wrap(message),
-                args: <Args>['text', rest],
+                args: <['text', string[]]>['text', rest],
                 mod:
                     Files.TextCommands.text.get(prefix) ??
                     Files.BothCommands.get(prefix) ??
@@ -41,7 +41,7 @@ export const onMessageCreate = (wrapper: Wrapper) => {
 
     const processEventPlugins$ = ensureModuleType$.pipe(
         concatMap(({ ctx, args, mod }) => {
-            const res = Promise.all(
+            const res = asyncResolveArray(
                 mod.onEvent.map(ePlug => {
                     return ePlug.execute([ctx, args], controller);
                 }),
@@ -54,11 +54,11 @@ export const onMessageCreate = (wrapper: Wrapper) => {
         next({ mod, ctx, args, res }) {
             if (res.every(pl => pl.ok)) {
                 Promise.resolve(mod.execute(ctx, args)).then(() => {
-                    wrapper.sernEmitter?.emit('module.activate', { success: true, module: mod! });
+                    wrapper.sernEmitter?.emit('module.activate', { type: 'success', module: mod! });
                 });
             } else {
                 wrapper.sernEmitter?.emit('module.activate', {
-                    success: false,
+                    type: 'failure',
                     module: mod!,
                     reason: SernError.PluginFailure,
                 });

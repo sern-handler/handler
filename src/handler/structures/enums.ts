@@ -2,15 +2,20 @@
  * @enum { number };
  */
 enum CommandType {
-    Text = 0b00000001,
-    Slash = 0b00000010,
-    MenuUser = 0b00000100,
-    MenuMsg = 0b00001000,
-    Button = 0b00010000,
-    MenuSelect = 0b00100000,
-    Modal = 0b01000000,
-    Autocomplete = 0b10000000,
+    Text = 0b00000000001,
+    Slash = 0b00000000010,
     Both = 0b0000011,
+    MenuUser = 0b00000000100,
+    MenuMsg = 0b0000001000,
+    Button = 0b00000010000,
+    MenuSelect = 0b00000100000,
+    Modal = 0b00001000000,
+}
+
+enum EventType {
+    Discord = 0b01,
+    Sern = 0b10,
+    External = 0b11,
 }
 
 enum PluginType {
@@ -18,4 +23,4 @@ enum PluginType {
     Event = 0b10,
 }
 
-export { CommandType, PluginType };
+export { CommandType, PluginType, EventType };

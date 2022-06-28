@@ -1,6 +1,6 @@
 {
   "name": "@sern/handler",
-  "version": "1.0.1-beta",
+  "version": "1.1.0-beta",
   "description": "A customizable, batteries-included, powerful discord.js framework to automate and streamline bot development.",
   "main": "dist/index.js",
   "scripts": {
@@ -9,7 +9,6 @@
     "lint": "eslint src/**/*.ts",
     "format": "eslint src/**/*.ts --fix",
     "release": "standard-version && git push --follow-tags",
-    "test": "jest --coverage --verbose",
     "commit": "cz"
   },
   "keywords": [
@@ -33,18 +32,16 @@
     "eslint": "^8.8.0",
     "@typescript-eslint/parser": "^5.10.2",
     "@typescript-eslint/eslint-plugin": "^5.10.2",
-    "@babel/core": "^7.17.2",
-    "@babel/preset-env": "^7.16.11",
-    "@babel/preset-typescript": "^7.16.7",
-    "@types/jest": "^27.4.0",
-    "babel-jest": "^27.5.1",
     "cz-conventional-changelog": "3.0.1",
-    "jest": "^27.5.1",
     "prettier": "2.6.2",
     "standard-version": "^9.3.2",
-    "typedoc": "^0.22.11",
-    "typescript": "^4.5.5"
+    "typescript": "4.5.5"
   },
+   "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sern-handler/handler.git"
+  },
+  "homepage": "https://sern-handler.js.org",
   "config": {
     "commitizen": {
       "path": "cz-conventional-changelog"
