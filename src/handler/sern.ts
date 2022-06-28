@@ -47,6 +47,7 @@ export function init(wrapper: Wrapper) {
  *     // events/level.ts
  *      export default eventModule({
  *          emitter: 'Level',
+ *          type : EventType.External,
  *          name: 'error',
  *          execute(args) {
  *              console.log(args)
