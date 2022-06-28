@@ -81,11 +81,11 @@ export function isDiscordEvent(el: EventModule): el is DiscordEventCommand {
     return el.type === EventType.Discord;
 }
 export function isSernEvent(el: EventModule): el is SernEventCommand {
-    return !isDiscordEvent(el);
+    return el.type === EventType.Sern;
 }
 
 export function isExternalEvent(el: EventModule): el is ExternalEventCommand {
-    return !isDiscordEvent(el) && !isSernEvent(el);
+    return el.type === EventType.External && 'emitter' in el;
 }
 
 // export function isEventPlugin<T extends CommandType>(
