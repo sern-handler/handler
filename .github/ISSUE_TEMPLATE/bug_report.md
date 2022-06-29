@@ -25,7 +25,8 @@ If applicable, add screenshots to help explain your problem.
 
 **Versioning**
 NodeJS version: 
-SernHandler version:
+DiscordJS version: 
+SernHandler version: 
 Channel: (e.g. beta)
 
 **Additional context**
