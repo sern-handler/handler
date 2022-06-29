@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/sern-handler/.github/main/VisualBanner.png" width="900px">
+  <img src="https://raw.githubusercontent.com/sern-handler/.github/main/sern-rounded.png" width="900px">
 </div>
 
 <h1 align="center">SernHandler</h1>
