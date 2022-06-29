@@ -1,10 +1,15 @@
-# SernHandler
+<div align="center">
+  <img src="https://raw.githubusercontent.com/sern-handler/.github/main/VisualBanner.png" width="900px">
+</div>
 
-<a href="https://www.npmjs.com/package/@sern/handler"><img src="https://img.shields.io/npm/v/@sern/handler?maxAge=3600" alt="NPM version" /></a>
-<a href="https://www.npmjs.com/package/@sern/handler"><img src="https://img.shields.io/npm/dt/@sern/handler?maxAge=3600" alt="NPM downloads" /></a>
-[![License: MIT](https://img.shields.io/badge/License-MIT-blavk.svg)](https://opensource.org/licenses/MIT)
+<h1 align="center">SernHandler</h1>
+<h4 align="center">A customizable, batteries-included, powerful discord.js framework to automate and streamline bot development</h4>
 
-A customizable, batteries-included, powerful discord.js framework to automate and streamline your bot development.
+<div align="center" style="margin-top: 10px">
+  <a href="https://www.npmjs.com/package/@sern/handler"><img src="https://img.shields.io/npm/v/@sern/handler?maxAge=3600" alt="NPM version" /></a>
+  <a href="https://www.npmjs.com/package/@sern/handler"><img src="https://img.shields.io/npm/dt/@sern/handler?maxAge=3600" alt="NPM downloads" /></a>
+  <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-blavk.svg" alt="License MIT"></a>
+</div>
 
 
 ## Installation
