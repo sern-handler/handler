@@ -9,7 +9,7 @@
   <img src="https://img.shields.io/badge/open-source-brightgreen">
   <a href="https://www.npmjs.com/package/@sern/handler"><img src="https://img.shields.io/npm/v/@sern/handler?maxAge=3600" alt="NPM version" /></a>
   <a href="https://www.npmjs.com/package/@sern/handler"><img src="https://img.shields.io/npm/dt/@sern/handler?maxAge=3600" alt="NPM downloads" /></a>
-  <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-blavk.svg" alt="License MIT"></a>
+  <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/license-MIT-brightgreen" alt="License MIT"></a>
   <a href="https://sern-handler.js.org"><img alt="docs.rs" src="https://img.shields.io/docsrs/docs"></a>
   <img alt="Lines of code" src="https://img.shields.io/tokei/lines/github/sern-handler/handler">
 </div>
