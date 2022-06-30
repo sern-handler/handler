@@ -54,7 +54,10 @@ export const onMessageCreate = (wrapper: Wrapper) => {
         next({ mod, ctx, args, res }) {
             if (res.every(pl => pl.ok)) {
                 Promise.resolve(mod.execute(ctx, args)).then(() => {
-                    wrapper.sernEmitter?.emit('module.activate', { type: PayloadType.Success, module: mod! });
+                    wrapper.sernEmitter?.emit('module.activate', {
+                        type: PayloadType.Success,
+                        module: mod!,
+                    });
                 });
             } else {
                 wrapper.sernEmitter?.emit('module.activate', {

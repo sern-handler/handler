@@ -73,7 +73,10 @@ export function onReady(wrapper: Wrapper) {
                 if (res.err) {
                     throw Error(SernError.NonValidModuleType);
                 }
-                wrapper.sernEmitter?.emit('module.register', { type: PayloadType.Success, module: mod });
+                wrapper.sernEmitter?.emit('module.register', {
+                    type: PayloadType.Success,
+                    module: mod,
+                });
             } else {
                 wrapper.sernEmitter?.emit('module.register', {
                     type: PayloadType.Failure,

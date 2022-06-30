@@ -214,7 +214,10 @@ export function onInteractionCreate(wrapper: Wrapper) {
                 const ePlugArr = await asyncResolveArray(eventPluginRes);
                 if (ePlugArr.every(e => e.ok)) {
                     await execute();
-                    wrapper.sernEmitter?.emit('module.activate', { type: PayloadType.Success, module: mod! });
+                    wrapper.sernEmitter?.emit('module.activate', {
+                        type: PayloadType.Success,
+                        module: mod!,
+                    });
                 } else {
                     wrapper.sernEmitter?.emit('module.activate', {
                         type: PayloadType.Failure,
