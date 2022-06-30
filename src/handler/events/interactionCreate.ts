@@ -12,7 +12,7 @@ import { match } from 'ts-pattern';
 import { SernError } from '../structures/errors';
 import Context from '../structures/context';
 import { controller } from '../sern';
-import type { Module } from '../structures/module';
+import type { CommandModule } from '../structures/module';
 import { PayloadType } from '../structures/enums';
 import {
     isApplicationCommand,
@@ -25,18 +25,20 @@ import {
     isSelectMenu,
     isUserContextMenuCmd,
 } from '../utilities/predicates';
-import { filterCorrectModule } from './observableHandling';
+import { filterCorrectModule, mod$ } from './observableHandling';
 import { CommandType } from '../structures/enums';
 import type { AutocompleteInteraction } from 'discord.js';
 import { asyncResolveArray } from '../utilities/asyncResolveArray';
 
-function applicationCommandHandler(mod: Module | undefined, interaction: CommandInteraction) {
-    const mod$ = <T extends CommandType>(cmdTy: T) => of(mod).pipe(filterCorrectModule(cmdTy));
+function applicationCommandHandler(
+    mod: CommandModule | undefined,
+    interaction: CommandInteraction,
+) {
     return (
         match(interaction)
             .when(isChatInputCommand, i => {
                 const ctx = Context.wrap(i);
-                return mod$(CommandType.Slash).pipe(
+                return mod$(mod, CommandType.Slash).pipe(
                     concatMap(m => {
                         return of(
                             m.onEvent.map(e => e.execute([ctx, ['slash', i.options]], controller)),
@@ -55,7 +57,7 @@ function applicationCommandHandler(mod: Module | undefined, interaction: Command
             //Todo: refactor so that we dont have to have two separate branches. They're near identical!!
             //Only thing that differs is type of interaction
             .when(isMessageCtxMenuCmd, ctx => {
-                return mod$(CommandType.MenuMsg).pipe(
+                return mod$(mod, CommandType.MenuMsg).pipe(
                     concatMap(m => {
                         return of(m.onEvent.map(e => e.execute([ctx], controller))).pipe(
                             map(res => ({
@@ -70,7 +72,7 @@ function applicationCommandHandler(mod: Module | undefined, interaction: Command
                 );
             })
             .when(isUserContextMenuCmd, ctx => {
-                return mod$(CommandType.MenuUser).pipe(
+                return mod$(mod, CommandType.MenuUser).pipe(
                     concatMap(m => {
                         return of(m.onEvent.map(e => e.execute([ctx], controller))).pipe(
                             map(res => ({
@@ -89,15 +91,14 @@ function applicationCommandHandler(mod: Module | undefined, interaction: Command
 }
 
 function messageComponentInteractionHandler(
-    mod: Module | undefined,
+    mod: CommandModule | undefined,
     interaction: MessageComponentInteraction,
 ) {
-    const mod$ = <T extends CommandType>(ty: T) => of(mod).pipe(filterCorrectModule(ty));
     //Todo: refactor so that we dont have to have two separate branches. They're near identical!!
     //Only thing that differs is type of interaction
     return match(interaction)
         .when(isButton, ctx => {
-            return mod$(CommandType.Button).pipe(
+            return mod$(mod, CommandType.Button).pipe(
                 concatMap(m => {
                     return of(m.onEvent.map(e => e.execute([ctx], controller))).pipe(
                         map(res => ({
@@ -112,7 +113,7 @@ function messageComponentInteractionHandler(
             );
         })
         .when(isSelectMenu, (ctx: SelectMenuInteraction) => {
-            return mod$(CommandType.MenuSelect).pipe(
+            return mod$(mod, CommandType.MenuSelect).pipe(
                 concatMap(m => {
                     return of(m.onEvent.map(e => e.execute([ctx], controller))).pipe(
                         map(res => ({
@@ -129,7 +130,7 @@ function messageComponentInteractionHandler(
         .otherwise(() => throwError(() => SernError.NotSupportedInteraction));
 }
 
-function modalHandler(modul: Module | undefined, ctx: ModalSubmitInteraction) {
+function modalHandler(modul: CommandModule | undefined, ctx: ModalSubmitInteraction) {
     return of(modul).pipe(
         filterCorrectModule(CommandType.Modal),
         concatMap(mod => {
@@ -146,7 +147,7 @@ function modalHandler(modul: Module | undefined, ctx: ModalSubmitInteraction) {
     );
 }
 
-function autoCmpHandler(mod: Module | undefined, interaction: AutocompleteInteraction) {
+function autoCmpHandler(mod: CommandModule | undefined, interaction: AutocompleteInteraction) {
     return of(mod).pipe(
         filterCorrectModule(CommandType.Slash),
         concatMap(mod => {

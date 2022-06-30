@@ -1,9 +1,11 @@
 import type { Message } from 'discord.js';
-import { Observable, throwError } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { SernError } from '../structures/errors';
-import type { Module, CommandModuleDefs } from '../structures/module';
+import type { Module, CommandModuleDefs, CommandModule } from '../structures/module';
 import { correctModuleType } from '../utilities/predicates';
 import type { Result } from 'ts-results';
+import type { CommandType } from '../structures/enums';
+
 export function filterCorrectModule<T extends keyof CommandModuleDefs>(cmdType: T) {
     return (src: Observable<Module | undefined>) =>
         new Observable<CommandModuleDefs[T]>(subscriber => {
@@ -63,4 +65,8 @@ export function errTap<T extends Module>(cb: (err: SernError) => void) {
                 complete: () => subscriber.complete(),
             });
         });
+}
+
+export function mod$<T extends CommandType>(module: CommandModule | undefined, cmdTy: T) {
+    return of(module).pipe(filterCorrectModule(cmdTy));
 }
