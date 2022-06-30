@@ -3,7 +3,7 @@
 </div>
 
 <h1 align="center">Sern - Handlers. Redefined.</h1>
-<h4 align="center">A customizable, batteries-included, powerful discord.js framework to automate and streamline bot development</h4>
+<h4 align="center">A customizable, batteries-included and powerful discord.js framework to automate and streamline bot development</h4>
 
 <div align="center" style="margin-top: 10px">
   <img src="https://img.shields.io/badge/open-source-brightgreen">
