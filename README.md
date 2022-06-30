@@ -89,5 +89,3 @@ It is **highly encouraged** to use the [command line interface](https://github.c
 ## Roadmap
 
 You can check our [roadmap](https://github.com/sern-handler/roadmap) to see what's going to be added or patched in the future.
-
-`Copyright ©️ 2022 Team SernHandler`
