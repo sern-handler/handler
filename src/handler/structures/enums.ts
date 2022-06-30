@@ -1,7 +1,7 @@
 /**
  * @enum { number };
  */
-enum CommandType {
+export enum CommandType {
     Text = 0b00000000001,
     Slash = 0b00000000010,
     Both = 0b0000011,
@@ -12,15 +12,19 @@ enum CommandType {
     Modal = 0b00001000000,
 }
 
-enum EventType {
+export enum EventType {
     Discord = 0b01,
     Sern = 0b10,
     External = 0b11,
 }
 
-enum PluginType {
+export enum PluginType {
     Command = 0b01,
     Event = 0b10,
 }
 
-export { CommandType, PluginType, EventType };
+export enum PayloadType {
+    Success = 'success',
+    Failure = 'failure',
+    Warning = 'warning',
+}
