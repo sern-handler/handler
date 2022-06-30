@@ -6,7 +6,7 @@ import type Wrapper from '../structures/wrapper';
 import { fmt } from '../utilities/messageHelpers';
 import * as Files from '../utilities/readFile';
 import { filterCorrectModule, ignoreNonBot } from './observableHandling';
-import { CommandType } from '../structures/enums';
+import { CommandType, PayloadType } from '../structures/enums';
 import { SernError } from '../structures/errors';
 import { asyncResolveArray } from '../utilities/asyncResolveArray';
 
@@ -54,11 +54,11 @@ export const onMessageCreate = (wrapper: Wrapper) => {
         next({ mod, ctx, args, res }) {
             if (res.every(pl => pl.ok)) {
                 Promise.resolve(mod.execute(ctx, args)).then(() => {
-                    wrapper.sernEmitter?.emit('module.activate', { type: 'success', module: mod! });
+                    wrapper.sernEmitter?.emit('module.activate', { type: PayloadType.Success, module: mod! });
                 });
             } else {
                 wrapper.sernEmitter?.emit('module.activate', {
-                    type: 'failure',
+                    type: PayloadType.Failure,
                     module: mod!,
                     reason: SernError.PluginFailure,
                 });

@@ -13,6 +13,7 @@ import { SernError } from '../structures/errors';
 import Context from '../structures/context';
 import { controller } from '../sern';
 import type { Module } from '../structures/module';
+import { PayloadType } from '../structures/enums';
 import {
     isApplicationCommand,
     isAutocomplete,
@@ -213,10 +214,10 @@ export function onInteractionCreate(wrapper: Wrapper) {
                 const ePlugArr = await asyncResolveArray(eventPluginRes);
                 if (ePlugArr.every(e => e.ok)) {
                     await execute();
-                    wrapper.sernEmitter?.emit('module.activate', { type: 'success', module: mod! });
+                    wrapper.sernEmitter?.emit('module.activate', { type: PayloadType.Success, module: mod! });
                 } else {
                     wrapper.sernEmitter?.emit('module.activate', {
-                        type: 'failure',
+                        type: PayloadType.Failure,
                         module: mod!,
                         reason: SernError.PluginFailure,
                     });

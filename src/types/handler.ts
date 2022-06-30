@@ -1,5 +1,6 @@
 import type { CommandInteractionOptionResolver } from 'discord.js';
 import type { CommandModule, EventModule, Module } from '../handler/structures/module';
+import type { PayloadType } from '../handler/structures/enums';
 export type Nullish<T> = T | undefined | null;
 
 // Thanks to @kelsny
@@ -20,9 +21,9 @@ export type DefinitelyDefined<T, K extends keyof T = keyof T> = {
         : Required<T>[L];
 } & T;
 
-type Reconstruct<T> = T extends Omit<infer O, infer _> ? O & Reconstruct<O> : T;
+export type Reconstruct<T> = T extends Omit<infer O, never> ? O & Reconstruct<O> : T;
 
-type IsOptional<T> = {
+export type IsOptional<T> = {
     [K in keyof T]-?: T[K] extends Required<T>[K] ? false : true;
 };
 
@@ -30,7 +31,7 @@ type IsOptional<T> = {
  * Turns a function with a union of array of args into a single union
  *  [ T , V , B ] | [ A ] => T | V | B | A
  */
-export type SpreadParams<T extends (...args: any) => unknown> = (
+export type SpreadParams<T extends (...args: never) => unknown> = (
     args: Parameters<T>[number],
 ) => unknown;
 
@@ -42,8 +43,8 @@ export type DefinedModule = DefinitelyDefined<Module, 'name' | 'description'>;
 export type DefinedCommandModule = DefinitelyDefined<CommandModule, 'name' | 'description'>;
 export type DefinedEventModule = DefinitelyDefined<EventModule, 'name' | 'description'>;
 export type Payload =
-    | { type: 'success'; module: Module }
-    | { type: 'failure'; module: Module | undefined; reason: string | Error };
+    | { type: PayloadType.Success; module: Module }
+    | { type: PayloadType.Failure; module: Module | undefined; reason: string | Error };
 export type SernEventsMapping = {
     ['module.register']: [Payload];
     ['module.activate']: [Payload];
