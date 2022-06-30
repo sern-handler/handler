@@ -21,6 +21,11 @@ export type DefinitelyDefined<T, K extends keyof T = keyof T> = {
         : Required<T>[L];
 } & T;
 
+export type EventInput =
+    | string
+    | { mod: EventModule; absPath: string }[]
+    | (() => { mod: EventModule; absPath: string }[]);
+
 export type Reconstruct<T> = T extends Omit<infer O, never> ? O & Reconstruct<O> : T;
 
 export type IsOptional<T> = {
