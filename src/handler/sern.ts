@@ -36,7 +36,7 @@ export function init(wrapper: Wrapper) {
 /**
  *
  * @param emitter Any external event emitter.
- * The object will be stored in a map, and then fetched by the name of the instance's class provided.
+ * The object will be stored in a map, and then fetched by the name of the instance's class.
  * As there are infinite possibilities to adding external event emitters,
  * Most types aren't provided and are as narrow as possibly can.
  * @example
