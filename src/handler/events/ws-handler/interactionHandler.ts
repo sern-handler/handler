@@ -52,7 +52,7 @@ export default class InteractionHandler extends EventsHandler<{
                         wrapper.sernEmitter?.emit('module.activate', {
                             type: PayloadType.Success,
                             module: payload.module,
-                        });
+                        }); //todo : emit activation event after promise resolves
                         return from(payload.execute() as Promise<unknown>);
                     } else {
                         wrapper.sernEmitter?.emit('module.activate', {
