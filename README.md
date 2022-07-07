@@ -28,6 +28,9 @@ yarn add @sern/handler
 ```sh
 pnpm add @sern/handler
 ```
+```sh
+bun install @sern/handler
+```
 
 ## Basic Usage
 
