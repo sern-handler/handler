@@ -4,6 +4,7 @@ import { buildData, ExternalEventEmitters } from '../utilities/readFile';
 import { controller } from '../sern';
 import type { DefinedCommandModule, DefinedEventModule, SpreadParams } from '../../types/handler';
 import type { EventModule } from '../structures/module';
+import { PayloadType } from '../structures/enums';
 import type Wrapper from '../structures/wrapper';
 import { basename } from 'path';
 import { match } from 'ts-pattern';
@@ -75,7 +76,7 @@ function eventObservable$(
                 return buildData<EventModule>(eventsDir).pipe(
                     errTap(reason =>
                         sernEmitter?.emit('module.register', {
-                            type: 'failure',
+                            type: PayloadType.Failure,
                             module: undefined,
                             reason,
                         }),

@@ -1,0 +1,22 @@
+{
+	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
+	"extends": ["config:base", "group:allNonMajor"],
+	"major": {
+		"dependencyDashboardApproval": true,
+		"reviewers": ["EvolutionX-10", "jacoobes", "Murtatrxx"]
+	},
+	"minor": {
+		"reviewers": ["jacoobes", "Murtatrxx"]
+	},
+	"schedule": ["every weekend"],
+	"lockFileMaintenance": {
+		"enabled": true,
+		"automerge": true
+	},
+	"packageRules": [
+		{
+			"matchUpdateTypes": ["minor", "patch"],
+			"matchCurrentVersion": "!/^0/"
+		}
+	]
+}

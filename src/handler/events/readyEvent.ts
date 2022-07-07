@@ -10,7 +10,7 @@ import type { CommandModule } from '../structures/module';
 import { match } from 'ts-pattern';
 import { SernError } from '../structures/errors';
 import type { DefinedCommandModule } from '../../types/handler';
-import { CommandType, PluginType } from '../structures/enums';
+import { CommandType, PluginType, PayloadType } from '../structures/enums';
 import { errTap } from './observableHandling';
 import { processCommandPlugins } from './userDefinedEventsHandling';
 
@@ -22,7 +22,7 @@ export function onReady(wrapper: Wrapper) {
     const processCommandFiles$ = Files.buildData<CommandModule>(commands).pipe(
         errTap(reason => {
             wrapper.sernEmitter?.emit('module.register', {
-                type: 'failure',
+                type: PayloadType.Failure,
                 module: undefined,
                 reason,
             });
@@ -73,10 +73,13 @@ export function onReady(wrapper: Wrapper) {
                 if (res.err) {
                     throw Error(SernError.NonValidModuleType);
                 }
-                wrapper.sernEmitter?.emit('module.register', { type: 'success', module: mod });
+                wrapper.sernEmitter?.emit('module.register', {
+                    type: PayloadType.Success,
+                    module: mod,
+                });
             } else {
                 wrapper.sernEmitter?.emit('module.register', {
-                    type: 'failure',
+                    type: PayloadType.Failure,
                     module: mod,
                     reason: SernError.PluginFailure,
                 });
