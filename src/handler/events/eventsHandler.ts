@@ -1,4 +1,4 @@
-import type Wrapper from '../../structures/wrapper';
+import type Wrapper from '../structures/wrapper';
 import type { Observable } from 'rxjs';
 import { Subject } from 'rxjs';
 

@@ -1,17 +1,17 @@
 import type { Interaction } from 'discord.js';
 import { concatMap, from, fromEvent, map, Observable, of } from 'rxjs';
-import type Wrapper from '../../structures/wrapper';
+import type Wrapper from '../structures/wrapper';
 import { EventsHandler } from './eventsHandler';
 import {
     isApplicationCommand,
     isAutocomplete,
     isMessageComponent,
     isModalSubmit,
-} from '../../utilities/predicates';
-import * as Files from '../../utilities/readFile';
-import type { CommandModule } from '../../structures/module';
-import { SernError } from '../../structures/errors';
-import { CommandType, PayloadType } from '../../structures/enums';
+} from '../utilities/predicates';
+import * as Files from '../utilities/readFile';
+import type { CommandModule } from '../structures/module';
+import { SernError } from '../structures/errors';
+import { CommandType, PayloadType } from '../structures/enums';
 import { match, P } from 'ts-pattern';
 import {
     applicationCommandDispatcher,
@@ -87,7 +87,7 @@ export default class InteractionHandler extends EventsHandler<{
                     this.setState({ event: interaction, module });
                 } else if (isModalSubmit(interaction)) {
                     /**
-                     * maybe move modal submits into messagecomponent object maps?
+                     * maybe move modal submits into message component object maps?
                      */
                     const module = Files.ModalSubmitCommands.get(interaction.customId);
                     this.setState({ event: interaction, module });
