@@ -1,5 +1,5 @@
 import type { Interaction } from 'discord.js';
-import { concatMap, from, fromEvent, map, Observable, of } from 'rxjs';
+import { concatMap, from, fromEvent, map, Observable } from 'rxjs';
 import type Wrapper from '../structures/wrapper';
 import { EventsHandler } from './eventsHandler';
 import {
@@ -11,7 +11,7 @@ import {
 import * as Files from '../utilities/readFile';
 import type { CommandModule } from '../structures/module';
 import { SernError } from '../structures/errors';
-import { CommandType, PayloadType } from '../structures/enums';
+import { CommandType } from '../structures/enums';
 import { match, P } from 'ts-pattern';
 import {
     applicationCommandDispatcher,
@@ -24,45 +24,30 @@ import {
 import type { ButtonInteraction, ModalSubmitInteraction, SelectMenuInteraction } from 'discord.js';
 import type { UserContextMenuCommandInteraction } from 'discord.js';
 import type { MessageContextMenuCommandInteraction } from 'discord.js';
+import { executeModule } from './observableHandling';
 
 /**
  *
  */
 export default class InteractionHandler extends EventsHandler<{
     event: Interaction;
-    module: CommandModule;
+    mod: CommandModule;
 }> {
-    protected override observable: Observable<Interaction>;
+    protected override discordEvent: Observable<Interaction>;
 
     constructor(protected wrapper: Wrapper) {
         super(wrapper);
-        this.observable = <Observable<Interaction>>fromEvent(wrapper.client, 'interactionCreate');
+        this.discordEvent = <Observable<Interaction>>fromEvent(wrapper.client, 'interactionCreate');
         this.init();
 
         this.payloadSubject
             .pipe(
                 map(this.processModules),
-                concatMap(({ module, execute, eventPluginRes }) => {
+                concatMap(({ mod, execute, eventPluginRes }) => {
                     //resolve all the Results from event plugins
-                    return from(eventPluginRes).pipe(map(res => ({ module, res, execute })));
+                    return from(eventPluginRes).pipe(map(res => ({ mod, res, execute })));
                 }),
-                concatMap(payload => {
-                    // resolves the Awaitable<unknown> of payload.execute
-                    if (payload.res.every(el => el.ok)) {
-                        wrapper.sernEmitter?.emit('module.activate', {
-                            type: PayloadType.Success,
-                            module: payload.module,
-                        }); //todo : emit activation event after promise resolves
-                        return from(payload.execute() as Promise<unknown>);
-                    } else {
-                        wrapper.sernEmitter?.emit('module.activate', {
-                            type: PayloadType.Failure,
-                            module: payload.module,
-                            reason: SernError.PluginFailure,
-                        });
-                        return of(null);
-                    }
-                }),
+                concatMap(payload => executeModule(wrapper, payload)),
             )
             .subscribe({
                 error: err => {
@@ -72,25 +57,25 @@ export default class InteractionHandler extends EventsHandler<{
     }
 
     override init() {
-        this.observable.subscribe({
+        this.discordEvent.subscribe({
             next: interaction => {
                 if (isMessageComponent(interaction)) {
-                    const module = Files.MessageCompCommands[interaction.type].get(
+                    const mod = Files.MessageCompCommands[interaction.type].get(
                         interaction.customId,
                     );
-                    this.setState({ event: interaction, module });
+                    this.setState({ event: interaction, mod });
                 } else if (isApplicationCommand(interaction) || isAutocomplete(interaction)) {
-                    const module =
+                    const mod =
                         Files.ApplicationCommands[interaction.commandType].get(
                             interaction.commandName,
                         ) ?? Files.BothCommands.get(interaction.commandName);
-                    this.setState({ event: interaction, module });
+                    this.setState({ event: interaction, mod });
                 } else if (isModalSubmit(interaction)) {
                     /**
                      * maybe move modal submits into message component object maps?
                      */
-                    const module = Files.ModalSubmitCommands.get(interaction.customId);
-                    this.setState({ event: interaction, module });
+                    const mod = Files.ModalSubmitCommands.get(interaction.customId);
+                    this.setState({ event: interaction, mod });
                 } else {
                     throw Error('This interaction is not supported yet');
                 }
@@ -101,17 +86,17 @@ export default class InteractionHandler extends EventsHandler<{
         });
     }
 
-    protected setState(state: { event: Interaction; module: CommandModule | undefined }): void {
-        if (state.module === undefined) {
+    protected setState(state: { event: Interaction; mod: CommandModule | undefined }): void {
+        if (state.mod === undefined) {
             this.payloadSubject.error(SernError.UndefinedModule);
         } else {
             //if statement above checks already, safe cast
-            this.payloadSubject.next(state as { event: Interaction; module: CommandModule });
+            this.payloadSubject.next(state as { event: Interaction; mod: CommandModule });
         }
     }
 
-    protected processModules(payload: { event: Interaction; module: CommandModule }) {
-        return match(payload.module)
+    protected processModules(payload: { event: Interaction; mod: CommandModule }) {
+        return match(payload.mod)
             .with(
                 { type: P.union(CommandType.Slash, CommandType.Both) },
                 applicationCommandDispatcher(payload.event),

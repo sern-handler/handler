@@ -1,10 +1,12 @@
 import type { Message } from 'discord.js';
-import { Observable, of, throwError } from 'rxjs';
+import { from, Observable, of, tap, throwError } from 'rxjs';
 import { SernError } from '../structures/errors';
 import type { Module, CommandModuleDefs, CommandModule } from '../structures/module';
 import { correctModuleType } from '../utilities/predicates';
 import type { Result } from 'ts-results';
 import type { CommandType } from '../structures/enums';
+import type Wrapper from '../structures/wrapper';
+import { PayloadType } from '../structures/enums';
 
 export function filterCorrectModule<T extends keyof CommandModuleDefs>(cmdType: T) {
     return (src: Observable<Module | undefined>) =>
@@ -69,4 +71,52 @@ export function errTap<T extends Module>(cb: (err: SernError) => void) {
 
 export function mod$<T extends CommandType>(module: CommandModule | undefined, cmdTy: T) {
     return of(module).pipe(filterCorrectModule(cmdTy));
+}
+//POG
+export function isOneOfCorrectModules<T extends readonly CommandType[]>(...inputs: [...T]) {
+    return (src: Observable<CommandModule | undefined>) => {
+        return new Observable<CommandModuleDefs[T[number]]>(subscriber => {
+            return src.subscribe({
+                next(mod) {
+                    if (mod === undefined) {
+                        return throwError(() => SernError.UndefinedModule);
+                    }
+                    if (inputs.some(type => (mod.type & type) !== 0)) {
+                        subscriber.next(mod as CommandModuleDefs[T[number]]);
+                    } else {
+                        return throwError(() => SernError.MismatchModule);
+                    }
+                },
+                error: e => subscriber.error(e),
+                complete: () => subscriber.complete(),
+            });
+        });
+    };
+}
+
+export function executeModule(
+    wrapper: Wrapper,
+    payload: {
+        mod: CommandModule;
+        execute: () => unknown;
+        res: Result<void, void>[];
+    },
+) {
+    if (payload.res.every(el => el.ok)) {
+        return from(payload.execute() as Promise<unknown>).pipe(
+            tap(() => {
+                wrapper.sernEmitter?.emit('module.activate', {
+                    type: PayloadType.Success,
+                    module: payload.mod,
+                });
+            }),
+        );
+    } else {
+        wrapper.sernEmitter?.emit('module.activate', {
+            type: PayloadType.Failure,
+            module: payload.mod,
+            reason: SernError.PluginFailure,
+        });
+        return of(null);
+    }
 }

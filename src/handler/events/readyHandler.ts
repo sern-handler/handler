@@ -19,11 +19,11 @@ export default class ReadyHandler extends EventsHandler<{
     mod: DefinedCommandModule;
     absPath: string;
 }> {
-    protected observable!: Observable<{ mod: CommandModule; absPath: string }>;
+    protected discordEvent!: Observable<{ mod: CommandModule; absPath: string }>;
     constructor(wrapper: Wrapper) {
         super(wrapper);
         const ready$ = fromEvent(this.wrapper.client, 'ready').pipe(take(1));
-        this.observable = ready$.pipe(
+        this.discordEvent = ready$.pipe(
             concatMap(() =>
                 Files.buildData<CommandModule>(this.wrapper.commands).pipe(
                     errTap(reason =>
@@ -109,7 +109,7 @@ export default class ReadyHandler extends EventsHandler<{
     }
 
     protected init() {
-        this.observable.pipe(map(ReadyHandler.intoDefinedModule)).subscribe({
+        this.discordEvent.pipe(map(ReadyHandler.intoDefinedModule)).subscribe({
             next: value => this.setState(value),
             complete: () => this.payloadSubject.unsubscribe(),
         });

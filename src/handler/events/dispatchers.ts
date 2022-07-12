@@ -26,11 +26,11 @@ export function applicationCommandDispatcher(interaction: Interaction) {
     } else {
         const ctx = Context.wrap(interaction as ChatInputCommandInteraction);
         const args: ['slash', SlashOptions] = ['slash', ctx.interaction.options];
-        return (module: BothCommand | SlashCommand) => ({
-            module,
-            execute: () => module.execute(ctx, args),
+        return (mod: BothCommand | SlashCommand) => ({
+            mod,
+            execute: () => mod.execute(ctx, args),
             eventPluginRes: asyncResolveArray(
-                module.onEvent.map(plugs => plugs.execute([ctx, args], controller)),
+                mod.onEvent.map(plugs => plugs.execute([ctx, args], controller)),
             ),
         });
     }
@@ -38,11 +38,11 @@ export function applicationCommandDispatcher(interaction: Interaction) {
 
 export function dispatchAutocomplete(interaction: AutocompleteInteraction) {
     const choice = interaction.options.getFocused(true);
-    return (module: BothCommand | SlashCommand) => {
-        const selectedOption = module.options?.find(o => o.autocomplete && o.name === choice.name);
+    return (mod: BothCommand | SlashCommand) => {
+        const selectedOption = mod.options?.find(o => o.autocomplete && o.name === choice.name);
         if (selectedOption !== undefined && selectedOption.autocomplete) {
             return {
-                module,
+                mod,
                 execute: () => selectedOption.command.execute(interaction),
                 eventPluginRes: asyncResolveArray(
                     selectedOption.command.onEvent.map(e => e.execute(interaction, controller)),
@@ -56,51 +56,51 @@ export function dispatchAutocomplete(interaction: AutocompleteInteraction) {
 }
 
 export function modalCommandDispatcher(interaction: ModalSubmitInteraction) {
-    return (module: ModalSubmitCommand) => ({
-        module,
-        execute: () => module.execute(interaction),
+    return (mod: ModalSubmitCommand) => ({
+        mod,
+        execute: () => mod.execute(interaction),
         eventPluginRes: asyncResolveArray(
-            module.onEvent.map(plugs => plugs.execute([interaction], controller)),
+            mod.onEvent.map(plugs => plugs.execute([interaction], controller)),
         ),
     });
 }
 
 export function buttonCommandDispatcher(interaction: ButtonInteraction) {
-    return (module: ButtonCommand) => ({
-        module,
-        execute: () => module.execute(interaction),
+    return (mod: ButtonCommand) => ({
+        mod,
+        execute: () => mod.execute(interaction),
         eventPluginRes: asyncResolveArray(
-            module.onEvent.map(plugs => plugs.execute([interaction], controller)),
+            mod.onEvent.map(plugs => plugs.execute([interaction], controller)),
         ),
     });
 }
 
 export function selectMenuCommandDispatcher(interaction: SelectMenuInteraction) {
-    return (module: SelectMenuCommand) => ({
-        module,
-        execute: () => module.execute(interaction),
+    return (mod: SelectMenuCommand) => ({
+        mod,
+        execute: () => mod.execute(interaction),
         eventPluginRes: asyncResolveArray(
-            module.onEvent.map(plugs => plugs.execute([interaction], controller)),
+            mod.onEvent.map(plugs => plugs.execute([interaction], controller)),
         ),
     });
 }
 
 export function ctxMenuUserDispatcher(interaction: UserContextMenuCommandInteraction) {
-    return (module: ContextMenuUser) => ({
-        module,
-        execute: () => module.execute(interaction),
+    return (mod: ContextMenuUser) => ({
+        mod,
+        execute: () => mod.execute(interaction),
         eventPluginRes: asyncResolveArray(
-            module.onEvent.map(plugs => plugs.execute([interaction], controller)),
+            mod.onEvent.map(plugs => plugs.execute([interaction], controller)),
         ),
     });
 }
 
 export function ctxMenuMsgDispatcher(interaction: MessageContextMenuCommandInteraction) {
-    return (module: ContextMenuMsg) => ({
-        module,
-        execute: () => module.execute(interaction),
+    return (mod: ContextMenuMsg) => ({
+        mod,
+        execute: () => mod.execute(interaction),
         eventPluginRes: asyncResolveArray(
-            module.onEvent.map(plugs => plugs.execute([interaction], controller)),
+            mod.onEvent.map(plugs => plugs.execute([interaction], controller)),
         ),
     });
 }
