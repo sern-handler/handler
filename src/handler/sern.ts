@@ -1,7 +1,5 @@
 import type Wrapper from './structures/wrapper';
-import { onReady } from './events/readyEvent';
 import { onMessageCreate } from './events/messageEvent';
-import { onInteractionCreate } from './events/interactionCreate';
 import { Err, Ok } from 'ts-results';
 import { ExternalEventEmitters } from './utilities/readFile';
 import type { EventEmitter } from 'events';
@@ -17,6 +15,8 @@ import type {
     InputEventModule,
 } from './plugins/plugin';
 import { SernError } from './structures/errors';
+import InteractionHandler from './events/interactionHandler';
+import ReadyHandler from './events/readyHandler';
 
 /**
  *
@@ -28,9 +28,10 @@ export function init(wrapper: Wrapper) {
     if (events !== undefined) {
         processEvents(wrapper, events);
     }
-    onReady(wrapper);
+    new ReadyHandler(wrapper);
+    // onReady(wrapper);
     onMessageCreate(wrapper);
-    onInteractionCreate(wrapper);
+    new InteractionHandler(wrapper);
 }
 
 /**

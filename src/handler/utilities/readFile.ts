@@ -63,8 +63,9 @@ export function buildData<T>(commandDir: string): Observable<
         SernError
     >
 > {
+    const commands = getCommands(commandDir);
     return from(
-        getCommands(commandDir).map(absPath => {
+        commands.map(absPath => {
             // eslint-disable-next-line @typescript-eslint/no-var-requires
             const mod = <T | undefined>require(absPath).default;
             if (mod !== undefined) {
