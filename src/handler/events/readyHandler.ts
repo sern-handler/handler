@@ -145,7 +145,7 @@ function registerModule(mod: DefinedCommandModule): Result<void, void> {
             return Ok.EMPTY;
         })
         .with({ type: CommandType.Button }, mod => {
-            Files.ApplicationCommands[ComponentType.Button].set(name, mod);
+            Files.MessageCompCommands[ComponentType.Button].set(name, mod);
             return Ok.EMPTY;
         })
         .with({ type: CommandType.MenuSelect }, mod => {
