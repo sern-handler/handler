@@ -60,7 +60,7 @@ export default class InteractionHandler extends EventsHandler<{
         this.discordEvent.subscribe({
             next: interaction => {
                 if (isMessageComponent(interaction)) {
-                    const mod = Files.MessageCompCommands[interaction.type].get(
+                    const mod = Files.MessageCompCommands[interaction.componentType].get(
                         interaction.customId,
                     );
                     this.setState({ event: interaction, mod });
