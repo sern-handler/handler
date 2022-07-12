@@ -1,5 +1,4 @@
 import type Wrapper from './structures/wrapper';
-import { onMessageCreate } from './events/messageEvent';
 import { Err, Ok } from 'ts-results';
 import { ExternalEventEmitters } from './utilities/readFile';
 import type { EventEmitter } from 'events';
@@ -17,6 +16,7 @@ import type {
 import { SernError } from './structures/errors';
 import InteractionHandler from './events/interactionHandler';
 import ReadyHandler from './events/readyHandler';
+import MessageHandler from './events/messageHandler';
 
 /**
  *
@@ -30,7 +30,8 @@ export function init(wrapper: Wrapper) {
     }
     new ReadyHandler(wrapper);
     // onReady(wrapper);
-    onMessageCreate(wrapper);
+    //onMessageCreate(wrapper);
+    new MessageHandler(wrapper);
     new InteractionHandler(wrapper);
 }
 
