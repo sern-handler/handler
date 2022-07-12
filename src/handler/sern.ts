@@ -29,8 +29,6 @@ export function init(wrapper: Wrapper) {
         processEvents(wrapper, events);
     }
     new ReadyHandler(wrapper);
-    // onReady(wrapper);
-    //onMessageCreate(wrapper);
     new MessageHandler(wrapper);
     new InteractionHandler(wrapper);
 }
