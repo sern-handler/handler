@@ -100,7 +100,7 @@ export function executeModule(
     },
 ) {
     if (payload.res.every(el => el.ok)) {
-        return from(payload.execute() as Promise<unknown>).pipe(
+        return from(Promise.resolve(payload.execute())).pipe(
             tap(() => {
                 wrapper.sernEmitter?.emit('module.activate', {
                     type: PayloadType.Success,
