@@ -28,21 +28,14 @@
   },
   "devDependencies": {
     "eslint": "8.19.0",
-    "@typescript-eslint/parser": "5.30.5",
-    "@typescript-eslint/eslint-plugin": "5.30.5",
-    "cz-conventional-changelog": "3.3.0",
+    "@typescript-eslint/parser": "5.30.3",
+    "@typescript-eslint/eslint-plugin": "5.30.3",
     "prettier": "2.7.1",
-    "standard-version": "9.5.0",
     "typescript": "4.7.4"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/sern-handler/handler.git"
   },
-  "homepage": "https://sern-handler.js.org",
-  "config": {
-    "commitizen": {
-      "path": "cz-conventional-changelog"
-    }
-  }
+  "homepage": "https://sern-handler.js.org"
 }
