@@ -1,10 +1,11 @@
 import type { CommandModuleDefs, EventModule, Module } from '../structures/module';
-import type { CommandInteraction, MessageComponentInteraction } from 'discord.js';
 import {
     AutocompleteInteraction,
     Interaction,
     InteractionType,
     ModalSubmitInteraction,
+    type CommandInteraction,
+    type MessageComponentInteraction,
 } from 'discord.js';
 import type {
     DiscordEventCommand,

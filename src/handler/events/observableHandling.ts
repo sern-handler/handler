@@ -69,9 +69,6 @@ export function errTap<T extends Module>(cb: (err: SernError) => void) {
         });
 }
 
-export function mod$<T extends CommandType>(module: CommandModule | undefined, cmdTy: T) {
-    return of(module).pipe(filterCorrectModule(cmdTy));
-}
 //POG
 export function isOneOfCorrectModules<T extends readonly CommandType[]>(...inputs: [...T]) {
     return (src: Observable<CommandModule | undefined>) => {

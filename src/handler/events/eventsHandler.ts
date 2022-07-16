@@ -1,6 +1,5 @@
 import type Wrapper from '../structures/wrapper';
-import type { Observable } from 'rxjs';
-import { Subject } from 'rxjs';
+import { Subject, type Observable } from 'rxjs';
 
 export abstract class EventsHandler<T> {
     protected payloadSubject = new Subject<T>();
