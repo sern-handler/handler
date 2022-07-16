@@ -30,9 +30,6 @@ import type {
 } from 'discord.js';
 import { executeModule } from './observableHandling';
 
-/**
- *
- */
 export default class InteractionHandler extends EventsHandler<{
     event: Interaction;
     mod: CommandModule;
