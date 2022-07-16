@@ -2,7 +2,12 @@ import { from, fromEvent, map } from 'rxjs';
 import * as Files from '../utilities/readFile';
 import { buildData, ExternalEventEmitters } from '../utilities/readFile';
 import { controller } from '../sern';
-import type { DefinedCommandModule, DefinedEventModule, SpreadParams } from '../../types/handler';
+import type {
+    DefinedCommandModule,
+    DefinedEventModule,
+    EventInput,
+    SpreadParams,
+} from '../../types/handler';
 import type { EventModule } from '../structures/module';
 import { PayloadType } from '../structures/enums';
 import type Wrapper from '../structures/wrapper';
@@ -28,13 +33,7 @@ export function processCommandPlugins<T extends DefinedCommandModule>(
     }));
 }
 
-export function processEvents(
-    wrapper: Wrapper,
-    events:
-        | string
-        | { mod: EventModule; absPath: string }[]
-        | (() => { mod: EventModule; absPath: string }[]),
-) {
+export function processEvents(wrapper: Wrapper, events: EventInput) {
     const eventStream$ = eventObservable$(wrapper, events);
     const normalize$ = eventStream$.pipe(
         map(({ mod, absPath }) => {
@@ -59,13 +58,7 @@ export function processEvents(
     });
 }
 
-function eventObservable$(
-    { sernEmitter }: Wrapper,
-    events:
-        | string
-        | { mod: EventModule; absPath: string }[]
-        | (() => { mod: EventModule; absPath: string }[]),
-) {
+function eventObservable$({ sernEmitter }: Wrapper, events: EventInput) {
     return match(events)
         .when(Array.isArray, (arr: { mod: EventModule; absPath: string }[]) => {
             return from(arr);

@@ -1,7 +1,4 @@
 import type Wrapper from './structures/wrapper';
-import { onReady } from './events/readyEvent';
-import { onMessageCreate } from './events/messageEvent';
-import { onInteractionCreate } from './events/interactionCreate';
 import { Err, Ok } from 'ts-results';
 import { ExternalEventEmitters } from './utilities/readFile';
 import type { EventEmitter } from 'events';
@@ -17,6 +14,9 @@ import type {
     InputEventModule,
 } from './plugins/plugin';
 import { SernError } from './structures/errors';
+import InteractionHandler from './events/interactionHandler';
+import ReadyHandler from './events/readyHandler';
+import MessageHandler from './events/messageHandler';
 
 /**
  *
@@ -28,15 +28,15 @@ export function init(wrapper: Wrapper) {
     if (events !== undefined) {
         processEvents(wrapper, events);
     }
-    onReady(wrapper);
-    onMessageCreate(wrapper);
-    onInteractionCreate(wrapper);
+    new ReadyHandler(wrapper);
+    new MessageHandler(wrapper);
+    new InteractionHandler(wrapper);
 }
 
 /**
  *
  * @param emitter Any external event emitter.
- * The object will be stored in a map, and then fetched by the name of the instance's class provided.
+ * The object will be stored in a map, and then fetched by the name of the instance's class.
  * As there are infinite possibilities to adding external event emitters,
  * Most types aren't provided and are as narrow as possibly can.
  * @example
