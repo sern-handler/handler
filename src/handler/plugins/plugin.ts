@@ -171,8 +171,6 @@ export type EventModulePlugin<T extends EventType> =
     | EventModuleCommandPluginDefs[T];
 
 export type CommandModulePlugin<T extends CommandType> = EventPlugin<T> | CommandPlugin<T>;
-//TODO: I WANT BETTER TYPINGS AHHHHHHHHHHHHHHH
-// Maybe add overlaods
 
 /**
  * User inputs this type. Sern processes behind the scenes for better usage

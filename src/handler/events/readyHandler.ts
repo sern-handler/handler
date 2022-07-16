@@ -9,10 +9,9 @@ import { basename } from 'path';
 import { CommandType, PayloadType, PluginType } from '../structures/enums';
 import { processCommandPlugins } from './userDefinedEventsHandling';
 import type { Awaitable } from 'discord.js';
-import type { Result } from 'ts-results';
 import { SernError } from '../structures/errors';
 import { match } from 'ts-pattern';
-import { Err, Ok } from 'ts-results';
+import { Err, Ok, type Result } from 'ts-results';
 import { ApplicationCommandType, ComponentType } from 'discord.js';
 
 export default class ReadyHandler extends EventsHandler<{

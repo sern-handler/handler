@@ -4,8 +4,7 @@ import { join } from 'path';
 import { from, Observable } from 'rxjs';
 import type { CommandModule } from '../structures/module';
 import { SernError } from '../structures/errors';
-import type { Result } from 'ts-results';
-import { Err, Ok } from 'ts-results';
+import { Err, Ok, type Result } from 'ts-results';
 import type { EventEmitter } from 'events';
 
 //Maybe move this? this probably doesnt belong in utlities/

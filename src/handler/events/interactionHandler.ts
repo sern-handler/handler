@@ -21,9 +21,13 @@ import {
     modalCommandDispatcher,
     selectMenuCommandDispatcher,
 } from './dispatchers';
-import type { ButtonInteraction, ModalSubmitInteraction, SelectMenuInteraction } from 'discord.js';
-import type { UserContextMenuCommandInteraction } from 'discord.js';
-import type { MessageContextMenuCommandInteraction } from 'discord.js';
+import type {
+    ButtonInteraction,
+    ModalSubmitInteraction,
+    SelectMenuInteraction,
+    UserContextMenuCommandInteraction,
+    MessageContextMenuCommandInteraction,
+} from 'discord.js';
 import { executeModule } from './observableHandling';
 
 /**
