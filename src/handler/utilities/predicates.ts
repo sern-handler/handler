@@ -3,12 +3,12 @@ import {
     AutocompleteInteraction,
     Interaction,
     InteractionType,
-    ModalSubmitInteraction,
-    ChatInputCommandInteraction,
-    UserContextMenuCommandInteraction,
-    MessageContextMenuCommandInteraction,
-    SelectMenuInteraction,
-    ButtonInteraction,
+    type ModalSubmitInteraction,
+    type ButtonInteraction,
+    type SelectMenuInteraction,
+    type ChatInputCommandInteraction,
+    type UserContextMenuCommandInteraction,
+    type MessageContextMenuCommandInteraction,
 } from 'discord.js';
 import type {
     DiscordEventCommand,
