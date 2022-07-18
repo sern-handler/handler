@@ -27,7 +27,7 @@ pnpm add @sern/handler
 
 ```js
 const { Client, GatewayIntentBits } = require('discord.js');
-const { Sern } = require('sern-handler');
+const { Sern } = require('@sern/handler');
 const { defaultPrefix, token } = require('./config.json');
 
 const client = new Client({
