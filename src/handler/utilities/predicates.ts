@@ -4,8 +4,11 @@ import {
     Interaction,
     InteractionType,
     ModalSubmitInteraction,
-    type CommandInteraction,
-    type MessageComponentInteraction,
+    ChatInputCommandInteraction,
+    UserContextMenuCommandInteraction,
+    MessageContextMenuCommandInteraction,
+    SelectMenuInteraction,
+    ButtonInteraction,
 } from 'discord.js';
 import type {
     DiscordEventCommand,
@@ -23,7 +26,12 @@ export function correctModuleType<T extends keyof CommandModuleDefs>(
     return plug !== undefined && (plug.type & type) !== 0;
 }
 
-export function isApplicationCommand(interaction: Interaction): interaction is CommandInteraction {
+export function isApplicationCommand(
+    interaction: Interaction,
+): interaction is
+    | ChatInputCommandInteraction
+    | UserContextMenuCommandInteraction
+    | MessageContextMenuCommandInteraction {
     return interaction.type === InteractionType.ApplicationCommand;
 }
 
@@ -36,7 +44,7 @@ export function isAutocomplete(interaction: Interaction): interaction is Autocom
 
 export function isMessageComponent(
     interaction: Interaction,
-): interaction is MessageComponentInteraction {
+): interaction is SelectMenuInteraction | ButtonInteraction {
     return interaction.type === InteractionType.MessageComponent;
 }
 
