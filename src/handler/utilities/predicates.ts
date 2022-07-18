@@ -41,7 +41,6 @@ export function isModalSubmit(interaction: Interaction): interaction is ModalSub
 export function isAutocomplete(interaction: Interaction): interaction is AutocompleteInteraction {
     return interaction.type === InteractionType.ApplicationCommandAutocomplete;
 }
-
 export function isMessageComponent(
     interaction: Interaction,
 ): interaction is SelectMenuInteraction | ButtonInteraction {
