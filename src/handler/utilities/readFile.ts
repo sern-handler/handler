@@ -7,7 +7,7 @@ import { SernError } from '../structures/errors';
 import { Err, Ok, type Result } from 'ts-results';
 import type { EventEmitter } from 'events';
 
-//Maybe move this? this probably doesnt belong in utlities/
+//Maybe move this? this probably doesn't belong in utilities/
 export const BothCommands = new Map<string, CommandModule>();
 export const ApplicationCommands = {
     [ApplicationCommandType.User]: new Map<string, CommandModule>(),

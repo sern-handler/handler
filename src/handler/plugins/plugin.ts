@@ -7,7 +7,7 @@
  * The goal of plugins is to organize commands and
  * provide extensions to repetitive patterns
  * examples include refreshing modules,
- * categorizing commands, cooldowns, permissions, etc.
+ * categorizing commands, cool-downs, permissions, etc.
  * Plugins are reminiscent of middleware in express.
  */
 
