@@ -89,7 +89,7 @@ export default class InteractionHandler extends EventsHandler<{
 
     protected setState(state: { event: Interaction; mod: CommandModule | undefined }): void {
         if (state.mod === undefined) {
-            this.wrapper?.sernEmitter?.emit('error', SernError.UndefinedModule);
+            this.wrapper?.sernEmitter?.emit('warning', 'Found no module for this interaction');
         } else {
             //if statement above checks already, safe cast
             this.payloadSubject.next(state as { event: Interaction; mod: CommandModule });
