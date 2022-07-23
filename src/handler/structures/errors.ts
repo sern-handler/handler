@@ -15,8 +15,20 @@ export enum SernError {
      * Attempted to lookup module in command module store. Nothing was found!
      */
     MismatchModule = `A module type mismatched with event emitted!`,
+    /**
+     * Unsupported interaction at this moment.
+     */
     NotSupportedInteraction = `This interaction is not supported.`,
+    /**
+     * One plugin called `controller.stop()` (end command execution / loading)
+     */
     PluginFailure = `A plugin failed to call controller.next()`,
+    /**
+     * A crash that occurs when accessing an invalid property of Context
+     */
     MismatchEvent = `You cannot use message when an interaction fired or vice versa`,
+    /**
+     * Unsupported feature attemped to access at this time
+     */
     NotSupportedYet = `This feature is not supported yet`,
 }
