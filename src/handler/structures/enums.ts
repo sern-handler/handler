@@ -1,5 +1,15 @@
 /**
- * @enum { number };
+ * @enum { number }
+ * @example
+ * ```ts
+ * export default commandModule({
+ *     type : CommandType.Text,
+ *     name : 'a text command'
+ *     execute(message) {
+ *         console.log(message.content)
+ *     }
+ * })
+ * ```
  */
 export enum CommandType {
     /**

@@ -20,8 +20,8 @@ import MessageHandler from './events/messageHandler';
 
 /**
  *
- * @param wrapper options to pass into sern.
- *  Function to start the handler up.
+ * @param wrapper Options to pass into sern.
+ * Function to start the handler up
  */
 export function init(wrapper: Wrapper) {
     const { events } = wrapper;
@@ -40,10 +40,12 @@ export function init(wrapper: Wrapper) {
  * As there are infinite possibilities to adding external event emitters,
  * Most types aren't provided and are as narrow as possibly can.
  * @example
- * // index.ts
- * Sern.addExternal(new Level()) //Add this before initiating Sern!
- *
- * // events/level.ts
+ * ```ts title ="src/index.ts"
+ * //Add this before initiating Sern!
+ * Sern.addExternal(new Level())
+ * ```
+ * @example
+ * ```ts title ="events/level.ts"
  *  export default eventModule({
  *      emitter: 'Level',
  *      type : EventType.External,
@@ -52,7 +54,7 @@ export function init(wrapper: Wrapper) {
  *          console.log(args)
  *      }
  *  })
- *
+ * ```
  */
 export function addExternal<T extends EventEmitter>(emitter: T) {
     if (ExternalEventEmitters.has(emitter.constructor.name)) {

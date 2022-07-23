@@ -3,7 +3,7 @@ import type SernEmitter from '../sernEmitter';
 import type { EventModule } from './module';
 
 /**
- * An object to be passed into Sern.init function.
+ * An object to be passed into init function.
  * @typedef {object} Wrapper
  */
 interface Wrapper {

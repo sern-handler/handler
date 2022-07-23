@@ -28,7 +28,7 @@ export enum SernError {
      */
     MismatchEvent = `You cannot use message when an interaction fired or vice versa`,
     /**
-     * Unsupported feature attemped to access at this time
+     * Unsupported feature attempted to access at this time
      */
     NotSupportedYet = `This feature is not supported yet`,
 }
