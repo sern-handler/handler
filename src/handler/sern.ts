@@ -22,6 +22,14 @@ import MessageHandler from './events/messageHandler';
  *
  * @param wrapper Options to pass into sern.
  * Function to start the handler up
+ * @example
+ * ```ts title="src/index.ts"
+ * Sern.init({
+ *     client,
+ *     defaultPrefix: '!',
+ *     commands: 'dist/commands',
+ * })
+ * ```
  */
 export function init(wrapper: Wrapper) {
     const { events } = wrapper;
@@ -40,12 +48,12 @@ export function init(wrapper: Wrapper) {
  * As there are infinite possibilities to adding external event emitters,
  * Most types aren't provided and are as narrow as possibly can.
  * @example
- * ```ts title ="src/index.ts"
+ * ```ts title="src/index.ts"
  * //Add this before initiating Sern!
  * Sern.addExternal(new Level())
  * ```
  * @example
- * ```ts title ="events/level.ts"
+ * ```ts title="events/level.ts"
  *  export default eventModule({
  *      emitter: 'Level',
  *      type : EventType.External,

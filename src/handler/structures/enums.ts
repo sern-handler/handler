@@ -3,6 +3,7 @@
  * @example
  * ```ts
  * export default commandModule({
+ *     // highlight-next-line
  *     type : CommandType.Text,
  *     name : 'a text command'
  *     execute(message) {
@@ -48,6 +49,17 @@ export enum CommandType {
 
 /**
  * @enum { number }
+ * @example
+ * ```ts
+ * export default eventModule({
+ *     //highlight-next-line
+ *     type : EventType.Discord,
+ *     name : 'guildMemberAdd'
+ *     execute(member : GuildMember) {
+ *         console.log(member)
+ *     }
+ * })
+ * ```
  */
 export enum EventType {
     /**
@@ -67,6 +79,16 @@ export enum EventType {
 
 /**
  * @enum { number }
+ * @example
+ * ```ts
+ * export default function myPlugin() : EventPlugin<CommandType.Text> {
+ *     //highlight-next-line
+ *     type : PluginType.Event,
+ *     execute([ctx, args], controller) {
+ *         return controller.next();
+ *     }
+ * }
+ * ```
  */
 export enum PluginType {
     /**
