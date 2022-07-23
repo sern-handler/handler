@@ -40,19 +40,18 @@ export function init(wrapper: Wrapper) {
  * As there are infinite possibilities to adding external event emitters,
  * Most types aren't provided and are as narrow as possibly can.
  * @example
- * ```
- *     Sern.addExternal(new Level())
- * ```
- * ```
- *     // events/level.ts
- *      export default eventModule({
- *          emitter: 'Level',
- *          type : EventType.External,
- *          name: 'error',
- *          execute(args) {
- *              console.log(args)
- *          }
- *      })
+ * // index.ts
+ * Sern.addExternal(new Level()) //Add this before initiating Sern!
+ *
+ * // events/level.ts
+ *  export default eventModule({
+ *      emitter: 'Level',
+ *      type : EventType.External,
+ *      name: 'error',
+ *      execute(args) {
+ *          console.log(args)
+ *      }
+ *  })
  *
  */
 export function addExternal<T extends EventEmitter>(emitter: T) {
@@ -62,11 +61,18 @@ export function addExternal<T extends EventEmitter>(emitter: T) {
     ExternalEventEmitters.set(emitter.constructor.name, emitter);
 }
 
+/**
+ * The object passed into every plugin to control a command's behavior
+ */
 export const controller = {
     next: () => Ok.EMPTY,
     stop: () => Err.EMPTY,
 };
 
+/**
+ * The wrapper function to define command modules for sern
+ * @param mod
+ */
 export function commandModule(mod: InputCommandModule): CommandModule {
     const onEvent: EventPlugin[] = [];
     const plugins: CommandPlugin[] = [];
@@ -84,6 +90,10 @@ export function commandModule(mod: InputCommandModule): CommandModule {
         plugins,
     } as CommandModule;
 }
+/**
+ * The wrapper function to define event modules for sern
+ * @param mod
+ */
 export function eventModule(mod: InputEventModule): EventModule {
     const onEvent: EventModuleEventPluginDefs[EventType][] = [];
     const plugins: EventModuleCommandPluginDefs[EventType][] = [];
