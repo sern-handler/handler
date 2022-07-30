@@ -1,10 +1,11 @@
 import { ApplicationCommandType, ComponentType } from 'discord.js';
 import { readdirSync, statSync } from 'fs';
 import { join } from 'path';
-import { from, Observable } from 'rxjs';
+import  { type Observable, from, concatAll } from 'rxjs';
 import type { CommandModule } from '../structures/module';
 import { SernError } from '../structures/errors';
-import { Err, Ok, type Result } from 'ts-results';
+import tsResult, { type Result } from 'ts-results';
+const { Err, Ok  } = tsResult;
 import type { EventEmitter } from 'events';
 
 //Maybe move this? this probably doesnt belong in utlities/
@@ -63,15 +64,14 @@ export function buildData<T>(commandDir: string): Observable<
     >
 > {
     const commands = getCommands(commandDir);
-    return from(
-        commands.map(absPath => {
+    return from(Promise.all(commands.map(async absPath => {
             // eslint-disable-next-line @typescript-eslint/no-var-requires
-            const mod = <T | undefined>require(absPath).default;
+            const mod = (await import(`file:///` +absPath)).default as T | undefined;
             if (mod !== undefined) {
                 return Ok({ mod, absPath });
             } else return Err(SernError.UndefinedModule);
-        }),
-    );
+        })
+    )).pipe(concatAll());
 }
 
 export function getCommands(dir: string): string[] {

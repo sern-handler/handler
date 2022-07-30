@@ -15,7 +15,7 @@ import type {
     ExternalEventCommand,
     SernEventCommand,
 } from '../structures/events';
-import { EventType } from '../..';
+import { EventType } from '../../index';
 
 export function correctModuleType<T extends keyof CommandModuleDefs>(
     plug: Module | undefined,
