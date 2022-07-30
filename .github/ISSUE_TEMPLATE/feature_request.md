@@ -1,3 +1,11 @@
+---
+name: Feature request
+about: Ask for things that are not in sern
+title: "[Feature] Request a feature"
+labels: feature
+assignees: EvolutionX-10, jacoobes, Murtatrxx
+
+---
 Request a new feature!
 ---
 ### Is your proposal related to a problem?
