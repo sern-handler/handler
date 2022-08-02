@@ -23,6 +23,7 @@ import type {
 } from 'discord.js';
 import { isAutocomplete } from '../utilities/predicates';
 import { SernError } from '../structures/errors';
+import treeSearch from '../utilities/treeSearch';
 
 export function applicationCommandDispatcher(interaction: Interaction) {
     if (isAutocomplete(interaction)) {
@@ -41,10 +42,9 @@ export function applicationCommandDispatcher(interaction: Interaction) {
 }
 
 export function dispatchAutocomplete(interaction: AutocompleteInteraction) {
-    const choice = interaction.options.getFocused(true);
     return (mod: BothCommand | SlashCommand) => {
-        const selectedOption = mod.options?.find(o => o.autocomplete && o.name === choice.name);
-        if (selectedOption !== undefined && selectedOption.autocomplete) {
+        const selectedOption = treeSearch(interaction, mod.options);
+        if (selectedOption !== undefined) {
             return {
                 mod,
                 execute: () => selectedOption.command.execute(interaction),
