@@ -2,31 +2,11 @@ import type { Message } from 'discord.js';
 import { from, Observable, of, tap, throwError } from 'rxjs';
 import { SernError } from '../structures/errors';
 import type { Module, CommandModuleDefs, CommandModule } from '../structures/module';
-import { correctModuleType } from '../utilities/predicates';
-import type { Result } from 'ts-results';
+import type { Result } from 'ts-results-es';
 import type { CommandType } from '../structures/enums';
 import type Wrapper from '../structures/wrapper';
 import { PayloadType } from '../structures/enums';
 
-export function filterCorrectModule<T extends keyof CommandModuleDefs>(cmdType: T) {
-    return (src: Observable<Module | undefined>) =>
-        new Observable<CommandModuleDefs[T]>(subscriber => {
-            return src.subscribe({
-                next(mod) {
-                    if (mod === undefined) {
-                        return throwError(() => SernError.UndefinedModule);
-                    }
-                    if (correctModuleType(mod, cmdType)) {
-                        subscriber.next(mod!);
-                    } else {
-                        return throwError(() => SernError.MismatchModule);
-                    }
-                },
-                error: e => subscriber.error(e),
-                complete: () => subscriber.complete(),
-            });
-        });
-}
 
 export function ignoreNonBot(prefix: string) {
     return (src: Observable<Message>) =>
