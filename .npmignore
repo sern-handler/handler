@@ -1,5 +1,4 @@
 src/
-tsconfig.json
 docs/
 .gitignore
 
@@ -105,3 +104,11 @@ jest.config.ts
 CODE_OF_CONDUCT.md
 
 babel.config.js
+
+tsup.config.js
+
+tsconfig-base.json
+
+tsconfig.cjs.json
+
+tsconfig.esm.json
