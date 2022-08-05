@@ -1,6 +1,5 @@
 import type Wrapper from './structures/wrapper';
-import tsResult from 'ts-results';
-const { Err, Ok } = tsResult;
+import { Err, Ok } from 'ts-results-es';
 import { ExternalEventEmitters } from './utilities/readFile';
 import type { EventEmitter } from 'events';
 import { processEvents } from './events/userDefinedEventsHandling';

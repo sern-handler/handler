@@ -11,8 +11,7 @@ import type {
     TextBasedChannel,
     User,
 } from 'discord.js';
-import tsResult, { type Option } from 'ts-results';
-const { None, Some } = tsResult;
+import { type Option, None, Some } from 'ts-results-es';
 import type { Nullish } from '../../types/handler';
 import { ExternallyUsed } from '../utilities/externallyUsed';
 import { SernError } from './errors';

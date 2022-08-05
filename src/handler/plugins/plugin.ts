@@ -12,7 +12,7 @@
  */
 
 import type { AutocompleteInteraction, Awaitable, Client, ClientEvents } from 'discord.js';
-import type { Result, Ok, Err } from 'ts-results';
+import type { Result, Ok, Err } from 'ts-results-es';
 import type { CommandType, DefinitelyDefined, Override, SernEventsMapping } from '../../index';
 import { EventType, PluginType } from '../../index';
 import type { BaseModule, CommandModuleDefs, EventModuleDefs } from '../structures/module';
