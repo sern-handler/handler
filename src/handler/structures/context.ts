@@ -13,7 +13,6 @@ import type {
 } from 'discord.js';
 import { type Option, None, Some } from 'ts-results-es';
 import type { Nullish } from '../../types/handler';
-import { ExternallyUsed } from '../utilities/externallyUsed';
 import { SernError } from './errors';
 
 function firstSome<T>(...args: Option<T>[]): Nullish<T> {
@@ -42,7 +41,6 @@ export default class Context {
      * CommandType.Slash or the event fired in a Both command was
      * ChatInputCommandInteraction
      */
-    @ExternallyUsed
     public get message() {
         return this.oMsg.expect(SernError.MismatchEvent);
     }
@@ -51,12 +49,10 @@ export default class Context {
      * CommandType.Text or the event fired in a Both command was
      * Message
      */
-    @ExternallyUsed
     public get interaction() {
         return this.oInterac.expect(SernError.MismatchEvent);
     }
 
-    @ExternallyUsed
     public get id(): Snowflake {
         return firstSome(
             this.oInterac.map(i => i.id),
@@ -64,7 +60,6 @@ export default class Context {
         )!;
     }
 
-    @ExternallyUsed
     public get channel(): Nullish<TextBasedChannel> {
         return firstSome(
             this.oMsg.map(m => m.channel),
@@ -72,7 +67,6 @@ export default class Context {
         );
     }
 
-    @ExternallyUsed
     public get user(): User {
         return firstSome(
             this.oMsg.map(m => m.author),
@@ -80,7 +74,6 @@ export default class Context {
         )!;
     }
 
-    @ExternallyUsed
     public get createdTimestamp(): number {
         return firstSome(
             this.oMsg.map(m => m.createdTimestamp),
@@ -88,7 +81,6 @@ export default class Context {
         )!;
     }
 
-    @ExternallyUsed
     public get guild(): Guild {
         return firstSome(
             this.oMsg.map(m => m.guild),
@@ -96,7 +88,6 @@ export default class Context {
         )!;
     }
 
-    @ExternallyUsed
     public get guildId(): Snowflake {
         return firstSome(
             this.oMsg.map(m => m.guildId),
@@ -107,7 +98,6 @@ export default class Context {
     /*
      * interactions can return APIGuildMember if the guild it is emitted from is not cached
      */
-    @ExternallyUsed
     public get member(): Nullish<GuildMember | APIGuildMember> {
         return firstSome(
             this.oMsg.map(m => m.member),
@@ -115,7 +105,6 @@ export default class Context {
         );
     }
 
-    @ExternallyUsed
     public get client(): Client {
         return firstSome(
             this.oMsg.map(m => m.client),
@@ -123,7 +112,6 @@ export default class Context {
         )!;
     }
 
-    @ExternallyUsed
     public get inGuild(): boolean {
         return firstSome(
             this.oMsg.map(m => m.inGuild()),
@@ -138,12 +126,10 @@ export default class Context {
         return new Context(Some(wrappable), None);
     }
 
-    @ExternallyUsed
     public isEmpty() {
         return this.oMsg.none && this.oInterac.none;
     }
     //Make queueable
-    @ExternallyUsed
     public reply(
         content: string | Omit<InteractionReplyOptions, 'fetchReply'> | ReplyMessageOptions,
     ) {
