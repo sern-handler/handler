@@ -15,7 +15,7 @@ import type {
     ExternalEventCommand,
     SernEventCommand,
 } from '../structures/events';
-import { EventType } from '../../index';
+import { EventType } from '../..';
 
 export function correctModuleType<T extends keyof CommandModuleDefs>(
     plug: Module | undefined,
@@ -43,7 +43,7 @@ export function isAutocomplete(interaction: Interaction): interaction is Autocom
 }
 export function isMessageComponent(
     interaction: Interaction,
-): interaction is SelectMenuInteraction | ButtonInteraction {
+): interaction is ButtonInteraction | SelectMenuInteraction {
     return interaction.type === InteractionType.MessageComponent;
 }
 
