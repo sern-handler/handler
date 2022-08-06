@@ -6,7 +6,7 @@ export default defineConfig([
         format : 'esm',
         sourcemap: false,
         target: 'node16',
-        tsconfig : './tsconfig.json',
+        tsconfig : './tsconfig-esm.json',
         outDir : './dist/esm',
         platform: 'node',
         clean: true,
