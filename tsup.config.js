@@ -9,6 +9,7 @@ export default defineConfig([
         tsconfig : './tsconfig-esm.json',
         outDir : './dist/esm',
         platform: 'node',
+        external: ['discord.js'],
         clean: true,
         treeshake: true,
         outExtension() {
@@ -22,6 +23,7 @@ export default defineConfig([
         format : 'cjs',
         splitting: false,
         sourcemap: false,
+        external: ['discord.js'],
         clean: true,
         target: 'node16',
         tsconfig : './tsconfig-cjs.json',

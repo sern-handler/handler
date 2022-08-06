@@ -16,7 +16,7 @@
     "clean-modules": "rimraf node_modules/ && npm install",
     "lint": "eslint src/**/*.ts",
     "format": "eslint src/**/*.ts --fix",
-    "build": "tsup --clean && node scripts/mkjson.mjs dist/cjs dist/esm && tsup --dts-only --outDir dist",
+    "build": "tsup && node scripts/mkjson.mjs dist/cjs dist/esm && tsup --dts-only --outDir dist",
     "publish": "npm run build && npm publish"
   },
   "keywords": [
