@@ -23,7 +23,7 @@ export default function treeSearch(iAutocomplete: AutocompleteInteraction, optio
                     if(cur.name === choice.name && cur.autocomplete) {
                         return cur;
                     }
-                    return undefined;
+                        return undefined;
                 }
             } break;
         }
