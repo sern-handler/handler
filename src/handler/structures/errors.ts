@@ -6,7 +6,7 @@ export enum SernError {
      * Throws when registering an invalid module.
      * This means it is undefined or an invalid command type was provided
      */
-    NonValidModuleType = 'Detected an unknown module type',
+    InvalidModuleType = 'Detected an unknown module type',
     /**
      * Attempted to lookup module in command module store. Nothing was found!
      */

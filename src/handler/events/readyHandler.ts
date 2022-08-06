@@ -46,7 +46,7 @@ export default class ReadyHandler extends EventsHandler<{
                 if (allPluginsSuccessful) {
                     const res = registerModule(payload.mod);
                     if (res.err) {
-                        throw Error(SernError.NonValidModuleType);
+                        throw Error(SernError.InvalidModuleType);
                     }
                     wrapper.sernEmitter?.emit('module.register', {
                         type: PayloadType.Success,

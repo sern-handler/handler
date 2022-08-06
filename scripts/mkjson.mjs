@@ -1,6 +1,6 @@
 import { writeFile } from 'fs/promises'
 import { join } from 'path';
-//A quick script to regenerate package.jsons for each cjs and esm after tsup cleans distributions
+// A quick script to regenerate package.jsons for each cjs and esm after tsup cleans distributions
 const locations = process.argv;
 locations.shift();
 locations.shift();
