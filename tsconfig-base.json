@@ -1,10 +1,5 @@
 {
   "compilerOptions": {
-    "experimentalDecorators": true,
-    "resolveJsonModule": true,
-    "target": "esnext",
-    "module": "commonjs",
-    "outDir": "dist",
     "rootDir": "src",
     "strict": true,
     "esModuleInterop": true,
@@ -14,6 +9,7 @@
     "moduleResolution": "node",
     "skipLibCheck": true,
     "declaration": true,
+    "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
   },
   "exclude": ["node_modules", "dist"],

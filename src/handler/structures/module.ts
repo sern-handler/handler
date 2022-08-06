@@ -30,7 +30,6 @@ export interface BaseModule {
     execute: (ctx: Context, args: Args) => Awaitable<void | unknown>;
 }
 
-//possible refactoring types into interfaces and not types
 export type TextCommand = Override<
     BaseModule,
     {
@@ -118,7 +117,6 @@ export type ModalSubmitCommand = Override<
 // Autocomplete commands are a little different
 // They can't have command plugins as they are
 // in conjunction with chat input commands
-// TODO: possibly in future, allow Autocmp commands in separate files?
 export type AutocompleteCommand = Override<
     BaseModule,
     {
@@ -178,7 +176,7 @@ export type SernAutocompleteData = Override<
 >;
 
 /**
- * Type that just uses SernAutocompleteData and not regular autocomplete
+ * Type that replaces autocomplete with {@link SernAutocompleteData}
  */
 export type BaseOptions =
     | ApplicationCommandChoicesData

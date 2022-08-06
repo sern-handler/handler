@@ -7,14 +7,14 @@
  * The goal of plugins is to organize commands and
  * provide extensions to repetitive patterns
  * examples include refreshing modules,
- * categorizing commands, cooldowns, permissions, etc.
+ * categorizing commands, cool-downs, permissions, etc.
  * Plugins are reminiscent of middleware in express.
  */
 
 import type { AutocompleteInteraction, Awaitable, Client, ClientEvents } from 'discord.js';
-import type { Err, Ok, Result } from 'ts-results';
-import type { CommandType, DefinitelyDefined, Override, SernEventsMapping } from '../..';
-import { EventType, PluginType } from '../..';
+import type { Result, Ok, Err } from 'ts-results-es';
+import type { CommandType, DefinitelyDefined, Override, SernEventsMapping } from '../../index';
+import { EventType, PluginType } from '../../index';
 import type { BaseModule, CommandModuleDefs, EventModuleDefs } from '../structures/module';
 import type { EventEmitter } from 'events';
 import type {

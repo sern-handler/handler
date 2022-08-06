@@ -11,7 +11,7 @@ import { processCommandPlugins } from './userDefinedEventsHandling';
 import type { Awaitable } from 'discord.js';
 import { SernError } from '../structures/errors';
 import { match } from 'ts-pattern';
-import { Err, Ok, type Result } from 'ts-results';
+import { type Result, Err, Ok } from 'ts-results-es';
 import { ApplicationCommandType, ComponentType } from 'discord.js';
 
 export default class ReadyHandler extends EventsHandler<{
@@ -46,7 +46,7 @@ export default class ReadyHandler extends EventsHandler<{
                 if (allPluginsSuccessful) {
                     const res = registerModule(payload.mod);
                     if (res.err) {
-                        throw Error(SernError.NonValidModuleType);
+                        throw Error(SernError.InvalidModuleType);
                     }
                     wrapper.sernEmitter?.emit('module.register', {
                         type: PayloadType.Success,
