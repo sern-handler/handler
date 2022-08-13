@@ -31,12 +31,12 @@ pnpm add @sern/handler
 
 ## 📕 Description
 
-We desinged the framework to be powerful, customizable, batteries-included and easy to use for you to build your dream projects sooner. 
+We designed the framework to be powerful, customizable, batteries-included and easy to use for you to build your dream projects sooner. 
 
 * Support for all discord.js v14 and it's all interactions
 * Exteremely lightweight and customizable
-* Blazingly fast with SWC (https://swc.rs/)
-* With the support of a powerful cli and community made plugins
+* Blazingly fast with [SWC](https://swc.rs/)
+* With the support of a powerful cli and community-made plugins
 
 ## 👶 Basic Usage
 
