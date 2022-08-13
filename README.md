@@ -15,7 +15,7 @@
 </div>
 
 
-## Installation
+## 📜 Installation
 
 ```sh
 npm install @sern/handler
@@ -28,17 +28,28 @@ yarn add @sern/handler
 ```sh
 pnpm add @sern/handler
 ```
-```sh
-bun install @sern/handler
-```
 
-## Basic Usage
+## 📕 Description
+
+We desinged the framework to be powerful, customizable, batteries-included and easy to use for you to build your dream projects sooner. 
+
+* Support for all discord.js v14 and it's all interactions
+* Exteremely lightweight and customizable
+* Blazingly fast with SWC (https://swc.rs/)
+* With the support of a powerful cli and community made plugins
+
+## 👶 Basic Usage
 
 #### ` index.js (CommonJS)`
 
 ```js
+// Import the discord.js Client and GatewayIntentBits
 const { Client, GatewayIntentBits } = require('discord.js');
-const { Sern } = require('sern-handler');
+
+// Import Sern namespace
+const { Sern } = require('@sern/handler');
+
+// Our configuration file
 const { defaultPrefix, token } = require('./config.json');
 
 const client = new Client({
@@ -50,9 +61,9 @@ const client = new Client({
 });
 
 Sern.init({
-    client,   
-    defaultPrefix,   
-    commands : 'src/commands',
+  client,   
+  defaultPrefix,   
+  commands : 'src/commands',
 });
 
 client.login(token);
@@ -61,34 +72,35 @@ client.login(token);
 #### ` ping.js (CommonJS)`
 
 ```js
-const { Sern, CommandType } = require('@sern/handler');
+const { CommandType } = require('@sern/handler');
 
-exports.default = {
-    description: 'A ping pong command',
-    type: CommandType.Slash,
-    execute(ctx) {
-        ctx.reply('pong!');
-    }
-  };
+exports.default = commandModule({
+  name: 'ping',
+  description: 'A ping pong command',
+  type: CommandType.Slash,
+  execute(ctx) {
+    ctx.reply('pong!');
+  }
+});
 ```
 
 See our [templates](https://github.com/sern-handler/templates) for TypeScript examples and more
 
-## CLI
+## 💻 CLI
 
 It is **highly encouraged** to use the [command line interface](https://github.com/sern-handler/cli) for your project. Don't forget to view it.
 
-## Links
+## 🔗 Links
 
 - [Official Documentation](https://sern-handler.js.org)
 - [Support Server](https://discord.com/invite/mmyCTnYtbF)
 
-## Contribute
+## 👋 Contribute
 
 - Read our contribution [guidelines](https://github.com/sern-handler/handler) carefully
 - Pull up on [issues](https://github.com/sern-handler/handler/issues) and report bugs
 - All kinds of contributions are welcomed.
 
-## Roadmap
+## 🚈 Roadmap
 
 You can check our [roadmap](https://github.com/sern-handler/roadmap) to see what's going to be added or patched in the future.
