@@ -1,8 +1,8 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/sern-handler/.github/main/sern-rounded.png" width="900px">
+  <img src="https://raw.githubusercontent.com/sern-handler/.github/main/banner.png" width="900px">
 </div>
 
-<h1 align="center">sern - Handlers. Redefined.</h1>
+<h1 align="center">Handlers. Redefined.</h1>
 <h4 align="center">A customizable, batteries-included, powerful discord.js framework to streamline bot development.</h4>
 
 <div align="center" style="margin-top: 10px">
