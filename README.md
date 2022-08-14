@@ -49,8 +49,6 @@ const { Client, GatewayIntentBits } = require('discord.js');
 const { Sern } = require('@sern/handler');
 
 // Our configuration file
-const { Sern } = require('@sern/handler');
-
 const { defaultPrefix, token } = require('./config.json');
 
 const client = new Client({
