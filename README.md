@@ -35,8 +35,7 @@ pnpm add @sern/handler
 * Hybrid commands
 * lightweight and customizable
 * ESM, CommonJS and TypeScript support
-* Blazingly fast compile time with [SWC](https://swc.rs/)
-* A powerful cli and community-made plugins
+* A powerful cli and community-made awesome plugins
 
 ## 👶 Basic Usage
 
