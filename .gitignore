@@ -82,5 +82,8 @@ dist
 # VisualStudio Config file
 .vs
 
+# VSCode settings and cache
+.vscode
+
 # IntelliJ IDEA Config file
 .idea/
