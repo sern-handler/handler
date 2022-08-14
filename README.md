@@ -50,6 +50,8 @@ const { Client, GatewayIntentBits } = require('discord.js');
 const { Sern } = require('@sern/handler');
 
 // Our configuration file
+const { Sern } = require('@sern/handler');
+
 const { defaultPrefix, token } = require('./config.json');
 
 const client = new Client({
@@ -82,6 +84,16 @@ exports.default = commandModule({
     ctx.reply('pong!');
   }
 });
+
+const { Sern, CommandType } = require('@sern/handler');
+
+exports.default = commandModule({
+    description: 'A ping pong command',
+    type: CommandType.Slash,
+    execute(ctx) {
+        ctx.reply('pong!');
+    }
+  });
 ```
 
 See our [templates](https://github.com/sern-handler/templates) for TypeScript examples and more

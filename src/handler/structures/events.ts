@@ -11,6 +11,9 @@ import type {
 import type { Awaitable, ClientEvents } from 'discord.js';
 import type { EventType } from './enums';
 
+/*
+ * Mapped type to generate all sern event modules
+ */
 export type SernEventCommand<T extends keyof SernEventsMapping = keyof SernEventsMapping> =
     Override<
         BaseModule,
@@ -22,6 +25,9 @@ export type SernEventCommand<T extends keyof SernEventsMapping = keyof SernEvent
             execute(...args: SernEventsMapping[T]): Awaitable<void | unknown>;
         }
     >;
+/*
+ * Mapped type to generate all discord event modules
+ */
 export type DiscordEventCommand<T extends keyof ClientEvents = keyof ClientEvents> = Override<
     BaseModule,
     {
@@ -32,7 +38,9 @@ export type DiscordEventCommand<T extends keyof ClientEvents = keyof ClientEvent
         execute(...args: ClientEvents[T]): Awaitable<void | unknown>;
     }
 >;
-
+/*
+ * Type for any event emitter that can be handled by sern
+ */
 export type ExternalEventCommand = Override<
     BaseModule,
     {

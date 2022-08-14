@@ -1,31 +1,30 @@
 import { ApplicationCommandType, ComponentType } from 'discord.js';
 import { readdirSync, statSync } from 'fs';
 import { join } from 'path';
-import { from, Observable } from 'rxjs';
-import type { Module } from '../structures/module';
+import  { type Observable, from, concatAll } from 'rxjs';
+import type { CommandModule } from '../structures/module';
 import { SernError } from '../structures/errors';
-import type { Result } from 'ts-results';
-import { Err, Ok } from 'ts-results';
+import { type Result, Err, Ok } from 'ts-results-es';
 import type { EventEmitter } from 'events';
 
 //Maybe move this? this probably doesnt belong in utlities/
-export const BothCommands = new Map<string, Module>();
+export const BothCommands = new Map<string, CommandModule>();
 export const ApplicationCommands = {
-    [ApplicationCommandType.User]: new Map<string, Module>(),
-    [ApplicationCommandType.Message]: new Map<string, Module>(),
-    [ApplicationCommandType.ChatInput]: new Map<string, Module>(),
-} as { [K in ApplicationCommandType]: Map<string, Module> };
+    [ApplicationCommandType.User]: new Map<string, CommandModule>(),
+    [ApplicationCommandType.Message]: new Map<string, CommandModule>(),
+    [ApplicationCommandType.ChatInput]: new Map<string, CommandModule>(),
+} as { [K in ApplicationCommandType]: Map<string, CommandModule> };
 
 export const MessageCompCommands = {
-    [ComponentType.Button]: new Map<string, Module>(),
-    [ComponentType.SelectMenu]: new Map<string, Module>(),
-    [ComponentType.TextInput]: new Map<string, Module>(),
+    [ComponentType.Button]: new Map<string, CommandModule>(),
+    [ComponentType.SelectMenu]: new Map<string, CommandModule>(),
+    [ComponentType.TextInput]: new Map<string, CommandModule>(),
 };
 export const TextCommands = {
-    text: new Map<string, Module>(),
-    aliases: new Map<string, Module>(),
+    text: new Map<string, CommandModule>(),
+    aliases: new Map<string, CommandModule>(),
 };
-export const ModalSubmitCommands = new Map<string, Module>();
+export const ModalSubmitCommands = new Map<string, CommandModule>();
 /**
  * keeps all external emitters stored here
  */
@@ -63,15 +62,20 @@ export function buildData<T>(commandDir: string): Observable<
         SernError
     >
 > {
-    return from(
-        getCommands(commandDir).map(absPath => {
-            // eslint-disable-next-line @typescript-eslint/no-var-requires
-            const mod = <T | undefined>require(absPath).default;
+    const commands = getCommands(commandDir);
+    return from(Promise.all(commands.map(async absPath => {
+            let mod : T | undefined;
+            try {
+                // eslint-disable-next-line @typescript-eslint/no-var-requires
+                mod = require(absPath).default;
+            } catch {
+                mod = (await import(`file:///` +absPath)).default;
+            }
             if (mod !== undefined) {
                 return Ok({ mod, absPath });
             } else return Err(SernError.UndefinedModule);
-        }),
-    );
+        })
+    )).pipe(concatAll());
 }
 
 export function getCommands(dir: string): string[] {

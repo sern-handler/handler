@@ -1,15 +1,23 @@
 {
   "name": "@sern/handler",
-  "version": "1.1.0-beta",
+  "version": "1.0.0",
   "description": "A customizable, batteries-included, powerful discord.js framework to automate and streamline bot development.",
-  "main": "dist/index.js",
+  "main": "dist/cjs/index.cjs",
+  "module": "dist/esm/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.mjs",
+      "require": "./dist/cjs/index.cjs"
+    }
+  },
   "scripts": {
-    "compile": "tsc",
-    "watch": "tsc -w",
+    "watch": "tsup --watch --dts",
+    "clean-modules": "rimraf node_modules/ && npm install",
     "lint": "eslint src/**/*.ts",
     "format": "eslint src/**/*.ts --fix",
-    "release": "standard-version && git push --follow-tags",
-    "commit": "cz"
+    "build": "tsup && node scripts/mkjson.mjs dist/cjs dist/esm && tsup --dts-only --outDir dist",
+    "publish": "npm run build && npm publish"
   },
   "keywords": [
     "sern-handler",
@@ -23,28 +31,22 @@
   "author": "SernDevs",
   "license": "MIT",
   "dependencies": {
-    "discord.js": "^14.0.0-dev.1647259751.2297c2b",
-    "rxjs": "^7.5.5",
+    "rxjs": "^7.5.6",
     "ts-pattern": "^4.0.2",
-    "ts-results": "^3.3.0"
+    "ts-results-es": "^3.5.0"
   },
   "devDependencies": {
-    "eslint": "8.19.0",
-    "@typescript-eslint/parser": "5.30.5",
-    "@typescript-eslint/eslint-plugin": "5.30.5",
-    "cz-conventional-changelog": "3.3.0",
+    "eslint": "8.21.0",
+    "@typescript-eslint/parser": "5.32.0",
+    "@typescript-eslint/eslint-plugin": "5.32.0",
+    "discord.js": "^14.1.2",
     "prettier": "2.7.1",
-    "standard-version": "9.5.0",
+    "tsup": "^6.1.3",
     "typescript": "4.7.4"
   },
-   "repository": {
+  "repository": {
     "type": "git",
     "url": "git+https://github.com/sern-handler/handler.git"
   },
-  "homepage": "https://sern-handler.js.org",
-  "config": {
-    "commitizen": {
-      "path": "cz-conventional-changelog"
-    }
-  }
+  "homepage": "https://sern-handler.js.org"
 }

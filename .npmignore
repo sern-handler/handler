@@ -1,5 +1,4 @@
 src/
-tsconfig.json
 docs/
 .gitignore
 
@@ -9,7 +8,6 @@ logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-
 # Runtime data
 pids
 *.pid
@@ -106,4 +104,10 @@ CODE_OF_CONDUCT.md
 
 babel.config.js
 
-tests/
+tsup.config.js
+
+tsconfig-base.json
+
+tsconfig.cjs.json
+
+tsconfig.esm.json

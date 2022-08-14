@@ -1,19 +1,14 @@
 import type { CommandModuleDefs, EventModule, Module } from '../structures/module';
-import type {
-    Awaitable,
-    ButtonInteraction,
-    ChatInputCommandInteraction,
-    CommandInteraction,
-    MessageComponentInteraction,
-    MessageContextMenuCommandInteraction,
-    SelectMenuInteraction,
-    UserContextMenuCommandInteraction,
-} from 'discord.js';
 import {
     AutocompleteInteraction,
     Interaction,
     InteractionType,
-    ModalSubmitInteraction,
+    type ModalSubmitInteraction,
+    type ButtonInteraction,
+    type SelectMenuInteraction,
+    type ChatInputCommandInteraction,
+    type UserContextMenuCommandInteraction,
+    type MessageContextMenuCommandInteraction,
 } from 'discord.js';
 import type {
     DiscordEventCommand,
@@ -31,31 +26,12 @@ export function correctModuleType<T extends keyof CommandModuleDefs>(
     return plug !== undefined && (plug.type & type) !== 0;
 }
 
-export function isChatInputCommand(i: CommandInteraction): i is ChatInputCommandInteraction {
-    return i.isChatInputCommand();
-}
-
-export function isButton(i: MessageComponentInteraction): i is ButtonInteraction {
-    return i.isButton();
-}
-
-export function isSelectMenu(i: MessageComponentInteraction): i is SelectMenuInteraction {
-    return i.isSelectMenu();
-}
-
-export function isMessageCtxMenuCmd(
-    i: CommandInteraction,
-): i is MessageContextMenuCommandInteraction {
-    return i.isMessageContextMenuCommand();
-}
-
-export function isUserContextMenuCmd(
-    i: CommandInteraction,
-): i is UserContextMenuCommandInteraction {
-    return i.isUserContextMenuCommand();
-}
-
-export function isApplicationCommand(interaction: Interaction): interaction is CommandInteraction {
+export function isApplicationCommand(
+    interaction: Interaction,
+): interaction is
+    | ChatInputCommandInteraction
+    | UserContextMenuCommandInteraction
+    | MessageContextMenuCommandInteraction {
     return interaction.type === InteractionType.ApplicationCommand;
 }
 
@@ -65,16 +41,10 @@ export function isModalSubmit(interaction: Interaction): interaction is ModalSub
 export function isAutocomplete(interaction: Interaction): interaction is AutocompleteInteraction {
     return interaction.type === InteractionType.ApplicationCommandAutocomplete;
 }
-
 export function isMessageComponent(
     interaction: Interaction,
-): interaction is MessageComponentInteraction {
+): interaction is ButtonInteraction | SelectMenuInteraction {
     return interaction.type === InteractionType.MessageComponent;
-}
-
-export function isPromise<T>(promiseLike: Awaitable<T>): promiseLike is PromiseLike<T> {
-    const keys = new Set(Object.keys(promiseLike));
-    return keys.has('then') && keys.has('catch');
 }
 
 export function isDiscordEvent(el: EventModule): el is DiscordEventCommand {

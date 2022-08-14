@@ -1,8 +1,5 @@
 import type Wrapper from './structures/wrapper';
-import { onReady } from './events/readyEvent';
-import { onMessageCreate } from './events/messageEvent';
-import { onInteractionCreate } from './events/interactionCreate';
-import { Err, Ok } from 'ts-results';
+import { Err, Ok } from 'ts-results-es';
 import { ExternalEventEmitters } from './utilities/readFile';
 import type { EventEmitter } from 'events';
 import { processEvents } from './events/userDefinedEventsHandling';
@@ -17,43 +14,55 @@ import type {
     InputEventModule,
 } from './plugins/plugin';
 import { SernError } from './structures/errors';
+import InteractionHandler from './events/interactionHandler';
+import ReadyHandler from './events/readyHandler';
+import MessageHandler from './events/messageHandler';
 
 /**
  *
- * @param wrapper options to pass into sern.
- *  Function to start the handler up.
+ * @param wrapper Options to pass into sern.
+ * Function to start the handler up
+ * @example
+ * ```ts title="src/index.ts"
+ * Sern.init({
+ *     client,
+ *     defaultPrefix: '!',
+ *     commands: 'dist/commands',
+ * })
+ * ```
  */
 export function init(wrapper: Wrapper) {
     const { events } = wrapper;
     if (events !== undefined) {
         processEvents(wrapper, events);
     }
-    onReady(wrapper);
-    onMessageCreate(wrapper);
-    onInteractionCreate(wrapper);
+    new ReadyHandler(wrapper);
+    new MessageHandler(wrapper);
+    new InteractionHandler(wrapper);
 }
 
 /**
  *
  * @param emitter Any external event emitter.
- * The object will be stored in a map, and then fetched by the name of the instance's class provided.
+ * The object will be stored in a map, and then fetched by the name of the instance's class.
  * As there are infinite possibilities to adding external event emitters,
  * Most types aren't provided and are as narrow as possibly can.
  * @example
+ * ```ts title="src/index.ts"
+ * //Add this before initiating Sern!
+ * Sern.addExternal(new Level())
  * ```
- *     Sern.addExternal(new Level())
+ * @example
+ * ```ts title="events/level.ts"
+ *  export default eventModule({
+ *      emitter: 'Level',
+ *      type : EventType.External,
+ *      name: 'error',
+ *      execute(args) {
+ *          console.log(args)
+ *      }
+ *  })
  * ```
- * ```
- *     // events/level.ts
- *      export default eventModule({
- *          emitter: 'Level',
- *          type : EventType.External,
- *          name: 'error',
- *          execute(args) {
- *              console.log(args)
- *          }
- *      })
- *
  */
 export function addExternal<T extends EventEmitter>(emitter: T) {
     if (ExternalEventEmitters.has(emitter.constructor.name)) {
@@ -62,11 +71,18 @@ export function addExternal<T extends EventEmitter>(emitter: T) {
     ExternalEventEmitters.set(emitter.constructor.name, emitter);
 }
 
+/**
+ * The object passed into every plugin to control a command's behavior
+ */
 export const controller = {
     next: () => Ok.EMPTY,
     stop: () => Err.EMPTY,
 };
 
+/**
+ * The wrapper function to define command modules for sern
+ * @param mod
+ */
 export function commandModule(mod: InputCommandModule): CommandModule {
     const onEvent: EventPlugin[] = [];
     const plugins: CommandPlugin[] = [];
@@ -84,6 +100,10 @@ export function commandModule(mod: InputCommandModule): CommandModule {
         plugins,
     } as CommandModule;
 }
+/**
+ * The wrapper function to define event modules for sern
+ * @param mod
+ */
 export function eventModule(mod: InputEventModule): EventModule {
     const onEvent: EventModuleEventPluginDefs[EventType][] = [];
     const plugins: EventModuleCommandPluginDefs[EventType][] = [];
