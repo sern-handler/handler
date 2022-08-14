@@ -29,7 +29,7 @@ yarn add @sern/handler
 pnpm add @sern/handler
 ```
 
-## 📕 Some Features
+## 👀 Quick Look
 
 * Support for discord.js v14 and all interactions
 * Hybrid commands
