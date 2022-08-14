@@ -81,16 +81,6 @@ exports.default = commandModule({
     ctx.reply('pong!');
   }
 });
-
-const { Sern, CommandType } = require('@sern/handler');
-
-exports.default = commandModule({
-    description: 'A ping pong command',
-    type: CommandType.Slash,
-    execute(ctx) {
-        ctx.reply('pong!');
-    }
-  });
 ```
 
 See our [templates](https://github.com/sern-handler/templates) for TypeScript examples and more
