@@ -29,15 +29,14 @@ yarn add @sern/handler
 pnpm add @sern/handler
 ```
 
-## 📕 Description
+## 📕 Some Features
 
-We designed the framework to be powerful, customizable, batteries-included, and easy to use for you to build your dream projects sooner. 
-
-* Support for all discord.js v14 and it's all interactions
-* Exteremely lightweight and customizable
-* First class ESM, CommonJS and TypeScript support
-* Blazingly fast with [SWC](https://swc.rs/)
-* With the support of a powerful cli and community-made plugins
+* Support for discord.js v14 and all interactions
+* Hybrid commands
+* lightweight and customizable
+* ESM, CommonJS and TypeScript support
+* Blazingly fast compile time with [SWC](https://swc.rs/)
+* A powerful cli and community-made plugins
 
 ## 👶 Basic Usage
 
@@ -93,7 +92,7 @@ It is **highly encouraged** to use the [command line interface](https://github.c
 
 ## 🔗 Links
 
-- [Official Documentation](https://sern-handler.js.org)
+- [Official Documentation and Guide](https://sern-handler.js.org)
 - [Support Server](https://discord.com/invite/mmyCTnYtbF)
 
 ## 👋 Contribute
