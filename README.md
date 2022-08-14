@@ -35,7 +35,7 @@ pnpm add @sern/handler
 * Hybrid commands
 * lightweight and customizable
 * ESM, CommonJS and TypeScript support
-* A powerful cli and community-made awesome plugins
+* A powerful cli and awesome community-made plugins
 
 ## 👶 Basic Usage
 
