@@ -1,3 +1,12 @@
+import type {
+    BothCommand,
+    ButtonCommand,
+    ContextMenuMsg,
+    ContextMenuUser,
+    ModalSubmitCommand,
+    SelectMenuCommand,
+    SlashCommand,
+} from '../structures/module';
 import Context from '../structures/context';
 import type { SlashOptions } from '../../types/handler';
 import { asyncResolveArray } from '../utilities/asyncResolveArray';
@@ -16,8 +25,7 @@ import { SernError } from '../structures/errors';
 import treeSearch from '../utilities/treeSearch';
 import type {
     BothCommand,
-    ButtonCommand,
-    ContextMenuMsg,
+    ButtonCommand, ContextMenuMsg,
     ContextMenuUser,
     ModalSubmitCommand,
     SelectMenuCommand,

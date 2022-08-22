@@ -33,6 +33,7 @@ export default function treeSearch(
                         if (cur.name === choice.name && cur.autocomplete) {
                             autocompleteData = cur;
                         }
+                        return undefined;
                     }
                 }
                 break;
