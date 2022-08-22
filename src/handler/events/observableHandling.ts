@@ -1,11 +1,11 @@
 import type { Message } from 'discord.js';
 import { from, Observable, of, tap, throwError } from 'rxjs';
 import { SernError } from '../structures/errors';
-import type { Module, CommandModuleDefs, CommandModule } from '../structures/module';
 import type { Result } from 'ts-results-es';
 import type { CommandType } from '../structures/enums';
 import type Wrapper from '../structures/wrapper';
 import { PayloadType } from '../structures/enums';
+import type { CommandModule, CommandModuleDefs, Module } from '../../types/module';
 
 export function ignoreNonBot(prefix: string) {
     return (src: Observable<Message>) =>

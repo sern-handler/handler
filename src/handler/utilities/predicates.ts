@@ -1,4 +1,3 @@
-import type { CommandModuleDefs, EventModule, Module } from '../structures/module';
 import {
     AutocompleteInteraction,
     Interaction,
@@ -16,6 +15,7 @@ import type {
     SernEventCommand,
 } from '../structures/events';
 import { EventType } from '../..';
+import type { CommandModuleDefs, EventModule, Module } from '../../types/module';
 
 export function correctModuleType<T extends keyof CommandModuleDefs>(
     plug: Module | undefined,

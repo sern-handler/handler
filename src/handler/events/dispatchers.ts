@@ -1,12 +1,4 @@
-import type {
-    BothCommand,
-    ButtonCommand,
-    ContextMenuMsg,
-    ContextMenuUser,
-    ModalSubmitCommand,
-    SelectMenuCommand,
-    SlashCommand,
-} from '../structures/module';
+
 import Context from '../structures/context';
 import type { SlashOptions } from '../../types/handler';
 import { asyncResolveArray } from '../utilities/asyncResolveArray';
@@ -24,6 +16,14 @@ import type {
 import { isAutocomplete } from '../utilities/predicates';
 import { SernError } from '../structures/errors';
 import treeSearch from '../utilities/treeSearch';
+import type {
+    BothCommand,
+    ButtonCommand, ContextMenuMsg,
+    ContextMenuUser,
+    ModalSubmitCommand,
+    SelectMenuCommand,
+    SlashCommand,
+} from '../../types/module';
 
 export function applicationCommandDispatcher(interaction: Interaction) {
     if (isAutocomplete(interaction)) {

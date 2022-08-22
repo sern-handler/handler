@@ -1,4 +1,4 @@
-import type { SernOptionsData } from '../structures/module';
+import type { SernOptionsData } from '../../types/module';
 import { ApplicationCommandOptionType, AutocompleteInteraction } from 'discord.js';
 
 export default function treeSearch(
