@@ -6,7 +6,6 @@ import { executeModule, ignoreNonBot, isOneOfCorrectModules } from './observable
 import { fmt } from '../utilities/messageHelpers';
 import Context from '../structures/context';
 import * as Files from '../utilities/readFile';
-import type { TextCommand } from '../structures/module';
 import { CommandType } from '../structures/enums';
 import { asyncResolveArray } from '../utilities/asyncResolveArray';
 import { controller } from '../sern';
