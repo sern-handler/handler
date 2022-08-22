@@ -2,10 +2,10 @@ import { ApplicationCommandType, ComponentType } from 'discord.js';
 import { readdirSync, statSync } from 'fs';
 import { join } from 'path';
 import { type Observable, from, concatAll } from 'rxjs';
-import type { CommandModule } from '../structures/module';
 import { SernError } from '../structures/errors';
 import { type Result, Err, Ok } from 'ts-results-es';
 import type { EventEmitter } from 'events';
+import type { CommandModule } from '../../types/module';
 
 //Maybe move this? this probably doesnt belong in utlities/
 export const BothCommands = new Map<string, CommandModule>();

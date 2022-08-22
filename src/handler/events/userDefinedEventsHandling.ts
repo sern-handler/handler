@@ -8,13 +8,13 @@ import type {
     EventInput,
     SpreadParams,
 } from '../../types/handler';
-import type { EventModule } from '../structures/module';
 import { PayloadType } from '../structures/enums';
 import type Wrapper from '../structures/wrapper';
 import { basename } from 'path';
 import { match } from 'ts-pattern';
 import { isDiscordEvent, isSernEvent } from '../utilities/predicates';
 import { errTap } from './observableHandling';
+import type { EventModule } from '../../types/module';
 
 /**
  * Utility function to process command plugins for all Modules

@@ -9,7 +9,6 @@ import {
     isModalSubmit,
 } from '../utilities/predicates';
 import * as Files from '../utilities/readFile';
-import type { CommandModule } from '../structures/module';
 import { SernError } from '../structures/errors';
 import { CommandType, PayloadType } from '../structures/enums';
 import { match, P } from 'ts-pattern';
@@ -29,6 +28,7 @@ import type {
     MessageContextMenuCommandInteraction,
 } from 'discord.js';
 import { executeModule } from './observableHandling';
+import type { CommandModule } from '../../types/module';
 
 export default class InteractionHandler extends EventsHandler<{
     event: Interaction;

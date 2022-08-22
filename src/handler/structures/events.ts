@@ -1,5 +1,4 @@
 import type { Override, SernEventsMapping } from '../../types/handler';
-import type { BaseModule } from './module';
 import type {
     DiscordEmitterPlugin,
     DiscordEventPlugin,
@@ -10,6 +9,7 @@ import type {
 } from '../plugins/plugin';
 import type { Awaitable, ClientEvents } from 'discord.js';
 import type { EventType } from './enums';
+import type { BaseModule } from '../../types/module';
 
 /*
  * Mapped type to generate all sern event modules

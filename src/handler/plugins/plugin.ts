@@ -15,7 +15,7 @@ import type { AutocompleteInteraction, Awaitable, Client, ClientEvents } from 'd
 import type { Result, Ok, Err } from 'ts-results-es';
 import type { CommandType, DefinitelyDefined, Override, SernEventsMapping } from '../../index';
 import { EventType, PluginType } from '../../index';
-import type { BaseModule, CommandModuleDefs, EventModuleDefs } from '../structures/module';
+import type { BaseModule, CommandModuleDefs, EventModuleDefs } from '../../types/module';
 import type { EventEmitter } from 'events';
 import type {
     DiscordEventCommand,

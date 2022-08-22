@@ -7,9 +7,10 @@ import { fmt } from '../utilities/messageHelpers';
 import Context from '../structures/context';
 import * as Files from '../utilities/readFile';
 import type { TextCommand } from '../structures/module';
-import { CommandType, PayloadType } from '../structures/enums';
+import { CommandType } from '../structures/enums';
 import { asyncResolveArray } from '../utilities/asyncResolveArray';
 import { controller } from '../sern';
+import type { TextCommand } from '../../types/module';
 
 export default class MessageHandler extends EventsHandler<{
     ctx: Context;

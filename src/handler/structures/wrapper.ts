@@ -1,6 +1,6 @@
 import type { Client } from 'discord.js';
 import type SernEmitter from '../sernEmitter';
-import type { EventModule } from './module';
+import type { EventModule } from '../../types/module';
 
 /**
  * An object to be passed into Sern#init() function.
