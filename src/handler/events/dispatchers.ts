@@ -1,4 +1,3 @@
-
 import Context from '../structures/context';
 import type { SlashOptions } from '../../types/handler';
 import { asyncResolveArray } from '../utilities/asyncResolveArray';
@@ -13,12 +12,12 @@ import type {
     UserContextMenuCommandInteraction,
     MessageContextMenuCommandInteraction,
 } from 'discord.js';
-import { isAutocomplete } from '../utilities/predicates';
 import { SernError } from '../structures/errors';
 import treeSearch from '../utilities/treeSearch';
 import type {
     BothCommand,
-    ButtonCommand, ContextMenuMsg,
+    ButtonCommand,
+    ContextMenuMsg,
     ContextMenuUser,
     ModalSubmitCommand,
     SelectMenuCommand,
@@ -26,7 +25,7 @@ import type {
 } from '../../types/module';
 
 export function applicationCommandDispatcher(interaction: Interaction) {
-    if (isAutocomplete(interaction)) {
+    if (interaction.isAutocomplete()) {
         return dispatchAutocomplete(interaction);
     } else {
         const ctx = Context.wrap(interaction as ChatInputCommandInteraction);
