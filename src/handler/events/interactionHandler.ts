@@ -2,12 +2,6 @@ import type { Interaction } from 'discord.js';
 import { concatMap, from, fromEvent, map, Observable } from 'rxjs';
 import type Wrapper from '../structures/wrapper';
 import { EventsHandler } from './eventsHandler';
-import {
-    isApplicationCommand,
-    isAutocomplete,
-    isMessageComponent,
-    isModalSubmit,
-} from '../utilities/predicates';
 import * as Files from '../utilities/readFile';
 import { SernError } from '../structures/errors';
 import { CommandType } from '../structures/enums';
@@ -60,15 +54,15 @@ export default class InteractionHandler extends EventsHandler<{
     override init() {
         this.discordEvent.subscribe({
             next: event => {
-                if (isMessageComponent(event)) {
+                if (event.isMessageComponent()) {
                     const mod = Files.MessageCompCommands[event.componentType].get(event.customId);
                     this.setState({ event, mod });
-                } else if (isApplicationCommand(event) || isAutocomplete(event)) {
+                } else if (event.isCommand() || event.isAutocomplete()) {
                     const mod =
                         Files.ApplicationCommands[event.commandType].get(event.commandName) ??
                         Files.BothCommands.get(event.commandName);
                     this.setState({ event, mod });
-                } else if (isModalSubmit(event)) {
+                } else if (event.isModalSubmit()) {
                     /**
                      * maybe move modal submits into message component object maps?
                      */
