@@ -47,6 +47,6 @@ export type Payload =
 export type SernEventsMapping = {
     ['module.register']: [Payload];
     ['module.activate']: [Payload];
-    ['error']: [message: Error | string, root ?: Module];
+    ['error']: [message: Error | string, root?: Module];
     ['warning']: [string];
 };
