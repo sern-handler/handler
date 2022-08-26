@@ -2,7 +2,7 @@ import type { Client } from 'discord.js';
 import type SernEmitter from '../sernEmitter';
 import type { EventModule } from '../../types/module';
 import type Logging from '../contracts/logging';
-import type ModuleManager from '../contracts/moduleManager';
+import type { ModuleConfig } from '../contracts/moduleManager';
 
 /**
  * An object to be passed into Sern#init() function.
@@ -19,7 +19,7 @@ interface Wrapper {
         | (() => { mod: EventModule; absPath: string }[]);
     readonly plugins ?: {
         logging ?: Logging;
-        moduleManager ?: ModuleManager;
+        moduleManager ?: ModuleConfig;
     }
 }
 
