@@ -3,7 +3,7 @@ import { Err, Ok } from 'ts-results-es';
 import { ExternalEventEmitters } from './utilities/readFile';
 import type { EventEmitter } from 'events';
 import { processEvents } from './events/userDefinedEventsHandling';
-import { EventType, PluginType } from './structures/enums';
+import { CommandType, EventType, PluginType } from './structures/enums';
 import type {
     CommandPlugin,
     EventModuleCommandPluginDefs,
@@ -17,6 +17,9 @@ import InteractionHandler from './events/interactionHandler';
 import ReadyHandler from './events/readyHandler';
 import MessageHandler from './events/messageHandler';
 import type { CommandModule, EventModule } from '../types/module';
+import type { ModuleStore } from './structures/moduleStore';
+import type { Client } from 'discord.js';
+import type { ModuleConfig, ModuleManagerConstructor } from './contracts/moduleManager';
 
 /**
  *
@@ -118,4 +121,11 @@ export function eventModule(mod: InputEventModule): EventModule {
         onEvent,
         plugins,
     } as EventModule;
+}
+
+export function ModuleConfiguration<T extends ModuleStore>(
+    moduleManager : ModuleManagerConstructor<T>,
+    moduleStore: T,
+) : ModuleConfig<T> {
+    return ( client: Client ) => new moduleManager(client, moduleStore);
 }
