@@ -1,5 +1,5 @@
 import { EventsHandler } from './eventsHandler';
-import { concatMap, from, fromEvent, map, Observable, of, switchMap } from 'rxjs';
+import { catchError, concatMap, from, fromEvent, map, Observable, of, switchMap } from 'rxjs';
 import type Wrapper from '../structures/wrapper';
 import type { Message } from 'discord.js';
 import { executeModule, ignoreNonBot, isOneOfCorrectModules } from './observableHandling';
@@ -36,12 +36,12 @@ export default class MessageHandler extends EventsHandler<{
                     return from(res).pipe(map(res => ({ mod, execute, res })));
                 }),
                 concatMap(payload => executeModule(wrapper, payload)),
-            )
-            .subscribe({
-                error: err => {
+                catchError((err, caught) => {
                     wrapper.sernEmitter?.emit('error', err);
-                },
-            });
+                    return caught;
+                })
+            )
+            .subscribe();
     }
 
     protected init(): void {
@@ -61,12 +61,12 @@ export default class MessageHandler extends EventsHandler<{
                             Files.TextCommands.aliases.get(prefix),
                     };
                 }),
-                concatMap(element => {
-                    return of(element.mod).pipe(
+                concatMap(element => of(element.mod)
+                    .pipe(
                         isOneOfCorrectModules(CommandType.Text),
-                        map(mod => ({ ...element, mod })),
-                    );
-                }),
+                        map(mod => ({ ...element, mod }))
+                    )
+                ),
             )
             .subscribe({
                 next: value => this.setState(value),

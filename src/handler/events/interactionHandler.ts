@@ -1,5 +1,12 @@
 import type { Interaction } from 'discord.js';
-import { concatMap, from, fromEvent, map, Observable } from 'rxjs';
+import {
+    catchError,
+    concatMap,
+    from,
+    fromEvent,
+    map,
+    Observable,
+} from 'rxjs';
 import type Wrapper from '../structures/wrapper';
 import { EventsHandler } from './eventsHandler';
 import {
@@ -49,12 +56,12 @@ export default class InteractionHandler extends EventsHandler<{
                     return from(eventPluginRes).pipe(map(res => ({ mod, res, execute })));
                 }),
                 concatMap(payload => executeModule(wrapper, payload)),
-            )
-            .subscribe({
-                error: err => {
+                catchError((err, caught) => {
                     wrapper.sernEmitter?.emit('error', err);
-                },
-            });
+                    return caught;
+                })
+            )
+            .subscribe();
     }
 
     override init() {
