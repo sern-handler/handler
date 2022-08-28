@@ -7,12 +7,12 @@ import type { ModuleStore } from '../structures/moduleStore';
 import type { Client } from 'discord.js';
 
 export abstract class ModuleManager<T extends ModuleStore = ModuleStore> {
-     constructor(
+    constructor(
         protected readonly _client: Client,
         protected readonly _moduleStore : T
     ) {}
     protected abstract getModule<T extends CommandType>(type: T, name: string) : CommandModuleDefs[T] | undefined
-    protected abstract setModule<T extends CommandType>(type : T, value: CommandModule) : void
+    protected abstract setModule<T extends CommandType>(type : T, value: Required<CommandModule>) : void
 }
 
 export interface ModuleManagerConstructor<T extends ModuleStore> {
