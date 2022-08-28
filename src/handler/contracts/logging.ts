@@ -1,6 +1,7 @@
 import type { SernEventsMapping } from '../../types/handler';
+import type { Client } from 'discord.js';
 
-interface Logging {
+export interface Logging {
 
     error(...payload : SernEventsMapping['error']) : void;
     warning(...payload : SernEventsMapping['warning']) : void;
@@ -8,5 +9,6 @@ interface Logging {
     moduleRegister(...register : SernEventsMapping['module.register']) : void;
 
 }
-
-export default Logging;
+export interface LoggingConstructor {
+    new(client: Client) : Logging
+}

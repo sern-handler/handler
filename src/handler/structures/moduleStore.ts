@@ -33,7 +33,7 @@ export class ModuleStore {
     /**
      *
      * @param appType
-     * Resolves the current map with the application type, good for resolving dynamically
+     * Resolves the current map with an ApplicationCommandType
      */
      resolveApplicationCommandMap(appType: ApplicationCommandType) {
          return this.ApplicationCommands[appType];
@@ -51,7 +51,7 @@ export class ModuleStore {
     /**
      *
      * @param type
-     * Resolves the map with a CommandType or 'Events', for EventEmitters
+     * Resolves the map with a CommandType
      */
      resolveMap<T extends CommandType>(type: T)  {
         return match(type as CommandType)
