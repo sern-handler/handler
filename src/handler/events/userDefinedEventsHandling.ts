@@ -1,4 +1,4 @@
-import { catchError, from, fromEvent, map } from 'rxjs';
+import { from, fromEvent, map } from 'rxjs';
 import * as Files from '../utilities/readFile';
 import { buildData, ExternalEventEmitters } from '../utilities/readFile';
 import { controller } from '../sern';
@@ -55,12 +55,6 @@ export function processEvents(wrapper: Wrapper, events: EventInput) {
         }
         //Would add sern event emitter for events loaded, attached onto sern emitter, but could lead to unwanted behavior!
         fromEvent(emitter, e.name, e.execute as SpreadParams<typeof e.execute>)
-            .pipe(
-              catchError((reason, caught) => {
-                  wrapper.sernEmitter?.emit('error', { type: PayloadType.Failure, module: e, reason });
-                  return caught;
-              })
-            )
         .subscribe();
     });
 }
