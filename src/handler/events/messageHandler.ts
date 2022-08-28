@@ -7,7 +7,7 @@ import { fmt } from '../utilities/messageHelpers';
 import Context from '../structures/context';
 import * as Files from '../utilities/readFile';
 import type { TextCommand } from '../structures/module';
-import { CommandType } from '../structures/enums';
+import { CommandType, PayloadType } from '../structures/enums';
 import { asyncResolveArray } from '../utilities/asyncResolveArray';
 import { controller } from '../sern';
 
@@ -70,7 +70,7 @@ export default class MessageHandler extends EventsHandler<{
             )
             .subscribe({
                 next: value => this.setState(value),
-                error: err => this.wrapper.sernEmitter?.emit('error', err),
+                error: reason => this.wrapper.sernEmitter?.emit('error', { type: PayloadType.Failure, reason }),
             });
     }
 

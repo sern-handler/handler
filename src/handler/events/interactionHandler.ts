@@ -18,7 +18,7 @@ import {
 import * as Files from '../utilities/readFile';
 import type { CommandModule } from '../structures/module';
 import { SernError } from '../structures/errors';
-import { CommandType } from '../structures/enums';
+import { CommandType, PayloadType } from '../structures/enums';
 import { match, P } from 'ts-pattern';
 import {
     applicationCommandDispatcher,
@@ -88,8 +88,8 @@ export default class InteractionHandler extends EventsHandler<{
                     throw Error('This interaction is not supported yet');
                 }
             },
-            error: e => {
-                this.wrapper.sernEmitter?.emit('error', e);
+            error: reason => {
+                this.wrapper.sernEmitter?.emit('error', { type: PayloadType.Failure, reason });
             },
         });
     }
