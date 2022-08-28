@@ -49,7 +49,7 @@ export type DefinedCommandModule = DefinitelyDefined<CommandModule, 'name' | 'de
 export type DefinedEventModule = DefinitelyDefined<EventModule, 'name' | 'description'>;
 export type Payload =
     | { type: PayloadType.Success; module: Module }
-    | { type: PayloadType.Failure; module: Module | undefined; reason: string | Error };
+    | { type: PayloadType.Failure; module?: Module; reason: string | Error };
 export type SernEventsMapping = {
     ['module.register']: [Payload];
     ['module.activate']: [Payload];
