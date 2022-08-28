@@ -1,7 +1,7 @@
 import { ApplicationCommandType, ComponentType } from 'discord.js';
 import { readdirSync, statSync } from 'fs';
 import { join } from 'path';
-import  { type Observable, from, concatAll } from 'rxjs';
+import { type Observable, from, concatAll } from 'rxjs';
 import type { CommandModule } from '../structures/module';
 import { SernError } from '../structures/errors';
 import { type Result, Err, Ok } from 'ts-results-es';
@@ -63,19 +63,22 @@ export function buildData<T>(commandDir: string): Observable<
     >
 > {
     const commands = getCommands(commandDir);
-    return from(Promise.all(commands.map(async absPath => {
-            let mod : T | undefined;
-            try {
-                // eslint-disable-next-line @typescript-eslint/no-var-requires
-                mod = require(absPath).default;
-            } catch {
-                mod = (await import(`file:///` +absPath)).default;
-            }
-            if (mod !== undefined) {
-                return Ok({ mod, absPath });
-            } else return Err(SernError.UndefinedModule);
-        })
-    )).pipe(concatAll());
+    return from(
+        Promise.all(
+            commands.map(async absPath => {
+                let mod: T | undefined;
+                try {
+                    // eslint-disable-next-line @typescript-eslint/no-var-requires
+                    mod = require(absPath).default;
+                } catch {
+                    mod = (await import(`file:///` + absPath)).default;
+                }
+                if (mod !== undefined) {
+                    return Ok({ mod, absPath });
+                } else return Err(SernError.UndefinedModule);
+            }),
+        ),
+    ).pipe(concatAll());
 }
 
 export function getCommands(dir: string): string[] {

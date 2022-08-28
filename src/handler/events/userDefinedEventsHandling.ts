@@ -54,8 +54,7 @@ export function processEvents(wrapper: Wrapper, events: EventInput) {
             throw new Error(`Cannot find event emitter as it is undefined`);
         }
         //Would add sern event emitter for events loaded, attached onto sern emitter, but could lead to unwanted behavior!
-        fromEvent(emitter, e.name, e.execute as SpreadParams<typeof e.execute>)
-        .subscribe();
+        fromEvent(emitter, e.name, e.execute as SpreadParams<typeof e.execute>).subscribe();
     });
 }
 

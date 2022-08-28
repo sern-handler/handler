@@ -7,7 +7,6 @@ import type { CommandType } from '../structures/enums';
 import type Wrapper from '../structures/wrapper';
 import { PayloadType } from '../structures/enums';
 
-
 export function ignoreNonBot(prefix: string) {
     return (src: Observable<Message>) =>
         new Observable<Message>(subscriber => {
@@ -81,24 +80,27 @@ export function executeModule(
 ) {
     if (payload.res.every(el => el.ok)) {
         const executeFn = Result.wrapAsync<unknown, Error | string>(() =>
-            Promise.resolve(payload.execute())
+            Promise.resolve(payload.execute()),
         );
         return from(executeFn).pipe(
             concatMap(res => {
-                if(res.err) {
-                    return throwError(() => ({ type: PayloadType.Failure, reason: res.val, module: payload.mod }));
+                if (res.err) {
+                    return throwError(() => ({
+                        type: PayloadType.Failure,
+                        reason: res.val,
+                        module: payload.mod,
+                    }));
                 }
                 return of(res.val).pipe(
                     tap(() =>
                         wrapper.sernEmitter?.emit('module.activate', {
                             type: PayloadType.Success,
                             module: payload.mod,
-                        })
-                    )
+                        }),
+                    ),
                 );
-            })
+            }),
         );
-
     } else {
         wrapper.sernEmitter?.emit('module.activate', {
             type: PayloadType.Failure,

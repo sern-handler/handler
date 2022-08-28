@@ -39,7 +39,7 @@ export default class MessageHandler extends EventsHandler<{
                 catchError((err, caught) => {
                     wrapper.sernEmitter?.emit('error', err);
                     return caught;
-                })
+                }),
             )
             .subscribe();
     }
@@ -61,16 +61,17 @@ export default class MessageHandler extends EventsHandler<{
                             Files.TextCommands.aliases.get(prefix),
                     };
                 }),
-                concatMap(element => of(element.mod)
-                    .pipe(
+                concatMap(element =>
+                    of(element.mod).pipe(
                         isOneOfCorrectModules(CommandType.Text),
-                        map(mod => ({ ...element, mod }))
-                    )
+                        map(mod => ({ ...element, mod })),
+                    ),
                 ),
             )
             .subscribe({
                 next: value => this.setState(value),
-                error: reason => this.wrapper.sernEmitter?.emit('error', { type: PayloadType.Failure, reason }),
+                error: reason =>
+                    this.wrapper.sernEmitter?.emit('error', { type: PayloadType.Failure, reason }),
             });
     }
 
