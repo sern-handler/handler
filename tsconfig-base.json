@@ -1,17 +1,17 @@
 {
-  "compilerOptions": {
-    "rootDir": "src",
-    "strict": true,
-    "esModuleInterop": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
-    "importsNotUsedAsValues": "error",
-    "moduleResolution": "node",
-    "skipLibCheck": true,
-    "declaration": true,
-    "allowSyntheticDefaultImports": true,
-    "forceConsistentCasingInFileNames": true,
-  },
-  "exclude": ["node_modules", "dist"],
-  "include": ["src"],
+    "compilerOptions": {
+        "rootDir": "src",
+        "strict": true,
+        "esModuleInterop": true,
+        "noImplicitAny": true,
+        "strictNullChecks": true,
+        "importsNotUsedAsValues": "error",
+        "moduleResolution": "node",
+        "skipLibCheck": true,
+        "declaration": true,
+        "allowSyntheticDefaultImports": true,
+        "forceConsistentCasingInFileNames": true
+    },
+    "exclude": ["node_modules", "dist"],
+    "include": ["src"]
 }
