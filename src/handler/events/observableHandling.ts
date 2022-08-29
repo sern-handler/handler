@@ -1,7 +1,6 @@
 import type { Message } from 'discord.js';
 import { concatMap, from, Observable, of, tap, throwError } from 'rxjs';
 import { SernError } from '../structures/errors';
-import type { Module, CommandModuleDefs, CommandModule } from '../structures/module';
 import { Result } from 'ts-results-es';
 import type { CommandType } from '../structures/enums';
 import type Wrapper from '../structures/wrapper';
