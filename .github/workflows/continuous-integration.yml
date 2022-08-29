@@ -39,10 +39,3 @@ jobs:
           title: "stlye: pretty please"
           body: "pretty pretty prettier"
           reviewers: EvolutionX-10
-      - name: Enable Pull Request Automerge
-        if: steps.cpr.outputs.pull-request-operation == 'created'
-        uses: peter-evans/enable-pull-request-automerge@v2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          pull-request-number: ${{ steps.cpr.outputs.pull-request-number }}
-          merge-method: squash
