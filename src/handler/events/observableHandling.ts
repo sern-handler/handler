@@ -7,7 +7,6 @@ import type { CommandType } from '../structures/enums';
 import type Wrapper from '../structures/wrapper';
 import { PayloadType } from '../structures/enums';
 
-
 export function ignoreNonBot(prefix: string) {
     return (src: Observable<Message>) =>
         new Observable<Message>(subscriber => {
