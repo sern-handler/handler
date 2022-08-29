@@ -3,36 +3,36 @@ import { defineConfig } from 'tsup';
 export default defineConfig([
     {
         entry: ['src/index.ts'],
-        format : 'esm',
+        format: 'esm',
         sourcemap: false,
         target: 'node16',
-        tsconfig : './tsconfig-esm.json',
-        outDir : './dist/esm',
+        tsconfig: './tsconfig-esm.json',
+        outDir: './dist/esm',
         platform: 'node',
         external: ['discord.js'],
         clean: true,
         treeshake: true,
         outExtension() {
             return {
-                js : '.mjs'
+                js: '.mjs',
             };
-        }
+        },
     },
     {
         entry: ['src/index.ts'],
-        format : 'cjs',
+        format: 'cjs',
         splitting: false,
         sourcemap: false,
         external: ['discord.js'],
         clean: true,
         target: 'node16',
-        tsconfig : './tsconfig-cjs.json',
-        outDir : './dist/cjs',
+        tsconfig: './tsconfig-cjs.json',
+        outDir: './dist/cjs',
         platform: 'node',
         outExtension() {
             return {
-                js : '.cjs'
+                js: '.cjs',
             };
-        }
-    }
+        },
+    },
 ]);
