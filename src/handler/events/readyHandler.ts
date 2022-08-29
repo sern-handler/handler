@@ -3,7 +3,6 @@ import type Wrapper from '../structures/wrapper';
 import { concatMap, fromEvent, Observable, map, take, of, from, toArray, switchMap } from 'rxjs';
 import * as Files from '../utilities/readFile';
 import { errTap } from './observableHandling';
-import type { DefinedCommandModule } from '../../types/handler';
 import { basename } from 'path';
 import { CommandType, PayloadType, PluginType } from '../structures/enums';
 import { processCommandPlugins } from './userDefinedEventsHandling';
@@ -13,6 +12,7 @@ import { match } from 'ts-pattern';
 import { type Result, Err, Ok } from 'ts-results-es';
 import { ApplicationCommandType, ComponentType } from 'discord.js';
 import type { CommandModule } from '../../types/module';
+import type { DefinedCommandModule } from '../../types/handler';
 
 export default class ReadyHandler extends EventsHandler<{
     mod: DefinedCommandModule;
