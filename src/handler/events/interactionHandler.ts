@@ -61,15 +61,12 @@ export default class InteractionHandler extends EventsHandler<{
         this.discordEvent.subscribe({
             next: event => {
                 if (isMessageComponent(event)) {
-                    const mod = Files.MessageCompCommands[event.componentType].get(
-                        event.customId,
-                    );
+                    const mod = Files.MessageCompCommands[event.componentType].get(event.customId);
                     this.setState({ event, mod });
                 } else if (isApplicationCommand(event) || isAutocomplete(event)) {
                     const mod =
-                        Files.ApplicationCommands[event.commandType].get(
-                            event.commandName,
-                        ) ?? Files.BothCommands.get(event.commandName);
+                        Files.ApplicationCommands[event.commandType].get(event.commandName) ??
+                        Files.BothCommands.get(event.commandName);
                     this.setState({ event, mod });
                 } else if (isModalSubmit(event)) {
                     /**
@@ -106,10 +103,7 @@ export default class InteractionHandler extends EventsHandler<{
                 { type: CommandType.Modal },
                 modalCommandDispatcher(event as ModalSubmitInteraction),
             )
-            .with(
-                { type: CommandType.Button },
-                buttonCommandDispatcher(event as ButtonInteraction),
-            )
+            .with({ type: CommandType.Button }, buttonCommandDispatcher(event as ButtonInteraction))
             .with(
                 { type: CommandType.MenuSelect },
                 selectMenuCommandDispatcher(event as SelectMenuInteraction),
