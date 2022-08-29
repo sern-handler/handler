@@ -36,6 +36,6 @@ jobs:
           branch: prettier
           delete-branch: true
           branch-suffix: short-commit-hash
-          title: "stlye: pretty please"
+          title: "style: pretty please"
           body: "pretty pretty prettier"
           reviewers: EvolutionX-10
