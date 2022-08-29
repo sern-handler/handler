@@ -4,7 +4,10 @@ on:
   # Trigger the workflow on push or pull request or custom
   push:
     branches:
+      main
   pull_request_target:
+    branches:
+      main
   workflow_dispatch:
 
 jobs:
@@ -36,6 +39,6 @@ jobs:
           branch: prettier
           delete-branch: true
           branch-suffix: short-commit-hash
-          title: "style: pretty please"
+          title: "stlye: pretty please"
           body: "pretty pretty prettier"
           reviewers: EvolutionX-10
