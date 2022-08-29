@@ -1,6 +1,7 @@
 import type { CommandInteractionOptionResolver } from 'discord.js';
 import type { PayloadType } from '../handler/structures/enums';
 import type { CommandModule, EventModule, Module } from './module';
+import type { Logging } from '../handler/contracts/logging';
 export type Nullish<T> = T | undefined | null;
 
 // Thanks to @kelsny
@@ -50,3 +51,12 @@ export type SernEventsMapping = {
     ['error']: [Payload];
     ['warning']: [string];
 };
+export interface ScopedPlugin {
+    init(dependencies: Map<string, ScopedPlugin>) : void
+}
+type DependencyMap = {
+    logger : Logging;
+    db :  '';
+    errorHandling: '';
+    moduleManager : '';
+}
