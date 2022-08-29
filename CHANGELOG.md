@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.1.0](https://github.com/sern-handler/handler/compare/v1.0.0...v1.1.0) (2022-08-29)
+
+
+### Features
+
+* add proper error handling ([#115](https://github.com/sern-handler/handler/issues/115)) ([395549c](https://github.com/sern-handler/handler/commit/395549c173cb62a18205e451bf2cb5579ba9a6e0))
+
+
+### Miscellaneous Chores
+
+* release 1.1.0 ([8a373de](https://github.com/sern-handler/handler/commit/8a373de880ff18df85af812adf9f6f6a4f45028d))
+
 ## 1.0.0 (2022-08-15)
 
 
