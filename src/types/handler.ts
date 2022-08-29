@@ -1,6 +1,6 @@
 import type { CommandInteractionOptionResolver } from 'discord.js';
+import type { CommandModule, EventModule, Module } from '../handler/structures/module';
 import type { PayloadType } from '../handler/structures/enums';
-import type { CommandModule, EventModule, Module } from './module';
 export type Nullish<T> = T | undefined | null;
 
 // Thanks to @kelsny
