@@ -1,5 +1,5 @@
 import type { Interaction } from 'discord.js';
-import { concatMap, from, fromEvent, map, Observable } from 'rxjs';
+import { catchError, concatMap, from, fromEvent, map, Observable } from 'rxjs';
 import type Wrapper from '../structures/wrapper';
 import { EventsHandler } from './eventsHandler';
 import {
@@ -11,7 +11,7 @@ import {
 import * as Files from '../utilities/readFile';
 import type { CommandModule } from '../structures/module';
 import { SernError } from '../structures/errors';
-import { CommandType } from '../structures/enums';
+import { CommandType, PayloadType } from '../structures/enums';
 import { match, P } from 'ts-pattern';
 import {
     applicationCommandDispatcher,
@@ -49,12 +49,12 @@ export default class InteractionHandler extends EventsHandler<{
                     return from(eventPluginRes).pipe(map(res => ({ mod, res, execute })));
                 }),
                 concatMap(payload => executeModule(wrapper, payload)),
-            )
-            .subscribe({
-                error: err => {
+                catchError((err, caught) => {
                     wrapper.sernEmitter?.emit('error', err);
-                },
-            });
+                    return caught;
+                }),
+            )
+            .subscribe();
     }
 
     override init() {
@@ -78,8 +78,8 @@ export default class InteractionHandler extends EventsHandler<{
                     throw Error('This interaction is not supported yet');
                 }
             },
-            error: e => {
-                this.wrapper.sernEmitter?.emit('error', e);
+            error: reason => {
+                this.wrapper.sernEmitter?.emit('error', { type: PayloadType.Failure, reason });
             },
         });
     }

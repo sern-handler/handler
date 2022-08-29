@@ -1,8 +1,8 @@
 import type { Message } from 'discord.js';
-import { from, Observable, of, tap, throwError } from 'rxjs';
+import { concatMap, from, Observable, of, tap, throwError } from 'rxjs';
 import { SernError } from '../structures/errors';
 import type { Module, CommandModuleDefs, CommandModule } from '../structures/module';
-import type { Result } from 'ts-results-es';
+import { Result } from 'ts-results-es';
 import type { CommandType } from '../structures/enums';
 import type Wrapper from '../structures/wrapper';
 import { PayloadType } from '../structures/enums';
@@ -79,12 +79,26 @@ export function executeModule(
     },
 ) {
     if (payload.res.every(el => el.ok)) {
-        return from(Promise.resolve(payload.execute())).pipe(
-            tap(() => {
-                wrapper.sernEmitter?.emit('module.activate', {
-                    type: PayloadType.Success,
-                    module: payload.mod,
-                });
+        const executeFn = Result.wrapAsync<unknown, Error | string>(() =>
+            Promise.resolve(payload.execute()),
+        );
+        return from(executeFn).pipe(
+            concatMap(res => {
+                if (res.err) {
+                    return throwError(() => ({
+                        type: PayloadType.Failure,
+                        reason: res.val,
+                        module: payload.mod,
+                    }));
+                }
+                return of(res.val).pipe(
+                    tap(() =>
+                        wrapper.sernEmitter?.emit('module.activate', {
+                            type: PayloadType.Success,
+                            module: payload.mod,
+                        }),
+                    ),
+                );
             }),
         );
     } else {
@@ -93,6 +107,6 @@ export function executeModule(
             module: payload.mod,
             reason: SernError.PluginFailure,
         });
-        return of(null);
+        return of(undefined);
     }
 }
