@@ -55,7 +55,9 @@ export type SernEventsMapping = {
 };
 
 
-export type ScopedPlugin = (dependencies: Map<string, ScopedPlugin>) => void
+export interface ScopedPlugin {
+   init (dependencies: Map<string, ScopedPlugin>) : void
+}
 
 type DependencyMap = {
     logger : Logging;
