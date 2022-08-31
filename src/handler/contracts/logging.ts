@@ -1,14 +1,13 @@
 import type { SernEventsMapping } from '../../types/handler';
-import type { Client } from 'discord.js';
+import type { ScopedPlugin } from '../../types/handler';
 
-export interface Logging {
-
+export interface Logging extends ScopedPlugin {
     error(...payload : SernEventsMapping['error']) : void;
     warning(...payload : SernEventsMapping['warning']) : void;
     moduleActivate(...warning : SernEventsMapping['module.activate']) : void;
     moduleRegister(...register : SernEventsMapping['module.register']) : void;
-
 }
+
 export interface LoggingConstructor {
-    new(client: Client) : Logging
+    new() : Logging
 }
