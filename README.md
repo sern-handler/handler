@@ -71,7 +71,7 @@ client.login(token);
 #### ` ping.js (CommonJS)`
 
 ```js
-const { CommandType } = require('@sern/handler');
+const { CommandType, commandModule } = require('@sern/handler');
 
 exports.default = commandModule({
   name: 'ping',
