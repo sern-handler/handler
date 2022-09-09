@@ -1,2 +1,3 @@
-
-export default <T> (value: T) => () => value;
+export default <T>(value: T) =>
+    () =>
+        value;
