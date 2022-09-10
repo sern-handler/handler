@@ -73,6 +73,11 @@ export function buildData<T>(commandDir: string): Observable<
                 } catch {
                     mod = (await import(`file:///` + absPath)).default;
                 }
+                
+                try {
+                    mod = new mod();
+                } catch {}
+                
                 if (mod !== undefined) {
                     return Ok({ mod, absPath });
                 } else return Err(SernError.UndefinedModule);
