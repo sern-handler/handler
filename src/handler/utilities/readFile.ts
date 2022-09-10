@@ -75,7 +75,7 @@ export function buildData<T>(commandDir: string): Observable<
                 }
                 
                 try {
-                    mod = new mod();
+                    mod = new (mod as unknown as new (...args: unknown[]) => T)();
                 } catch {}
                 
                 if (mod !== undefined) {
