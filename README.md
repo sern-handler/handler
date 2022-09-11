@@ -61,7 +61,7 @@ const client = new Client({
 
 Sern.init({
   client,   
-  defaultPrefix,   
+  defaultPrefix: `${defaultPrefix}`,   
   commands : 'src/commands',
 });
 
