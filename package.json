@@ -36,8 +36,8 @@
         "ts-results-es": "^3.5.0"
     },
     "devDependencies": {
-        "@typescript-eslint/eslint-plugin": "5.36.2",
-        "@typescript-eslint/parser": "5.36.1",
+        "@typescript-eslint/eslint-plugin": "5.36.1",
+        "@typescript-eslint/parser": "5.36.2",
         "eslint": "8.22.0",
         "prettier": "2.7.1",
         "tsup": "^6.1.3",
