@@ -87,7 +87,7 @@ export default class ReadyHandler extends EventsHandler<{
             type: PluginType.Command;
         }[];
     }) {
-        if ((mod.plugins || []).length === 0) {
+        if (mod.plugins.length === 0) {
             return of({ mod, pluginRes: [] });
         }
         // modules with no event plugins are ignored in the previous
