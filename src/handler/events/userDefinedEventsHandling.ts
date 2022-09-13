@@ -25,7 +25,7 @@ export function processCommandPlugins<T extends DefinedCommandModule>(
     wrapper: Wrapper,
     payload: { mod: T; absPath: string },
 ) {
-    return payload.mod.plugins.map(plug => ({
+    return (payload.mod.plugins || []).map(plug => ({
         ...plug,
         name: plug?.name ?? 'Unnamed Plugin',
         description: plug?.description ?? '...',
