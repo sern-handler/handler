@@ -31,4 +31,8 @@ export enum SernError {
      * Unsupported feature attempted to access at this time
      */
     NotSupportedYet = `This feature is not supported yet`,
+    /**
+     * Required dependencies not found
+     */
+    RequiredNotFound = `@sern/client is required`
 }
