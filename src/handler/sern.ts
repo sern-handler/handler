@@ -3,7 +3,7 @@ import { Err, Ok } from 'ts-results-es';
 import { ExternalEventEmitters } from './utilities/readFile';
 import type { EventEmitter } from 'events';
 import { processEvents } from './events/userDefinedEventsHandling';
-import { CommandType, EventType, PluginType } from './structures/enums';
+import { EventType, PluginType } from './structures/enums';
 import type {
     CommandPlugin,
     EventModuleCommandPluginDefs,
@@ -17,9 +17,9 @@ import InteractionHandler from './events/interactionHandler';
 import ReadyHandler from './events/readyHandler';
 import MessageHandler from './events/messageHandler';
 import type { CommandModule, EventModule } from '../types/module';
-import type { ModuleStore } from './structures/moduleStore';
-import type { Client } from 'discord.js';
-import type { ModuleConfig, ModuleManagerConstructor } from './contracts/moduleManager';
+import { requireDependencies } from './dependencies/provider';
+import { containerSubject } from './dependencies/provider';
+
 
 /**
  *
@@ -34,8 +34,12 @@ import type { ModuleConfig, ModuleManagerConstructor } from './contracts/moduleM
  * })
  * ```
  */
+
 export function init(wrapper: Wrapper) {
     const { events } = wrapper;
+    requireDependencies(wrapper.dependencies)
+        .map((r) => containerSubject.next(r))
+        .unwrap();
     if (events !== undefined) {
         processEvents(wrapper, events);
     }
@@ -121,11 +125,4 @@ export function eventModule(mod: InputEventModule): EventModule {
         onEvent,
         plugins,
     } as EventModule;
-}
-
-export function ModuleConfiguration<T extends ModuleStore>(
-    moduleManager : ModuleManagerConstructor<T>,
-    moduleStore: T,
-) : ModuleConfig<T> {
-    return ( client: Client ) => new moduleManager(client, moduleStore);
 }
