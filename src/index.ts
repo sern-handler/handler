@@ -6,3 +6,4 @@ export * from './types/module';
 export * from './handler/structures/structxports';
 export * from './handler/plugins/plugin';
 export { SernEmitter };
+export { constFn as singleton, transient } from './handler/utilities/functions';
