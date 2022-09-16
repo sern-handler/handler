@@ -3,6 +3,8 @@ import { SernError } from '../structures/errors';
 import { BehaviorSubject } from 'rxjs';
 import { Err, Ok } from 'ts-results-es';
 import { makeRoot } from 'iti';
+import type { RequiredDependencies } from '../../types/handler';
+import { EventEmitter } from 'events';
 
 export const containerSubject = new BehaviorSubject<NodeApi<Record<string,unknown>> | null>(null);
 export function requireDependencies(root: NodeApi<Record<string,unknown>>) {
@@ -23,6 +25,8 @@ export function useContainer() {
     };
 }
 
-export function makeDependencies() {
-    return makeRoot();
+export function makeDependencies(
+    cb: (root : NodeApi<{}>) => NodeApi<RequiredDependencies & Record<string,unknown>>
+) : NodeApi<RequiredDependencies> {
+    return cb(makeRoot());
 }
