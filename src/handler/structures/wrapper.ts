@@ -1,16 +1,15 @@
 import type { Client } from 'discord.js';
 import type SernEmitter from '../sernEmitter';
 import type { EventModule } from '../../types/module';
-import type { Result } from 'ts-results-es';
-import type { Controller } from '../plugins/plugin';
-import type { ScopedPlugin } from '../../types/handler';
 
 /**
  * An object to be passed into Sern#init() function.
  * @typedef {object} Wrapper
  */
 interface Wrapper {
+    //@deprecated Use Sern#makeDependencies instead.
     readonly client: Client;
+    //@deprecated Use Sern#makeDependencies instead.
     readonly sernEmitter?: SernEmitter;
     readonly defaultPrefix?: string;
     readonly commands: string;
@@ -18,9 +17,6 @@ interface Wrapper {
         | string
         | { mod: EventModule; absPath: string }[]
         | (() => { mod: EventModule; absPath: string }[]);
-    readonly configureDependencies?: (
-        add: (dep : ScopedPlugin, controller: Controller) => void,
-    ) => Result<void, void>
 }
 
 export default Wrapper;

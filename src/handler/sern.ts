@@ -23,6 +23,9 @@ import InteractionHandler from './events/interactionHandler';
 import ReadyHandler from './events/readyHandler';
 import MessageHandler from './events/messageHandler';
 import type { CommandModule, EventModule } from '../types/module';
+import { makeRoot, NodeApi } from 'iti';
+import type { RequiredDependencies } from '../types/handler';
+import { containerSubject, requireDependencies } from './dependencies/provider';
 
 
 /**
@@ -125,6 +128,14 @@ export function eventModule(mod: InputEventModule): EventModule {
         onEvent,
         plugins,
     } as EventModule;
+}
+
+export function makeDependencies<T extends Record<string, unknown>>(
+    cb: (root: NodeApi<{}>) => NodeApi<T>,
+) {
+    const container = cb(makeRoot());
+    requireDependencies(container);
+    containerSubject.next(container as NodeApi<RequiredDependencies & Record<string, unknown>>);
 }
 
 export abstract class CommandExecutable<Type extends CommandType> {
