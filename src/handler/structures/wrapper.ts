@@ -7,7 +7,9 @@ import type { EventModule } from './module';
  * @typedef {object} Wrapper
  */
 interface Wrapper {
+    //@deprecated - Use Sern#makeDependencies again
     readonly client: Client;
+    //@deprecated - Use Sern#makeDependencies again
     readonly sernEmitter?: SernEmitter;
     readonly defaultPrefix?: string;
     readonly commands: string;

@@ -42,7 +42,7 @@ export function init(wrapper: Wrapper) {
 }
 
 /**
- *
+ * @deprecated - use Sern#makeDependencies instead
  * @param emitter Any external event emitter.
  * The object will be stored in a map, and then fetched by the name of the instance's class.
  * As there are infinite possibilities to adding external event emitters,
