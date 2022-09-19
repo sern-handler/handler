@@ -22,6 +22,8 @@ import { SernError } from './structures/errors';
 import InteractionHandler from './events/interactionHandler';
 import ReadyHandler from './events/readyHandler';
 import MessageHandler from './events/messageHandler';
+import type { CommandModule, EventModule } from '../types/module';
+
 
 /**
  *

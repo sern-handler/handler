@@ -32,7 +32,7 @@ export enum SernError {
      */
     NotSupportedYet = `This feature is not supported yet`,
     /**
-     * Required dependencies not found
+     * Required Dependency not found
      */
-    RequiredNotFound = `@sern/client is required`
+    MissingRequired = `@sern/client is required, was not found`
 }
