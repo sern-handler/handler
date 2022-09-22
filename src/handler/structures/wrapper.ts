@@ -15,7 +15,9 @@ interface Wrapper {
     readonly commands: string;
     readonly events?:
         | string
+        //@deprecated - array and function options will be removed
         | { mod: EventModule; absPath: string }[]
+        //@deprecated - array and function options will be removed
         | (() => { mod: EventModule; absPath: string }[]);
 }
 
