@@ -3,10 +3,13 @@ import { Err, Ok } from 'ts-results-es';
 import { ExternalEventEmitters } from './utilities/readFile';
 import type { EventEmitter } from 'events';
 import { processEvents } from './events/userDefinedEventsHandling';
-import type { BaseOptions, CommandModule, CommandModuleDefs, EventModule, EventModuleDefs, SernOptionsData, SernSubCommandData, SernSubCommandGroupData } from './structures/module';
-import { CommandType, EventType, EventType, EventType, PluginType } from './structures/enums';
 import type {
-    CommandModulePlugin,
+    CommandModule,
+    CommandModuleDefs,
+    EventModule,
+} from './structures/module';
+import { CommandType, EventType, PluginType } from './structures/enums';
+import type {
     CommandPlugin,
     EventModuleCommandPluginDefs,
     EventModuleEventPluginDefs,
@@ -18,8 +21,6 @@ import { SernError } from './structures/errors';
 import InteractionHandler from './events/interactionHandler';
 import ReadyHandler from './events/readyHandler';
 import MessageHandler from './events/messageHandler';
-import { Args, Payload } from '../types/handler';
-import Context from './structures/context';
 
 /**
  *
@@ -123,34 +124,11 @@ export function eventModule(mod: InputEventModule): EventModule {
     } as EventModule;
 }
 
-abstract class CommandModuleClass<Type extends CommandType = CommandType> {
-    abstract type : Type;
-    abstract name ?: string;
-    abstract description ?: string;
-    protected plugins: CommandModulePlugin<Type>[];
-    abstract options?: Type extends CommandType.Both 
-        ? SernOptionsData[] 
-        : Type extends CommandType.Slash 
-            ? SernOptionsData[] 
-            : never
-    private onEvent: EventPlugin<Type>[];
-    constructor() {
-        this.onEvent = this.plugins
-            .filter(pl => pl.type === PluginType.Event) as EventPlugin<Type>[];
-        this.plugins = this.plugins
-            .filter(pl => pl.type === PluginType.Command) as CommandPlugin<Type>[];
-    }
-    abstract execute(...params: Parameters<CommandModuleDefs[Type]['execute']>): unknown
-}
-
-abstract class EventModuleClass<
-    Type extends EventType = EventType,
-    > {
-    abstract type: Type;
-    abstract name ?: string;
-    abstract description ?: string;
-    protected plugins : [never, "Plugins for EventModules are under development right now"];
-    abstract execute(...params: Parameters<EventModuleDefs[Type]['execute']>) : unknown    
+export interface CommandExecuteable<Type extends CommandType> {
+    type : Type;
+    plugins?: CommandPlugin<Type>[];
+    onEvent?: EventPlugin<Type>[];
+    execute : CommandModuleDefs[Type]['execute']
 }
 
 
