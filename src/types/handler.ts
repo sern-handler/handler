@@ -26,12 +26,6 @@ export type EventInput =
     | { mod: EventModule; absPath: string }[]
     | (() => { mod: EventModule; absPath: string }[]);
 
-export type Reconstruct<T> = T extends Omit<infer O, never> ? O & Reconstruct<O> : T;
-
-export type IsOptional<T> = {
-    [K in keyof T]-?: T[K] extends Required<T>[K] ? false : true;
-};
-
 /**
  * Turns a function with a union of array of args into a single union
  *  [ T , V , B ] | [ A ] => T | V | B | A

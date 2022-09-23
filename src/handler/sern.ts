@@ -3,9 +3,10 @@ import { Err, Ok } from 'ts-results-es';
 import { ExternalEventEmitters } from './utilities/readFile';
 import type { EventEmitter } from 'events';
 import { processEvents } from './events/userDefinedEventsHandling';
-import type { CommandModule, EventModule } from './structures/module';
-import { EventType, PluginType } from './structures/enums';
+import type { BaseOptions, CommandModule, CommandModuleDefs, EventModule, SernOptionsData, SernSubCommandData, SernSubCommandGroupData } from './structures/module';
+import { CommandType, EventType, PluginType } from './structures/enums';
 import type {
+    CommandModulePlugin,
     CommandPlugin,
     EventModuleCommandPluginDefs,
     EventModuleEventPluginDefs,
@@ -17,6 +18,8 @@ import { SernError } from './structures/errors';
 import InteractionHandler from './events/interactionHandler';
 import ReadyHandler from './events/readyHandler';
 import MessageHandler from './events/messageHandler';
+import { Args } from '../types/handler';
+import Context from './structures/context';
 
 /**
  *
@@ -119,3 +122,27 @@ export function eventModule(mod: InputEventModule): EventModule {
         plugins,
     } as EventModule;
 }
+
+abstract class ClassModule<Type extends CommandType> {
+    abstract type : Type;
+    abstract name ?: string;
+    abstract description ?: string;
+    protected plugins: CommandModulePlugin<Type>[];
+    abstract options?: Type extends CommandType.Both 
+        ? SernOptionsData[] 
+        : Type extends CommandType.Slash 
+            ? SernOptionsData[] 
+            : never
+    private onEvent: EventPlugin<Type>[];
+    constructor() {
+        this.onEvent = this.plugins
+            .filter(pl => pl.type === PluginType.Event) as EventPlugin<Type>[];
+        this.plugins = this.plugins
+            .filter(pl => pl.type === PluginType.Command) as CommandPlugin<Type>[];
+    }
+    abstract execute(...params: Parameters<CommandModuleDefs[Type]['execute']>): unknown
+}
+
+
+
+
