@@ -124,14 +124,14 @@ export function eventModule(mod: InputEventModule): EventModule {
     } as EventModule;
 }
 
-export interface CommandExecuteable<Type extends CommandType> {
+export interface CommandExecutable<Type extends CommandType> {
     type : Type;
     plugins?: CommandPlugin<Type>[];
     onEvent?: EventPlugin<Type>[];
     execute: CommandModuleDefs[Type]['execute']
 }
 
-export interface EventExecuteable<Type extends EventType> {
+export interface EventExecutable<Type extends EventType> {
     type: Type;
     plugins?: EventModuleCommandPluginDefs[Type][]
     onEvent?: EventModuleEventPluginDefs[Type][]
