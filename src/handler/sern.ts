@@ -6,7 +6,7 @@ import { processEvents } from './events/userDefinedEventsHandling';
 import type {
     CommandModule,
     CommandModuleDefs,
-    EventModule,
+    EventModule, EventModuleDefs,
 } from './structures/module';
 import { CommandType, EventType, PluginType } from './structures/enums';
 import type {
@@ -128,7 +128,12 @@ export interface CommandExecuteable<Type extends CommandType> {
     type : Type;
     plugins?: CommandPlugin<Type>[];
     onEvent?: EventPlugin<Type>[];
-    execute : CommandModuleDefs[Type]['execute']
+    execute: CommandModuleDefs[Type]['execute']
 }
 
-
+export interface EventExecuteable<Type extends EventType> {
+    type: Type;
+    plugins?: EventModuleCommandPluginDefs[Type][]
+    onEvent?: EventModuleEventPluginDefs[Type][]
+    execute: EventModuleDefs[Type]['execute']
+}
