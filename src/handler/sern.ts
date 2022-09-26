@@ -124,16 +124,16 @@ export function eventModule(mod: InputEventModule): EventModule {
     } as EventModule;
 }
 
-export interface CommandExecutable<Type extends CommandType> {
-    type : Type;
-    plugins?: CommandPlugin<Type>[];
-    onEvent?: EventPlugin<Type>[];
-    execute: CommandModuleDefs[Type]['execute']
+export abstract class CommandExecutable<Type extends CommandType> {
+    abstract type : Type;
+    plugins: CommandPlugin<Type>[] = [];
+    onEvent: EventPlugin<Type>[] = [];
+    abstract execute: CommandModuleDefs[Type]['execute'];
 }
 
-export interface EventExecutable<Type extends EventType> {
-    type: Type;
-    plugins?: EventModuleCommandPluginDefs[Type][]
-    onEvent?: EventModuleEventPluginDefs[Type][]
-    execute: EventModuleDefs[Type]['execute']
+export abstract class EventExecutable<Type extends EventType> {
+    abstract type: Type;
+    plugins: EventModuleCommandPluginDefs[Type][] = [];
+    onEvent: EventModuleEventPluginDefs[Type][] = [];
+    abstract execute: EventModuleDefs[Type]['execute'];
 }
