@@ -1,6 +1,7 @@
 import type { CommandInteractionOptionResolver } from 'discord.js';
 import type { CommandModule, EventModule, Module } from '../handler/structures/module';
 import type { PayloadType } from '../handler/structures/enums';
+import type { InteractionReplyOptions, MessageReplyOptions } from 'discord.js';
 export type Nullish<T> = T | undefined | null;
 
 // Thanks to @kelsny
@@ -50,3 +51,5 @@ export type SernEventsMapping = {
     ['error']: [Payload];
     ['warning']: [string];
 };
+
+export type ReplyOptions = string | Omit<InteractionReplyOptions, 'fetchReply'> | MessageReplyOptions;

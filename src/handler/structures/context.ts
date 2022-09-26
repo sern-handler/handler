@@ -6,13 +6,13 @@ import type {
     GuildMember,
     InteractionReplyOptions,
     Message,
-    ReplyMessageOptions,
     Snowflake,
     TextBasedChannel,
+    MessageReplyOptions,
     User,
 } from 'discord.js';
 import { type Option, None, Some } from 'ts-results-es';
-import type { Nullish } from '../../types/handler';
+import type { Nullish, ReplyOptions } from '../../types/handler';
 import { SernError } from './errors';
 
 function firstSome<T>(...args: Option<T>[]): Nullish<T> {
@@ -131,7 +131,7 @@ export default class Context {
     }
     //Make queueable
     public reply(
-        content: string | Omit<InteractionReplyOptions, 'fetchReply'> | ReplyMessageOptions,
+        content: ReplyOptions
     ) {
         return firstSome(
             this.oInterac.map(i => {
@@ -140,7 +140,7 @@ export default class Context {
                     .then(() => i.fetchReply());
             }),
             this.oMsg.map(m => {
-                return m.reply(content as string | ReplyMessageOptions);
+                return m.reply(content as string | MessageReplyOptions);
             }),
         )!;
     }

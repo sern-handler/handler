@@ -128,12 +128,12 @@ export abstract class CommandExecutable<Type extends CommandType> {
     abstract type : Type;
     plugins: CommandPlugin<Type>[] = [];
     onEvent: EventPlugin<Type>[] = [];
-    abstract execute(...params: Parameters<CommandModuleDefs[Type]['execute']>): unknown;
+    abstract execute: CommandModuleDefs[Type]['execute'];
 }
 
 export abstract class EventExecutable<Type extends EventType> {
     abstract type: Type;
     plugins: EventModuleCommandPluginDefs[Type][] = [];
     onEvent: EventModuleEventPluginDefs[Type][] = [];
-    abstract execute(...params: Parameters<EventModuleDefs[Type]['execute']>): unknown;
+    abstract execute: EventModuleDefs[Type]['execute'];
 }
