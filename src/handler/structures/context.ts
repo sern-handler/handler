@@ -130,9 +130,7 @@ export default class Context {
         return this.oMsg.none && this.oInterac.none;
     }
     //Make queueable
-    public reply(
-        content: ReplyOptions
-    ) {
+    public reply(content: ReplyOptions) {
         return firstSome(
             this.oInterac.map(i => {
                 return i

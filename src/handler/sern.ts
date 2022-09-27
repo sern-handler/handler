@@ -6,7 +6,8 @@ import { processEvents } from './events/userDefinedEventsHandling';
 import type {
     CommandModule,
     CommandModuleDefs,
-    EventModule, EventModuleDefs,
+    EventModule,
+    EventModuleDefs,
 } from './structures/module';
 import { CommandType, EventType, PluginType } from './structures/enums';
 import type {
@@ -125,7 +126,7 @@ export function eventModule(mod: InputEventModule): EventModule {
 }
 
 export abstract class CommandExecutable<Type extends CommandType> {
-    abstract type : Type;
+    abstract type: Type;
     plugins: CommandPlugin<Type>[] = [];
     onEvent: EventPlugin<Type>[] = [];
     abstract execute: CommandModuleDefs[Type]['execute'];

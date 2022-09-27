@@ -52,4 +52,7 @@ export type SernEventsMapping = {
     ['warning']: [string];
 };
 
-export type ReplyOptions = string | Omit<InteractionReplyOptions, 'fetchReply'> | MessageReplyOptions;
+export type ReplyOptions =
+    | string
+    | Omit<InteractionReplyOptions, 'fetchReply'>
+    | MessageReplyOptions;
