@@ -7,13 +7,17 @@ import type { EventModule } from './module';
  * @typedef {object} Wrapper
  */
 interface Wrapper {
+    //@deprecated - Use Sern#makeDependencies instead
     readonly client: Client;
+    //@deprecated - Use Sern#makeDependencies instead
     readonly sernEmitter?: SernEmitter;
     readonly defaultPrefix?: string;
     readonly commands: string;
     readonly events?:
         | string
+        //@deprecated - array and function options will be removed
         | { mod: EventModule; absPath: string }[]
+        //@deprecated - array and function options will be removed
         | (() => { mod: EventModule; absPath: string }[]);
 }
 

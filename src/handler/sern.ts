@@ -3,8 +3,13 @@ import { Err, Ok } from 'ts-results-es';
 import { ExternalEventEmitters } from './utilities/readFile';
 import type { EventEmitter } from 'events';
 import { processEvents } from './events/userDefinedEventsHandling';
-import type { CommandModule, EventModule } from './structures/module';
-import { EventType, PluginType } from './structures/enums';
+import type {
+    CommandModule,
+    CommandModuleDefs,
+    EventModule,
+    EventModuleDefs,
+} from './structures/module';
+import { CommandType, EventType, PluginType } from './structures/enums';
 import type {
     CommandPlugin,
     EventModuleCommandPluginDefs,
@@ -42,7 +47,7 @@ export function init(wrapper: Wrapper) {
 }
 
 /**
- *
+ * @deprecated - use Sern#makeDependencies instead
  * @param emitter Any external event emitter.
  * The object will be stored in a map, and then fetched by the name of the instance's class.
  * As there are infinite possibilities to adding external event emitters,
@@ -118,4 +123,18 @@ export function eventModule(mod: InputEventModule): EventModule {
         onEvent,
         plugins,
     } as EventModule;
+}
+
+export abstract class CommandExecutable<Type extends CommandType> {
+    abstract type: Type;
+    plugins: CommandPlugin<Type>[] = [];
+    onEvent: EventPlugin<Type>[] = [];
+    abstract execute: CommandModuleDefs[Type]['execute'];
+}
+
+export abstract class EventExecutable<Type extends EventType> {
+    abstract type: Type;
+    plugins: EventModuleCommandPluginDefs[Type][] = [];
+    onEvent: EventModuleEventPluginDefs[Type][] = [];
+    abstract execute: EventModuleDefs[Type]['execute'];
 }

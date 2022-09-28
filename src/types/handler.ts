@@ -1,6 +1,7 @@
 import type { CommandInteractionOptionResolver } from 'discord.js';
 import type { CommandModule, EventModule, Module } from '../handler/structures/module';
 import type { PayloadType } from '../handler/structures/enums';
+import type { InteractionReplyOptions, MessageReplyOptions } from 'discord.js';
 export type Nullish<T> = T | undefined | null;
 
 // Thanks to @kelsny
@@ -26,12 +27,6 @@ export type EventInput =
     | { mod: EventModule; absPath: string }[]
     | (() => { mod: EventModule; absPath: string }[]);
 
-export type Reconstruct<T> = T extends Omit<infer O, never> ? O & Reconstruct<O> : T;
-
-export type IsOptional<T> = {
-    [K in keyof T]-?: T[K] extends Required<T>[K] ? false : true;
-};
-
 /**
  * Turns a function with a union of array of args into a single union
  *  [ T , V , B ] | [ A ] => T | V | B | A
@@ -56,3 +51,8 @@ export type SernEventsMapping = {
     ['error']: [Payload];
     ['warning']: [string];
 };
+
+export type ReplyOptions =
+    | string
+    | Omit<InteractionReplyOptions, 'fetchReply'>
+    | MessageReplyOptions;
