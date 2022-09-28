@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.2.0](https://github.com/sern-handler/handler/compare/v1.1.0...v1.2.0) (2022-09-28)
+
+
+### Features
+
+* allow constructable modules ([#133](https://github.com/sern-handler/handler/issues/133)) ([03936eb](https://github.com/sern-handler/handler/commit/03936eb2ea1d1af7cada04d77bb8345d63a5e20f))
+* classmodules@arcs ([#143](https://github.com/sern-handler/handler/issues/143)) ([5028886](https://github.com/sern-handler/handler/commit/50288867a5b171511941a1be3877d721694e9f77))
+* update CODEOWNERS ([6b8995d](https://github.com/sern-handler/handler/commit/6b8995d149c857558415a6c151a3f575ec373445))
+
+
+### Reverts
+
+* feat of allow constructable modules ([#138](https://github.com/sern-handler/handler/issues/138)) ([82bbdda](https://github.com/sern-handler/handler/commit/82bbddac8d656b60b3a1fb2471ea03ee5224f5c3))
+
 ## [1.1.0](https://github.com/sern-handler/handler/compare/v1.0.0...v1.1.0) (2022-08-29)
 
 
