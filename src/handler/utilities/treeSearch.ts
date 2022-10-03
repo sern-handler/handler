@@ -1,12 +1,14 @@
-import type { SernOptionsData } from '../structures/module';
+import type { SernAutocompleteData, SernOptionsData } from '../structures/module';
 import { ApplicationCommandOptionType, AutocompleteInteraction } from 'discord.js';
 
 export default function treeSearch(
     iAutocomplete: AutocompleteInteraction,
     options: SernOptionsData[] | undefined,
-) {
+): SernAutocompleteData {
     if (options === undefined) return undefined;
     const _options = options.slice(); // required to prevent direct mutation of options
+    let autocompleteData: SernAutocompleteData;
+
     while (_options.length > 0) {
         const cur = _options.pop()!;
         switch (cur.type) {
@@ -29,12 +31,12 @@ export default function treeSearch(
                     if (cur.autocomplete) {
                         const choice = iAutocomplete.options.getFocused(true);
                         if (cur.name === choice.name && cur.autocomplete) {
-                            return cur;
+                            autocompleteData = cur;
                         }
-                        return undefined;
                     }
                 }
                 break;
         }
     }
+    return autocompleteData;
 }
