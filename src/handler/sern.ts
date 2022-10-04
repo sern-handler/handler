@@ -3,12 +3,6 @@ import { Err, Ok } from 'ts-results-es';
 import { ExternalEventEmitters } from './utilities/readFile';
 import type { EventEmitter } from 'events';
 import { processEvents } from './events/userDefinedEventsHandling';
-import type {
-    CommandModule,
-    CommandModuleDefs,
-    EventModule,
-    EventModuleDefs,
-} from './structures/module';
 import { CommandType, EventType, PluginType } from './structures/enums';
 import type {
     CommandPlugin,
@@ -22,7 +16,7 @@ import { SernError } from './structures/errors';
 import InteractionHandler from './events/interactionHandler';
 import ReadyHandler from './events/readyHandler';
 import MessageHandler from './events/messageHandler';
-import type { CommandModule, EventModule } from '../types/module';
+import type { CommandModule, CommandModuleDefs, EventModule, EventModuleDefs } from '../types/module';
 import { makeRoot, NodeApi } from 'iti';
 import type { RequiredDependencies } from '../types/handler';
 import { containerSubject, requireDependencies } from './dependencies/provider';
