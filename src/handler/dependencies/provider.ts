@@ -5,7 +5,7 @@ import * as assert from 'assert';
 import type { RequiredDependencies } from '../../types/handler';
 
 export const containerSubject = new BehaviorSubject<NodeApi<RequiredDependencies & Record<string,unknown>> | null>(null);
-export function requireDependencies<T>(root: NodeApi<T>) {
+export function requireDependencies<T extends {}>(root: NodeApi<T>) {
     const tokens = Object.values(root.getTokens());
     const hasRequiredDependencies = tokens.includes('@sern/client');
     assert.ok(hasRequiredDependencies, SernError.MissingRequired);
