@@ -96,7 +96,7 @@ It is **highly encouraged** to use the [command line interface](https://github.c
 
 ## 👋 Contribute
 
-- Read our contribution [guidelines](https://github.com/sern-handler/handler) carefully
+- Read our contribution [guidelines](./.github/CONTRIBUTING.md) carefully
 - Pull up on [issues](https://github.com/sern-handler/handler/issues) and report bugs
 - All kinds of contributions are welcomed.
 
