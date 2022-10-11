@@ -32,7 +32,7 @@
     "author": "SernDevs",
     "license": "MIT",
     "dependencies": {
-        "iti": "^0.4.2",
+        "iti": "^0.5.0",
         "rxjs": "^7.5.6",
         "ts-pattern": "^4.0.2",
         "ts-results-es": "^3.5.0"

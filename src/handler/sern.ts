@@ -16,10 +16,15 @@ import { SernError } from './structures/errors';
 import InteractionHandler from './events/interactionHandler';
 import ReadyHandler from './events/readyHandler';
 import MessageHandler from './events/messageHandler';
-import type { CommandModule, CommandModuleDefs, EventModule, EventModuleDefs } from '../types/module';
-import { makeRoot, NodeApi } from 'iti';
-import type { RequiredDependencies } from '../types/handler';
-import { containerSubject, requireDependencies } from './dependencies/provider';
+import type {
+    CommandModule,
+    CommandModuleDefs,
+    EventModule,
+    EventModuleDefs,
+} from '../types/module';
+import { createContainer, Container } from 'iti';
+import type { RequiredDependencies, ExtractFromPartial } from '../types/handler';
+import { containerSubject, requireDependencies, useContainer } from './dependencies/provider';
 
 
 /**
@@ -124,12 +129,13 @@ export function eventModule(mod: InputEventModule): EventModule {
     } as EventModule;
 }
 
-export function makeDependencies<T extends Record<string, unknown>>(
-    cb: (root: NodeApi<{}>) => NodeApi<T>,
+export function makeDependencies<T extends Partial<RequiredDependencies>>(
+    cb: (root: Container<{}, {}>) => Container<T, T>,
 ) {
-    const container = cb(makeRoot());
+    const container = cb(createContainer());
     requireDependencies(container);
-    containerSubject.next(container as NodeApi<RequiredDependencies & Record<string, unknown>>);
+    containerSubject.next(container as Container<RequiredDependencies & Record<string, unknown>, {}>);
+    return useContainer<ExtractFromPartial<T>>();
 }
 
 export abstract class CommandExecutable<Type extends CommandType> {

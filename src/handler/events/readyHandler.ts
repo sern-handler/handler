@@ -13,6 +13,8 @@ import { type Result, Err, Ok } from 'ts-results-es';
 import { ApplicationCommandType, ComponentType } from 'discord.js';
 import type { CommandModule } from '../../types/module';
 import type { DefinedCommandModule } from '../../types/handler';
+import type { EventEmitter } from 'events';
+import type SernEmitter from '../sernEmitter';
 
 export default class ReadyHandler extends EventsHandler<{
     mod: DefinedCommandModule;
@@ -21,12 +23,15 @@ export default class ReadyHandler extends EventsHandler<{
     protected discordEvent!: Observable<{ mod: CommandModule; absPath: string }>;
     constructor(wrapper: Wrapper) {
         super(wrapper);
-        const ready$ = fromEvent(this.wrapper.client, 'ready').pipe(take(1));
+        const [client, emitter] = wrapper
+            .containerConfig
+            .containerGetter(['@sern/client', '@sern/emitter']) as [EventEmitter, SernEmitter];
+        const ready$ = fromEvent(client, 'ready').pipe(take(1));
         this.discordEvent = ready$.pipe(
             concatMap(() =>
                 Files.buildData<CommandModule>(this.wrapper.commands).pipe(
                     errTap(reason =>
-                        wrapper.sernEmitter?.emit('module.register', {
+                        emitter.emit('module.register', {
                             type: PayloadType.Failure,
                             module: undefined,
                             reason,
@@ -48,12 +53,12 @@ export default class ReadyHandler extends EventsHandler<{
                     if (res.err) {
                         throw Error(SernError.InvalidModuleType);
                     }
-                    wrapper.sernEmitter?.emit('module.register', {
+                    emitter.emit('module.register', {
                         type: PayloadType.Success,
                         module: payload.mod,
                     });
                 } else {
-                    wrapper.sernEmitter?.emit('module.register', {
+                    emitter.emit('module.register', {
                         type: PayloadType.Failure,
                         module: payload.mod,
                         reason: SernError.PluginFailure,

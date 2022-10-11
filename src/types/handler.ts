@@ -1,8 +1,11 @@
 import type { CommandInteractionOptionResolver } from 'discord.js';
 import type { PayloadType } from '../handler/structures/enums';
+import type { InteractionReplyOptions, MessageReplyOptions } from 'discord.js';
+import type SernEmitter from '../handler/sernEmitter';
+import type { EventEmitter } from 'events';
 import type { CommandModule, EventModule, Module } from './module';
+import type { UnpackFunction } from 'iti';
 export type Nullish<T> = T | undefined | null;
-
 // Thanks to @kelsny
 export type ParseType<T> = {
     [K in keyof T]: T[K] extends unknown ? [k: K, args: T[K]] : never;
@@ -20,11 +23,6 @@ export type DefinitelyDefined<T, K extends keyof T = keyof T> = {
         ? DefinitelyDefined<T[L], keyof T[L]>
         : Required<T>[L];
 } & T;
-
-export type EventInput =
-    | string
-    | { mod: EventModule; absPath: string }[]
-    | (() => { mod: EventModule; absPath: string }[]);
 
 
 /**
@@ -52,9 +50,16 @@ export type SernEventsMapping = {
 };
 
 export interface RequiredDependencies {
-    ['@sern/client'] : EventEmitter;
+    '@sern/client' : () => EventEmitter; //singleton client
+    '@sern/emitter' : () => SernEmitter; //singleton SernEmitter
 }
-export type ReplyOptions =
-    | string
-    | Omit<InteractionReplyOptions, 'fetchReply'>
-    | MessageReplyOptions;
+export type ReplyOptions = string | Omit<InteractionReplyOptions, 'fetchReply'> | MessageReplyOptions;
+
+
+export type ExtractFromPartial<T extends Partial<Record<string,unknown>>> = T extends Partial<infer Full> ? Full : never;
+
+export type MapDeps<
+    Deps extends RequiredDependencies,
+    T extends readonly unknown[]
+    > = T extends readonly [infer First extends keyof Deps, ...infer Rest extends unknown[]]
+    ? [ UnpackFunction<Deps[First]>, ...MapDeps<Deps, Rest> extends [never] ? [] : MapDeps<Deps,Rest>] : never

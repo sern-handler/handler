@@ -1,17 +1,15 @@
-import { from, fromEvent, map } from 'rxjs';
+import { fromEvent, map } from 'rxjs';
 import * as Files from '../utilities/readFile';
 import { buildData, ExternalEventEmitters } from '../utilities/readFile';
 import { controller } from '../sern';
 import type {
     DefinedCommandModule,
     DefinedEventModule,
-    EventInput,
     SpreadParams,
 } from '../../types/handler';
 import { PayloadType } from '../structures/enums';
 import type Wrapper from '../structures/wrapper';
 import { basename } from 'path';
-import { match } from 'ts-pattern';
 import { isDiscordEvent, isSernEvent } from '../utilities/predicates';
 import { errTap } from './observableHandling';
 import type { EventModule } from '../../types/module';
@@ -33,7 +31,7 @@ export function processCommandPlugins<T extends DefinedCommandModule>(
     }));
 }
 
-export function processEvents(wrapper: Wrapper, events: EventInput) {
+export function processEvents(wrapper: Wrapper, events: string) {
     const eventStream$ = eventObservable$(wrapper, events);
     const normalize$ = eventStream$.pipe(
         map(({ mod, absPath }) => {
@@ -58,30 +56,14 @@ export function processEvents(wrapper: Wrapper, events: EventInput) {
     });
 }
 
-function eventObservable$({ sernEmitter }: Wrapper, events: EventInput) {
-    return match(events)
-        .when(Array.isArray, (arr: { mod: EventModule; absPath: string }[]) => {
-            return from(arr);
-        })
-        .when(
-            e => typeof e === 'string',
-            (eventsDir: string) => {
-                return buildData<EventModule>(eventsDir).pipe(
-                    errTap(reason =>
-                        sernEmitter?.emit('module.register', {
-                            type: PayloadType.Failure,
-                            module: undefined,
-                            reason,
-                        }),
-                    ),
-                );
-            },
-        )
-        .when(
-            e => typeof e === 'function',
-            (evs: () => { mod: EventModule; absPath: string }[]) => {
-                return from(evs());
-            },
-        )
-        .run();
+function eventObservable$({ sernEmitter }: Wrapper, events: string) {
+        return buildData<EventModule>(events).pipe(
+                   errTap(reason =>
+                      sernEmitter?.emit('module.register', {
+                          type: PayloadType.Failure,
+                          module: undefined,
+                          reason,
+                      }),
+                  ),
+              );
 }

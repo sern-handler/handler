@@ -1,4 +1,4 @@
-import type { EventModule } from '../../types/module';
+import type { RequiredDependencies } from '../../types/handler';
 
 /**
  * An object to be passed into Sern#init() function.
@@ -7,10 +7,10 @@ import type { EventModule } from '../../types/module';
 interface Wrapper {
     readonly defaultPrefix?: string;
     readonly commands: string;
-    readonly events?:
-        | string
-        | { mod: EventModule; absPath: string }[]
-        | (() => { mod: EventModule; absPath: string }[]);
+    readonly events?: string;
+    readonly containerConfig : {
+        containerGetter : (keys: [...(keyof RequiredDependencies)[]]) => object[];
+    }
 }
 
 export default Wrapper;
