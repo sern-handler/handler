@@ -33,9 +33,9 @@ pnpm add @sern/handler
 
 * Support for discord.js v14 and all interactions
 * Hybrid commands
-* lightweight and customizable
+* Lightweight and customizable
 * ESM, CommonJS and TypeScript support
-* A powerful cli and awesome community-made plugins
+* A powerful CLI and awesome community-made plugins
 
 ## 👶 Basic Usage
 
@@ -83,7 +83,7 @@ exports.default = commandModule({
 });
 ```
 
-See our [templates](https://github.com/sern-handler/templates) for TypeScript examples and more
+See our [templates](https://github.com/sern-handler/templates) for TypeScript examples and more.
 
 ## 💻 CLI
 
@@ -92,11 +92,11 @@ It is **highly encouraged** to use the [command line interface](https://github.c
 ## 🔗 Links
 
 - [Official Documentation and Guide](https://sern-handler.js.org)
-- [Support Server](https://discord.com/invite/mmyCTnYtbF)
+- [Support Server](https://sern-handler.js.org/discord)
 
 ## 👋 Contribute
 
-- Read our contribution [guidelines](https://github.com/sern-handler/handler) carefully
+- Read our contribution [guidelines](./.github/CONTRIBUTING.md) carefully
 - Pull up on [issues](https://github.com/sern-handler/handler/issues) and report bugs
 - All kinds of contributions are welcomed.
 
