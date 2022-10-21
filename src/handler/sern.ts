@@ -23,8 +23,11 @@ import type {
     EventModuleDefs,
 } from '../types/module';
 import { createContainer, Container } from 'iti';
-import type { RequiredDependencies, ExtractFromPartial } from '../types/handler';
-import { containerSubject, requireDependencies, useContainer } from './dependencies/provider';
+import type {
+    ExtractFromPartial,
+    Dependencies,
+} from '../types/handler';
+import { containerSubject, composeRoot, useContainer } from './dependencies/provider';
 
 
 /**
@@ -129,12 +132,12 @@ export function eventModule(mod: InputEventModule): EventModule {
     } as EventModule;
 }
 
-export function makeDependencies<T extends Partial<RequiredDependencies>>(
+export function makeDependencies<T extends Partial<Dependencies>>(
     cb: (root: Container<{}, {}>) => Container<T, T>,
 ) {
     const container = cb(createContainer());
-    requireDependencies(container);
-    containerSubject.next(container as Container<RequiredDependencies & Record<string, unknown>, {}>);
+    composeRoot(container);
+    containerSubject.next(container as Container<Dependencies & Record<string,unknown>, {}>);
     return useContainer<ExtractFromPartial<T>>();
 }
 

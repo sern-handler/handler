@@ -4,4 +4,5 @@ export interface Logging {
     error(...payload : SernEventsMapping['error']) : void;
     warning(...payload : SernEventsMapping['warning']) : void;
     info(payload: unknown) : void
+    debug(payload: unknown) : void
 }
