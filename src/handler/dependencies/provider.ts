@@ -5,9 +5,10 @@ import * as assert from 'assert';
 import type { MapDeps, RequiredDependencies } from '../../types/handler';
 import SernEmitter from '../sernEmitter';
 import { constFn } from '../utilities/functions';
+import { DefaultModuleManager } from '../contracts';
+import { ModuleStore } from '../structures/moduleStore';
 
 export const containerSubject = new BehaviorSubject<Container<RequiredDependencies & Record<string,unknown>, {}> | null>(null);
-
 export function requireDependencies<T extends Record<string,unknown>>(root: Container<T, T>) {
     const client = root.get('@sern/client');
     assert.ok(client !== undefined, SernError.MissingRequired);
@@ -15,6 +16,25 @@ export function requireDependencies<T extends Record<string,unknown>>(root: Cont
         root.upsert({
             '@sern/emitter' : constFn(new SernEmitter())
         });
+    }
+    if(root.get('@sern/logger') === undefined) {
+        root.upsert({
+            '@sern/logger' : constFn({
+                error : console.error,
+                warning : console.warn,
+                info: console.log
+            })
+        });
+    }
+    if(root.get('@sern/store') === undefined) {
+        root.upsert({
+            '@sern/store' : constFn(new ModuleStore())
+        });
+    }
+    if(root.get('@sern/modules') === undefined) {
+        root.upsert(({ '@sern/store': store }) => ({
+            '@sern/modules' : constFn(new DefaultModuleManager(store as ModuleStore))
+        }));
     }
 }
 

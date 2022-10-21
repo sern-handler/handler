@@ -9,7 +9,7 @@ interface Wrapper {
     readonly commands: string;
     readonly events?: string;
     readonly containerConfig : {
-        containerGetter : (keys: [...(keyof RequiredDependencies)[]]) => object[];
+        containerGetter : (keys: [...(keyof RequiredDependencies)[]]) => unknown[];
     }
 }
 

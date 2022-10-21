@@ -1,7 +1,6 @@
 import type { CommandInteractionOptionResolver } from 'discord.js';
 import type { PayloadType } from '../handler/structures/enums';
 import type { InteractionReplyOptions, MessageReplyOptions } from 'discord.js';
-import type SernEmitter from '../handler/sernEmitter';
 import type { EventEmitter } from 'events';
 import type { CommandModule, EventModule, Module } from './module';
 import type { UnpackFunction } from 'iti';
@@ -49,9 +48,10 @@ export type SernEventsMapping = {
     ['warning']: [string];
 };
 
+export type Singleton<T> = () => T
+export type Transient<T> = () => () => T;
 export interface RequiredDependencies {
-    '@sern/client' : () => EventEmitter; //singleton client
-    '@sern/emitter' : () => SernEmitter; //singleton SernEmitter
+    '@sern/client' : Singleton<EventEmitter>;
 }
 export type ReplyOptions = string | Omit<InteractionReplyOptions, 'fetchReply'> | MessageReplyOptions;
 
