@@ -4,7 +4,7 @@ import type { InteractionReplyOptions, MessageReplyOptions } from 'discord.js';
 import type { EventEmitter } from 'events';
 import type { CommandModule, EventModule, Module } from './module';
 import type { UnpackFunction } from 'iti';
-import type { Logging, ModuleManager } from '../handler/contracts';
+import type { ErrorHandling, Logging, ModuleManager } from '../handler/contracts';
 import type { ModuleStore } from '../handler/structures/moduleStore';
 import type SernEmitter from '../handler/sernEmitter';
 export type Nullish<T> = T | undefined | null;
@@ -60,6 +60,7 @@ export interface Dependencies {
     '@sern/emitter': Singleton<SernEmitter>;
     '@sern/store' : Singleton<ModuleStore>;
     '@sern/modules' : Singleton<ModuleManager>;
+    '@sern/errors': Singleton<ErrorHandling>;
 }
 
 export type ReplyOptions = string | Omit<InteractionReplyOptions, 'fetchReply'> | MessageReplyOptions;
@@ -70,5 +71,5 @@ export type ExtractFromPartial<T extends Partial<Record<string,unknown>>> = T ex
 export type MapDeps<
     Deps extends Dependencies,
     T extends readonly unknown[]
-    > = T extends readonly [infer First extends keyof Deps, ...infer Rest extends unknown[]]
-    ? [ UnpackFunction<Deps[First]>, ...MapDeps<Deps, Rest> extends [never] ? [] : MapDeps<Deps,Rest>] : never
+    > = T extends [infer First extends keyof Deps, ...infer Rest extends readonly unknown[]]
+    ? [ UnpackFunction<Deps[First]>, ...(MapDeps<Deps, Rest> extends [never] ? [] : MapDeps<Deps,Rest>)] : [never]

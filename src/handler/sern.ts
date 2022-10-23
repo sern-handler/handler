@@ -24,8 +24,7 @@ import type {
 } from '../types/module';
 import { createContainer, Container } from 'iti';
 import type {
-    ExtractFromPartial,
-    Dependencies,
+    Dependencies
 } from '../types/handler';
 import { containerSubject, composeRoot, useContainer } from './dependencies/provider';
 
@@ -132,13 +131,13 @@ export function eventModule(mod: InputEventModule): EventModule {
     } as EventModule;
 }
 
-export function makeDependencies<T extends Partial<Dependencies>>(
-    cb: (root: Container<{}, {}>) => Container<T, T>,
+export function makeDependencies<T extends Dependencies>(
+    cb: (root: Container<Record<string,unknown>, {}>) => Container<Partial<T>, {}>,
 ) {
     const container = cb(createContainer());
     composeRoot(container);
-    containerSubject.next(container as Container<Dependencies & Record<string,unknown>, {}>);
-    return useContainer<ExtractFromPartial<T>>();
+    containerSubject.next(container as unknown as Container<Dependencies, {}>);
+    return useContainer<T>();
 }
 
 export abstract class CommandExecutable<Type extends CommandType> {

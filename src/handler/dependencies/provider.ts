@@ -5,11 +5,11 @@ import * as assert from 'assert';
 import type { Dependencies, MapDeps } from '../../types/handler';
 import SernEmitter from '../sernEmitter';
 import { constFn } from '../utilities/functions';
-import { DefaultModuleManager } from '../contracts';
+import { DefaultErrorHandling, DefaultModuleManager } from '../contracts';
 import { ModuleStore } from '../structures/moduleStore';
 
-export const containerSubject = new BehaviorSubject<Container<Dependencies & Record<string,unknown>, {}> | null>(null);
-export function composeRoot<T extends Record<string,unknown>>(root: Container<T, T>) {
+export const containerSubject = new BehaviorSubject<Container<Dependencies, {}> | null>(null);
+export function composeRoot<T extends Dependencies>(root: Container<Partial<T>, {}>) {
     const client = root.get('@sern/client');
     assert.ok(client !== undefined, SernError.MissingRequired);
     if(root.get('@sern/emitter') === undefined) {
@@ -28,15 +28,20 @@ export function composeRoot<T extends Record<string,unknown>>(root: Container<T,
         });
     }
     if(root.get('@sern/modules') === undefined) {
-        root.upsert(({ '@sern/store': store }) => ({
-            '@sern/modules' : constFn(new DefaultModuleManager(store as ModuleStore))
+        root.upsert((ctx) => ({
+            '@sern/modules' : constFn(new DefaultModuleManager(ctx['@sern/store'] as ModuleStore))
         }));
+    }
+    if(root.get('@sern/errors') === undefined) {
+        root.upsert({
+            '@sern/errors': constFn(new DefaultErrorHandling())
+        });
     }
 }
 
 
 export function useContainer<T extends Dependencies>() {
-    const container = containerSubject.getValue() as Container<T & Record<string,unknown>, {}>;
+    const container = containerSubject.getValue()! as unknown as Container<T, {}>;
     assert.ok(container !== null, 'useContainer was called before Sern#init');
-    return <V extends (keyof T)[]>(keys: [...V]) => keys.map(key => container.get(key) as MapDeps<T, V>);
+    return <V extends (keyof T)[]>(...keys: [...V]) => keys.map(key => container.get(key)) as MapDeps<T, V>;
 }
