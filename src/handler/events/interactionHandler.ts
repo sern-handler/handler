@@ -32,7 +32,7 @@ export default class InteractionHandler extends EventsHandler<{
 
     constructor(protected wrapper: Wrapper) {
         super(wrapper);
-        this.discordEvent = <Observable<Interaction>>fromEvent(wrapper.client, 'interactionCreate');
+        this.discordEvent = <Observable<Interaction>>fromEvent(this.client, 'interactionCreate');
         this.init();
 
         this.payloadSubject
@@ -44,7 +44,7 @@ export default class InteractionHandler extends EventsHandler<{
                 }),
                 concatMap(payload => executeModule(wrapper, payload)),
                 catchError((err, caught) => {
-                    wrapper.sernEmitter?.emit('error', err);
+                    this.emitter?.emit('error', err);
                     return caught;
                 }),
             )
@@ -73,14 +73,14 @@ export default class InteractionHandler extends EventsHandler<{
                 }
             },
             error: reason => {
-                this.wrapper.sernEmitter?.emit('error', { type: PayloadType.Failure, reason });
+                this.emitter.emit('error', { type: PayloadType.Failure, reason });
             },
         });
     }
 
     protected setState(state: { event: Interaction; mod: CommandModule | undefined }): void {
         if (state.mod === undefined) {
-            this.wrapper?.sernEmitter?.emit('warning', 'Found no module for this interaction');
+            this.emitter.emit('warning', 'Found no module for this interaction');
         } else {
             //if statement above checks already, safe cast
             this.payloadSubject.next(state as { event: Interaction; mod: CommandModule });

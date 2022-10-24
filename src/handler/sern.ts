@@ -45,7 +45,7 @@ import { containerSubject, composeRoot, useContainer } from './dependencies/prov
 export function init(wrapper: Wrapper) {
     const { events } = wrapper;
     if (events !== undefined) {
-        processEvents(wrapper, events);
+        processEvents(wrapper);
     }
     new ReadyHandler(wrapper);
     new MessageHandler(wrapper);

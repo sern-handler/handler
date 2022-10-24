@@ -19,7 +19,7 @@ export default class MessageHandler extends EventsHandler<{
     protected discordEvent: Observable<Message>;
     public constructor(wrapper: Wrapper) {
         super(wrapper);
-        this.discordEvent = <Observable<Message>>fromEvent(wrapper.client, 'messageCreate');
+        this.discordEvent = <Observable<Message>>fromEvent(this.client, 'messageCreate');
         this.init();
         this.payloadSubject
             .pipe(
@@ -37,7 +37,7 @@ export default class MessageHandler extends EventsHandler<{
                 }),
                 concatMap(payload => executeModule(wrapper, payload)),
                 catchError((err, caught) => {
-                    wrapper.sernEmitter?.emit('error', err);
+                    this.emitter?.emit('error', err);
                     return caught;
                 }),
             )
@@ -71,7 +71,7 @@ export default class MessageHandler extends EventsHandler<{
             .subscribe({
                 next: value => this.setState(value),
                 error: reason =>
-                    this.wrapper.sernEmitter?.emit('error', { type: PayloadType.Failure, reason }),
+                    this.emitter?.emit('error', { type: PayloadType.Failure, reason }),
             });
     }
 

@@ -13,6 +13,8 @@ import { basename } from 'path';
 import { isDiscordEvent, isSernEvent } from '../utilities/predicates';
 import { errTap } from './observableHandling';
 import type { EventModule } from '../../types/module';
+import type { EventEmitter } from 'events';
+import type SernEmitter from '../sernEmitter';
 
 /**
  * Utility function to process command plugins for all Modules
@@ -31,8 +33,9 @@ export function processCommandPlugins<T extends DefinedCommandModule>(
     }));
 }
 
-export function processEvents(wrapper: Wrapper, events: string) {
-    const eventStream$ = eventObservable$(wrapper, events);
+export function processEvents(wrapper: Wrapper) {
+    const [sernEmitter, client] = wrapper.containerConfig.get('@sern/emitter', '@sern/client');
+    const eventStream$ = eventObservable$(sernEmitter as SernEmitter, wrapper.events!);
     const normalize$ = eventStream$.pipe(
         map(({ mod, absPath }) => {
             return <DefinedEventModule>{
@@ -44,22 +47,22 @@ export function processEvents(wrapper: Wrapper, events: string) {
     );
     normalize$.subscribe(e => {
         const emitter = isSernEvent(e)
-            ? wrapper?.sernEmitter
+            ? sernEmitter
             : isDiscordEvent(e)
-            ? wrapper.client
+            ? client
             : ExternalEventEmitters.get(e.emitter);
         if (emitter === undefined) {
             throw new Error(`Cannot find event emitter as it is undefined`);
         }
         //Would add sern event emitter for events loaded, attached onto sern emitter, but could lead to unwanted behavior!
-        fromEvent(emitter, e.name, e.execute as SpreadParams<typeof e.execute>).subscribe();
+        fromEvent(emitter as EventEmitter, e.name, e.execute as SpreadParams<typeof e.execute>).subscribe();
     });
 }
 
-function eventObservable$({ sernEmitter }: Wrapper, events: string) {
+function eventObservable$(emitter : SernEmitter, events: string) {
         return buildData<EventModule>(events).pipe(
                    errTap(reason =>
-                      sernEmitter?.emit('module.register', {
+                      emitter.emit('module.register', {
                           type: PayloadType.Failure,
                           module: undefined,
                           reason,

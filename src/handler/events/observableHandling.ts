@@ -6,6 +6,7 @@ import type { CommandType } from '../structures/enums';
 import type Wrapper from '../structures/wrapper';
 import { PayloadType } from '../structures/enums';
 import type { CommandModule, CommandModuleDefs, Module } from '../../types/module';
+import type { EventEmitter } from 'events';
 
 export function ignoreNonBot(prefix: string) {
     return (src: Observable<Message>) =>
@@ -78,6 +79,7 @@ export function executeModule(
         res: Result<void, void>[];
     },
 ) {
+    const [ emitter ] = wrapper.containerConfig.get('@sern/emitter') as [EventEmitter];
     if (payload.res.every(el => el.ok)) {
         const executeFn = Result.wrapAsync<unknown, Error | string>(() =>
             Promise.resolve(payload.execute()),
@@ -93,7 +95,7 @@ export function executeModule(
                 }
                 return of(res.val).pipe(
                     tap(() =>
-                        wrapper.sernEmitter?.emit('module.activate', {
+                        emitter.emit('module.activate', {
                             type: PayloadType.Success,
                             module: payload.mod,
                         }),
@@ -102,7 +104,7 @@ export function executeModule(
             }),
         );
     } else {
-        wrapper.sernEmitter?.emit('module.activate', {
+        emitter.emit('module.activate', {
             type: PayloadType.Failure,
             module: payload.mod,
             reason: SernError.PluginFailure,
