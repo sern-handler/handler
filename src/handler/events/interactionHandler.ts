@@ -44,7 +44,7 @@ export default class InteractionHandler extends EventsHandler<{
                     return from(eventPluginRes).pipe(map(res => ({ mod, res, execute })));
                 }),
                 concatMap(payload => executeModule(wrapper, payload)),
-                catchError(handleError(this.crashHandler)),
+                catchError(handleError(this.crashHandler, this.logger)),
             )
             .subscribe();
     }

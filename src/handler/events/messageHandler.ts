@@ -1,5 +1,5 @@
 import { EventsHandler } from './eventsHandler';
-import { catchError, concatMap, from, fromEvent, map, Observable, of, switchMap } from 'rxjs';
+import { catchError, concatMap, from, fromEvent, map, Observable, of, switchMap, tap } from 'rxjs';
 import type Wrapper from '../structures/wrapper';
 import type { Message } from 'discord.js';
 import { executeModule, ignoreNonBot, isOneOfCorrectModules } from './observableHandling';
@@ -37,7 +37,7 @@ export default class MessageHandler extends EventsHandler<{
                     return from(res).pipe(map(res => ({ mod, execute, res })));
                 }),
                 concatMap(payload => executeModule(wrapper, payload)),
-                catchError(handleError(this.crashHandler)),
+                catchError(handleError(this.crashHandler, this.logger)),
             )
             .subscribe();
     }
