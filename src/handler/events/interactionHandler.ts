@@ -1,5 +1,5 @@
 import type { Interaction } from 'discord.js';
-import { catchError, concatMap, from, fromEvent, map, Observable } from 'rxjs';
+import { catchError, concatMap, from, fromEvent, map, Observable, retry } from 'rxjs';
 import type Wrapper from '../structures/wrapper';
 import { EventsHandler } from './eventsHandler';
 import * as Files from '../utilities/readFile';
@@ -23,6 +23,7 @@ import type {
 } from 'discord.js';
 import { executeModule } from './observableHandling';
 import type { CommandModule } from '../../types/module';
+import { handleError } from '../contracts/errorHandling';
 
 export default class InteractionHandler extends EventsHandler<{
     event: Interaction;
@@ -43,10 +44,7 @@ export default class InteractionHandler extends EventsHandler<{
                     return from(eventPluginRes).pipe(map(res => ({ mod, res, execute })));
                 }),
                 concatMap(payload => executeModule(wrapper, payload)),
-                catchError((err, caught) => {
-                    this.emitter?.emit('error', err);
-                    return caught;
-                }),
+                catchError(handleError(this.crashHandler)),
             )
             .subscribe();
     }

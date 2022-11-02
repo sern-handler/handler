@@ -19,7 +19,7 @@ export default class ReadyHandler extends EventsHandler<{
     absPath: string;
 }> {
     protected discordEvent!: Observable<{ mod: CommandModule; absPath: string }>;
-    constructor(wrapper: Wrapper) {
+    constructor(protected wrapper: Wrapper) {
         super(wrapper);
         const ready$ = fromEvent(this.client, 'ready').pipe(take(1));
         this.discordEvent = ready$.pipe(
@@ -46,7 +46,7 @@ export default class ReadyHandler extends EventsHandler<{
                 if (allPluginsSuccessful) {
                     const res = registerModule(payload.mod);
                     if (res.err) {
-                        throw Error(SernError.InvalidModuleType);
+                        this.crashHandler.crash(Error(SernError.InvalidModuleType));
                     }
                     this.emitter.emit('module.register', {
                         type: PayloadType.Success,

@@ -1,16 +1,41 @@
+import type { Observable } from 'rxjs';
 
 
 export interface ErrorHandling {
     /**
-     * MUTATES GLOBALLY
+     * Number of times the process should throw an error until crashing and exiting
      */
-    retry : number
-    crash(error : Error) : unknown
+    keepAlive : number
+
+    /**
+     * Utility function to crash
+     * @param error
+     */
+    crash(error : Error) : never
+
+    /**
+     * A function that is called on every crash. Updates keepAlive
+     * @param error
+     */
+    updateAlive(error: Error): void
 }
 
 export class DefaultErrorHandling implements ErrorHandling {
-    retry = 5;
-    crash(error: Error) {
+    keepAlive = 5;
+    crash(error: Error): never {
         throw error;
     }
+    updateAlive(_: Error) {
+        this.keepAlive--;
+    }
+}
+
+export function handleError<C>(crashHandler: ErrorHandling) {
+    return (error: Error, caught: Observable<C>) => {
+        if(crashHandler.keepAlive == 0) {
+            crashHandler.crash(error);
+        }
+        crashHandler.updateAlive(error);
+        return caught;
+    };
 }

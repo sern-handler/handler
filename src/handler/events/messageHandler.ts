@@ -10,6 +10,7 @@ import { CommandType, PayloadType } from '../structures/enums';
 import { asyncResolveArray } from '../utilities/asyncResolveArray';
 import { controller } from '../sern';
 import type { TextCommand } from '../../types/module';
+import { handleError } from '../contracts/errorHandling';
 
 export default class MessageHandler extends EventsHandler<{
     ctx: Context;
@@ -17,7 +18,7 @@ export default class MessageHandler extends EventsHandler<{
     mod: TextCommand;
 }> {
     protected discordEvent: Observable<Message>;
-    public constructor(wrapper: Wrapper) {
+    public constructor(protected wrapper: Wrapper) {
         super(wrapper);
         this.discordEvent = <Observable<Message>>fromEvent(this.client, 'messageCreate');
         this.init();
@@ -36,10 +37,7 @@ export default class MessageHandler extends EventsHandler<{
                     return from(res).pipe(map(res => ({ mod, execute, res })));
                 }),
                 concatMap(payload => executeModule(wrapper, payload)),
-                catchError((err, caught) => {
-                    this.emitter?.emit('error', err);
-                    return caught;
-                }),
+                catchError(handleError(this.crashHandler)),
             )
             .subscribe();
     }
