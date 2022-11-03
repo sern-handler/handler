@@ -11,6 +11,7 @@ import { asyncResolveArray } from '../utilities/asyncResolveArray';
 import { controller } from '../sern';
 import type { TextCommand } from '../../types/module';
 import { handleError } from '../contracts/errorHandling';
+import type { ModuleManager } from '../contracts';
 
 export default class MessageHandler extends EventsHandler<{
     ctx: Context;
@@ -18,8 +19,10 @@ export default class MessageHandler extends EventsHandler<{
     mod: TextCommand;
 }> {
     protected discordEvent: Observable<Message>;
+    private moduleManager: ModuleManager;
     public constructor(protected wrapper: Wrapper) {
         super(wrapper);
+        this.moduleManager = wrapper.containerConfig.get('@sern/modules')[0] as ModuleManager;
         this.discordEvent = <Observable<Message>>fromEvent(this.client, 'messageCreate');
         this.init();
         this.payloadSubject

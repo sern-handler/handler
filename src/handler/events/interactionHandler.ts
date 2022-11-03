@@ -24,16 +24,19 @@ import type {
 import { executeModule } from './observableHandling';
 import type { CommandModule } from '../../types/module';
 import { handleError } from '../contracts/errorHandling';
+import { ModuleManager } from '../contracts';
+import { ModuleStore } from '../structures/moduleStore';
 
 export default class InteractionHandler extends EventsHandler<{
     event: Interaction;
     mod: CommandModule;
 }> {
     protected override discordEvent: Observable<Interaction>;
-
+    private moduleManager: ModuleManager;
     constructor(protected wrapper: Wrapper) {
         super(wrapper);
         this.discordEvent = <Observable<Interaction>>fromEvent(this.client, 'interactionCreate');
+        this.moduleManager = wrapper.containerConfig.get('@sern/modules')[0] as ModuleManager;
         this.init();
 
         this.payloadSubject
@@ -50,21 +53,23 @@ export default class InteractionHandler extends EventsHandler<{
     }
 
     override init() {
+        const strat = (cb: (ms: ModuleStore) => CommandModule) => {
+           return this.moduleManager.getModule(cb);
+        }
         this.discordEvent.subscribe({
             next: event => {
                 if (event.isMessageComponent()) {
-                    const mod = Files.MessageCompCommands[event.componentType].get(event.customId);
+                    const mod = strat(ms  => 
+                        ms.InteractionHandlers[event.componentType].get(event.customId));
                     this.setState({ event, mod });
                 } else if (event.isCommand() || event.isAutocomplete()) {
-                    const mod =
-                        Files.ApplicationCommands[event.commandType].get(event.commandName) ??
-                        Files.BothCommands.get(event.commandName);
+                    const mod = strat(ms => 
+                        ms.ApplicationCommands[event.commandType].get(event.commandName) ??
+                        ms.BothCommands.get(event.commandName)
+                    );
                     this.setState({ event, mod });
                 } else if (event.isModalSubmit()) {
-                    /**
-                     * maybe move modal submits into message component object maps?
-                     */
-                    const mod = Files.ModalSubmitCommands.get(event.customId);
+                    const mod = strat((ms) => ms.InteractionHandlers[5].get(event.customId));
                     this.setState({ event, mod });
                 } else {
                     throw Error('This interaction is not supported yet');
