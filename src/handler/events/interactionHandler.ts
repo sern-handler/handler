@@ -24,19 +24,19 @@ import type {
 import { executeModule } from './observableHandling';
 import type { CommandModule } from '../../types/module';
 import { handleError } from '../contracts/errorHandling';
-import { ModuleManager } from '../contracts';
-import { ModuleStore } from '../structures/moduleStore';
+import type { ModuleManager } from '../contracts';
+import type { ModuleStore } from '../structures/moduleStore';
 
 export default class InteractionHandler extends EventsHandler<{
     event: Interaction;
     mod: CommandModule;
 }> {
     protected override discordEvent: Observable<Interaction>;
-    private moduleManager: ModuleManager;
+    private modules: ModuleManager;
     constructor(protected wrapper: Wrapper) {
         super(wrapper);
         this.discordEvent = <Observable<Interaction>>fromEvent(this.client, 'interactionCreate');
-        this.moduleManager = wrapper.containerConfig.get('@sern/modules')[0] as ModuleManager;
+        this.modules = wrapper.containerConfig.get('@sern/modules')[0] as ModuleManager;
         this.init();
 
         this.payloadSubject
@@ -53,9 +53,9 @@ export default class InteractionHandler extends EventsHandler<{
     }
 
     override init() {
-        const strat = (cb: (ms: ModuleStore) => CommandModule) => {
-           return this.moduleManager.getModule(cb);
-        }
+        const strat = (cb: (ms: ModuleStore) => CommandModule| undefined) => {
+           return this.modules.get(cb);
+        };
         this.discordEvent.subscribe({
             next: event => {
                 if (event.isMessageComponent()) {
