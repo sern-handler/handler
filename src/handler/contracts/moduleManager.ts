@@ -14,7 +14,7 @@ export class DefaultModuleManager implements ModuleManager {
         return strat(this.moduleStore);
     }
 
-    set(strat: (ms: ModuleStore) => void) {
+    set(strat: (ms: ModuleStore) => void): void {
         strat(this.moduleStore);
     }
 }

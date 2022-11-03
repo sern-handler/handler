@@ -10,9 +10,11 @@ import type { Awaitable } from 'discord.js';
 import { SernError } from '../structures/errors';
 import { match } from 'ts-pattern';
 import { type Result, Err, Ok } from 'ts-results-es';
-import { ApplicationCommandType, ComponentType } from 'discord.js';
+import { ApplicationCommandType, ComponentType, InteractionType } from 'discord.js';
 import type { CommandModule } from '../../types/module';
 import type { DefinedCommandModule } from '../../types/handler';
+import type { ModuleManager } from '../contracts';
+import type { ModuleStore } from '../structures/moduleStore';
 
 export default class ReadyHandler extends EventsHandler<{
     mod: DefinedCommandModule;
@@ -44,7 +46,7 @@ export default class ReadyHandler extends EventsHandler<{
             .subscribe(payload => {
                 const allPluginsSuccessful = payload.pluginRes.every(({ execute }) => execute.ok);
                 if (allPluginsSuccessful) {
-                    const res = registerModule(payload.mod);
+                    const res = registerModule(this.modules, payload.mod);
                     if (res.err) {
                         this.crashHandler.crash(Error(SernError.InvalidModuleType));
                     }
@@ -118,41 +120,44 @@ export default class ReadyHandler extends EventsHandler<{
     }
 }
 
-function registerModule(mod: DefinedCommandModule): Result<void, void> {
+function registerModule(manager: ModuleManager, mod: DefinedCommandModule): Result<void, void> {
     const name = mod.name;
+    const insert = (cb: (ms: ModuleStore) => void) => {
+        manager.set(cb);
+    };
     return match<DefinedCommandModule>(mod)
         .with({ type: CommandType.Text }, mod => {
-            mod.alias?.forEach(a => Files.TextCommands.aliases.set(a, mod));
-            Files.TextCommands.text.set(name, mod);
+            mod.alias?.forEach(a => insert(ms => ms.TextCommands.aliases.set(a, mod)));
+            insert(ms => ms.TextCommands.text.set(name, mod));
             return Ok.EMPTY;
         })
         .with({ type: CommandType.Slash }, mod => {
-            Files.ApplicationCommands[ApplicationCommandType.ChatInput].set(name, mod);
+            insert(ms => ms.ApplicationCommands[ApplicationCommandType.ChatInput].set(name, mod));
             return Ok.EMPTY;
         })
         .with({ type: CommandType.Both }, mod => {
-            Files.BothCommands.set(name, mod);
-            mod.alias?.forEach(a => Files.TextCommands.aliases.set(a, mod));
+            insert( ms => ms.BothCommands.set(name, mod));
+            mod.alias?.forEach(a => insert(ms => ms.TextCommands.aliases.set(a, mod)));
             return Ok.EMPTY;
         })
         .with({ type: CommandType.MenuUser }, mod => {
-            Files.ApplicationCommands[ApplicationCommandType.User].set(name, mod);
+            insert(ms => ms.ApplicationCommands[ApplicationCommandType.User].set(name, mod));
             return Ok.EMPTY;
         })
         .with({ type: CommandType.MenuMsg }, mod => {
-            Files.ApplicationCommands[ApplicationCommandType.Message].set(name, mod);
+            insert(ms => ms.ApplicationCommands[ApplicationCommandType.Message].set(name, mod));
             return Ok.EMPTY;
         })
         .with({ type: CommandType.Button }, mod => {
-            Files.MessageCompCommands[ComponentType.Button].set(name, mod);
+            insert(ms => ms.InteractionHandlers[ComponentType.Button].set(name, mod));
             return Ok.EMPTY;
         })
         .with({ type: CommandType.MenuSelect }, mod => {
-            Files.MessageCompCommands[ComponentType.SelectMenu].set(name, mod);
+            insert(ms => ms.InteractionHandlers[ComponentType.SelectMenu].set(name, mod));
             return Ok.EMPTY;
         })
         .with({ type: CommandType.Modal }, mod => {
-            Files.ModalSubmitCommands.set(name, mod);
+            insert(ms => ms.InteractionHandlers[InteractionType.ModalSubmit].set(name, mod));
             return Ok.EMPTY;
         })
         .otherwise(() => Err.EMPTY);

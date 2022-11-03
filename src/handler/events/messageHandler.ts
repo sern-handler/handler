@@ -5,13 +5,13 @@ import type { Message } from 'discord.js';
 import { executeModule, ignoreNonBot, isOneOfCorrectModules } from './observableHandling';
 import { fmt } from '../utilities/messageHelpers';
 import Context from '../structures/context';
-import * as Files from '../utilities/readFile';
 import { CommandType, PayloadType } from '../structures/enums';
 import { asyncResolveArray } from '../utilities/asyncResolveArray';
 import { controller } from '../sern';
-import type { TextCommand } from '../../types/module';
+import type { CommandModule, TextCommand } from '../../types/module';
 import { handleError } from '../contracts/errorHandling';
 import type { ModuleManager } from '../contracts';
+import type { ModuleStore } from '../structures/moduleStore';
 
 export default class MessageHandler extends EventsHandler<{
     ctx: Context;
@@ -19,10 +19,9 @@ export default class MessageHandler extends EventsHandler<{
     mod: TextCommand;
 }> {
     protected discordEvent: Observable<Message>;
-    private moduleManager: ModuleManager;
     public constructor(protected wrapper: Wrapper) {
         super(wrapper);
-        this.moduleManager = wrapper.containerConfig.get('@sern/modules')[0] as ModuleManager;
+        this.modules = wrapper.containerConfig.get('@sern/modules')[0] as ModuleManager;
         this.discordEvent = <Observable<Message>>fromEvent(this.client, 'messageCreate');
         this.init();
         this.payloadSubject
@@ -48,6 +47,9 @@ export default class MessageHandler extends EventsHandler<{
     protected init(): void {
         if (this.wrapper.defaultPrefix === undefined) return; //for now, just ignore if prefix doesn't exist
         const { defaultPrefix } = this.wrapper;
+        const strat = (cb: (ms: ModuleStore) => CommandModule | undefined) => {
+              return this.modules.get(cb);
+        };
         this.discordEvent
             .pipe(
                 ignoreNonBot(this.wrapper.defaultPrefix),
@@ -56,10 +58,11 @@ export default class MessageHandler extends EventsHandler<{
                     return {
                         ctx: Context.wrap(message),
                         args: <['text', string[]]>['text', rest],
-                        mod:
-                            Files.TextCommands.text.get(prefix) ??
-                            Files.BothCommands.get(prefix) ??
-                            Files.TextCommands.aliases.get(prefix),
+                        mod: strat(ms =>
+                            ms.TextCommands.text.get(prefix) ??
+                            ms.BothCommands.get(prefix) ??
+                            ms.TextCommands.aliases.get(prefix)
+                        ),
                     };
                 }),
                 concatMap(element =>

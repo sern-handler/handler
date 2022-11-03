@@ -1,8 +1,7 @@
 import type { Interaction } from 'discord.js';
-import { catchError, concatMap, from, fromEvent, map, Observable, retry } from 'rxjs';
+import { catchError, concatMap, from, fromEvent, map, Observable } from 'rxjs';
 import type Wrapper from '../structures/wrapper';
 import { EventsHandler } from './eventsHandler';
-import * as Files from '../utilities/readFile';
 import { SernError } from '../structures/errors';
 import { CommandType, PayloadType } from '../structures/enums';
 import { match, P } from 'ts-pattern';
@@ -24,7 +23,6 @@ import type {
 import { executeModule } from './observableHandling';
 import type { CommandModule } from '../../types/module';
 import { handleError } from '../contracts/errorHandling';
-import type { ModuleManager } from '../contracts';
 import type { ModuleStore } from '../structures/moduleStore';
 
 export default class InteractionHandler extends EventsHandler<{
@@ -32,11 +30,9 @@ export default class InteractionHandler extends EventsHandler<{
     mod: CommandModule;
 }> {
     protected override discordEvent: Observable<Interaction>;
-    private modules: ModuleManager;
     constructor(protected wrapper: Wrapper) {
         super(wrapper);
         this.discordEvent = <Observable<Interaction>>fromEvent(this.client, 'interactionCreate');
-        this.modules = wrapper.containerConfig.get('@sern/modules')[0] as ModuleManager;
         this.init();
 
         this.payloadSubject
@@ -113,8 +109,6 @@ export default class InteractionHandler extends EventsHandler<{
                 { type: CommandType.MenuMsg },
                 ctxMenuMsgDispatcher(event as MessageContextMenuCommandInteraction),
             )
-            .otherwise(() => {
-                throw Error(SernError.MismatchModule);
-            });
+            .otherwise(() => this.crashHandler.crash(Error(SernError.MismatchModule)));
     }
 }
