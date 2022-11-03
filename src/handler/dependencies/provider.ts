@@ -7,36 +7,38 @@ import SernEmitter from '../sernEmitter';
 import { constFn } from '../utilities/functions';
 import { DefaultErrorHandling, DefaultModuleManager } from '../contracts';
 import { ModuleStore } from '../structures/moduleStore';
+import { Result } from 'ts-results-es';
 
 export const containerSubject = new BehaviorSubject<Container<Dependencies, {}> | null>(null);
 export function composeRoot<T extends Dependencies>(root: Container<Partial<T>, {}>) {
     const client = root.get('@sern/client');
     assert.ok(client !== undefined, SernError.MissingRequired);
-    if(root.get('@sern/emitter') === undefined) {
+    const getOr = (key: keyof Dependencies, or: () => unknown) => Result.wrap(() => root.get(key)).unwrapOr(or());
+    getOr('@sern/emitter', () =>
         root.upsert({
             '@sern/emitter' : constFn(new SernEmitter())
-        });
-    }
-    if(root.get('@sern/logger') === undefined) {
+        })
+    );
+    getOr('@sern/logger', () =>
         root.upsert({
             '@sern/logger' : constFn(console)
-        });
-    }
-    if(root.get('@sern/store') === undefined) {
+        })
+    );
+    getOr('@sern/store', () =>
         root.upsert({
             '@sern/store' : constFn(new ModuleStore())
-        });
-    }
-    if(root.get('@sern/modules') === undefined) {
+        })
+    );
+    getOr('@sern/modules', () =>
         root.upsert((ctx) => ({
             '@sern/modules' : constFn(new DefaultModuleManager(ctx['@sern/store'] as ModuleStore))
-        }));
-    }
-    if(root.get('@sern/errors') === undefined) {
+        }))
+    );
+    getOr('@sern/errors', () =>
         root.upsert({
             '@sern/errors': constFn(new DefaultErrorHandling())
-        });
-    }
+        })
+    );
 }
 
 

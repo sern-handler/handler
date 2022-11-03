@@ -47,7 +47,7 @@ export default class MessageHandler extends EventsHandler<{
     protected init(): void {
         if (this.wrapper.defaultPrefix === undefined) return; //for now, just ignore if prefix doesn't exist
         const { defaultPrefix } = this.wrapper;
-        const strat = (cb: (ms: ModuleStore) => CommandModule | undefined) => {
+        const get = (cb: (ms: ModuleStore) => CommandModule | undefined) => {
               return this.modules.get(cb);
         };
         this.discordEvent
@@ -58,7 +58,7 @@ export default class MessageHandler extends EventsHandler<{
                     return {
                         ctx: Context.wrap(message),
                         args: <['text', string[]]>['text', rest],
-                        mod: strat(ms =>
+                        mod: get(ms =>
                             ms.TextCommands.text.get(prefix) ??
                             ms.BothCommands.get(prefix) ??
                             ms.TextCommands.aliases.get(prefix)

@@ -49,23 +49,23 @@ export default class InteractionHandler extends EventsHandler<{
     }
 
     override init() {
-        const strat = (cb: (ms: ModuleStore) => CommandModule| undefined) => {
+        const get = (cb: (ms: ModuleStore) => CommandModule| undefined) => {
            return this.modules.get(cb);
         };
         this.discordEvent.subscribe({
             next: event => {
                 if (event.isMessageComponent()) {
-                    const mod = strat(ms  => 
+                    const mod = get(ms  =>
                         ms.InteractionHandlers[event.componentType].get(event.customId));
                     this.setState({ event, mod });
                 } else if (event.isCommand() || event.isAutocomplete()) {
-                    const mod = strat(ms => 
+                    const mod = get(ms =>
                         ms.ApplicationCommands[event.commandType].get(event.commandName) ??
                         ms.BothCommands.get(event.commandName)
                     );
                     this.setState({ event, mod });
                 } else if (event.isModalSubmit()) {
-                    const mod = strat((ms) => ms.InteractionHandlers[5].get(event.customId));
+                    const mod = get((ms) => ms.InteractionHandlers[5].get(event.customId));
                     this.setState({ event, mod });
                 } else {
                     throw Error('This interaction is not supported yet');

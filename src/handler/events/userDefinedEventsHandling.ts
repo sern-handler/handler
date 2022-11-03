@@ -4,7 +4,7 @@ import { buildData, ExternalEventEmitters } from '../utilities/readFile';
 import { controller } from '../sern';
 import type {
     DefinedCommandModule,
-    DefinedEventModule,
+    DefinedEventModule, Dependencies,
     SpreadParams,
 } from '../../types/handler';
 import { PayloadType } from '../structures/enums';
@@ -33,9 +33,10 @@ export function processCommandPlugins<T extends DefinedCommandModule>(
     }));
 }
 
-export function processEvents(wrapper: Wrapper) {
-    const [sernEmitter, client] = wrapper.containerConfig.get('@sern/emitter', '@sern/client');
-    const eventStream$ = eventObservable$(sernEmitter as SernEmitter, wrapper.events!);
+export function processEvents({ containerConfig, events }: Wrapper) {
+    const [ sernEmitter, client ] = containerConfig.get('@sern/emitter', '@sern/client');
+    const lazy = (k: string) => containerConfig.get(k as keyof Dependencies)[0];
+    const eventStream$ = eventObservable$(sernEmitter as SernEmitter, events!);
     const normalize$ = eventStream$.pipe(
         map(({ mod, absPath }) => {
             return <DefinedEventModule>{
@@ -50,7 +51,7 @@ export function processEvents(wrapper: Wrapper) {
             ? sernEmitter
             : isDiscordEvent(e)
             ? client
-            : ExternalEventEmitters.get(e.emitter);
+            : lazy(e.emitter);
         if (emitter === undefined) {
             throw new Error(`Cannot find event emitter as it is undefined`);
         }

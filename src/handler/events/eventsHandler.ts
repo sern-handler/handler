@@ -11,7 +11,7 @@ export abstract class EventsHandler<T> {
     protected emitter: SernEmitter;
     protected crashHandler: ErrorHandling;
     protected logger: Logging;
-    protected modules: ModuleManager
+    protected modules: ModuleManager;
     protected constructor({ containerConfig }: Wrapper) {
         const [
             client,
@@ -21,12 +21,9 @@ export abstract class EventsHandler<T> {
             modules
         ] = containerConfig.get('@sern/client', '@sern/emitter', '@sern/errors', '@sern/logger', '@sern/modules');
         this.logger = logger as Logging;
-        this.logger.info('Logger activated ');
-        this.modules = modules as ModuleManager
+        this.modules = modules as ModuleManager;
         this.client = client as EventEmitter;
-        this.logger.info('Client activated: ' + this.client.constructor.name);
         this.emitter = emitter as SernEmitter;
-        this.logger.info('SernEmitter activated ');
         this.crashHandler = crash as ErrorHandling;
     }
     protected abstract init(): void;
