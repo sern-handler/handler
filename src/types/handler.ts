@@ -21,7 +21,6 @@ export type SlashOptions = Omit<CommandInteractionOptionResolver, 'getMessage' |
 export type Override<T1, T2> = Omit<T1, keyof T2> & T2;
 
 
-
 /**
  * Turns a function with a union of array of args into a single union
  *  [ T , V , B ] | [ A ] => T | V | B | A

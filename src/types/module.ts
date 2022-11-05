@@ -32,7 +32,7 @@ export interface BaseModule {
     type: CommandType | EventType;
     name?: string;
     description?: string;
-    execute: (...args: never[]) => unknown
+    execute: (...args: any[]) => unknown
 }
 
 export interface TextCommand extends BaseModule {
@@ -159,21 +159,17 @@ export type BaseOptions =
     | ApplicationCommandAttachmentOption
     | SernAutocompleteData;
 
-export type SernSubCommandData = Override<
-    Omit<BaseApplicationCommandOptionsData, 'required'>,
-    {
-        type: ApplicationCommandOptionType.Subcommand;
-        options?: BaseOptions[];
-    }
->;
+export interface SernSubCommandData extends BaseApplicationCommandOptionsData {
+    type: ApplicationCommandOptionType.Subcommand;
+    required: never;
+    options?: BaseOptions[];
+}
 
-export type SernSubCommandGroupData = Override<
-    Omit<BaseApplicationCommandOptionsData, 'required'>,
-    {
-        type: ApplicationCommandOptionType.SubcommandGroup;
-        options?: SernSubCommandData[];
-    }
->;
+export interface SernSubCommandGroupData extends BaseApplicationCommandOptionsData {
+    type: ApplicationCommandOptionType.SubcommandGroup;
+    required: never;
+    options?: SernSubCommandData[];
+}
 
 export type SernOptionsData<U extends ApplicationCommandOptionData = ApplicationCommandOptionData> =
     U extends ApplicationCommandSubCommandData
