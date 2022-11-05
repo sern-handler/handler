@@ -7,34 +7,35 @@ import SernEmitter from '../sernEmitter';
 import { constFn } from '../utilities/functions';
 import { DefaultErrorHandling, DefaultModuleManager } from '../contracts';
 import { ModuleStore } from '../structures/moduleStore';
-import { Result } from 'ts-results-es';
+import { None, Result } from 'ts-results-es';
 
 export const containerSubject = new BehaviorSubject<Container<Dependencies, {}> | null>(null);
-export function composeRoot<T extends Dependencies>(root: Container<Partial<T>, {}>) {
+export function composeRoot<T extends Dependencies>(root: Container<Partial<T>, {}>, exclusion: Set<keyof Dependencies>) {
     const client = root.get('@sern/client');
     assert.ok(client !== undefined, SernError.MissingRequired);
-    const getOr = (key: keyof Dependencies, or: () => unknown) => Result.wrap(() => root.get(key)).unwrapOr(or());
-    getOr('@sern/emitter', () =>
-        root.upsert({
+    const exclude = (key: keyof Dependencies) => exclusion.has(key);
+    const getOr = (key: keyof Dependencies, or: unknown) => Result.wrap(() => root.get(key)).unwrapOr(or);
+    const xGetOr = (key: keyof Dependencies, or: unknown) => getOr(key, exclude(key) ? or : None );
+    xGetOr('@sern/emitter', root.upsert({
             '@sern/emitter' : constFn(new SernEmitter())
         })
     );
-    getOr('@sern/logger', () =>
+    xGetOr('@sern/logger',
         root.upsert({
             '@sern/logger' : constFn(console)
         })
     );
-    getOr('@sern/store', () =>
+    xGetOr('@sern/store',
         root.upsert({
             '@sern/store' : constFn(new ModuleStore())
         })
     );
-    getOr('@sern/modules', () =>
+    xGetOr('@sern/modules',
         root.upsert((ctx) => ({
             '@sern/modules' : constFn(new DefaultModuleManager(ctx['@sern/store'] as ModuleStore))
         }))
     );
-    getOr('@sern/errors', () =>
+    xGetOr('@sern/errors',
         root.upsert({
             '@sern/errors': constFn(new DefaultErrorHandling())
         })

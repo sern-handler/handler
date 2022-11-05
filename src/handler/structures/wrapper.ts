@@ -16,11 +16,13 @@ interface Wrapper {
 interface P extends Dependencies {
     a : () => ''
 }
-const useDeps = makeDependencies<P>(root => {
-    return root.add({
-        a : () => ''
-    });
-});
+const useDeps = makeDependencies<P>({
+    exclude: new Set(['@sern/logger', '@sern/emitter']),
+    build: root => {
+        return root.add({
+            a : () => ''
+        });
+    }});
 const p : Wrapper = {
     commands: 'hello',
     containerConfig : {

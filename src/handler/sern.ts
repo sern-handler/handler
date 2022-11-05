@@ -131,11 +131,12 @@ export function eventModule(mod: InputEventModule): EventModule {
     } as EventModule;
 }
 
-export function makeDependencies<T extends Dependencies>(
-    cb: (root: Container<Record<string,unknown>, {}>) => Container<Partial<T>, {}>,
-) {
-    const container = cb(createContainer());
-    composeRoot(container);
+export function makeDependencies<T extends Dependencies>(conf: {
+    exclude: Set<Exclude<keyof Dependencies, '@sern/client' | '@sern/store' | '@sern/modules' | '@sern/error'>>,
+    build: (root: Container<Record<string, unknown>, {}>) => Container<Partial<T>, {}>,
+}) {
+    const container = conf.build(createContainer());
+    composeRoot(container, conf.exclude);
     containerSubject.next(container as unknown as Container<Dependencies, {}>);
     return useContainer<T>();
 }
