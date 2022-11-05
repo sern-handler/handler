@@ -15,27 +15,22 @@ import type { AutocompleteInteraction, Awaitable, Client, ClientEvents } from 'd
 import type { Result, Ok, Err } from 'ts-results-es';
 import type { CommandType, DefinitelyDefined, Override, SernEventsMapping } from '../../index';
 import { EventType, PluginType } from '../../index';
-import type { BaseModule, CommandModuleDefs, EventModuleDefs } from '../../types/module';
-import type { EventEmitter } from 'events';
+import type { CommandModuleDefs, EventModuleDefs } from '../../types/module';
 import type {
     DiscordEventCommand,
     ExternalEventCommand,
     SernEventCommand,
 } from '../structures/events';
-import type SernEmitter from '../sernEmitter';
-import type Wrapper from '../structures/wrapper';
 
 export interface Controller {
     next: () => Ok<void>;
     stop: () => Err<void>;
 }
-
-type BasePlugin = Override<
-    BaseModule,
-    {
-        type: PluginType;
-    }
->;
+interface BasePlugin {
+    name?: string;
+    description?: string;
+    type: PluginType
+}
 
 export type CommandPlugin<T extends keyof CommandModuleDefs = keyof CommandModuleDefs> = {
     [K in T]: Override<
@@ -43,9 +38,8 @@ export type CommandPlugin<T extends keyof CommandModuleDefs = keyof CommandModul
         {
             type: PluginType.Command;
             execute: (
-                wrapper: Wrapper,
                 payload: {
-                    mod: DefinitelyDefined<CommandModuleDefs[T], 'name'>;
+                    mod: DefinitelyDefined<CommandModuleDefs[T], 'name' | 'description'>;
                     absPath: string;
                 },
                 controller: Controller,
@@ -54,51 +48,38 @@ export type CommandPlugin<T extends keyof CommandModuleDefs = keyof CommandModul
     >;
 }[T];
 
-export type DiscordEmitterPlugin = Override<
-    BasePlugin,
-    {
+export interface DiscordEmitterPlugin extends BasePlugin {
         type: PluginType.Command;
         execute: (
             wrapper: Client,
             module: DefinitelyDefined<DiscordEventCommand, 'name'>,
             controller: Controller,
         ) => Awaitable<Result<void, void>>;
-    }
->;
-export type ExternalEmitterPlugin<T extends EventEmitter = EventEmitter> = Override<
-    BasePlugin,
-    {
-        type: PluginType.Command;
-        execute: (
-            wrapper: T,
-            module: DefinitelyDefined<ExternalEventCommand, 'name'>,
-            controller: Controller,
-        ) => Awaitable<Result<void, void>>;
-    }
->;
+}
 
-export type SernEmitterPlugin = Override<
-    BasePlugin,
-    {
-        type: PluginType.Command;
-        execute: (
-            wrapper: SernEmitter,
-            module: DefinitelyDefined<SernEventCommand, 'name'>,
-            controller: Controller,
-        ) => Awaitable<Result<void, void>>;
-    }
->;
+export interface ExternalEmitterPlugin extends BasePlugin {
+    type: PluginType.Command;
+    execute: (
+        module: DefinitelyDefined<ExternalEventCommand, 'name'>,
+        controller: Controller,
+    ) => Awaitable<Result<void, void>>;
+}
 
-export type AutocompletePlugin = Override<
-    BaseModule,
-    {
-        type: PluginType.Event;
-        execute: (
-            autocmp: AutocompleteInteraction,
-            controlller: Controller,
-        ) => Awaitable<Result<void, void>>;
-    }
->;
+export interface SernEmitterPlugin extends BasePlugin {
+    type: PluginType.Command;
+    execute: (
+        module: DefinitelyDefined<SernEventCommand, 'name'>,
+        controller: Controller,
+    ) => Awaitable<Result<void, void>>;
+}
+
+export interface AutocompletePlugin extends BasePlugin {
+    type: PluginType.Event;
+    execute: (
+        autocmp: AutocompleteInteraction,
+        controlller: Controller,
+    ) => Awaitable<Result<void, void>>;
+}
 
 export type EventPlugin<T extends keyof CommandModuleDefs = keyof CommandModuleDefs> = {
     [K in T]: Override<
@@ -113,34 +94,25 @@ export type EventPlugin<T extends keyof CommandModuleDefs = keyof CommandModuleD
     >;
 }[T];
 
-export type SernEventPlugin<T extends keyof SernEventsMapping = keyof SernEventsMapping> = Override<
-    BasePlugin,
-    {
-        name?: T;
-        type: PluginType.Event;
-        execute: (
-            args: SernEventsMapping[T],
-            controller: Controller,
-        ) => Awaitable<Result<void, void>>;
-    }
->;
+interface SernEventPlugin<T extends keyof SernEventsMapping = keyof SernEventsMapping> extends BasePlugin {
+    name?: T;
+    type: PluginType.Event;
+    execute: (
+        args: SernEventsMapping[T],
+        controller: Controller,
+    ) => Awaitable<Result<void, void>>;
+}
 
-export type ExternalEventPlugin = Override<
-    BasePlugin,
-    {
-        type: PluginType.Event;
-        execute: (args: unknown[], controller: Controller) => Awaitable<Result<void, void>>;
-    }
->;
+interface ExternalEventPlugin extends BasePlugin {
+    type: PluginType.Event;
+    execute: (args: unknown[], controller: Controller) => Awaitable<Result<void, void>>;
+}
 
-export type DiscordEventPlugin<T extends keyof ClientEvents = keyof ClientEvents> = Override<
-    BasePlugin,
-    {
-        name?: T;
-        type: PluginType.Event;
-        execute: (args: ClientEvents[T], controller: Controller) => Awaitable<Result<void, void>>;
-    }
->;
+interface DiscordEventPlugin<T extends keyof ClientEvents = keyof ClientEvents> extends BasePlugin {
+    name?: T;
+    type: PluginType.Event;
+    execute: (args: ClientEvents[T], controller: Controller) => Awaitable<Result<void, void>>;
+}
 
 export type CommandModuleNoPlugins = {
     [T in CommandType]: Omit<CommandModuleDefs[T], 'plugins' | 'onEvent'>;

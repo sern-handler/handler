@@ -105,7 +105,7 @@ export default class ReadyHandler extends EventsHandler<{
     }
 
     private processPlugins(payload: { mod: DefinedCommandModule; absPath: string }) {
-        const cmdPluginRes = processCommandPlugins(this.wrapper, payload);
+        const cmdPluginRes = processCommandPlugins(payload);
         return of({ mod: payload.mod, cmdPluginRes });
     }
 
@@ -122,9 +122,7 @@ export default class ReadyHandler extends EventsHandler<{
 
 function registerModule(manager: ModuleManager, mod: DefinedCommandModule): Result<void, void> {
     const name = mod.name;
-    const insert = (cb: (ms: ModuleStore) => void) => {
-        manager.set(cb);
-    };
+    const insert = (cb: (ms: ModuleStore) => void) =>  manager.set(cb);
     return match<DefinedCommandModule>(mod)
         .with({ type: CommandType.Text }, mod => {
             mod.alias?.forEach(a => insert(ms => ms.TextCommands.aliases.set(a, mod)));

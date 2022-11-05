@@ -18,18 +18,16 @@ import type SernEmitter from '../sernEmitter';
 
 /**
  * Utility function to process command plugins for all Modules
- * @param wrapper
  * @param payload
  */
 export function processCommandPlugins<T extends DefinedCommandModule>(
-    wrapper: Wrapper,
     payload: { mod: T; absPath: string },
 ) {
     return payload.mod.plugins.map(plug => ({
         ...plug,
         name: plug?.name ?? 'Unnamed Plugin',
         description: plug?.description ?? '...',
-        execute: plug.execute(wrapper, payload, controller),
+        execute: plug.execute(payload, controller),
     }));
 }
 
