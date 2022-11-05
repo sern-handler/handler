@@ -23,7 +23,7 @@ import type {
     SernEventCommand,
 } from '../handler/structures/events';
 import { CommandType } from '../handler/structures/enums';
-import type { Args, Override, SlashOptions } from './handler';
+import type { Args, SlashOptions } from './handler';
 import type Context from '../handler/structures/context';
 import type { AutocompletePlugin, CommandPlugin, EventPlugin } from '../handler/plugins/plugin';
 import { EventType } from '../handler/structures/enums';
@@ -135,18 +135,14 @@ export type EventModuleDefs = {
     [EventType.External]: ExternalEventCommand;
 };
 
-
-export type SernAutocompleteData = Override<
-    BaseApplicationCommandOptionsData,
-    {
-        autocomplete: true;
-        type:
-            | ApplicationCommandOptionType.String
-            | ApplicationCommandOptionType.Number
-            | ApplicationCommandOptionType.Integer;
-        command: AutocompleteCommand;
-    }
->;
+export interface SernAutocompleteData extends Omit<BaseApplicationCommandOptionsData, 'autocomplete'> {
+    autocomplete: true;
+    type:
+        | ApplicationCommandOptionType.String
+        | ApplicationCommandOptionType.Number
+        | ApplicationCommandOptionType.Integer;
+    command: AutocompleteCommand;
+}
 
 /**
  * Type that replaces autocomplete with {@link SernAutocompleteData}
