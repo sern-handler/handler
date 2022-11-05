@@ -16,7 +16,7 @@ export interface SernEventCommand<T extends keyof SernEventsMapping = keyof Sern
     type: EventType.Sern;
     onEvent: SernEventPlugin[];
     plugins: SernEmitterPlugin[];
-    execute(...args: SernEventsMapping[T]): Awaitable<void | unknown>;
+    execute(...args: SernEventsMapping[T]): Awaitable<unknown>;
 }
 
 export interface DiscordEventCommand<T extends keyof ClientEvents = keyof ClientEvents> {
@@ -35,27 +35,3 @@ export interface ExternalEventCommand {
     plugins: ExternalEmitterPlugin[];
     execute(...args: unknown[]): Awaitable<unknown>;
 }
-
-// export type DiscordEventCommand<T extends keyof ClientEvents = keyof ClientEvents> = Override<
-//     BaseModule,
-//     {
-//         name?: T;
-//         type: EventType.Discord;
-//         onEvent: DiscordEventPlugin[];
-//         plugins: DiscordEmitterPlugin[];
-//         execute(...args: ClientEvents[T]): Awaitable<void | unknown>;
-//     }
-// >;
-// /*
-//  * Type for any event emitter that can be handled by sern
-//  */
-// export type ExternalEventCommand = Override<
-//     BaseModule,
-//     {
-//         emitter: string;
-//         type: EventType.External;
-//         onEvent: ExternalEventPlugin[];
-//         plugins: ExternalEmitterPlugin[];
-//         execute(...args: unknown[]): Awaitable<void | unknown>;
-//     }
-// >;

@@ -1,4 +1,5 @@
 /**
+ * A bitfield that discriminates command modules
  * @enum { number }
  * @example
  * ```ts
@@ -16,38 +17,39 @@ export enum CommandType {
     /**
      * The CommandType for text commands
      */
-    Text = 0b00000000001,
+    Text = 1,
     /**
      * The CommandType for slash commands
      */
-    Slash = 0b00000000010,
+    Slash = 2,
     /**
      * The CommandType for hybrid commands, text and slash
      */
-    Both = 0b0000011,
+    Both = 3,
     /**
      * The CommandType for UserContextMenuInteraction commands
      */
-    MenuUser = 0b00000000100,
+    MenuUser = 4,
     /**
      * The CommandType for MessageContextMenuInteraction commands
      */
-    MenuMsg = 0b0000001000,
+    MenuMsg = 8,
     /**
      * The CommandType for ButtonInteraction commands
      */
-    Button = 0b00000010000,
+    Button = 16,
     /**
      * The CommandType for SelectMenuInteraction commands
      */
-    MenuSelect = 0b00000100000,
+    MenuSelect = 32,
     /**
      * The CommandType for ModalSubmitInteraction commands
      */
-    Modal = 0b00001000000,
+    Modal = 64,
 }
 
 /**
+ * A bitfield that discriminates event modules
  * @enum { number }
  * @example
  * ```ts
@@ -65,19 +67,20 @@ export enum EventType {
     /**
      * The EventType for handling discord events
      */
-    Discord = 0b01,
+    Discord = 1,
     /**
      * The EventType for handling sern events
      */
-    Sern = 0b10,
+    Sern = 2,
     /**
      * The EventType for handling external events.
      * Could be for example, `process` events, database events
      */
-    External = 0b11,
+    External = 3,
 }
 
 /**
+ * A bitfield that discriminates plugins
  * @enum { number }
  * @example
  * ```ts
@@ -94,11 +97,11 @@ export enum PluginType {
     /**
      * The PluginType for CommandPlugins
      */
-    Command = 0b01,
+    Command = 1,
     /**
      * The PluginType for EventPlugins
      */
-    Event = 0b10,
+    Event = 2,
 }
 /**
  * @enum { string }

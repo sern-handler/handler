@@ -1,6 +1,6 @@
 import { fromEvent, map } from 'rxjs';
 import * as Files from '../utilities/readFile';
-import { buildData, ExternalEventEmitters } from '../utilities/readFile';
+import { buildData } from '../utilities/readFile';
 import { controller } from '../sern';
 import type {
     DefinedCommandModule,

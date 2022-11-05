@@ -1,5 +1,4 @@
 import type { Dependencies } from '../../types/handler';
-import { makeDependencies } from '../sern';
 
 /**
  * An object to be passed into Sern#init() function.
@@ -13,20 +12,4 @@ interface Wrapper {
         get: (...keys: (keyof Dependencies)[]) => unknown[];
     }
 }
-interface P extends Dependencies {
-    a : () => ''
-}
-const useDeps = makeDependencies<P>({
-    exclude: new Set(['@sern/logger', '@sern/emitter']),
-    build: root => {
-        return root.add({
-            a : () => ''
-        });
-    }});
-const p : Wrapper = {
-    commands: 'hello',
-    containerConfig : {
-        get: useDeps
-    }
-};
 export default Wrapper;

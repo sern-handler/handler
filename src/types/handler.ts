@@ -20,11 +20,6 @@ export type SlashOptions = Omit<CommandInteractionOptionResolver, 'getMessage' |
 // Source: https://dev.to/vborodulin/ts-how-to-override-properties-with-type-intersection-554l
 export type Override<T1, T2> = Omit<T1, keyof T2> & T2;
 
-export type DefinitelyDefined<T, K extends keyof T = keyof T> = {
-    [L in K]-?: T[L] extends Record<string, unknown>
-        ? DefinitelyDefined<T[L], keyof T[L]>
-        : Required<T>[L];
-} & T;
 
 
 /**
@@ -39,16 +34,16 @@ export type SpreadParams<T extends (...args: never) => unknown> = (
  * After modules are transformed, name and description are given default values if none
  * are provided to Module. This type represents that transformation
  */
-export type DefinedCommandModule = DefinitelyDefined<CommandModule, 'name' | 'description'>;
-export type DefinedEventModule = DefinitelyDefined<EventModule, 'name'>;
+export type DefinedCommandModule = CommandModule & { name: string; description: string };
+export type DefinedEventModule = EventModule & { name: string };
 export type Payload =
     | { type: PayloadType.Success; module: Module }
     | { type: PayloadType.Failure; module?: Module; reason: string | Error };
 export type SernEventsMapping = {
-    ['module.register']: [Payload];
-    ['module.activate']: [Payload];
-    ['error']: [Payload];
-    ['warning']: [string];
+    'module.register': [Payload];
+    'module.activate': [Payload];
+    'error': [Payload];
+    'warning': [string];
 };
 
 export type Singleton<T> = () => T
