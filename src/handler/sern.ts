@@ -131,6 +131,9 @@ export function eventModule(mod: InputEventModule): EventModule {
     } as EventModule;
 }
 
+/**
+ * @param conf a configuration for creating your project dependencies
+ */
 export function makeDependencies<T extends Dependencies>(conf: {
     exclude: Set<Exclude<keyof Dependencies, '@sern/client' | '@sern/store' | '@sern/modules' | '@sern/error'>>,
     build: (root: Container<Record<string, unknown>, {}>) => Container<Partial<T>, {}>,

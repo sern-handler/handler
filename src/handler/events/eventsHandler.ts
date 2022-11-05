@@ -8,9 +8,9 @@ export abstract class EventsHandler<T> {
     protected payloadSubject = new Subject<T>();
     protected abstract discordEvent: Observable<unknown>;
     protected client: EventEmitter;
-    protected emitter: SernEmitter;
+    protected emitter?: SernEmitter;
     protected crashHandler: ErrorHandling;
-    protected logger: Logging;
+    protected logger?: Logging;
     protected modules: ModuleManager;
     protected constructor({ containerConfig }: Wrapper) {
         const [

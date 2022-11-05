@@ -1,11 +1,6 @@
 import type { CommandModule } from '../../types/module';
 import { ApplicationCommandType, ComponentType, InteractionType } from 'discord.js';
-import type { EventEmitter } from 'events';
 
-/**
- * Would be a little overkill for a class just for the event emitters?
- */
-export const ExternalEventEmitters = new Map<string, EventEmitter>();
 /**
  * Storing all command modules
  */

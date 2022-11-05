@@ -31,12 +31,12 @@ export class DefaultErrorHandling implements ErrorHandling {
     }
 }
 
-export function handleError<C>(crashHandler: ErrorHandling, logging: Logging) {
+export function handleError<C>(crashHandler: ErrorHandling, logging?: Logging) {
     return (error: Error, caught: Observable<C>) => {
         if(crashHandler.keepAlive == 0) {
             crashHandler.crash(error);
         }
-        logging.error(error.message);
+        logging?.error(error.message);
         crashHandler.updateAlive(error);
         return caught;
     };

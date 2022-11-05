@@ -14,7 +14,7 @@ export function composeRoot<T extends Dependencies>(root: Container<Partial<T>, 
     const client = root.get('@sern/client');
     assert.ok(client !== undefined, SernError.MissingRequired);
     const exclude = (key: keyof Dependencies) => exclusion.has(key);
-    const getOr = (key: keyof Dependencies, or: unknown) => Result.wrap(() => root.get(key)).unwrapOr(or);
+    const getOr = (key: keyof Dependencies, elseVal: unknown) => Result.wrap(() => root.get(key)).unwrapOr(elseVal);
     const xGetOr = (key: keyof Dependencies, or: unknown) => getOr(key, exclude(key) ? or : None );
     xGetOr('@sern/emitter', root.upsert({
             '@sern/emitter' : constFn(new SernEmitter())
