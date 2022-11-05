@@ -45,7 +45,7 @@ export type CommandPlugin<T extends keyof CommandModuleDefs = keyof CommandModul
             execute: (
                 wrapper: Wrapper,
                 payload: {
-                    mod: DefinitelyDefined<CommandModuleDefs[T], 'name' | 'description'>;
+                    mod: DefinitelyDefined<CommandModuleDefs[T], 'name'>;
                     absPath: string;
                 },
                 controller: Controller,
@@ -60,7 +60,7 @@ export type DiscordEmitterPlugin = Override<
         type: PluginType.Command;
         execute: (
             wrapper: Client,
-            module: DefinitelyDefined<DiscordEventCommand, 'name' | 'description'>,
+            module: DefinitelyDefined<DiscordEventCommand, 'name'>,
             controller: Controller,
         ) => Awaitable<Result<void, void>>;
     }
@@ -71,7 +71,7 @@ export type ExternalEmitterPlugin<T extends EventEmitter = EventEmitter> = Overr
         type: PluginType.Command;
         execute: (
             wrapper: T,
-            module: DefinitelyDefined<ExternalEventCommand, 'name' | 'description'>,
+            module: DefinitelyDefined<ExternalEventCommand, 'name'>,
             controller: Controller,
         ) => Awaitable<Result<void, void>>;
     }
@@ -83,7 +83,7 @@ export type SernEmitterPlugin = Override<
         type: PluginType.Command;
         execute: (
             wrapper: SernEmitter,
-            module: DefinitelyDefined<SernEventCommand, 'name' | 'description'>,
+            module: DefinitelyDefined<SernEventCommand, 'name'>,
             controller: Controller,
         ) => Awaitable<Result<void, void>>;
     }

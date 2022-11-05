@@ -41,7 +41,6 @@ export function processEvents({ containerConfig, events }: Wrapper) {
         map(({ mod, absPath }) => {
             return <DefinedEventModule>{
                 name: mod?.name ?? Files.fmtFileName(basename(absPath)),
-                description: mod?.description ?? '...',
                 ...mod,
             };
         }),

@@ -29,7 +29,7 @@ import type { AutocompletePlugin, CommandPlugin, EventPlugin } from '../handler/
 import { EventType } from '../handler/structures/enums';
 
 export interface BaseModule {
-    type: CommandType;
+    type: CommandType | EventType;
     name?: string;
     description?: string;
     execute: (...args: never[]) => unknown

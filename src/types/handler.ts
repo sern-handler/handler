@@ -40,7 +40,7 @@ export type SpreadParams<T extends (...args: never) => unknown> = (
  * are provided to Module. This type represents that transformation
  */
 export type DefinedCommandModule = DefinitelyDefined<CommandModule, 'name' | 'description'>;
-export type DefinedEventModule = DefinitelyDefined<EventModule, 'name' | 'description'>;
+export type DefinedEventModule = DefinitelyDefined<EventModule, 'name'>;
 export type Payload =
     | { type: PayloadType.Success; module: Module }
     | { type: PayloadType.Failure; module?: Module; reason: string | Error };
@@ -64,9 +64,6 @@ export interface Dependencies {
 }
 
 export type ReplyOptions = string | Omit<InteractionReplyOptions, 'fetchReply'> | MessageReplyOptions;
-
-
-export type ExtractFromPartial<T extends Partial<Record<string,unknown>>> = T extends Partial<infer Full> ? Full : never;
 
 export type MapDeps<
     Deps extends Dependencies,

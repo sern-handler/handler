@@ -28,6 +28,7 @@ export interface DiscordEventCommand<T extends keyof ClientEvents = keyof Client
 }
 
 export interface ExternalEventCommand {
+    name?: string
     emitter: string;
     type: EventType.External;
     onEvent: ExternalEventPlugin[];
