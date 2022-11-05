@@ -32,105 +32,77 @@ export interface BaseModule {
     type: CommandType;
     name?: string;
     description?: string;
+    execute: (...args: never[]) => unknown
 }
 
-export type TextCommand = Override<
-    BaseModule,
-    {
-        type: CommandType.Text;
-        onEvent: EventPlugin<CommandType.Text>[]; //maybe allow BothPlugins for this also?
-        plugins: CommandPlugin[]; //maybe allow BothPlugins for this also?
-        alias?: string[];
-        execute: (ctx: Context, args: ['text', string[]]) => Awaitable<void | unknown>;
-    }
->;
+export interface TextCommand extends BaseModule {
+    type: CommandType.Text;
+    onEvent: EventPlugin<CommandType.Text>[];
+    plugins: CommandPlugin[];
+    alias?: string[];
+    execute: (ctx: Context, args: ['text', string[]]) => Awaitable<unknown>;
+}
 
-export type SlashCommand = Override<
-    BaseModule,
-    {
-        type: CommandType.Slash;
-        onEvent: EventPlugin<CommandType.Slash>[]; //maybe allow BothPlugins for this also?
-        plugins: CommandPlugin[]; //maybe allow BothPlugins for this also?
-        options?: SernOptionsData[];
-        execute: (ctx: Context, args: ['slash', SlashOptions]) => Awaitable<void | unknown>;
-    }
->;
+export interface SlashCommand extends BaseModule {
+    type: CommandType.Slash;
+    onEvent: EventPlugin<CommandType.Slash>[];
+    plugins: CommandPlugin[];
+    options?: SernOptionsData[];
+    execute: (ctx: Context, args: ['slash', SlashOptions]) => Awaitable<unknown>;
+}
 
-export type BothCommand = Override<
-    BaseModule,
-    {
-        type: CommandType.Both;
-        onEvent: EventPlugin<CommandType.Both>[];
-        plugins: CommandPlugin[];
-        alias?: string[];
-        options?: SernOptionsData[];
-        execute: (ctx: Context, args: Args) => Awaitable<void | unknown>;
-    }
->;
+export interface BothCommand extends BaseModule {
+    type: CommandType.Both;
+    onEvent: EventPlugin<CommandType.Both>[];
+    plugins: CommandPlugin[];
+    alias?: string[];
+    options?: SernOptionsData[];
+    execute: (ctx: Context, args: Args) => Awaitable<unknown>;
+}
 
-export type ContextMenuUser = Override<
-    BaseModule,
-    {
-        type: CommandType.MenuUser;
-        onEvent: EventPlugin<CommandType.MenuUser>[];
-        plugins: CommandPlugin[];
-        execute: (ctx: UserContextMenuCommandInteraction) => Awaitable<void | unknown>;
-    }
->;
+export interface ContextMenuUser extends BaseModule {
+    type: CommandType.MenuUser;
+    onEvent: EventPlugin<CommandType.MenuUser>[];
+    plugins: CommandPlugin[];
+    execute: (ctx: UserContextMenuCommandInteraction) => Awaitable<unknown>;
+}
 
-export type ContextMenuMsg = Override<
-    BaseModule,
-    {
-        type: CommandType.MenuMsg;
-        onEvent: EventPlugin<CommandType.MenuMsg>[];
-        plugins: CommandPlugin[];
-        execute: (ctx: MessageContextMenuCommandInteraction) => Awaitable<void | unknown>;
-    }
->;
+export interface ContextMenuMsg extends BaseModule {
+    type: CommandType.MenuMsg;
+    onEvent: EventPlugin<CommandType.MenuMsg>[];
+    plugins: CommandPlugin[];
+    execute: (ctx: MessageContextMenuCommandInteraction) => Awaitable<unknown>;
+}
 
-export type ButtonCommand = Override<
-    BaseModule,
-    {
-        type: CommandType.Button;
-        onEvent: EventPlugin<CommandType.Button>[];
-        plugins: CommandPlugin[];
-        execute: (ctx: ButtonInteraction) => Awaitable<void | unknown>;
-    }
->;
+export interface ButtonCommand extends BaseModule {
+    type: CommandType.Button;
+    onEvent: EventPlugin<CommandType.Button>[];
+    plugins: CommandPlugin[];
+    execute: (ctx: ButtonInteraction) => Awaitable<unknown>;
+}
 
-export type SelectMenuCommand = Override<
-    BaseModule,
-    {
-        type: CommandType.MenuSelect;
-        onEvent: EventPlugin<CommandType.MenuSelect>[];
-        plugins: CommandPlugin[];
-        execute: (ctx: SelectMenuInteraction) => Awaitable<void | unknown>;
-    }
->;
+export interface SelectMenuCommand extends BaseModule {
+    type: CommandType.MenuSelect;
+    onEvent: EventPlugin<CommandType.MenuSelect>[];
+    plugins: CommandPlugin[];
+    execute: (ctx: SelectMenuInteraction) => Awaitable<unknown>;
+}
 
-export type ModalSubmitCommand = Override<
-    BaseModule,
-    {
-        type: CommandType.Modal;
-        onEvent: EventPlugin<CommandType.Modal>[];
-        plugins: CommandPlugin[];
-        execute: (ctx: ModalSubmitInteraction) => Awaitable<void | unknown>;
-    }
->;
+export interface ModalSubmitCommand extends BaseModule {
+    type: CommandType.Modal;
+    onEvent: EventPlugin<CommandType.Modal>[];
+    plugins: CommandPlugin[];
+    execute: (ctx: ModalSubmitInteraction) => Awaitable<unknown>;
+}
 
-// Autocomplete commands are a little different
-// They can't have command plugins as they are
-// in conjunction with chat input commands
-export type AutocompleteCommand = Override<
-    BaseModule,
-    {
-        name?: never;
-        description?: never;
-        type?: never;
-        onEvent: AutocompletePlugin[];
-        execute: (ctx: AutocompleteInteraction) => Awaitable<void | unknown>;
-    }
->;
+export interface AutocompleteCommand extends BaseModule {
+    name: never;
+    description: never;
+    type: never;
+    onEvent: AutocompletePlugin[];
+    execute: (ctx: AutocompleteInteraction) => Awaitable<unknown>;
+}
+
 export type EventModule = DiscordEventCommand | SernEventCommand | ExternalEventCommand;
 export type CommandModule =
     | TextCommand
