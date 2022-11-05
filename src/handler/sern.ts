@@ -135,11 +135,11 @@ export function eventModule(mod: InputEventModule): EventModule {
  * @param conf a configuration for creating your project dependencies
  */
 export function makeDependencies<T extends Dependencies>(conf: {
-    exclude: Set<Exclude<keyof Dependencies, '@sern/client' | '@sern/store' | '@sern/modules' | '@sern/error'>>,
+    exclude?: Set<Exclude<keyof Dependencies, '@sern/client' | '@sern/store' | '@sern/modules' | '@sern/error'>>,
     build: (root: Container<Record<string, unknown>, {}>) => Container<Partial<T>, {}>,
 }) {
     const container = conf.build(createContainer());
-    composeRoot(container, conf.exclude);
+    composeRoot(container, conf.exclude ?? new Set());
     containerSubject.next(container as unknown as Container<Dependencies, {}>);
     return useContainer<T>();
 }
