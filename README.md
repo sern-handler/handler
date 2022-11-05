@@ -10,7 +10,7 @@
   <a href="https://www.npmjs.com/package/@sern/handler"><img src="https://img.shields.io/npm/v/@sern/handler?maxAge=3600" alt="NPM version" /></a>
   <a href="https://www.npmjs.com/package/@sern/handler"><img src="https://img.shields.io/npm/dt/@sern/handler?maxAge=3600" alt="NPM downloads" /></a>
   <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/license-MIT-brightgreen" alt="License MIT" /></a>
-  <a href="https://sern-handler.js.org"><img alt="docs.rs" src="https://img.shields.io/docsrs/docs" /></a>
+  <a href="https://sern.dev"><img alt="docs.rs" src="https://img.shields.io/docsrs/docs" /></a>
   <img alt="Lines of code" src="https://img.shields.io/badge/total%20lines-2k-blue" />
 </div>
 
@@ -91,8 +91,8 @@ It is **highly encouraged** to use the [command line interface](https://github.c
 
 ## 🔗 Links
 
-- [Official Documentation and Guide](https://sern-handler.js.org)
-- [Support Server](https://sern-handler.js.org/discord)
+- [Official Documentation and Guide](https://sern.dev)
+- [Support Server](https://sern.dev/discord)
 
 ## 👋 Contribute
 
