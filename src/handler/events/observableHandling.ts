@@ -79,7 +79,7 @@ export function executeModule(
         res: Result<void, void>[];
     },
 ) {
-    const [ emitter ] = wrapper.containerConfig.get('@sern/emitter') as [EventEmitter];
+    const [ emitter ] = wrapper.containerConfig.get('@sern/emitter')[0] as [EventEmitter | undefined];
     if (payload.res.every(el => el.ok)) {
         const executeFn = Result.wrapAsync<unknown, Error | string>(() =>
             Promise.resolve(payload.execute()),
@@ -95,7 +95,7 @@ export function executeModule(
                 }
                 return of(res.val).pipe(
                     tap(() =>
-                        emitter.emit('module.activate', {
+                        emitter?.emit('module.activate', {
                             type: PayloadType.Success,
                             module: payload.mod,
                         }),
@@ -104,7 +104,7 @@ export function executeModule(
             }),
         );
     } else {
-        emitter.emit('module.activate', {
+        emitter?.emit('module.activate', {
             type: PayloadType.Failure,
             module: payload.mod,
             reason: SernError.PluginFailure,

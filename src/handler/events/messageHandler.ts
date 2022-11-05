@@ -1,5 +1,5 @@
 import { EventsHandler } from './eventsHandler';
-import { catchError, concatMap, from, fromEvent, map, Observable, of, switchMap, tap } from 'rxjs';
+import { catchError, concatMap, from, fromEvent, map, Observable, of, switchMap } from 'rxjs';
 import type Wrapper from '../structures/wrapper';
 import type { Message } from 'discord.js';
 import { executeModule, ignoreNonBot, isOneOfCorrectModules } from './observableHandling';
