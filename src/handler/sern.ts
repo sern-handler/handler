@@ -1,7 +1,5 @@
 import type Wrapper from './structures/wrapper';
 import { Err, Ok } from 'ts-results-es';
-import { ExternalEventEmitters } from './utilities/readFile';
-import type { EventEmitter } from 'events';
 import { processEvents } from './events/userDefinedEventsHandling';
 import { CommandType, EventType, PluginType } from './structures/enums';
 import type {
@@ -52,35 +50,6 @@ export function init(wrapper: Wrapper) {
     new InteractionHandler(wrapper);
 }
 
-/**
- * @deprecated - use Sern#makeDependencies instead
- * @param emitter Any external event emitter.
- * The object will be stored in a map, and then fetched by the name of the instance's class.
- * As there are infinite possibilities to adding external event emitters,
- * Most types aren't provided and are as narrow as possibly can.
- * @example
- * ```ts title="src/index.ts"
- * //Add this before initiating Sern!
- * Sern.addExternal(new Level())
- * ```
- * @example
- * ```ts title="events/level.ts"
- *  export default eventModule({
- *      emitter: 'Level',
- *      type : EventType.External,
- *      name: 'error',
- *      execute(args) {
- *          console.log(args)
- *      }
- *  })
- * ```
- */
-export function addExternal<T extends EventEmitter>(emitter: T) {
-    if (ExternalEventEmitters.has(emitter.constructor.name)) {
-        throw Error(`${emitter.constructor.name} already exists!`);
-    }
-    ExternalEventEmitters.set(emitter.constructor.name, emitter);
-}
 
 /**
  * The object passed into every plugin to control a command's behavior

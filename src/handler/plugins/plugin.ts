@@ -11,9 +11,9 @@
  * Plugins are reminiscent of middleware in express.
  */
 
-import type { AutocompleteInteraction, Awaitable, Client, ClientEvents } from 'discord.js';
+import type { AutocompleteInteraction, Awaitable, ClientEvents } from 'discord.js';
 import type { Result, Ok, Err } from 'ts-results-es';
-import type { CommandType, DefinitelyDefined, Override, SernEventsMapping } from '../../index';
+import type { CommandType, DefinitelyDefined, SernEventsMapping } from '../../index';
 import { EventType, PluginType } from '../../index';
 import type { CommandModuleDefs, EventModuleDefs } from '../../types/module';
 import type {
@@ -33,8 +33,7 @@ interface BasePlugin {
 }
 
 export type CommandPlugin<T extends keyof CommandModuleDefs = keyof CommandModuleDefs> = {
-    [K in T]: Override<
-        BasePlugin,
+    [K in T]: BasePlugin &
         {
             type: PluginType.Command;
             execute: (
@@ -45,13 +44,11 @@ export type CommandPlugin<T extends keyof CommandModuleDefs = keyof CommandModul
                 controller: Controller,
             ) => Awaitable<Result<void, void>>;
         }
-    >;
 }[T];
 
 export interface DiscordEmitterPlugin extends BasePlugin {
         type: PluginType.Command;
         execute: (
-            wrapper: Client,
             module: DefinitelyDefined<DiscordEventCommand, 'name'>,
             controller: Controller,
         ) => Awaitable<Result<void, void>>;
@@ -82,8 +79,7 @@ export interface AutocompletePlugin extends BasePlugin {
 }
 
 export type EventPlugin<T extends keyof CommandModuleDefs = keyof CommandModuleDefs> = {
-    [K in T]: Override<
-        BasePlugin,
+    [K in T]: BasePlugin &
         {
             type: PluginType.Event;
             execute: (
@@ -91,7 +87,6 @@ export type EventPlugin<T extends keyof CommandModuleDefs = keyof CommandModuleD
                 controller: Controller,
             ) => Awaitable<Result<void, void>>;
         }
-    >;
 }[T];
 
 interface SernEventPlugin<T extends keyof SernEventsMapping = keyof SernEventsMapping> extends BasePlugin {
