@@ -30,7 +30,7 @@ export default class InteractionHandler extends EventsHandler<{
     mod: CommandModule;
 }> {
     protected override discordEvent: Observable<Interaction>;
-    constructor(protected wrapper: Wrapper) {
+    constructor(wrapper: Wrapper) {
         super(wrapper);
         this.discordEvent = <Observable<Interaction>>fromEvent(this.client, 'interactionCreate');
         this.init();

@@ -21,12 +21,12 @@ export default class ReadyHandler extends EventsHandler<{
     absPath: string;
 }> {
     protected discordEvent!: Observable<{ mod: CommandModule; absPath: string }>;
-    constructor(protected wrapper: Wrapper) {
+    constructor(wrapper: Wrapper) {
         super(wrapper);
         const ready$ = fromEvent(this.client, 'ready').pipe(take(1));
         this.discordEvent = ready$.pipe(
             concatMap(() =>
-                Files.buildData<CommandModule>(this.wrapper.commands).pipe(
+                Files.buildData<CommandModule>(wrapper.commands).pipe(
                     errTap(reason =>
                         this.emitter?.emit('module.register', {
                             type: PayloadType.Failure,
