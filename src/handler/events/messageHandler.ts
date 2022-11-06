@@ -12,6 +12,7 @@ import type { CommandModule, TextCommand } from '../../types/module';
 import { handleError } from '../contracts/errorHandling';
 import type { ModuleManager } from '../contracts';
 import type { ModuleStore } from '../structures/moduleStore';
+import { _const } from '../utilities/functions';
 
 export default class MessageHandler extends EventsHandler<{
     ctx: Context;
@@ -28,13 +29,10 @@ export default class MessageHandler extends EventsHandler<{
             .pipe(
                 switchMap(({ mod, ctx, args }) => {
                     const res = asyncResolveArray(
-                        mod.onEvent.map(ePlug => {
-                            return ePlug.execute([ctx, args], controller);
-                        }),
+                            mod.onEvent.map(ep => ep.execute([ctx, args], controller)
+                        ),
                     );
-                    const execute = () => {
-                        return mod.execute(ctx, args);
-                    };
+                    const execute = _const(mod.execute(ctx, args));
                     //resolves the promise and re-emits it back into source
                     return from(res).pipe(map(res => ({ mod, execute, res })));
                 }),

@@ -15,6 +15,7 @@ import type { CommandModule } from '../../types/module';
 import type { DefinedCommandModule } from '../../types/handler';
 import type { ModuleManager } from '../contracts';
 import type { ModuleStore } from '../structures/moduleStore';
+import { nameOrFilename } from '../utilities/functions';
 
 export default class ReadyHandler extends EventsHandler<{
     mod: DefinedCommandModule;
@@ -70,7 +71,7 @@ export default class ReadyHandler extends EventsHandler<{
         return {
             absPath,
             mod: {
-                name: mod?.name ?? Files.fmtFileName(basename(absPath)),
+                name: nameOrFilename(mod.name, absPath),
                 description: mod?.description ?? '...',
                 ...mod,
             },

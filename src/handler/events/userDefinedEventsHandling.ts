@@ -1,5 +1,4 @@
 import { fromEvent, map } from 'rxjs';
-import * as Files from '../utilities/readFile';
 import { buildData } from '../utilities/readFile';
 import { controller } from '../sern';
 import type {
@@ -9,12 +8,12 @@ import type {
 } from '../../types/handler';
 import { PayloadType } from '../structures/enums';
 import type Wrapper from '../structures/wrapper';
-import { basename } from 'path';
 import { isDiscordEvent, isSernEvent } from '../utilities/predicates';
 import { errTap } from './observableHandling';
 import type { EventModule } from '../../types/module';
 import type { EventEmitter } from 'events';
 import type SernEmitter from '../sernEmitter';
+import { nameOrFilename } from '../utilities/functions';
 
 /**
  * Utility function to process command plugins for all Modules
@@ -38,7 +37,7 @@ export function processEvents({ containerConfig, events }: Wrapper) {
     const normalize$ = eventStream$.pipe(
         map(({ mod, absPath }) => {
             return <DefinedEventModule>{
-                name: mod?.name ?? Files.fmtFileName(basename(absPath)),
+                name: nameOrFilename(mod.name, absPath),
                 ...mod,
             };
         }),
