@@ -16,7 +16,6 @@ export function correctModuleType<T extends keyof CommandModuleDefs>(
 }
 
 
-
 export function isDiscordEvent(el: EventModule): el is DiscordEventCommand {
     return el.type === EventType.Discord;
 }

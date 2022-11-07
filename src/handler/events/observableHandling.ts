@@ -7,6 +7,7 @@ import type Wrapper from '../structures/wrapper';
 import { PayloadType } from '../structures/enums';
 import type { CommandModule, CommandModuleDefs, Module } from '../../types/module';
 import type { EventEmitter } from 'events';
+import { _const } from '../utilities/functions';
 
 export function ignoreNonBot(prefix: string) {
     return (src: Observable<Message>) =>
@@ -56,12 +57,12 @@ export function isOneOfCorrectModules<T extends readonly CommandType[]>(...input
             return src.subscribe({
                 next(mod) {
                     if (mod === undefined) {
-                        return throwError(() => SernError.UndefinedModule);
+                        return throwError(_const(SernError.UndefinedModule));
                     }
                     if (inputs.some(type => (mod.type & type) !== 0)) {
                         subscriber.next(mod as CommandModuleDefs[T[number]]);
                     } else {
-                        return throwError(() => SernError.MismatchModule);
+                        return throwError(_const(SernError.MismatchModule));
                     }
                 },
                 error: e => subscriber.error(e),
@@ -79,7 +80,7 @@ export function executeModule(
         res: Result<void, void>[];
     },
 ) {
-    const [ emitter ] = wrapper.containerConfig.get('@sern/emitter')[0] as [EventEmitter | undefined];
+    const [ emitter ] = wrapper.containerConfig.get('@sern/emitter')[0] as [EventEmitter?];
     if (payload.res.every(el => el.ok)) {
         const executeFn = Result.wrapAsync<unknown, Error | string>(() =>
             Promise.resolve(payload.execute()),

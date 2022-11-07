@@ -3,19 +3,18 @@ import type Wrapper from '../structures/wrapper';
 import { concatMap, fromEvent, Observable, map, take, of, from, toArray, switchMap } from 'rxjs';
 import * as Files from '../utilities/readFile';
 import { errTap } from './observableHandling';
-import { basename } from 'path';
 import { CommandType, PayloadType, PluginType } from '../structures/enums';
 import { processCommandPlugins } from './userDefinedEventsHandling';
 import type { Awaitable } from 'discord.js';
 import { SernError } from '../structures/errors';
 import { match } from 'ts-pattern';
-import { type Result, Err, Ok } from 'ts-results-es';
+import { Result } from 'ts-results-es';
 import { ApplicationCommandType, ComponentType, InteractionType } from 'discord.js';
 import type { CommandModule } from '../../types/module';
 import type { DefinedCommandModule } from '../../types/handler';
 import type { ModuleManager } from '../contracts';
 import type { ModuleStore } from '../structures/moduleStore';
-import { nameOrFilename } from '../utilities/functions';
+import { _const, err, nameOrFilename, ok } from '../utilities/functions';
 
 export default class ReadyHandler extends EventsHandler<{
     mod: DefinedCommandModule;
@@ -123,41 +122,36 @@ export default class ReadyHandler extends EventsHandler<{
 
 function registerModule(manager: ModuleManager, mod: DefinedCommandModule): Result<void, void> {
     const name = mod.name;
-    const insert = (cb: (ms: ModuleStore) => void) =>  manager.set(cb);
+    const insert = (cb: (ms: ModuleStore) => void) => {
+        const set = Result.wrap(_const(manager.set(cb)));
+        return set.ok ? ok() : err();
+    };
     return match<DefinedCommandModule>(mod)
         .with({ type: CommandType.Text }, mod => {
             mod.alias?.forEach(a => insert(ms => ms.TextCommands.aliases.set(a, mod)));
-            insert(ms => ms.TextCommands.text.set(name, mod));
-            return Ok.EMPTY;
+            return insert(ms => ms.TextCommands.text.set(name, mod));
         })
-        .with({ type: CommandType.Slash }, mod => {
-            insert(ms => ms.ApplicationCommands[ApplicationCommandType.ChatInput].set(name, mod));
-            return Ok.EMPTY;
-        })
+        .with({ type: CommandType.Slash }, mod =>
+            insert(ms => ms.ApplicationCommands[ApplicationCommandType.ChatInput].set(name, mod))
+        )
         .with({ type: CommandType.Both }, mod => {
-            insert( ms => ms.BothCommands.set(name, mod));
             mod.alias?.forEach(a => insert(ms => ms.TextCommands.aliases.set(a, mod)));
-            return Ok.EMPTY;
+            return insert( ms => ms.BothCommands.set(name, mod));
         })
-        .with({ type: CommandType.MenuUser }, mod => {
-            insert(ms => ms.ApplicationCommands[ApplicationCommandType.User].set(name, mod));
-            return Ok.EMPTY;
-        })
-        .with({ type: CommandType.MenuMsg }, mod => {
-            insert(ms => ms.ApplicationCommands[ApplicationCommandType.Message].set(name, mod));
-            return Ok.EMPTY;
-        })
-        .with({ type: CommandType.Button }, mod => {
-            insert(ms => ms.InteractionHandlers[ComponentType.Button].set(name, mod));
-            return Ok.EMPTY;
-        })
-        .with({ type: CommandType.MenuSelect }, mod => {
-            insert(ms => ms.InteractionHandlers[ComponentType.SelectMenu].set(name, mod));
-            return Ok.EMPTY;
-        })
-        .with({ type: CommandType.Modal }, mod => {
-            insert(ms => ms.InteractionHandlers[InteractionType.ModalSubmit].set(name, mod));
-            return Ok.EMPTY;
-        })
-        .otherwise(() => Err.EMPTY);
+        .with({ type: CommandType.MenuUser }, mod =>
+             insert(ms => ms.ApplicationCommands[ApplicationCommandType.User].set(name, mod))
+        )
+        .with({ type: CommandType.MenuMsg }, mod =>
+             insert(ms => ms.ApplicationCommands[ApplicationCommandType.Message].set(name, mod))
+        )
+        .with({ type: CommandType.Button }, mod =>
+             insert(ms => ms.InteractionHandlers[ComponentType.Button].set(name, mod))
+        )
+        .with({ type: CommandType.MenuSelect }, mod =>
+             insert(ms => ms.InteractionHandlers[ComponentType.SelectMenu].set(name, mod))
+        )
+        .with({ type: CommandType.Modal }, mod =>
+            insert(ms => ms.InteractionHandlers[InteractionType.ModalSubmit].set(name, mod))
+        )
+        .otherwise(err);
 }

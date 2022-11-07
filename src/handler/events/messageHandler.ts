@@ -29,8 +29,7 @@ export default class MessageHandler extends EventsHandler<{
             .pipe(
                 switchMap(({ mod, ctx, args }) => {
                     const res = asyncResolveArray(
-                            mod.onEvent.map(ep => ep.execute([ctx, args], controller)
-                        ),
+                            mod.onEvent.map(ep => ep.execute([ctx, args], controller)),
                     );
                     const execute = _const(mod.execute(ctx, args));
                     //resolves the promise and re-emits it back into source

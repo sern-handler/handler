@@ -26,7 +26,6 @@ import type {
 } from '../types/handler';
 import { containerSubject, composeRoot, useContainer } from './dependencies/provider';
 
-
 /**
  *
  * @param wrapper Options to pass into sern.
