@@ -1,5 +1,5 @@
 import Context from '../structures/context';
-import type { SlashOptions } from '../../types/handler';
+import type { Payload, SlashOptions } from '../../types/handler';
 import { asyncResolveArray } from '../utilities/asyncResolveArray';
 import { controller } from '../sern';
 import type {
@@ -22,6 +22,12 @@ import type {
     SelectMenuCommand,
     SlashCommand,
 } from '../../types/module';
+import type SernEmitter from '../sernEmitter';
+import { EventEmitter } from 'events';
+import type { DiscordEventCommand, ExternalEventCommand, SernEventCommand } from '../structures/events';
+import * as assert from 'assert';
+import { _const } from '../utilities/functions';
+import { concatMap, from, fromEvent } from 'rxjs';
 
 export function applicationCommandDispatcher(interaction: Interaction) {
     if (interaction.isAutocomplete()) {
@@ -104,5 +110,38 @@ export function ctxMenuMsgDispatcher(interaction: MessageContextMenuCommandInter
         eventPluginRes: asyncResolveArray(
             mod.onEvent.map(plugs => plugs.execute([interaction], controller)),
         ),
+    });
+}
+
+export function sernEmitterDispatcher(e: SernEmitter | undefined) {
+    assert.ok(e !== undefined, 'SernEmitter is undefined, but tried creating EventModule');
+    return(cmd: SernEventCommand & { name: string }) => ({
+        cmd,
+        execute: _const(
+            fromEvent(e, cmd.name).pipe(
+                concatMap(event => {
+                    return from(cmd.onEvent.map(plug => plug.execute([event] as [Payload] | [string], controller)));
+                })
+            )
+        )
+    });
+}
+
+export function discordEventDispatcher(e: EventEmitter) {
+    return (cmd: DiscordEventCommand & { name: string }) => ({
+        cmd,
+        execute: _const(
+            fromEvent(e, cmd.name)
+        )
+    });
+}
+
+export function externalEventDispatcher(e: unknown) {
+    assert.ok(e instanceof EventEmitter, `${e} is not an EventEmitter`);
+    return (cmd: ExternalEventCommand & { name: string}) => ({
+        cmd,
+        execute: _const(
+            fromEvent(e, cmd.name)
+        )
     });
 }

@@ -1,5 +1,4 @@
 import type Wrapper from './structures/wrapper';
-import { Err, Ok } from 'ts-results-es';
 import { processEvents } from './events/userDefinedEventsHandling';
 import { CommandType, EventType, PluginType } from './structures/enums';
 import type {
@@ -25,6 +24,8 @@ import type {
     Dependencies
 } from '../types/handler';
 import { containerSubject, composeRoot, useContainer } from './dependencies/provider';
+import type { Logging } from './contracts';
+import { err, ok } from './utilities/functions';
 
 /**
  *
@@ -40,6 +41,8 @@ import { containerSubject, composeRoot, useContainer } from './dependencies/prov
  * ```
  */
 export function init(wrapper: Wrapper) {
+    const logger = wrapper.containerConfig.get('@sern/logger')[0] as Logging | undefined;
+    const startTime = performance.now();
     const { events } = wrapper;
     if (events !== undefined) {
         processEvents(wrapper);
@@ -47,15 +50,16 @@ export function init(wrapper: Wrapper) {
     new ReadyHandler(wrapper);
     new MessageHandler(wrapper);
     new InteractionHandler(wrapper);
+    const endTime = performance.now();
+    logger?.info({ message: `sern loaded in ${startTime-endTime}` , date: new Date() });
 }
-
 
 /**
  * The object passed into every plugin to control a command's behavior
  */
 export const controller = {
-    next: () => Ok.EMPTY,
-    stop: () => Err.EMPTY,
+    next: ok,
+    stop: err,
 };
 
 /**

@@ -36,7 +36,7 @@ export function handleError<C>(crashHandler: ErrorHandling, logging?: Logging) {
         if(crashHandler.keepAlive == 0) {
             crashHandler.crash(error);
         }
-        logging?.error(error.message);
+        logging?.error({ message: error.message, date: new Date()});
         crashHandler.updateAlive(error);
         return caught;
     };

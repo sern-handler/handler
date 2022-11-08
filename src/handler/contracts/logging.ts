@@ -1,7 +1,8 @@
+import type { LogPayload } from '../../types/handler';
 
 export interface Logging {
-    error(...payload : unknown[]) : void;
-    warning(...payload : unknown[]) : void;
-    info(...payload: unknown[]) : void
-    debug(...payload: unknown[]) : void
+    error(payload : LogPayload) : void;
+    warning(payload : LogPayload) : void;
+    info(payload : LogPayload) : void
+    debug(payload : LogPayload) : void
 }

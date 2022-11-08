@@ -41,7 +41,7 @@ export type SernEventsMapping = {
     'error': [Payload];
     'warning': [string];
 };
-
+export type LogPayload = { message: string, date: Date }
 export type Singleton<T> = () => T
 export type Transient<T> = () => () => T;
 
