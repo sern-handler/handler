@@ -1,6 +1,6 @@
 import Context from '../structures/context';
 import type { Payload, SlashOptions } from '../../types/handler';
-import { asyncResolveArray } from '../utilities/asyncResolveArray';
+import { resolveArrAsync } from '../utilities/resolveArrAsync';
 import { controller } from '../sern';
 import type {
     ButtonInteraction,
@@ -27,7 +27,7 @@ import { EventEmitter } from 'events';
 import type { DiscordEventCommand, ExternalEventCommand, SernEventCommand } from '../structures/events';
 import * as assert from 'assert';
 import { _const } from '../utilities/functions';
-import { concatMap, from, fromEvent } from 'rxjs';
+import { concatMap, from, fromEvent, toArray } from 'rxjs';
 
 export function applicationCommandDispatcher(interaction: Interaction) {
     if (interaction.isAutocomplete()) {
@@ -38,7 +38,7 @@ export function applicationCommandDispatcher(interaction: Interaction) {
         return (mod: BothCommand | SlashCommand) => ({
             mod,
             execute: () => mod.execute(ctx, args),
-            eventPluginRes: asyncResolveArray(
+            eventPluginRes: resolveArrAsync(
                 mod.onEvent.map(plugs => plugs.execute([ctx, args], controller)),
             ),
         });
@@ -52,7 +52,7 @@ export function dispatchAutocomplete(interaction: AutocompleteInteraction) {
             return {
                 mod,
                 execute: () => selectedOption.command.execute(interaction),
-                eventPluginRes: asyncResolveArray(
+                eventPluginRes: resolveArrAsync(
                     selectedOption.command.onEvent.map(e => e.execute(interaction, controller)),
                 ),
             };
@@ -67,7 +67,7 @@ export function modalCommandDispatcher(interaction: ModalSubmitInteraction) {
     return (mod: ModalSubmitCommand) => ({
         mod,
         execute: () => mod.execute(interaction),
-        eventPluginRes: asyncResolveArray(
+        eventPluginRes: resolveArrAsync(
             mod.onEvent.map(plugs => plugs.execute([interaction], controller)),
         ),
     });
@@ -77,7 +77,7 @@ export function buttonCommandDispatcher(interaction: ButtonInteraction) {
     return (mod: ButtonCommand) => ({
         mod,
         execute: () => mod.execute(interaction),
-        eventPluginRes: asyncResolveArray(
+        eventPluginRes: resolveArrAsync(
             mod.onEvent.map(plugs => plugs.execute([interaction], controller)),
         ),
     });
@@ -87,7 +87,7 @@ export function selectMenuCommandDispatcher(interaction: SelectMenuInteraction) 
     return (mod: SelectMenuCommand) => ({
         mod,
         execute: () => mod.execute(interaction),
-        eventPluginRes: asyncResolveArray(
+        eventPluginRes: resolveArrAsync(
             mod.onEvent.map(plugs => plugs.execute([interaction], controller)),
         ),
     });
@@ -97,7 +97,7 @@ export function ctxMenuUserDispatcher(interaction: UserContextMenuCommandInterac
     return (mod: ContextMenuUser) => ({
         mod,
         execute: () => mod.execute(interaction),
-        eventPluginRes: asyncResolveArray(
+        eventPluginRes: resolveArrAsync(
             mod.onEvent.map(plugs => plugs.execute([interaction], controller)),
         ),
     });
@@ -107,21 +107,24 @@ export function ctxMenuMsgDispatcher(interaction: MessageContextMenuCommandInter
     return (mod: ContextMenuMsg) => ({
         mod,
         execute: () => mod.execute(interaction),
-        eventPluginRes: asyncResolveArray(
+        eventPluginRes: resolveArrAsync(
             mod.onEvent.map(plugs => plugs.execute([interaction], controller)),
         ),
     });
 }
 
 export function sernEmitterDispatcher(e: SernEmitter | undefined) {
-    assert.ok(e !== undefined, 'SernEmitter is undefined, but tried creating EventModule');
+    assert.ok(e !== undefined, 'SernEmitter is undefined, but tried creating SernEventCommand');
     return(cmd: SernEventCommand & { name: string }) => ({
         cmd,
         execute: _const(
-            fromEvent(e, cmd.name).pipe(
-                concatMap(event => {
-                    return from(cmd.onEvent.map(plug => plug.execute([event] as [Payload] | [string], controller)));
-                })
+            fromEvent(e, cmd.name)
+                .pipe(
+                    concatMap(event => from(
+                        resolveArrAsync(
+                            cmd.onEvent.map(plug => plug.execute([event] as [Payload] | [string], controller))
+                    ))
+                )
             )
         )
     });
@@ -132,6 +135,14 @@ export function discordEventDispatcher(e: EventEmitter) {
         cmd,
         execute: _const(
             fromEvent(e, cmd.name)
+                .pipe(
+                    concatMap(event => from(
+                        resolveArrAsync(
+                            // god forbid I use any!!!
+                            cmd.onEvent.map(plug => plug.execute([event as any], controller))
+                        ))
+                    )
+                )
         )
     });
 }
@@ -142,6 +153,13 @@ export function externalEventDispatcher(e: unknown) {
         cmd,
         execute: _const(
             fromEvent(e, cmd.name)
+                .pipe(
+                    concatMap(event => from(
+                        resolveArrAsync(
+                            cmd.onEvent.map(plug => plug.execute([event], controller))
+                        ))
+                    )
+                )
         )
     });
 }

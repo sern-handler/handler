@@ -9,7 +9,6 @@ import type {
     InputCommandModule,
     InputEventModule,
 } from './plugins/plugin';
-import { SernError } from './structures/errors';
 import InteractionHandler from './events/interactionHandler';
 import ReadyHandler from './events/readyHandler';
 import MessageHandler from './events/messageHandler';
@@ -90,13 +89,7 @@ export function commandModule(mod: InputCommandModule): CommandModule {
 export function eventModule(mod: InputEventModule): EventModule {
     const onEvent: EventModuleEventPluginDefs[EventType][] = [];
     const plugins: EventModuleCommandPluginDefs[EventType][] = [];
-    const hasPlugins = mod.plugins && mod.plugins.length > 0;
-    if (hasPlugins) {
-        throw Error(
-            SernError.NotSupportedYet + `: Plugins on event listeners are not supported yet`,
-        );
-    }
-    return {
+        return {
         ...mod,
         onEvent,
         plugins,

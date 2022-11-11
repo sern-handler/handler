@@ -26,4 +26,3 @@ export function isSernEvent(el: EventModule): el is SernEventCommand {
 export function isExternalEvent(el: EventModule): el is ExternalEventCommand {
     return el.type === EventType.External && 'emitter' in el;
 }
-
