@@ -79,7 +79,6 @@ export function eventModule(mod: InputEventModule): EventModule {
         plugins,
     } as EventModule;
 }
-
 /**
  * @param conf a configuration for creating your project dependencies
  */

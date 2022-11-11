@@ -122,7 +122,7 @@ export function sernEmitterDispatcher(e: SernEmitter | undefined) {
                 .pipe(
                     concatMap(event => from(
                         resolveArrAsync(
-                            cmd.onEvent.map(plug => plug.execute([event] as [Payload] | [string], controller))
+                            cmd.onEvent.map(plug => plug.execute([event] as [Payload], controller))
                     ))
                 )
             )

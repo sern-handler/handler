@@ -34,12 +34,13 @@ export type DefinedCommandModule = CommandModule & { name: string; description: 
 export type DefinedEventModule = EventModule & { name: string };
 export type Payload =
     | { type: PayloadType.Success; module: Module }
-    | { type: PayloadType.Failure; module?: Module; reason: string | Error };
+    | { type: PayloadType.Failure; module?: Module; reason: string | Error }
+    | { type: PayloadType.Warning; reason: string};
 export type SernEventsMapping = {
     'module.register': [Payload];
     'module.activate': [Payload];
     'error': [Payload];
-    'warning': [string];
+    'warning': [Payload];
 };
 export type LogPayload = { message: string, date: Date }
 export type Singleton<T> = () => T
