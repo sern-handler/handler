@@ -29,7 +29,7 @@ import type { AutocompletePlugin, CommandPlugin, EventPlugin } from '../handler/
 import { EventType } from '../handler/structures/enums';
 
 export interface BaseModule {
-    type: CommandType | EventType;
+    type?: CommandType | EventType;
     name?: string;
     description?: string;
     execute: (...args: any[]) => unknown
@@ -96,9 +96,9 @@ export interface ModalSubmitCommand extends BaseModule {
 }
 
 export interface AutocompleteCommand extends BaseModule {
-    name: never;
-    description: never;
-    type: never;
+    name?: never;
+    description?: never;
+    type?: never;
     onEvent: AutocompletePlugin[];
     execute: (ctx: AutocompleteInteraction) => Awaitable<unknown>;
 }
@@ -157,13 +157,13 @@ export type BaseOptions =
 
 export interface SernSubCommandData extends BaseApplicationCommandOptionsData {
     type: ApplicationCommandOptionType.Subcommand;
-    required: never;
+    required?: never;
     options?: BaseOptions[];
 }
 
 export interface SernSubCommandGroupData extends BaseApplicationCommandOptionsData {
     type: ApplicationCommandOptionType.SubcommandGroup;
-    required: never;
+    required?: never;
     options?: SernSubCommandData[];
 }
 
