@@ -23,3 +23,17 @@ export function nameOrFilename(modName: string | undefined, absPath: string) {
 //function wrappers for empty ok / err
 export const ok = _const(Ok.EMPTY);
 export const err = _const(Err.EMPTY);
+
+
+export function partition<T, V>(arr: (T & V)[], condition: (e: (T & V)) => boolean) : [T[], V[]] {
+    const t : T[] = [];
+    const v : V[] = [];
+    for(const el of arr) {
+        if(condition(el)) {
+            t.push(el as T);
+        } else {
+            v.push(el as V);
+        }
+    }
+    return [ t, v ];
+}

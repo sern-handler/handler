@@ -26,7 +26,7 @@ export interface Controller {
     next: () => Ok<void>;
     stop: () => Err<void>;
 }
-interface BasePlugin {
+export interface BasePlugin {
     name?: string;
     description?: string;
     type: PluginType

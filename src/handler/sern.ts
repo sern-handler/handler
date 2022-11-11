@@ -2,6 +2,7 @@ import type Wrapper from './structures/wrapper';
 import { processEvents } from './events/userDefinedEventsHandling';
 import { CommandType, EventType, PluginType } from './structures/enums';
 import type {
+    BasePlugin,
     CommandPlugin,
     EventModuleCommandPluginDefs,
     EventModuleEventPluginDefs,
@@ -12,19 +13,12 @@ import type {
 import InteractionHandler from './events/interactionHandler';
 import ReadyHandler from './events/readyHandler';
 import MessageHandler from './events/messageHandler';
-import type {
-    CommandModule,
-    CommandModuleDefs,
-    EventModule,
-    EventModuleDefs,
-} from '../types/module';
-import { createContainer, Container } from 'iti';
-import type {
-    Dependencies
-} from '../types/handler';
-import { containerSubject, composeRoot, useContainer } from './dependencies/provider';
+import type { CommandModule, CommandModuleDefs, EventModule, EventModuleDefs } from '../types/module';
+import { Container, createContainer } from 'iti';
+import type { Dependencies } from '../types/handler';
+import { composeRoot, containerSubject, useContainer } from './dependencies/provider';
 import type { Logging } from './contracts';
-import { err, ok } from './utilities/functions';
+import { err, ok, partition } from './utilities/functions';
 
 /**
  *
@@ -66,16 +60,7 @@ export const controller = {
  * @param mod
  */
 export function commandModule(mod: InputCommandModule): CommandModule {
-    const onEvent: EventPlugin[] = [];
-    const plugins: CommandPlugin[] = [];
-    for (const pl of mod.plugins ?? []) {
-        if (pl.type === PluginType.Event) {
-            onEvent.push(pl);
-        } else {
-            plugins.push(pl as CommandPlugin);
-        }
-    }
-
+    const [onEvent, plugins] = partition(mod.plugins ?? [], el => (el as BasePlugin).type === PluginType.Event);
     return {
         ...mod,
         onEvent,
@@ -87,8 +72,7 @@ export function commandModule(mod: InputCommandModule): CommandModule {
  * @param mod
  */
 export function eventModule(mod: InputEventModule): EventModule {
-    const onEvent: EventModuleEventPluginDefs[EventType][] = [];
-    const plugins: EventModuleCommandPluginDefs[EventType][] = [];
+    const [onEvent, plugins] = partition(mod.plugins ?? [], el => (el as BasePlugin).type === PluginType.Event);
         return {
         ...mod,
         onEvent,
