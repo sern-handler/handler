@@ -62,3 +62,4 @@ export type MapDeps<
     T extends readonly unknown[]
     > = T extends [infer First extends keyof Deps, ...infer Rest extends readonly unknown[]]
     ? [ UnpackFunction<Deps[First]>, ...(MapDeps<Deps, Rest> extends [never] ? [] : MapDeps<Deps,Rest>)] : [never]
+export type UnknownFunction = (...args: unknown[]) => unknown

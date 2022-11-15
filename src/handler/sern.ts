@@ -44,7 +44,7 @@ export function init(wrapper: Wrapper) {
     new MessageHandler(wrapper);
     new InteractionHandler(wrapper);
     const endTime = performance.now();
-    logger?.info({ message: `sern loaded in ${startTime-endTime}` , date: new Date() });
+    logger?.info({ message: `sern loaded in ${endTime-startTime} ms` , date: new Date() });
 }
 
 /**

@@ -3,8 +3,7 @@ import { buildData } from '../utilities/readFile';
 import { controller } from '../sern';
 import type {
     DefinedCommandModule,
-    DefinedEventModule, Dependencies,
-    SpreadParams,
+    DefinedEventModule, Dependencies, UnknownFunction,
 } from '../../types/handler';
 import { PayloadType } from '../structures/enums';
 import type Wrapper from '../structures/wrapper';
@@ -35,7 +34,7 @@ export function processCommandPlugins<T extends DefinedCommandModule>(
 }
 
 export function processEvents({ containerConfig, events }: Wrapper) {
-    const [ client, error, sernEmitter ] = containerConfig.get('@sern/emitter', '@sern/client') as [EventEmitter, ErrorHandling, SernEmitter?];
+    const [ client, error, sernEmitter ] = containerConfig.get('@sern/client', '@sern/errors', '@sern/emitter') as [EventEmitter, ErrorHandling, SernEmitter?];
     const lazy = (k: string) => containerConfig.get(k as keyof Dependencies)[0];
     const eventStream$ = eventObservable$(events!, sernEmitter);
     const normalize$ = eventStream$.pipe(
@@ -47,21 +46,19 @@ export function processEvents({ containerConfig, events }: Wrapper) {
         }),
     );
     normalize$.subscribe(e => {
-        const s = match(e)
+        const payload = match(e)
             .when(isSernEvent, sernEmitterDispatcher(sernEmitter))
             .when(isDiscordEvent, discordEventDispatcher(client))
-            .when(isExternalEvent, e => externalEventDispatcher(lazy(e.emitter)))
+            .when(isExternalEvent, externalEventDispatcher(e => lazy(e.emitter)))
             .otherwise(() => error.crash(Error(SernError.InvalidModuleType)));
-        const emitter = isSernEvent(e)
-            ? sernEmitter
-            : isDiscordEvent(e)
-            ? client
-            : lazy(e.emitter);
-        if (emitter === undefined) {
-            throw new Error(`Cannot find event emitter as it is undefined`);
-        }
-        //Would add sern event emitter for events loaded, attached onto sern emitter, but could lead to unwanted behavior!
-        fromEvent(emitter as EventEmitter, e.name, e.execute as SpreadParams<typeof e.execute>).subscribe();
+       payload
+            .execute()
+            .subscribe(isSuccess => {
+                if(isSuccess) {
+                    //maybe store this somewhere or add teardown logic?
+                    fromEvent(payload.source, payload.cmd.name, payload.cmd.execute as UnknownFunction).subscribe();
+                }
+            });
     });
 }
 

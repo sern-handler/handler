@@ -6,7 +6,7 @@ import { executeModule, ignoreNonBot, isOneOfCorrectModules } from './observable
 import { fmt } from '../utilities/messageHelpers';
 import Context from '../structures/context';
 import { CommandType, PayloadType } from '../structures/enums';
-import { resolveArrAsync } from '../utilities/resolveArrAsync';
+import { arrAsync } from '../utilities/arrAsync';
 import { controller } from '../sern';
 import type { CommandModule, TextCommand } from '../../types/module';
 import { handleError } from '../contracts/errorHandling';
@@ -28,7 +28,7 @@ export default class MessageHandler extends EventsHandler<{
         this.payloadSubject
             .pipe(
                 switchMap(({ mod, ctx, args }) => {
-                    const res = resolveArrAsync(
+                    const res = arrAsync(
                             mod.onEvent.map(ep => ep.execute([ctx, args], controller)),
                     );
                     const execute = _const(mod.execute(ctx, args));

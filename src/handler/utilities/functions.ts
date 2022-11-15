@@ -1,6 +1,7 @@
 import * as Files from './readFile';
 import { basename } from 'path';
-import { Err, Ok } from 'ts-results-es';
+import { Err, Ok, Result } from 'ts-results-es';
+import { Observable, of, switchMap } from 'rxjs';
 /**
  * A function that returns whatever value is provided.
  * Used for singleton in iti
@@ -37,3 +38,7 @@ export function partition<T, V>(arr: (T & V)[], condition: (e: (T & V)) => boole
     }
     return [ t, v ];
 }
+
+ export function reducePlugins(src: Observable<Result<void, void>[]>) : Observable<boolean> {
+    return src.pipe(switchMap(s => of(s.every((a) => a.ok))));
+ }
