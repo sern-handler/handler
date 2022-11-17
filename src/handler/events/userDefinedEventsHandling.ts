@@ -1,4 +1,4 @@
-import { fromEvent, map } from 'rxjs';
+import { concatMap, map, tap } from 'rxjs';
 import { buildData } from '../utilities/readFile';
 import { controller } from '../sern';
 import type {
@@ -52,13 +52,18 @@ export function processEvents({ containerConfig, events }: Wrapper) {
             .when(isExternalEvent, externalEventDispatcher(e => lazy(e.emitter)))
             .otherwise(() => error.crash(Error(SernError.InvalidModuleType)));
        payload
-            .execute()
-            .subscribe(isSuccess => {
-                if(isSuccess) {
-                    //maybe store this somewhere or add teardown logic?
-                    fromEvent(payload.source, payload.cmd.name, payload.cmd.execute as UnknownFunction).subscribe();
-                }
-            });
+            .execute
+            .pipe(
+                concatMap(({event, executeEvent}) =>
+                    executeEvent
+                    .pipe( tap(success => {
+                        if(success) {
+                            //Safe because type checking previous and merging here
+                            payload.cmd.execute(event as never);
+                        }
+                    }))
+                ),
+            ).subscribe();
     });
 }
 

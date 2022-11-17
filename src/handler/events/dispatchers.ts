@@ -27,7 +27,7 @@ import { EventEmitter } from 'events';
 import type { DiscordEventCommand, ExternalEventCommand, SernEventCommand } from '../structures/events';
 import * as assert from 'assert';
 import { _const, reducePlugins } from '../utilities/functions';
-import { concatMap, from, fromEvent } from 'rxjs';
+import { concatMap, filter, from, fromEvent, map, of } from 'rxjs';
 
 export function applicationCommandDispatcher(interaction: Interaction) {
     if (interaction.isAutocomplete()) {
@@ -113,21 +113,20 @@ export function ctxMenuMsgDispatcher(interaction: MessageContextMenuCommandInter
     });
 }
 
-export function sernEmitterDispatcher(e: SernEmitter | undefined) {
-    assert.ok(e, 'SernEmitter is undefined, but tried creating SernEventCommand');
+export function sernEmitterDispatcher(e: SernEmitter | undefined) { assert.ok(e, 'SernEmitter is undefined, but tried creating SernEventCommand');
     return(cmd: SernEventCommand & { name: string }) => ({
         source: e,
         cmd,
-        execute: _const(
-            fromEvent(e, cmd.name)
-                .pipe(concatMap(event =>
+        execute: fromEvent(e, cmd.name)
+            .pipe( map( event => ({
+                event,
+                executeEvent: of(event).pipe(concatMap(event =>
                         reducePlugins(from(
                         arrAsync(
-                            cmd.onEvent.map(plug => plug.execute([event] as [Payload], controller))
+                            cmd.onEvent.map(plug => plug.execute([event as Payload], controller))
+                        ))
                     )))
-                )
-            )
-        )
+            })))
     });
 }
 
@@ -135,36 +134,36 @@ export function discordEventDispatcher(e: EventEmitter) {
     return (cmd: DiscordEventCommand & { name: string }) => ({
         source: e,
         cmd,
-        execute: _const(
-            fromEvent(e, cmd.name)
-                .pipe(concatMap(event =>
+        execute: fromEvent(e, cmd.name)
+                .pipe( map( event => ({
+                    event,
+                    executeEvent: of(event).pipe(concatMap( event =>
                         reducePlugins(from(
                         arrAsync(
                             // god forbid I use any!!!
                             cmd.onEvent.map(plug => plug.execute([event as any], controller))
                         ))
-                    ))
-                )
-        )
+                      )))
+                })))
     });
 }
 
 export function externalEventDispatcher(e: (e:ExternalEventCommand) => unknown) {
-    assert.ok(e instanceof EventEmitter, `${e} is not an EventEmitter`);
     return (cmd: ExternalEventCommand & { name: string}) => {
         const external = e(cmd);
         assert.ok(external instanceof EventEmitter, `${e} is not an EventEmitter`);
         return {
             source: external,
             cmd,
-            execute: _const(
-                fromEvent(external, cmd.name)
-                    .pipe(concatMap(event =>
+            execute: fromEvent(external, cmd.name)
+                    .pipe(map(event => ({
+                        event,
+                        executeEvent : of(event).pipe(concatMap(event =>
                             reducePlugins(from(arrAsync(
                                 cmd.onEvent.map(plug => plug.execute([event], controller))
                             )))
-                        ),
-                    ))
+                        )),
+                    })))
         };
     };
 }

@@ -80,7 +80,7 @@ export function executeModule(
         res: Result<void, void>[];
     },
 ) {
-    const [ emitter ] = wrapper.containerConfig.get('@sern/emitter')[0] as [EventEmitter?];
+    const emitter = wrapper.containerConfig.get('@sern/emitter')[0] as EventEmitter|undefined;
     if (payload.res.every(el => el.ok)) {
         const executeFn = Result.wrapAsync<unknown, Error | string>(() =>
             Promise.resolve(payload.execute()),
