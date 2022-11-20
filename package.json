@@ -50,5 +50,5 @@
         "type": "git",
         "url": "git+https://github.com/sern-handler/handler.git"
     },
-    "homepage": "https://sern-handler.js.org"
+    "homepage": "https://sern.dev"
 }
