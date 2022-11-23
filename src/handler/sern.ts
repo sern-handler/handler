@@ -15,10 +15,10 @@ import ReadyHandler from './events/readyHandler';
 import MessageHandler from './events/messageHandler';
 import type { CommandModule, CommandModuleDefs, EventModule, EventModuleDefs } from '../types/module';
 import { Container, createContainer } from 'iti';
-import type { Dependencies } from '../types/handler';
+import type { Dependencies, OptionalDependencies } from '../types/handler';
 import { composeRoot, containerSubject, useContainer } from './dependencies/provider';
 import type { Logging } from './contracts';
-import { err, ok, partition } from './utilities/functions';
+import { err, now, ok, partition } from './utilities/functions';
 
 /**
  *
@@ -44,7 +44,7 @@ export function init(wrapper: Wrapper) {
     new MessageHandler(wrapper);
     new InteractionHandler(wrapper);
     const endTime = performance.now();
-    logger?.info({ message: `sern loaded in ${endTime-startTime} ms` , date: new Date() });
+    logger?.info({ message: `sern : ${(endTime-startTime).toFixed(2)} ms` , date: now() });
 }
 
 /**
@@ -83,7 +83,7 @@ export function eventModule(mod: InputEventModule): EventModule {
  * @param conf a configuration for creating your project dependencies
  */
 export function makeDependencies<T extends Dependencies>(conf: {
-    exclude?: Set<Exclude<keyof Dependencies, '@sern/client' | '@sern/store' | '@sern/modules' | '@sern/error'>>,
+    exclude?: Set<OptionalDependencies>,
     build: (root: Container<Record<string, unknown>, {}>) => Container<Partial<T>, {}>,
 }) {
     const container = conf.build(createContainer());

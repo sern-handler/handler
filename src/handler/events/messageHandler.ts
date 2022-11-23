@@ -72,7 +72,7 @@ export default class MessageHandler extends EventsHandler<{
             .subscribe({
                 next: value => this.setState(value),
                 error: reason =>
-                    this.emitter?.emit('error', { type: PayloadType.Failure, reason }),
+                    this.emitter.emit('error', { type: PayloadType.Failure, reason }),
             });
     }
 

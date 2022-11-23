@@ -4,7 +4,7 @@ import { BehaviorSubject } from 'rxjs';
 import * as assert from 'assert';
 import type { Dependencies, MapDeps } from '../../types/handler';
 import SernEmitter from '../sernEmitter';
-import { _const } from '../utilities/functions';
+import { _const, now } from '../utilities/functions';
 import { DefaultErrorHandling, DefaultModuleManager } from '../contracts';
 import { ModuleStore } from '../structures/moduleStore';
 import { None, Result } from 'ts-results-es';
@@ -21,6 +21,7 @@ export function composeRoot<T extends Dependencies>(root: Container<Partial<T>, 
             '@sern/emitter' : _const(new SernEmitter())
         })
     );
+    //An "optional" dependency
     xGetOr('@sern/logger',
         root.upsert({
             '@sern/logger' : _const(new DefaultLogging())
@@ -41,6 +42,7 @@ export function composeRoot<T extends Dependencies>(root: Container<Partial<T>, 
             '@sern/errors': _const(new DefaultErrorHandling())
         })
     );
+    root.get('@sern/logger')?.info({ message: 'All dependencies loaded successfully', date:now() });
 }
 
 

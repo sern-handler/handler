@@ -63,3 +63,5 @@ export type MapDeps<
     > = T extends [infer First extends keyof Deps, ...infer Rest extends readonly unknown[]]
     ? [ UnpackFunction<Deps[First]>, ...(MapDeps<Deps, Rest> extends [never] ? [] : MapDeps<Deps,Rest>)] : [never]
 export type UnknownFunction = (...args: unknown[]) => unknown
+//Basically, '@sern/client' | '@sern/store' | '@sern/modules' | '@sern/error' | '@sern/emitter' will be provided defaults, and you can exclude the rest
+export type OptionalDependencies = '@sern/logger';

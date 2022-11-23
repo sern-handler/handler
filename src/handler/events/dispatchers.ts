@@ -113,7 +113,7 @@ export function ctxMenuMsgDispatcher(interaction: MessageContextMenuCommandInter
     });
 }
 
-export function sernEmitterDispatcher(e: SernEmitter | undefined) { assert.ok(e, 'SernEmitter is undefined, but tried creating SernEventCommand');
+export function sernEmitterDispatcher(e: SernEmitter) {
     return(cmd: SernEventCommand & { name: string }) => ({
         source: e,
         cmd,

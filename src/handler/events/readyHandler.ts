@@ -50,12 +50,12 @@ export default class ReadyHandler extends EventsHandler<{
                     if (res.err) {
                         this.crashHandler.crash(Error(SernError.InvalidModuleType));
                     }
-                    this.emitter?.emit('module.register', {
+                    this.emitter.emit('module.register', {
                         type: PayloadType.Success,
                         module: payload.mod,
                     });
                 } else {
-                    this.emitter?.emit('module.register', {
+                    this.emitter.emit('module.register', {
                         type: PayloadType.Failure,
                         module: payload.mod,
                         reason: SernError.PluginFailure,

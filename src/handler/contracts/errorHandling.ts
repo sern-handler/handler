@@ -1,5 +1,6 @@
 import type { Observable } from 'rxjs';
 import type { Logging } from './logging';
+import { now } from '../utilities/functions';
 
 
 export interface ErrorHandling {
@@ -36,7 +37,7 @@ export function handleError<C>(crashHandler: ErrorHandling, logging?: Logging) {
         if(crashHandler.keepAlive == 0) {
             crashHandler.crash(error);
         }
-        logging?.error({ message: error.message, date: new Date()});
+        logging?.error({ message: error.message, date: now()});
         crashHandler.updateAlive(error);
         return caught;
     };

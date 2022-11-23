@@ -80,7 +80,7 @@ export function executeModule(
         res: Result<void, void>[];
     },
 ) {
-    const emitter = wrapper.containerConfig.get('@sern/emitter')[0] as EventEmitter|undefined;
+    const emitter = wrapper.containerConfig.get('@sern/emitter')[0] as EventEmitter;
     if (payload.res.every(el => el.ok)) {
         const executeFn = Result.wrapAsync<unknown, Error | string>(() =>
             Promise.resolve(payload.execute()),
@@ -96,7 +96,7 @@ export function executeModule(
                 }
                 return of(res.val).pipe(
                     tap(() =>
-                        emitter?.emit('module.activate', {
+                        emitter.emit('module.activate', {
                             type: PayloadType.Success,
                             module: payload.mod,
                         }),

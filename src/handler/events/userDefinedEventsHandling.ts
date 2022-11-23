@@ -34,7 +34,7 @@ export function processCommandPlugins<T extends DefinedCommandModule>(
 }
 
 export function processEvents({ containerConfig, events }: Wrapper) {
-    const [ client, error, sernEmitter ] = containerConfig.get('@sern/client', '@sern/errors', '@sern/emitter') as [EventEmitter, ErrorHandling, SernEmitter?];
+    const [ client, error, sernEmitter ] = containerConfig.get('@sern/client', '@sern/errors', '@sern/emitter') as [EventEmitter, ErrorHandling, SernEmitter];
     const lazy = (k: string) => containerConfig.get(k as keyof Dependencies)[0];
     const eventStream$ = eventObservable$(events!, sernEmitter);
     const normalize$ = eventStream$.pipe(
@@ -67,10 +67,10 @@ export function processEvents({ containerConfig, events }: Wrapper) {
     });
 }
 
-function eventObservable$(events: string, emitter?: SernEmitter) {
+function eventObservable$(events: string, emitter: SernEmitter) {
         return buildData<EventModule>(events).pipe(
                    errTap(reason =>
-                      emitter?.emit('module.register', {
+                      emitter.emit('module.register', {
                           type: PayloadType.Failure,
                           module: undefined,
                           reason,

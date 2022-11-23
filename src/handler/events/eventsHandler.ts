@@ -8,7 +8,7 @@ export abstract class EventsHandler<T> {
     protected payloadSubject = new Subject<T>();
     protected abstract discordEvent: Observable<unknown>;
     protected client: EventEmitter;
-    protected emitter?: SernEmitter;
+    protected emitter: SernEmitter;
     protected crashHandler: ErrorHandling;
     protected logger?: Logging;
     protected modules: ModuleManager;
@@ -17,9 +17,9 @@ export abstract class EventsHandler<T> {
             client,
             emitter,
             crash,
+            modules,
             logger,
-            modules
-        ] = containerConfig.get('@sern/client', '@sern/emitter', '@sern/errors', '@sern/logger', '@sern/modules');
+        ] = containerConfig.get('@sern/client', '@sern/emitter', '@sern/errors', '@sern/modules', '@sern/logger');
         this.logger = logger as Logging;
         this.modules = modules as ModuleManager;
         this.client = client as EventEmitter;
