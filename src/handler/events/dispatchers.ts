@@ -26,8 +26,8 @@ import type SernEmitter from '../sernEmitter';
 import { EventEmitter } from 'events';
 import type { DiscordEventCommand, ExternalEventCommand, SernEventCommand } from '../structures/events';
 import * as assert from 'assert';
-import { _const, reducePlugins } from '../utilities/functions';
-import { concatMap, filter, from, fromEvent, map, of } from 'rxjs';
+import { reducePlugins } from '../utilities/functions';
+import { concatMap, from, fromEvent, map, of } from 'rxjs';
 
 export function applicationCommandDispatcher(interaction: Interaction) {
     if (interaction.isAutocomplete()) {

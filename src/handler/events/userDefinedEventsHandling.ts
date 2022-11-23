@@ -1,9 +1,9 @@
-import { concatMap, map, tap } from 'rxjs';
+import { catchError, concatMap, map, tap } from 'rxjs';
 import { buildData } from '../utilities/readFile';
 import { controller } from '../sern';
 import type {
     DefinedCommandModule,
-    DefinedEventModule, Dependencies, UnknownFunction,
+    DefinedEventModule, Dependencies,
 } from '../../types/handler';
 import { PayloadType } from '../structures/enums';
 import type Wrapper from '../structures/wrapper';
@@ -15,8 +15,9 @@ import type SernEmitter from '../sernEmitter';
 import { nameOrFilename } from '../utilities/functions';
 import { match } from 'ts-pattern';
 import { discordEventDispatcher, externalEventDispatcher, sernEmitterDispatcher } from './dispatchers';
-import type { ErrorHandling } from '../contracts';
+import type { ErrorHandling, Logging } from '../contracts';
 import { SernError } from '../structures/errors';
+import { handleError } from '../contracts/errorHandling';
 
 /**
  * Utility function to process command plugins for all Modules
@@ -34,7 +35,12 @@ export function processCommandPlugins<T extends DefinedCommandModule>(
 }
 
 export function processEvents({ containerConfig, events }: Wrapper) {
-    const [ client, error, sernEmitter ] = containerConfig.get('@sern/client', '@sern/errors', '@sern/emitter') as [EventEmitter, ErrorHandling, SernEmitter];
+    const [
+        client,
+        error,
+        sernEmitter,
+        logging
+    ] = containerConfig.get('@sern/client', '@sern/errors', '@sern/emitter') as [EventEmitter, ErrorHandling, SernEmitter, Logging?];
     const lazy = (k: string) => containerConfig.get(k as keyof Dependencies)[0];
     const eventStream$ = eventObservable$(events!, sernEmitter);
     const normalize$ = eventStream$.pipe(
@@ -60,8 +66,11 @@ export function processEvents({ containerConfig, events }: Wrapper) {
                         if(success) {
                             //Safe because type checking previous and merging here
                             payload.cmd.execute(event as never);
+                            sernEmitter.emit('module.activate',{ type:PayloadType.Success, module: payload.cmd });
+                        } else {
+                            sernEmitter.emit('module.activate', { type:PayloadType.Failure, module: payload.cmd, reason: SernError.PluginFailure });
                         }
-                    }))
+                    }), catchError(handleError(error, logging)))
                 ),
             ).subscribe();
     });
