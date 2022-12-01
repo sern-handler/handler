@@ -4,10 +4,10 @@ import type {
     SernEventCommand,
 } from '../structures/events';
 import { EventType } from '../..';
-import type { CommandModuleDefs, EventModule, Module } from '../../types/module';
+import type { CommandModuleDefs, EventModule, AnyModule } from '../../types/module';
 
 export function correctModuleType<T extends keyof CommandModuleDefs>(
-    plug: Module | undefined,
+    plug: AnyModule | undefined,
     type: T,
 ): plug is CommandModuleDefs[T] {
     // Another way to check if type is equivalent,

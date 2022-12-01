@@ -9,7 +9,7 @@ import type { Awaitable } from 'discord.js';
 import { SernError } from '../structures/errors';
 import { match } from 'ts-pattern';
 import { Result } from 'ts-results-es';
-import { ApplicationCommandType, ComponentType, InteractionType } from 'discord.js';
+import { ApplicationCommandType, ComponentType } from 'discord.js';
 import type { CommandModule } from '../../types/module';
 import type { DefinedCommandModule } from '../../types/handler';
 import type { ModuleManager } from '../contracts';
@@ -138,20 +138,32 @@ function registerModule(manager: ModuleManager, mod: DefinedCommandModule): Resu
             mod.alias?.forEach(a => insert(ms => ms.TextCommands.aliases.set(a, mod)));
             return insert( ms => ms.BothCommands.set(name, mod));
         })
-        .with({ type: CommandType.MenuUser }, mod =>
+        .with({ type: CommandType.CtxUser }, mod =>
              insert(ms => ms.ApplicationCommands[ApplicationCommandType.User].set(name, mod))
         )
-        .with({ type: CommandType.MenuMsg }, mod =>
+        .with({ type: CommandType.CtxMsg }, mod =>
              insert(ms => ms.ApplicationCommands[ApplicationCommandType.Message].set(name, mod))
         )
         .with({ type: CommandType.Button }, mod =>
              insert(ms => ms.InteractionHandlers[ComponentType.Button].set(name, mod))
         )
-        .with({ type: CommandType.MenuSelect }, mod =>
-             insert(ms => ms.InteractionHandlers[ComponentType.SelectMenu].set(name, mod))
+        .with({ type: CommandType.MenuStringSelect }, mod =>
+             insert(ms => ms.InteractionHandlers[ComponentType.StringSelect].set(name, mod))
+        )
+        .with( { type: CommandType.MenuMentionableSelect }, mod =>
+            insert (ms => ms.InteractionHandlers[ComponentType.MentionableSelect].set(name, mod))
+        )
+        .with( { type: CommandType.MenuChannelSelect }, mod =>
+            insert ( ms => ms.InteractionHandlers[ComponentType.ChannelSelect].set(name, mod))
+        )
+        .with( { type: CommandType.MenuUserSelect }, mod =>
+            insert ( ms => ms.InteractionHandlers[ComponentType.UserSelect].set(name, mod))
+        )
+        .with( { type: CommandType.MenuRoleSelect}, mod =>
+            insert ( ms => ms.InteractionHandlers[ComponentType.RoleSelect].set(name, mod))
         )
         .with({ type: CommandType.Modal }, mod =>
-            insert(ms => ms.InteractionHandlers[InteractionType.ModalSubmit].set(name, mod))
+            insert(ms => ms.ModalSubmit.set(name, mod))
         )
         .otherwise(err);
 }

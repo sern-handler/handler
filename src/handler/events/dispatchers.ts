@@ -5,7 +5,6 @@ import { controller } from '../sern';
 import type {
     ButtonInteraction,
     ModalSubmitInteraction,
-    SelectMenuInteraction,
     AutocompleteInteraction,
     ChatInputCommandInteraction,
     Interaction,
@@ -19,8 +18,8 @@ import type {
     ButtonCommand, ContextMenuMsg,
     ContextMenuUser,
     ModalSubmitCommand,
-    SelectMenuCommand,
-    SlashCommand,
+    StringSelectCommand,
+    SlashCommand, UserSelectCommand, ChannelSelectCommand, MentionableSelectCommand, RoleSelectCommand,
 } from '../../types/module';
 import type SernEmitter from '../sernEmitter';
 import { EventEmitter } from 'events';
@@ -28,6 +27,7 @@ import type { DiscordEventCommand, ExternalEventCommand, SernEventCommand } from
 import * as assert from 'assert';
 import { reducePlugins } from '../utilities/functions';
 import { concatMap, from, fromEvent, map, of } from 'rxjs';
+import type { MessageComponentInteraction } from 'discord.js';
 
 export function applicationCommandDispatcher(interaction: Interaction) {
     if (interaction.isAutocomplete()) {
@@ -83,12 +83,13 @@ export function buttonCommandDispatcher(interaction: ButtonInteraction) {
     });
 }
 
-export function selectMenuCommandDispatcher(interaction: SelectMenuInteraction) {
-    return (mod: SelectMenuCommand) => ({
+export function selectMenuCommandDispatcher(interaction: MessageComponentInteraction) {
+    //safe casts because command type runtime check
+    return (mod: StringSelectCommand | UserSelectCommand | ChannelSelectCommand | MentionableSelectCommand | RoleSelectCommand) => ({
         mod,
-        execute: () => mod.execute(interaction),
+        execute: () => mod.execute(interaction as never),
         eventPluginRes: arrAsync(
-            mod.onEvent.map(plugs => plugs.execute([interaction], controller)),
+            mod.onEvent.map(plugs => plugs.execute([interaction as never], controller)),
         ),
     });
 }

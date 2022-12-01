@@ -14,8 +14,11 @@ import type {
     ButtonInteraction,
     MessageContextMenuCommandInteraction,
     ModalSubmitInteraction,
-    SelectMenuInteraction,
     UserContextMenuCommandInteraction,
+    ChannelSelectMenuInteraction,
+    MentionableSelectMenuInteraction,
+    RoleSelectMenuInteraction,
+    StringSelectMenuInteraction
 } from 'discord.js';
 import type {
     DiscordEventCommand,
@@ -27,15 +30,16 @@ import type { Args, SlashOptions } from './handler';
 import type Context from '../handler/structures/context';
 import type { AutocompletePlugin, CommandPlugin, EventPlugin } from '../handler/plugins/plugin';
 import { EventType } from '../handler/structures/enums';
+import type { UserSelectMenuInteraction } from 'discord.js';
 
-export interface BaseModule {
+export interface Module {
     type?: CommandType | EventType;
     name?: string;
     description?: string;
     execute: (...args: any[]) => unknown
 }
 
-export interface TextCommand extends BaseModule {
+export interface TextCommand extends Module {
     type: CommandType.Text;
     onEvent: EventPlugin<CommandType.Text>[];
     plugins: CommandPlugin[];
@@ -43,7 +47,7 @@ export interface TextCommand extends BaseModule {
     execute: (ctx: Context, args: ['text', string[]]) => Awaitable<unknown>;
 }
 
-export interface SlashCommand extends BaseModule {
+export interface SlashCommand extends Module {
     type: CommandType.Slash;
     onEvent: EventPlugin<CommandType.Slash>[];
     plugins: CommandPlugin[];
@@ -51,7 +55,7 @@ export interface SlashCommand extends BaseModule {
     execute: (ctx: Context, args: ['slash', SlashOptions]) => Awaitable<unknown>;
 }
 
-export interface BothCommand extends BaseModule {
+export interface BothCommand extends Module {
     type: CommandType.Both;
     onEvent: EventPlugin<CommandType.Both>[];
     plugins: CommandPlugin[];
@@ -60,42 +64,70 @@ export interface BothCommand extends BaseModule {
     execute: (ctx: Context, args: Args) => Awaitable<unknown>;
 }
 
-export interface ContextMenuUser extends BaseModule {
-    type: CommandType.MenuUser;
-    onEvent: EventPlugin<CommandType.MenuUser>[];
+export interface ContextMenuUser extends Module {
+    type: CommandType.CtxUser;
+    onEvent: EventPlugin<CommandType.CtxUser>[];
     plugins: CommandPlugin[];
     execute: (ctx: UserContextMenuCommandInteraction) => Awaitable<unknown>;
 }
 
-export interface ContextMenuMsg extends BaseModule {
-    type: CommandType.MenuMsg;
-    onEvent: EventPlugin<CommandType.MenuMsg>[];
+export interface ContextMenuMsg extends Module {
+    type: CommandType.CtxMsg;
+    onEvent: EventPlugin<CommandType.CtxMsg>[];
     plugins: CommandPlugin[];
     execute: (ctx: MessageContextMenuCommandInteraction) => Awaitable<unknown>;
 }
 
-export interface ButtonCommand extends BaseModule {
+export interface ButtonCommand extends Module {
     type: CommandType.Button;
     onEvent: EventPlugin<CommandType.Button>[];
     plugins: CommandPlugin[];
     execute: (ctx: ButtonInteraction) => Awaitable<unknown>;
 }
 
-export interface SelectMenuCommand extends BaseModule {
-    type: CommandType.MenuSelect;
-    onEvent: EventPlugin<CommandType.MenuSelect>[];
+export interface StringSelectCommand extends Module {
+    type: CommandType.MenuStringSelect;
+    onEvent: EventPlugin<CommandType.MenuStringSelect>[];
     plugins: CommandPlugin[];
-    execute: (ctx: SelectMenuInteraction) => Awaitable<unknown>;
+    execute: (ctx: StringSelectMenuInteraction) => Awaitable<unknown>;
 }
 
-export interface ModalSubmitCommand extends BaseModule {
+export interface ChannelSelectCommand extends Module {
+    type: CommandType.MenuChannelSelect;
+    onEvent: EventPlugin<CommandType.MenuChannelSelect>[];
+    plugins: CommandPlugin[];
+    execute: (ctx: ChannelSelectMenuInteraction) => Awaitable<unknown>;
+}
+
+export interface RoleSelectCommand extends Module {
+    type: CommandType.MenuRoleSelect;
+    onEvent: EventPlugin<CommandType.MenuRoleSelect>[];
+    plugins: CommandPlugin[];
+    execute: (ctx: RoleSelectMenuInteraction) => Awaitable<unknown>;
+}
+
+export interface MentionableSelectCommand extends Module {
+    type: CommandType.MenuMentionableSelect;
+    onEvent: EventPlugin<CommandType.MenuMentionableSelect>[];
+    plugins: CommandPlugin[];
+    execute: (ctx: MentionableSelectMenuInteraction) => Awaitable<unknown>;
+}
+
+export interface UserSelectCommand extends Module {
+    type: CommandType.MenuUserSelect;
+    onEvent: EventPlugin<CommandType.MenuUserSelect>[];
+    plugins: CommandPlugin[];
+    execute: (ctx: UserSelectMenuInteraction) => Awaitable<unknown>;
+}
+
+export interface ModalSubmitCommand extends Module {
     type: CommandType.Modal;
     onEvent: EventPlugin<CommandType.Modal>[];
     plugins: CommandPlugin[];
     execute: (ctx: ModalSubmitInteraction) => Awaitable<unknown>;
 }
 
-export interface AutocompleteCommand extends BaseModule {
+export interface AutocompleteCommand extends Module {
     name?: never;
     description?: never;
     type?: never;
@@ -111,10 +143,14 @@ export type CommandModule =
     | ContextMenuUser
     | ContextMenuMsg
     | ButtonCommand
-    | SelectMenuCommand
+    | StringSelectCommand
+    | MentionableSelectCommand
+    | UserSelectCommand
+    | ChannelSelectCommand
+    | RoleSelectCommand
     | ModalSubmitCommand;
 
-export type Module = CommandModule | EventModule;
+export type AnyModule = CommandModule | EventModule;
 
 //https://stackoverflow.com/questions/64092736/alternative-to-switch-statement-for-typescript-discriminated-union
 // Explicit Module Definitions for mapping
@@ -122,10 +158,14 @@ export type CommandModuleDefs = {
     [CommandType.Text]: TextCommand;
     [CommandType.Slash]: SlashCommand;
     [CommandType.Both]: BothCommand;
-    [CommandType.MenuMsg]: ContextMenuMsg;
-    [CommandType.MenuUser]: ContextMenuUser;
+    [CommandType.CtxMsg]: ContextMenuMsg;
+    [CommandType.CtxUser]: ContextMenuUser;
     [CommandType.Button]: ButtonCommand;
-    [CommandType.MenuSelect]: SelectMenuCommand;
+    [CommandType.MenuStringSelect]: StringSelectCommand;
+    [CommandType.MenuRoleSelect] : RoleSelectCommand;
+    [CommandType.MenuChannelSelect] : ChannelSelectCommand;
+    [CommandType.MenuMentionableSelect] : MentionableSelectCommand;
+    [CommandType.MenuUserSelect] : UserSelectCommand;
     [CommandType.Modal]: ModalSubmitCommand;
 };
 

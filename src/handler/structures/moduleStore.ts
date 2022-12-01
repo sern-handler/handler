@@ -1,5 +1,5 @@
 import type { CommandModule } from '../../types/module';
-import { ApplicationCommandType, ComponentType, InteractionType } from 'discord.js';
+import { ApplicationCommandType, ComponentType } from 'discord.js';
 
 /**
  * Storing all command modules
@@ -12,13 +12,16 @@ export class ModuleStore {
         [ApplicationCommandType.Message]: new Map<string, CommandModule>(),
         [ApplicationCommandType.ChatInput]: new Map<string, CommandModule>(),
     };
-
-     readonly InteractionHandlers = {
+    readonly ModalSubmit = new Map<string, CommandModule>();
+    readonly InteractionHandlers = {
         [ComponentType.Button]: new Map<string, CommandModule>(),
-        [ComponentType.SelectMenu]: new Map<string, CommandModule>(),
-        [InteractionType.ModalSubmit] : new Map<string, CommandModule>()
+        [ComponentType.StringSelect]: new Map<string, CommandModule>(),
+        [ComponentType.ChannelSelect] : new Map<string, CommandModule>(),
+        [ComponentType.MentionableSelect] : new Map<string, CommandModule>(),
+        [ComponentType.RoleSelect] : new Map<string, CommandModule>(),
+        [ComponentType.UserSelect] : new Map<string, CommandModule>(),
     };
-     readonly TextCommands = {
+    readonly TextCommands = {
         text: new Map<string, CommandModule>(),
         aliases: new Map<string, CommandModule>(),
     };

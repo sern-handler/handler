@@ -46,7 +46,7 @@
         "typescript": "4.9"
     },
     "peerDependencies": {
-        "discord.js": ">= ^14.5.x"
+        "discord.js": ">= ^14.7.x"
     },
     "repository": {
         "type": "git",

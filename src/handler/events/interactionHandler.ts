@@ -16,7 +16,6 @@ import {
 import type {
     ButtonInteraction,
     ModalSubmitInteraction,
-    SelectMenuInteraction,
     UserContextMenuCommandInteraction,
     MessageContextMenuCommandInteraction,
 } from 'discord.js';
@@ -24,6 +23,7 @@ import { executeModule } from './observableHandling';
 import type { CommandModule } from '../../types/module';
 import { handleError } from '../contracts/errorHandling';
 import type { ModuleStore } from '../structures/moduleStore';
+import type { MessageComponentInteraction } from 'discord.js';
 
 export default class InteractionHandler extends EventsHandler<{
     event: Interaction;
@@ -97,15 +97,21 @@ export default class InteractionHandler extends EventsHandler<{
             )
             .with({ type: CommandType.Button }, buttonCommandDispatcher(event as ButtonInteraction))
             .with(
-                { type: CommandType.MenuSelect },
-                selectMenuCommandDispatcher(event as SelectMenuInteraction),
+                { type: P.union(
+                        CommandType.MenuRoleSelect,
+                        CommandType.MenuStringSelect,
+                        CommandType.MenuUserSelect,
+                        CommandType.MenuMentionableSelect,
+                        CommandType.MenuChannelSelect
+                    ) },
+                selectMenuCommandDispatcher(event as MessageComponentInteraction),
             )
             .with(
-                { type: CommandType.MenuUser },
+                { type: CommandType.CtxUser },
                 ctxMenuUserDispatcher(event as UserContextMenuCommandInteraction),
             )
             .with(
-                { type: CommandType.MenuMsg },
+                { type: CommandType.CtxMsg },
                 ctxMenuMsgDispatcher(event as MessageContextMenuCommandInteraction),
             )
             .otherwise(() => this.crashHandler.crash(Error(SernError.MismatchModule)));

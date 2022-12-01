@@ -2,7 +2,7 @@ import type { CommandInteractionOptionResolver } from 'discord.js';
 import type { PayloadType } from '../handler/structures/enums';
 import type { InteractionReplyOptions, MessageReplyOptions } from 'discord.js';
 import type { EventEmitter } from 'events';
-import type { CommandModule, EventModule, Module } from './module';
+import type { CommandModule, EventModule, AnyModule } from './module';
 import type { UnpackFunction } from 'iti';
 import type { ErrorHandling, Logging, ModuleManager } from '../handler/contracts';
 import type { ModuleStore } from '../handler/structures/moduleStore';
@@ -34,8 +34,8 @@ export type SpreadParams<T extends (...args: never) => unknown> = (
 export type DefinedCommandModule = CommandModule & { name: string; description: string };
 export type DefinedEventModule = EventModule & { name: string };
 export type Payload =
-    | { type: PayloadType.Success; module: Module }
-    | { type: PayloadType.Failure; module?: Module; reason: string | Error }
+    | { type: PayloadType.Success; module: AnyModule }
+    | { type: PayloadType.Failure; module?: AnyModule; reason: string | Error }
     | { type: PayloadType.Warning; reason: string};
 export type SernEventsMapping = {
     'module.register': [Payload];

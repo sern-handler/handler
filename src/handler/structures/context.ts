@@ -5,10 +5,10 @@ import type {
     Message,
     Snowflake,
     MessageReplyOptions,
-    User, Awaitable,
+    User,
 } from 'discord.js';
 import { Result as Either, Ok as Left, Err as Right } from 'ts-results-es';
-import type { CarriesContexts, ReplyOptions } from '../../types/handler';
+import type { ReplyOptions } from '../../types/handler';
 import { SernError } from './errors';
 
 

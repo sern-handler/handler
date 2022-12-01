@@ -5,7 +5,7 @@ import { Result } from 'ts-results-es';
 import type { CommandType } from '../structures/enums';
 import type Wrapper from '../structures/wrapper';
 import { PayloadType } from '../structures/enums';
-import type { CommandModule, CommandModuleDefs, Module } from '../../types/module';
+import type { CommandModule, CommandModuleDefs, AnyModule } from '../../types/module';
 import { _const } from '../utilities/functions';
 import type SernEmitter from '../sernEmitter';
 
@@ -33,7 +33,7 @@ export function ignoreNonBot(prefix: string) {
  * If the current value in Result stream is an error, calls callback.
  * @param cb
  */
-export function errTap<T extends Module>(cb: (err: SernError) => void) {
+export function errTap<T extends AnyModule>(cb: (err: SernError) => void) {
     return (src: Observable<Result<{ mod: T; absPath: string }, SernError>>) =>
         new Observable<{ mod: T; absPath: string }>(subscriber => {
             return src.subscribe({

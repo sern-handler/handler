@@ -29,23 +29,28 @@ export enum CommandType {
     /**
      * The CommandType for UserContextMenuInteraction commands
      */
-    MenuUser = 4,
+    CtxUser = 4,
     /**
      * The CommandType for MessageContextMenuInteraction commands
      */
-    MenuMsg = 8,
+    CtxMsg = 8,
     /**
      * The CommandType for ButtonInteraction commands
      */
     Button = 16,
     /**
-     * The CommandType for SelectMenuInteraction commands
+     * The CommandType for StringSelectMenuInteraction commands
      */
-    MenuSelect = 32,
+    MenuStringSelect = 32,
     /**
      * The CommandType for ModalSubmitInteraction commands
      */
     Modal = 64,
+
+    MenuChannelSelect = 256,
+    MenuMentionableSelect = 512,
+    MenuRoleSelect= 1024,
+    MenuUserSelect= 2048
 }
 
 /**
