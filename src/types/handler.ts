@@ -48,7 +48,7 @@ export type Transient<T> = () => () => T;
 
 export interface Dependencies {
     '@sern/client': Singleton<EventEmitter>;
-    '@sern/logger': Singleton<Logging>;
+    '@sern/logger'?: Singleton<Logging>;
     '@sern/emitter': Singleton<SernEmitter>;
     '@sern/store' : Singleton<ModuleStore>;
     '@sern/modules' : Singleton<ModuleManager>;
