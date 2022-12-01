@@ -20,7 +20,7 @@ export abstract class EventsHandler<T> {
             modules,
             logger,
         ] = containerConfig.get('@sern/client', '@sern/emitter', '@sern/errors', '@sern/modules', '@sern/logger');
-        this.logger = logger as Logging;
+        this.logger = logger as Logging|undefined;
         this.modules = modules as ModuleManager;
         this.client = client as EventEmitter;
         this.emitter = emitter as SernEmitter;

@@ -42,5 +42,3 @@ export function partition<T, V>(arr: (T & V)[], condition: (e: (T & V)) => boole
  export function reducePlugins(src: Observable<Result<void, void>[]>) : Observable<boolean> {
     return src.pipe(switchMap(s => of(s.every((a) => a.ok))));
  }
-
- export const now = _const(new Date());

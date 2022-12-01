@@ -18,7 +18,7 @@ import { Container, createContainer } from 'iti';
 import type { Dependencies, OptionalDependencies } from '../types/handler';
 import { composeRoot, containerSubject, useContainer } from './dependencies/provider';
 import type { Logging } from './contracts';
-import { err, now, ok, partition } from './utilities/functions';
+import { err, ok, partition } from './utilities/functions';
 
 /**
  *
@@ -44,7 +44,7 @@ export function init(wrapper: Wrapper) {
     new MessageHandler(wrapper);
     new InteractionHandler(wrapper);
     const endTime = performance.now();
-    logger?.info({ message: `sern : ${(endTime-startTime).toFixed(2)} ms` , date: now() });
+    logger?.info({ message: `sern : ${(endTime-startTime).toFixed(2)} ms` });
 }
 
 /**

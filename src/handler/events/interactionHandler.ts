@@ -48,7 +48,7 @@ export default class InteractionHandler extends EventsHandler<{
     }
 
     override init() {
-        const get = (cb: (ms: ModuleStore) => CommandModule| undefined) => {
+        const get = (cb: (ms: ModuleStore) => CommandModule|undefined) => {
            return this.modules.get(cb);
         };
         this.discordEvent.subscribe({

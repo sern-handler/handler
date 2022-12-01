@@ -1,27 +1,28 @@
 import type { LogPayload } from '../../types/handler';
 
-export interface Logging {
-    error(payload : LogPayload) : void;
-    warning(payload : LogPayload) : void;
-    info(payload : LogPayload) : void
-    debug(payload : LogPayload) : void
+export interface Logging<T = unknown> {
+    error(payload : LogPayload<T>) : void;
+    warning(payload : LogPayload<T>) : void;
+    info(payload : LogPayload<T>) : void
+    debug(payload : LogPayload<T>) : void
 }
 
 export class DefaultLogging implements Logging {
+    private date = () => new Date();
     debug(payload: LogPayload): void {
-        console.debug(`DEBUG -> ${payload.message}`);
+        console.debug(`DEBUG: ${this.date().toISOString()} -> ${payload.message}`);
     }
 
     error(payload: LogPayload): void {
-        console.error(`ERROR -> ${payload.message}`);
+        console.error(`ERROR: ${this.date().toISOString()} -> ${payload.message}`);
     }
 
     info(payload: LogPayload): void {
-        console.info(`INFO -> ${payload.message}`);
+        console.info(`INFO: ${this.date().toISOString()} -> ${payload.message}`);
     }
 
     warning(payload: LogPayload): void {
-        console.warn(`WARN -> ${payload.message}`);
+        console.warn(`WARN: ${this.date().toISOString()} -> ${payload.message}`);
     }
 
 }

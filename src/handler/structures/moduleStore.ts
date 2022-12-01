@@ -3,6 +3,7 @@ import { ApplicationCommandType, ComponentType, InteractionType } from 'discord.
 
 /**
  * Storing all command modules
+ * This dependency is usually injected into ModuleManager
  */
 export class ModuleStore {
      readonly BothCommands = new Map<string, CommandModule>();

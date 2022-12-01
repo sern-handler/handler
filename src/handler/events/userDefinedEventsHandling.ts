@@ -66,9 +66,6 @@ export function processEvents({ containerConfig, events }: Wrapper) {
                         if(success) {
                             //Safe because type checking previous and merging here
                             payload.cmd.execute(event as never);
-                            sernEmitter.emit('module.activate',{ type:PayloadType.Success, module: payload.cmd });
-                        } else {
-                            sernEmitter.emit('module.activate', { type:PayloadType.Failure, module: payload.cmd, reason: SernError.PluginFailure });
                         }
                     }), catchError(handleError(error, logging)))
                 ),

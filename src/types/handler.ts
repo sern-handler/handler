@@ -7,6 +7,7 @@ import type { UnpackFunction } from 'iti';
 import type { ErrorHandling, Logging, ModuleManager } from '../handler/contracts';
 import type { ModuleStore } from '../handler/structures/moduleStore';
 import type SernEmitter from '../handler/sernEmitter';
+import type { CommandType } from '../handler/structures/enums';
 export type Nullish<T> = T | undefined | null;
 // Thanks to @kelsny
 export type ParseType<T> = {
@@ -42,7 +43,7 @@ export type SernEventsMapping = {
     'error': [Payload];
     'warning': [Payload];
 };
-export type LogPayload = { message: string, date: Date }
+export type LogPayload<T = unknown> = { message: T }
 export type Singleton<T> = () => T
 export type Transient<T> = () => () => T;
 
@@ -65,3 +66,4 @@ export type MapDeps<
 export type UnknownFunction = (...args: unknown[]) => unknown
 //Basically, '@sern/client' | '@sern/store' | '@sern/modules' | '@sern/error' | '@sern/emitter' will be provided defaults, and you can exclude the rest
 export type OptionalDependencies = '@sern/logger';
+export type CarriesContexts = CommandType.Slash | CommandType.Text | CommandType.Both
