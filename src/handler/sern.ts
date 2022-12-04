@@ -19,6 +19,15 @@ import type { Dependencies, OptionalDependencies } from '../types/handler';
 import { composeRoot, containerSubject, useContainer } from './dependencies/provider';
 import type { Logging } from './contracts';
 import { err, ok, partition } from './utilities/functions';
+import type {
+    APIButtonComponent,
+    APISelectMenuComponent,
+    Awaitable,
+    ButtonInteraction,
+    Interaction,
+} from 'discord.js';
+import { concatMap, filter, from, fromEvent, Observable, switchMap, take, takeWhile } from 'rxjs';
+import { SelectMenuInteraction } from 'discord.js';
 
 /**
  *
@@ -79,6 +88,38 @@ export function eventModule(mod: InputEventModule): EventModule {
         plugins,
     } as EventModule;
 }
+
+export function onClick(
+    button: APIButtonComponent,
+    execute: (b: ButtonInteraction) => Awaitable<unknown>,
+    teardown: number | ((b: ButtonInteraction) => Awaitable<boolean>) = 1
+) {
+    const containerReceiver = useContainer();
+    const [ client ] = containerReceiver('@sern/client');
+    const teardownLogic = typeof teardown === 'number'
+        ? (o: Observable<Interaction>) => o.pipe(take(teardown))
+        : (o: Observable<Interaction>) => o.pipe(
+            concatMap(i =>
+                Promise.resolve(teardown(i as ButtonInteraction))
+            ),
+            concatMap(condition => o.pipe(takeWhile(() => !condition, true)))
+        );
+
+    (<Observable<Interaction>>fromEvent(client, 'interactionCreate')).pipe(
+        filter(i => i.isButton() && 'custom_id' in button ? button.custom_id === i.customId : true),
+        teardownLogic,
+        switchMap(i =>
+            from(Promise.resolve(execute(i as ButtonInteraction)))
+        ),
+    ).subscribe();
+}
+export function onSubmit<T extends APISelectMenuComponent>(
+    menu: T,
+    execute : () => Awaitable<unknown>
+) {
+    return;
+}
+
 /**
  * @param conf a configuration for creating your project dependencies
  */
