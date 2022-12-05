@@ -25,7 +25,7 @@ export class DefaultErrorHandling implements ErrorHandling {
     crash(error: Error): never {
         throw error;
     }
-    updateAlive(_: Error) {
+    updateAlive(e: Error) {
         this.keepAlive--;
     }
 }
@@ -35,7 +35,7 @@ export function handleError<C>(crashHandler: ErrorHandling, logging?: Logging) {
         if(crashHandler.keepAlive == 0) {
             crashHandler.crash(error);
         }
-        logging?.error({ message: error.message });
+        logging?.error({ message: JSON.stringify(error) });
         crashHandler.updateAlive(error);
         return caught;
     };

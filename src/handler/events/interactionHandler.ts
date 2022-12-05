@@ -98,11 +98,11 @@ export default class InteractionHandler extends EventsHandler<{
             .with({ type: CommandType.Button }, buttonCommandDispatcher(event as ButtonInteraction))
             .with(
                 { type: P.union(
-                        CommandType.MenuRoleSelect,
-                        CommandType.MenuStringSelect,
-                        CommandType.MenuUserSelect,
-                        CommandType.MenuMentionableSelect,
-                        CommandType.MenuChannelSelect
+                        CommandType.RoleSelect,
+                        CommandType.StringSelect,
+                        CommandType.UserSelect,
+                        CommandType.MentionableSelect,
+                        CommandType.ChannelSelect
                     ) },
                 selectMenuCommandDispatcher(event as MessageComponentInteraction),
             )

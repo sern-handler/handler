@@ -7,8 +7,6 @@ import type { UnpackFunction } from 'iti';
 import type { ErrorHandling, Logging, ModuleManager } from '../handler/contracts';
 import type { ModuleStore } from '../handler/structures/moduleStore';
 import type SernEmitter from '../handler/sernEmitter';
-import type { CommandType } from '../handler/structures/enums';
-export type Nullish<T> = T | undefined | null;
 // Thanks to @kelsny
 export type ParseType<T> = {
     [K in keyof T]: T[K] extends unknown ? [k: K, args: T[K]] : never;
@@ -63,7 +61,5 @@ export type MapDeps<
     T extends readonly unknown[]
     > = T extends [infer First extends keyof Deps, ...infer Rest extends readonly unknown[]]
     ? [ UnpackFunction<Deps[First]>, ...(MapDeps<Deps, Rest> extends [never] ? [] : MapDeps<Deps,Rest>)] : [never]
-export type UnknownFunction = (...args: unknown[]) => unknown
 //Basically, '@sern/client' | '@sern/store' | '@sern/modules' | '@sern/error' | '@sern/emitter' will be provided defaults, and you can exclude the rest
 export type OptionalDependencies = '@sern/logger';
-export type CarriesContexts = CommandType.Slash | CommandType.Text | CommandType.Both

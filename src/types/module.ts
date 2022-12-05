@@ -86,36 +86,36 @@ export interface ButtonCommand extends Module {
 }
 
 export interface StringSelectCommand extends Module {
-    type: CommandType.MenuStringSelect;
-    onEvent: EventPlugin<CommandType.MenuStringSelect>[];
+    type: CommandType.StringSelect;
+    onEvent: EventPlugin<CommandType.StringSelect>[];
     plugins: CommandPlugin[];
     execute: (ctx: StringSelectMenuInteraction) => Awaitable<unknown>;
 }
 
 export interface ChannelSelectCommand extends Module {
-    type: CommandType.MenuChannelSelect;
-    onEvent: EventPlugin<CommandType.MenuChannelSelect>[];
+    type: CommandType.ChannelSelect;
+    onEvent: EventPlugin<CommandType.ChannelSelect>[];
     plugins: CommandPlugin[];
     execute: (ctx: ChannelSelectMenuInteraction) => Awaitable<unknown>;
 }
 
 export interface RoleSelectCommand extends Module {
-    type: CommandType.MenuRoleSelect;
-    onEvent: EventPlugin<CommandType.MenuRoleSelect>[];
+    type: CommandType.RoleSelect;
+    onEvent: EventPlugin<CommandType.RoleSelect>[];
     plugins: CommandPlugin[];
     execute: (ctx: RoleSelectMenuInteraction) => Awaitable<unknown>;
 }
 
 export interface MentionableSelectCommand extends Module {
-    type: CommandType.MenuMentionableSelect;
-    onEvent: EventPlugin<CommandType.MenuMentionableSelect>[];
+    type: CommandType.MentionableSelect;
+    onEvent: EventPlugin<CommandType.MentionableSelect>[];
     plugins: CommandPlugin[];
     execute: (ctx: MentionableSelectMenuInteraction) => Awaitable<unknown>;
 }
 
 export interface UserSelectCommand extends Module {
-    type: CommandType.MenuUserSelect;
-    onEvent: EventPlugin<CommandType.MenuUserSelect>[];
+    type: CommandType.UserSelect;
+    onEvent: EventPlugin<CommandType.UserSelect>[];
     plugins: CommandPlugin[];
     execute: (ctx: UserSelectMenuInteraction) => Awaitable<unknown>;
 }
@@ -161,11 +161,11 @@ export type CommandModuleDefs = {
     [CommandType.CtxMsg]: ContextMenuMsg;
     [CommandType.CtxUser]: ContextMenuUser;
     [CommandType.Button]: ButtonCommand;
-    [CommandType.MenuStringSelect]: StringSelectCommand;
-    [CommandType.MenuRoleSelect] : RoleSelectCommand;
-    [CommandType.MenuChannelSelect] : ChannelSelectCommand;
-    [CommandType.MenuMentionableSelect] : MentionableSelectCommand;
-    [CommandType.MenuUserSelect] : UserSelectCommand;
+    [CommandType.StringSelect]: StringSelectCommand;
+    [CommandType.RoleSelect] : RoleSelectCommand;
+    [CommandType.ChannelSelect] : ChannelSelectCommand;
+    [CommandType.MentionableSelect] : MentionableSelectCommand;
+    [CommandType.UserSelect] : UserSelectCommand;
     [CommandType.Modal]: ModalSubmitCommand;
 };
 

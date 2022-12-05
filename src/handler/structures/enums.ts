@@ -41,16 +41,16 @@ export enum CommandType {
     /**
      * The CommandType for StringSelectMenuInteraction commands
      */
-    MenuStringSelect = 32,
+    StringSelect = 32,
     /**
      * The CommandType for ModalSubmitInteraction commands
      */
     Modal = 64,
 
-    MenuChannelSelect = 256,
-    MenuMentionableSelect = 512,
-    MenuRoleSelect= 1024,
-    MenuUserSelect= 2048
+    ChannelSelect = 256,
+    MentionableSelect = 512,
+    RoleSelect= 1024,
+    UserSelect= 2048
 }
 
 /**

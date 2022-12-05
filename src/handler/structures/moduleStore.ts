@@ -13,6 +13,7 @@ export class ModuleStore {
         [ApplicationCommandType.ChatInput]: new Map<string, CommandModule>(),
     };
     readonly ModalSubmit = new Map<string, CommandModule>();
+    readonly TextCommands = new Map<string, CommandModule>();
     readonly InteractionHandlers = {
         [ComponentType.Button]: new Map<string, CommandModule>(),
         [ComponentType.StringSelect]: new Map<string, CommandModule>(),
@@ -20,10 +21,6 @@ export class ModuleStore {
         [ComponentType.MentionableSelect] : new Map<string, CommandModule>(),
         [ComponentType.RoleSelect] : new Map<string, CommandModule>(),
         [ComponentType.UserSelect] : new Map<string, CommandModule>(),
-    };
-    readonly TextCommands = {
-        text: new Map<string, CommandModule>(),
-        aliases: new Map<string, CommandModule>(),
     };
 }
 
