@@ -46,7 +46,9 @@ export enum CommandType {
      * The CommandType for ModalSubmitInteraction commands
      */
     Modal = 64,
-
+    /**
+     * The CommandType for the other SelectMenuInteractions
+     */
     ChannelSelect = 256,
     MentionableSelect = 512,
     RoleSelect= 1024,
