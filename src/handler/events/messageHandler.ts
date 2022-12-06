@@ -56,9 +56,8 @@ export default class MessageHandler extends EventsHandler<{
                         ctx: Context.wrap(message),
                         args: <['text', string[]]>['text', rest],
                         mod: get(ms =>
-                            ms.TextCommands.text.get(prefix) ??
-                            ms.BothCommands.get(prefix) ??
-                            ms.TextCommands.aliases.get(prefix)
+                            ms.TextCommands.get(prefix) ??
+                            ms.BothCommands.get(prefix)
                         ),
                     };
                 }),
