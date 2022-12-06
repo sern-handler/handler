@@ -40,7 +40,7 @@ export function processEvents({ containerConfig, events }: Wrapper) {
         error,
         sernEmitter,
         logging
-    ] = containerConfig.get('@sern/client', '@sern/errors', '@sern/emitter') as [EventEmitter, ErrorHandling, SernEmitter, Logging?];
+    ] = containerConfig.get('@sern/client', '@sern/errors', '@sern/emitter', '@sern/logger') as [EventEmitter, ErrorHandling, SernEmitter, Logging?];
     const lazy = (k: string) => containerConfig.get(k as keyof Dependencies)[0];
     const eventStream$ = eventObservable$(events!, sernEmitter);
     const normalize$ = eventStream$.pipe(
