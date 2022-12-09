@@ -1,17 +1,15 @@
 import { EventsHandler } from './eventsHandler';
 import type Wrapper from '../structures/wrapper';
-import { concatMap, fromEvent, Observable, map, take, of, from, toArray, switchMap } from 'rxjs';
+import { concatMap, fromEvent, Observable, map, take } from 'rxjs';
 import * as Files from '../utilities/readFile';
-import { errTap } from './observableHandling';
-import { CommandType, PayloadType, PluginType } from '../structures/enums';
-import { processCommandPlugins } from './userDefinedEventsHandling';
-import type { Awaitable } from 'discord.js';
+import { errTap, processPlugins, resolvePlugins } from './observableHandling';
+import { CommandType, PayloadType } from '../structures/enums';
 import { SernError } from '../structures/errors';
 import { match } from 'ts-pattern';
 import { Result } from 'ts-results-es';
 import { ApplicationCommandType, ComponentType } from 'discord.js';
 import type { CommandModule } from '../../types/module';
-import type { DefinedCommandModule } from '../../types/handler';
+import type { DefinedCommandModule, DefinedEventModule } from '../../types/handler';
 import type { ModuleManager } from '../contracts';
 import type { ModuleStore } from '../structures/moduleStore';
 import { _const, err, nameOrFilename, ok } from '../utilities/functions';
@@ -40,10 +38,9 @@ export default class ReadyHandler extends EventsHandler<{
         this.init();
         this.payloadSubject
             .pipe(
-                concatMap(payload => this.processPlugins(payload)),
-                concatMap(payload => this.resolvePlugins(payload)),
-            )
-            .subscribe(payload => {
+                concatMap(processPlugins),
+                concatMap(resolvePlugins),
+            ).subscribe(payload => {
                 const allPluginsSuccessful = payload.pluginRes.every(({ execute }) => execute.ok);
                 if (allPluginsSuccessful) {
                     const res = registerModule(this.modules, payload.mod);
@@ -77,38 +74,6 @@ export default class ReadyHandler extends EventsHandler<{
         };
     }
 
-    private resolvePlugins({
-        mod,
-        cmdPluginRes,
-    }: {
-        mod: DefinedCommandModule;
-        cmdPluginRes: {
-            name: string;
-            description: string;
-            execute: Awaitable<Result<void, void>>;
-            type: PluginType.Command;
-        }[];
-    }) {
-        if (mod.plugins.length === 0) {
-            return of({ mod, pluginRes: [] });
-        }
-        // modules with no event plugins are ignored in the previous
-        return from(cmdPluginRes).pipe(
-            switchMap(pl =>
-                from(pl.execute).pipe(
-                    map(execute => ({ ...pl, execute })),
-                    toArray(),
-                ),
-            ),
-            map(pluginRes => ({ mod, pluginRes })),
-        );
-    }
-
-    private processPlugins(payload: { mod: DefinedCommandModule; absPath: string }) {
-        const cmdPluginRes = processCommandPlugins(payload);
-        return of({ mod: payload.mod, cmdPluginRes });
-    }
-
     protected init() {
         this.discordEvent.pipe(map(ReadyHandler.intoDefinedModule)).subscribe({
             next: value => this.setState(value),
@@ -120,13 +85,13 @@ export default class ReadyHandler extends EventsHandler<{
     }
 }
 
-function registerModule(manager: ModuleManager, mod: DefinedCommandModule): Result<void, void> {
+function registerModule(manager: ModuleManager, mod: DefinedCommandModule | DefinedEventModule): Result<void, void> {
     const name = mod.name;
     const insert = (cb: (ms: ModuleStore) => void) => {
         const set = Result.wrap(_const(manager.set(cb)));
         return set.ok ? ok() : err();
     };
-    return match<DefinedCommandModule>(mod)
+    return match<DefinedCommandModule | DefinedEventModule>(mod)
         .with({ type: CommandType.Text }, mod => {
             mod.alias?.forEach(a => insert(ms => ms.TextCommands.set(a, mod)));
             return insert(ms => ms.TextCommands.set(name, mod));

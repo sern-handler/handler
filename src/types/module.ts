@@ -36,7 +36,7 @@ export interface Module {
     type?: CommandType | EventType;
     name?: string;
     description?: string;
-    execute: (...args: any[]) => unknown
+    execute: (...args: any[]) => any
 }
 
 export interface TextCommand extends Module {

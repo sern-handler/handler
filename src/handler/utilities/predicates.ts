@@ -1,10 +1,6 @@
-import type {
-    DiscordEventCommand,
-    ExternalEventCommand,
-    SernEventCommand,
-} from '../structures/events';
-import { EventType } from '../..';
-import type { CommandModuleDefs, EventModule, AnyModule } from '../../types/module';
+import type { DiscordEventCommand, ExternalEventCommand, SernEventCommand } from '../structures/events';
+import { CommandModule, EventType } from '../..';
+import type { AnyModule, CommandModuleDefs, EventModule } from '../../types/module';
 
 export function correctModuleType<T extends keyof CommandModuleDefs>(
     plug: AnyModule | undefined,
@@ -16,13 +12,12 @@ export function correctModuleType<T extends keyof CommandModuleDefs>(
 }
 
 
-export function isDiscordEvent(el: EventModule): el is DiscordEventCommand {
+export function isDiscordEvent(el: EventModule | CommandModule): el is DiscordEventCommand {
     return el.type === EventType.Discord;
 }
-export function isSernEvent(el: EventModule): el is SernEventCommand {
+export function isSernEvent(el: EventModule | CommandModule): el is SernEventCommand {
     return el.type === EventType.Sern;
 }
-
-export function isExternalEvent(el: EventModule): el is ExternalEventCommand {
+export function isExternalEvent(el: EventModule | CommandModule): el is ExternalEventCommand {
     return el.type === EventType.External && 'emitter' in el;
 }

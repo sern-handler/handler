@@ -45,11 +45,10 @@ export type CommandPlugin<T extends keyof CommandModuleDefs = keyof CommandModul
             ) => Awaitable<Result<void, void>>;
         }
 }[T];
-
 export interface DiscordEmitterPlugin extends Plugin {
         type: PluginType.Command;
         execute: (
-            payload: { mod: DiscordEventCommand & { name: string; description : string }; absPath: string },
+            payload: { mod: DiscordEventCommand & { name: string }; absPath: string },
             controller: Controller,
         ) => Awaitable<Result<void, void>>;
 }
@@ -57,7 +56,7 @@ export interface DiscordEmitterPlugin extends Plugin {
 export interface ExternalEmitterPlugin extends Plugin {
     type: PluginType.Command;
     execute: (
-        payload: { mod: ExternalEventCommand &  { name : string; description : string }; absPath: string } ,
+        payload: { mod: ExternalEventCommand &  { name : string }; absPath: string } ,
         controller: Controller,
     ) => Awaitable<Result<void, void>>;
 }

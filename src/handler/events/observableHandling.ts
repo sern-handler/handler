@@ -1,13 +1,16 @@
 import type { Message } from 'discord.js';
-import { concatMap, from, Observable, of, tap, throwError } from 'rxjs';
+import { concatMap, from, map, Observable, of, switchMap, tap, throwError, toArray } from 'rxjs';
 import { SernError } from '../structures/errors';
 import { Result } from 'ts-results-es';
 import type { CommandType } from '../structures/enums';
 import type Wrapper from '../structures/wrapper';
-import { PayloadType } from '../structures/enums';
+import { PayloadType, PluginType } from '../structures/enums';
 import type { CommandModule, CommandModuleDefs, AnyModule } from '../../types/module';
 import { _const } from '../utilities/functions';
 import type SernEmitter from '../sernEmitter';
+import type { DefinedCommandModule, DefinedEventModule } from '../../types/handler';
+import type { Awaitable } from 'discord.js';
+import { processCommandPlugins } from './userDefinedEventsHandling';
 
 export function ignoreNonBot(prefix: string) {
     return (src: Observable<Message>) =>
@@ -110,4 +113,31 @@ export function executeModule(
         });
         return of(undefined);
     }
+}
+
+export function resolvePlugins({ mod, cmdPluginRes }: {
+    mod: DefinedCommandModule | DefinedEventModule;
+    cmdPluginRes: {
+        execute: Awaitable<Result<void, void>>;
+        type: PluginType.Command;
+    }[];
+}) {
+    if (mod.plugins.length === 0) {
+        return of({ mod, pluginRes: [] });
+    }
+    // modules with no event plugins are ignored in the previous
+    return from(cmdPluginRes).pipe(
+        switchMap(pl =>
+            from(pl.execute).pipe(
+                map(execute => ({ ...pl, execute })),
+                toArray(),
+            ),
+        ),
+        map(pluginRes => ({ mod, pluginRes })),
+    );
+}
+
+export function processPlugins(payload: { mod: DefinedCommandModule | DefinedEventModule; absPath: string }) {
+    const cmdPluginRes = processCommandPlugins(payload);
+    return of({ mod: payload.mod, cmdPluginRes });
 }
