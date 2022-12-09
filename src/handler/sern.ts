@@ -2,7 +2,7 @@ import type Wrapper from './structures/wrapper';
 import { processEvents } from './events/userDefinedEventsHandling';
 import { CommandType, EventType, PluginType } from './structures/enums';
 import type {
-    BasePlugin,
+    Plugin,
     CommandPlugin,
     EventModuleCommandPluginDefs,
     EventModuleEventPluginDefs,
@@ -59,7 +59,7 @@ export const controller = {
  * @param mod
  */
 export function commandModule(mod: InputCommandModule): CommandModule {
-    const [onEvent, plugins] = partition(mod.plugins ?? [], el => (el as BasePlugin).type === PluginType.Event);
+    const [onEvent, plugins] = partition(mod.plugins ?? [], el => (el as Plugin).type === PluginType.Event);
     return {
         ...mod,
         onEvent,
@@ -71,7 +71,7 @@ export function commandModule(mod: InputCommandModule): CommandModule {
  * @param mod
  */
 export function eventModule(mod: InputEventModule): EventModule {
-    const [onEvent, plugins] = partition(mod.plugins ?? [], el => (el as BasePlugin).type === PluginType.Event);
+    const [onEvent, plugins] = partition(mod.plugins ?? [], el => (el as Plugin).type === PluginType.Event);
         return {
         ...mod,
         onEvent,

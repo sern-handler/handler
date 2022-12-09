@@ -2,7 +2,7 @@ import type { CommandInteractionOptionResolver } from 'discord.js';
 import type { PayloadType } from '../handler/structures/enums';
 import type { InteractionReplyOptions, MessageReplyOptions } from 'discord.js';
 import type { EventEmitter } from 'events';
-import type { CommandModule, EventModule, AnyModule } from './module';
+import type { CommandModule, EventModule, AnyModule, Module } from './module';
 import type { UnpackFunction } from 'iti';
 import type { ErrorHandling, Logging, ModuleManager } from '../handler/contracts';
 import type { ModuleStore } from '../handler/structures/moduleStore';
