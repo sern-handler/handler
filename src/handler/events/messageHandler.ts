@@ -31,7 +31,7 @@ export default class MessageHandler extends EventsHandler<{
                     const res = arrAsync(
                             mod.onEvent.map(ep => ep.execute([ctx, args], controller)),
                     );
-                    const execute = _const(mod.execute(ctx, args));
+                    const execute = () => mod.execute(ctx, args);
                     //resolves the promise and re-emits it back into source
                     return from(res).pipe(map(res => ({ mod, execute, res })));
                 }),

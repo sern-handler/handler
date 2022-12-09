@@ -82,9 +82,7 @@ export function executeModule(
 ) {
     const emitter = wrapper.containerConfig.get('@sern/emitter')[0] as SernEmitter;
     if (payload.res.every(el => el.ok)) {
-        const executeFn = Result.wrapAsync<unknown, Error | string>(() =>
-            Promise.resolve(payload.execute()),
-        );
+        const executeFn = Result.wrapAsync<unknown, Error | string>(() => Promise.resolve(payload.execute()));
         return from(executeFn).pipe(
             concatMap(res => {
                 if (res.err) {
