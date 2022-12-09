@@ -4,19 +4,29 @@ import { BehaviorSubject } from 'rxjs';
 import * as assert from 'assert';
 import type { Dependencies, MapDeps } from '../../types/handler';
 import SernEmitter from '../sernEmitter';
-import { _const } from '../utilities/functions';
-import { DefaultErrorHandling, DefaultModuleManager } from '../contracts';
+import { _const, ok } from '../utilities/functions';
+import { DefaultErrorHandling, DefaultModuleManager, Logging } from '../contracts';
 import { ModuleStore } from '../structures/moduleStore';
-import { None, Result } from 'ts-results-es';
+import { Ok, Result } from 'ts-results-es';
 import { DefaultLogging } from '../contracts';
 
-export const containerSubject = new BehaviorSubject<Container<Dependencies, {}> | null>(null);
-export function composeRoot<T extends Dependencies>(root: Container<Partial<T>, {}>, exclusion: Set<keyof Dependencies>) {
+export const containerSubject = new BehaviorSubject<Container<Dependencies, Partial<Dependencies>> | null>(null);
+export function composeRoot<T extends Dependencies>(root: Container<Partial<T>, Partial<Dependencies>>, exclusion: Set<keyof Dependencies>) {
     const client = root.get('@sern/client');
     assert.ok(client !== undefined, SernError.MissingRequired);
     const excluded = (key: keyof Dependencies) => exclusion.has(key);
-    const getOr = (key: keyof Dependencies, elseVal: unknown) => Result.wrap(() => root.get(key)).unwrapOr(elseVal);
-    const xGetOr = (key: keyof Dependencies, or: unknown) => getOr(key, excluded(key) ? or : None );
+    const get = <T>(key : keyof Dependencies) => Result.wrap(() => root.get(key) as T);
+    const getOr = (key: keyof Dependencies, elseVal: unknown) => get(key).unwrapOr(elseVal);
+    const xGetOr = (key: keyof Dependencies, or: unknown) => {
+        if(excluded(key)) {
+            get(key) //if dev created a dependency but excluded, deletes on root composition
+                .andThen(() => Ok(root.delete(key)))
+                .unwrapOr(ok());
+        } else {
+            getOr(key, or);
+        }
+
+    };
     xGetOr('@sern/emitter', root.upsert({
             '@sern/emitter' : _const(new SernEmitter())
         })
@@ -42,12 +52,25 @@ export function composeRoot<T extends Dependencies>(root: Container<Partial<T>, 
             '@sern/errors': _const(new DefaultErrorHandling())
         })
     );
-    root.get('@sern/logger')?.info({ message: 'All dependencies loaded successfully' });
+    //If logger exists, log info, else do nothing.
+    get<Logging>('@sern/logger')
+        .map((logger => logger.info({ message: 'All dependencies loaded successfully' })))
+        .unwrapOr(ok());
 }
 
 
 export function useContainer<T extends Dependencies>() {
     const container = containerSubject.getValue()! as unknown as Container<T, {}>;
     assert.ok(container !== null, 'useContainer was called before Sern#init');
-    return <V extends (keyof T)[]>(...keys: [...V]) => keys.map(key => container.get(key)) as MapDeps<T, V>;
+    //weird edge case, why can i not use _const here?
+    return <V extends (keyof T)[]>(...keys: [...V]) =>
+        keys.map(key => Result.wrap(() => container.get(key)).unwrapOr(undefined)) as MapDeps<T, V>;
+}
+
+/**
+ * Returns the underlying data structure holding all dependencies.
+ * Exposes some methods from iti
+ */
+export function useContainerRaw() {
+    return containerSubject.getValue();
 }
