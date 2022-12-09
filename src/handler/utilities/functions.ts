@@ -7,9 +7,7 @@ import { Observable, of, switchMap } from 'rxjs';
  * Used for singleton in iti
  * @param value
  */
-export const _const = <T>(value: T) =>
-    () =>
-        value;
+export const _const = <T>(value: T) => () => value;
 /**
  * A function that returns another function
  * Used for transient in iti

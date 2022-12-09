@@ -1,5 +1,6 @@
 import type { Observable } from 'rxjs';
 import type { Logging } from './logging';
+import { useContainerRaw } from '../dependencies/provider';
 
 export interface ErrorHandling {
     /**
@@ -31,8 +32,9 @@ export class DefaultErrorHandling implements ErrorHandling {
 }
 
 export function handleError<C>(crashHandler: ErrorHandling, logging?: Logging) {
-    return (error: Error, caught: Observable<C>) => {
+    return async (error: Error, caught: Observable<C>) => {
         if(crashHandler.keepAlive == 0) {
+            await useContainerRaw()?.disposeAll();
             crashHandler.crash(error);
         }
         logging?.error({ message: JSON.stringify(error) });
