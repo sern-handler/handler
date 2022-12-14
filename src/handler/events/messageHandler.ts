@@ -12,7 +12,6 @@ import type { CommandModule, TextCommand } from '../../types/module';
 import { handleError } from '../contracts/errorHandling';
 import type { ModuleManager } from '../contracts';
 import type { ModuleStore } from '../structures/moduleStore';
-import { _const } from '../utilities/functions';
 
 export default class MessageHandler extends EventsHandler<{
     ctx: Context;
