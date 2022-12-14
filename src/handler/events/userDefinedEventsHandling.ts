@@ -42,7 +42,7 @@ export function processEvents({ containerConfig, events }: Wrapper) {
         .pipe(tap( it => sernEmitter.emit('module.register', it)));
     const emitFailure$ = (mod: AnyModule) => of({ type: PayloadType.Success, module: mod, } as const)
         .pipe(tap(it => sernEmitter.emit('module.register', it)));
-    const normalize$ = eventStream$.pipe(
+    const eventCreation$ = eventStream$.pipe(
         map(({ mod, absPath }) => ({
             mod : {
                 name: nameOrFilename(mod.name, absPath),
@@ -63,9 +63,8 @@ export function processEvents({ containerConfig, events }: Wrapper) {
             iif(() => success, emitSuccess$(mod), emitFailure$(mod))
                 .pipe(filter(res => res.type === PayloadType.Success), map(() => mod))
         ),
-
     );
-    normalize$.subscribe(e => {
+    eventCreation$.subscribe(e => {
         const payload = match(e)
             .when(isSernEvent, sernEmitterDispatcher(sernEmitter))
             .when(isDiscordEvent, discordEventDispatcher(client))
