@@ -27,7 +27,9 @@ export interface Controller {
     stop: () => Err<void>;
 }
 export interface Plugin {
+    /** @deprecated will be removed in the next update */
     name?: string;
+    /** @deprecated will be removed in the next update */
     description?: string;
     type: PluginType
 }
