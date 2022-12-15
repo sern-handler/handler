@@ -26,7 +26,7 @@ export default class ReadyHandler extends EventsHandler<{
             concatMap(() =>
                 Files.buildData<CommandModule>(wrapper.commands).pipe(
                     errTap(reason =>
-                        this.emitter?.emit('module.register', {
+                        this.emitter.emit('module.register', {
                             type: PayloadType.Failure,
                             module: undefined,
                             reason,
