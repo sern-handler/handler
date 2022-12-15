@@ -2,7 +2,7 @@ import { catchError, concatMap, filter, from, iif, map, of, tap, toArray } from 
 import { buildData } from '../utilities/readFile';
 import { controller } from '../sern';
 import type { DefinedCommandModule, DefinedEventModule, Dependencies } from '../../types/handler';
-import { PayloadType } from '../structures/enums';
+import { PayloadType, PluginType } from '../structures/enums';
 import type Wrapper from '../structures/wrapper';
 import { isDiscordEvent, isExternalEvent, isSernEvent } from '../utilities/predicates';
 import { errTap, processPlugins, resolvePlugins } from './observableHandling';
@@ -15,6 +15,8 @@ import { discordEventDispatcher, externalEventDispatcher, sernEmitterDispatcher 
 import type { ErrorHandling, Logging } from '../contracts';
 import { SernError } from '../structures/errors';
 import { handleError } from '../contracts/errorHandling';
+import type { Awaitable } from 'discord.js';
+import type { Result } from 'ts-results-es';
 
 /**
  * Utility function to process command plugins for all Modules
@@ -22,7 +24,7 @@ import { handleError } from '../contracts/errorHandling';
  */
 export function processCommandPlugins<T extends DefinedCommandModule | DefinedEventModule>(
     payload: { mod: T; absPath: string },
-) {
+): {type: PluginType.Command, execute: Awaitable<Result<void,void>>}[]  {
     return payload.mod.plugins.map(plug => ({
         type: plug.type,
         execute: plug.execute(payload as any, controller),
