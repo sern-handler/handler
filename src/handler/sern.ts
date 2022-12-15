@@ -26,9 +26,12 @@ import { err, ok, partition } from './utilities/functions';
  * @example
  * ```ts title="src/index.ts"
  * Sern.init({
- *     client,
  *     defaultPrefix: '!',
  *     commands: 'dist/commands',
+ *     events: 'dist/events',
+ *     containerConfig : {
+ *         get: useContainer
+ *     }
  * })
  * ```
  */
