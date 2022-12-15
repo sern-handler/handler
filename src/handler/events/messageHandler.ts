@@ -10,7 +10,6 @@ import { arrAsync } from '../utilities/arrAsync';
 import { controller } from '../sern';
 import type { CommandModule, TextCommand } from '../../types/module';
 import { handleError } from '../contracts/errorHandling';
-import type { ModuleManager } from '../contracts';
 import type { ModuleStore } from '../structures/moduleStore';
 
 export default class MessageHandler extends EventsHandler<{
@@ -21,7 +20,6 @@ export default class MessageHandler extends EventsHandler<{
     protected discordEvent: Observable<Message>;
     public constructor(protected wrapper: Wrapper) {
         super(wrapper);
-        this.modules = wrapper.containerConfig.get('@sern/modules')[0] as ModuleManager;
         this.discordEvent = <Observable<Message>>fromEvent(this.client, 'messageCreate');
         this.init();
         this.payloadSubject
