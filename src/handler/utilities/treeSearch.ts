@@ -1,4 +1,3 @@
-
 import { ApplicationCommandOptionType, AutocompleteInteraction } from 'discord.js';
 import type { SernAutocompleteData, SernOptionsData } from '../../types/module';
 

@@ -10,7 +10,7 @@
   <a href="https://www.npmjs.com/package/@sern/handler"><img src="https://img.shields.io/npm/v/@sern/handler?maxAge=3600" alt="NPM version" /></a>
   <a href="https://www.npmjs.com/package/@sern/handler"><img src="https://img.shields.io/npm/dt/@sern/handler?maxAge=3600" alt="NPM downloads" /></a>
   <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/license-MIT-brightgreen" alt="License MIT" /></a>
-  <a href="https://sern-handler.js.org"><img alt="docs.rs" src="https://img.shields.io/docsrs/docs" /></a>
+  <a href="https://sern.dev"><img alt="docs.rs" src="https://img.shields.io/docsrs/docs" /></a>
   <img alt="Lines of code" src="https://img.shields.io/badge/total%20lines-2k-blue" />
 </div>
 
@@ -33,9 +33,9 @@ pnpm add @sern/handler
 
 * Support for discord.js v14 and all interactions
 * Hybrid commands
-* lightweight and customizable
+* Lightweight and customizable
 * ESM, CommonJS and TypeScript support
-* A powerful cli and awesome community-made plugins
+* A powerful CLI and awesome community-made plugins
 
 ## 👶 Basic Usage
 
@@ -83,7 +83,7 @@ exports.default = commandModule({
 });
 ```
 
-See our [templates](https://github.com/sern-handler/templates) for TypeScript examples and more
+See our [templates](https://github.com/sern-handler/templates) for TypeScript examples and more.
 
 ## 💻 CLI
 
@@ -91,12 +91,12 @@ It is **highly encouraged** to use the [command line interface](https://github.c
 
 ## 🔗 Links
 
-- [Official Documentation and Guide](https://sern-handler.js.org)
-- [Support Server](https://discord.com/invite/mmyCTnYtbF)
+- [Official Documentation and Guide](https://sern.dev)
+- [Support Server](https://sern.dev/discord)
 
 ## 👋 Contribute
 
-- Read our contribution [guidelines](https://github.com/sern-handler/handler) carefully
+- Read our contribution [guidelines](./.github/CONTRIBUTING.md) carefully
 - Pull up on [issues](https://github.com/sern-handler/handler/issues) and report bugs
 - All kinds of contributions are welcomed.
 
