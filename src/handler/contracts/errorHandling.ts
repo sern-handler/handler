@@ -1,7 +1,7 @@
 import type { Observable } from 'rxjs';
 import type { Logging } from './logging';
 import { useContainerRaw } from '../dependencies/provider';
-
+import util from 'util';
 export interface ErrorHandling {
     /**
      * Number of times the process should throw an error until crashing and exiting
@@ -32,13 +32,18 @@ export class DefaultErrorHandling implements ErrorHandling {
 }
 
 export function handleError<C>(crashHandler: ErrorHandling, logging?: Logging) {
-    return async (error: Error, caught: Observable<C>) => {
+    return (pload: unknown, caught: Observable<C>) => {
+        // This is done to fit the ErrorHandling contract
+        const err = pload instanceof Error ? pload : Error(util.format(pload));
         if(crashHandler.keepAlive == 0) {
-            await useContainerRaw()?.disposeAll();
-            crashHandler.crash(error);
+            useContainerRaw()?.disposeAll().then(() => {
+                logging?.info({ message: 'Cleaning container and crashing' });
+            });
+            crashHandler.crash(err);
         }
-        logging?.error({ message: JSON.stringify(error) });
-        crashHandler.updateAlive(error);
+        //formatted payload
+        logging?.error({ message: util.format(pload) });
+        crashHandler.updateAlive(err);
         return caught;
     };
 }
