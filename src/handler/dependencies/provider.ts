@@ -14,41 +14,48 @@ export const containerSubject = new BehaviorSubject<Container<Dependencies, Part
 export function composeRoot<T extends Dependencies>(root: Container<Partial<T>, Partial<Dependencies>>, exclusion: Set<keyof Dependencies>) {
     const client = root.get('@sern/client');
     assert.ok(client !== undefined, SernError.MissingRequired);
+    //A utility function checking if a dependency has been declared excluded
     const excluded = (key: keyof Dependencies) => exclusion.has(key);
+    //Wraps a fetch to the container in a Result, deferring the action
     const get = <T>(key : keyof Dependencies) => Result.wrap(() => root.get(key) as T);
-    const getOr = (key: keyof Dependencies, elseVal: unknown) => get(key).unwrapOr(elseVal);
-    const xGetOr = (key: keyof Dependencies, or: unknown) => {
+    const getOr = (key: keyof Dependencies, elseAction: () => unknown) => {
+        //Gets dependency but if an Err, map to a function that upserts.
+        const dep = get(key).mapErr(() => elseAction);
+        if(dep.err) {
+            //Defers upsert until final check here
+            return dep.val();
+        }
+    };
+    const xGetOr = (key: keyof Dependencies, action: () => unknown) => {
         if(excluded(key)) {
             get(key) //if dev created a dependency but excluded, deletes on root composition
                 .andThen(() => Ok(root.delete(key)))
                 .unwrapOr(ok());
         } else {
-            getOr(key, or);
+            getOr(key, action);
         }
 
     };
-    xGetOr('@sern/emitter', root.upsert({
+    xGetOr('@sern/emitter', () => root.upsert({
             '@sern/emitter' : _const(new SernEmitter())
         })
     );
     //An "optional" dependency
-    xGetOr('@sern/logger',
+    xGetOr('@sern/logger', () => {
         root.upsert({
-            '@sern/logger' : _const(new DefaultLogging())
-        })
+                '@sern/logger' : _const(new DefaultLogging())
+            });
+        }
     );
-    xGetOr('@sern/store',
-        root.upsert({
+    xGetOr('@sern/store', () => root.upsert({
             '@sern/store' : _const(new ModuleStore())
         })
     );
-    xGetOr('@sern/modules',
-        root.upsert((ctx) => ({
+    xGetOr('@sern/modules', () => root.upsert((ctx) => ({
             '@sern/modules' : _const(new DefaultModuleManager(ctx['@sern/store'] as ModuleStore))
         }))
     );
-    xGetOr('@sern/errors',
-        root.upsert({
+    xGetOr('@sern/errors', () => root.upsert({
             '@sern/errors': _const(new DefaultErrorHandling())
         })
     );
