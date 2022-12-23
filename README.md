@@ -58,11 +58,20 @@ const client = new Client({
     GatewayIntentBits.GuildMessages
   ]
 });
+export const useContainer = Sern.makeDependencies({
+    build: root => root
+        .add({ '@sern/client': single(client)  })
+        .add({ '@sern/logger': single(new DefaultLogging()) })
+});
 
+//View docs for all options
 Sern.init({
-  client,   
-  defaultPrefix,   
-  commands : 'src/commands',
+	defaultPrefix: '!', // removing defaultPrefix will shut down text commands
+	commands: 'src/commands',
+	// events: 'src/events' (optional),
+	containerConfig : {
+		get: useContainer
+	}
 });
 
 client.login(token);
