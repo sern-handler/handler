@@ -40,9 +40,11 @@ export function processEvents({ containerConfig, events }: Wrapper) {
     ] = containerConfig.get('@sern/client', '@sern/errors', '@sern/emitter', '@sern/logger') as [EventEmitter, ErrorHandling, SernEmitter, Logging?];
     const lazy = (k: string) => containerConfig.get(k as keyof Dependencies)[0];
     const eventStream$ = eventObservable$(events!, sernEmitter);
-    const emitSuccess$ = (mod: AnyModule) => of({ type: PayloadType.Failure, module: mod, reason: SernError.PluginFailure, })
+    const emitSuccess$ = (mod: AnyModule) =>
+        of({ type: PayloadType.Failure, module: mod, reason: SernError.PluginFailure })
         .pipe(tap( it => sernEmitter.emit('module.register', it)));
-    const emitFailure$ = (mod: AnyModule) => of({ type: PayloadType.Success, module: mod, } as const)
+    const emitFailure$ = (mod: AnyModule) =>
+        of({ type: PayloadType.Success, module: mod, } as const)
         .pipe(tap(it => sernEmitter.emit('module.register', it)));
     const eventCreation$ = eventStream$.pipe(
         map(({ mod, absPath }) => ({
@@ -54,6 +56,7 @@ export function processEvents({ containerConfig, events }: Wrapper) {
         })),
         concatMap(processPlugins),
         concatMap(resolvePlugins),
+        //Reduces pluginRes (generated from above) into a single boolean
         concatMap(s => from(s.pluginRes)
             .pipe(
                 map(pl => pl.execute),
@@ -62,8 +65,11 @@ export function processEvents({ containerConfig, events }: Wrapper) {
                 map(success => ({ success, mod: s.mod }))
             )),
         concatMap(({ success, mod }) =>
-            iif(() => success, emitSuccess$(mod), emitFailure$(mod))
-                .pipe(filter(res => res.type === PayloadType.Success), map(() => mod))
+            iif(() => success, emitFailure$(mod), emitSuccess$(mod))
+                .pipe(
+                    filter(res => res.type === PayloadType.Success),
+                    map(() => mod)
+                )
         ),
     );
     eventCreation$.subscribe(e => {
@@ -87,13 +93,14 @@ export function processEvents({ containerConfig, events }: Wrapper) {
 }
 
 function eventObservable$(events: string, emitter: SernEmitter) {
-        return buildData<EventModule>(events).pipe(
-                   errTap(reason =>
-                      emitter.emit('module.register', {
-                          type: PayloadType.Failure,
-                          module: undefined,
-                          reason,
-                      }),
-                  ),
-              );
+        return buildData<EventModule>(events)
+            .pipe(
+                errTap(reason =>
+                   emitter.emit('module.register', {
+                        type: PayloadType.Failure,
+                        module: undefined,
+                        reason,
+                    }),
+                ),
+            );
 }
