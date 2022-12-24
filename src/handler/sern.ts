@@ -86,7 +86,7 @@ export function eventModule(mod: InputEventModule): EventModule {
  */
 export function makeDependencies<T extends Dependencies>(conf: {
     exclude?: Set<OptionalDependencies>,
-    build: (root: Container<Record<string, unknown>, {}>) => Container<Partial<T>, {}>,
+    build: (root: Container<Record<string,any>, {}>) => Container<Partial<T>, T>,
 }) {
     const container = conf.build(createContainer());
     composeRoot(container, conf.exclude ?? new Set());
