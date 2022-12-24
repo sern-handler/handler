@@ -57,19 +57,21 @@ export function processEvents({ containerConfig, events }: Wrapper) {
         concatMap(processPlugins),
         concatMap(resolvePlugins),
         //Reduces pluginRes (generated from above) into a single boolean
-        concatMap(s => from(s.pluginRes)
+        concatMap(({pluginRes, mod}) => from(pluginRes)
             .pipe(
                 map(pl => pl.execute),
                 toArray(),
                 reducePlugins,
-                map(success => ({ success, mod: s.mod }))
+                map(success => ({ success, mod }))
             )),
         concatMap(({ success, mod }) =>
-            iif(() => success, emitFailure$(mod), emitSuccess$(mod))
-                .pipe(
-                    filter(res => res.type === PayloadType.Success),
-                    map(() => mod)
-                )
+            iif(() => success,
+                emitFailure$(mod),
+                emitSuccess$(mod)
+            ).pipe(
+                filter(res => res.type === PayloadType.Success),
+                map(() => mod)
+            )
         ),
     );
     eventCreation$.subscribe(e => {
