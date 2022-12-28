@@ -2,14 +2,6 @@ import type { Interaction } from 'discord.js';
 import { catchError, concatMap, from, fromEvent, map, Observable } from 'rxjs';
 import type Wrapper from '../structures/wrapper';
 import { EventsHandler } from './eventsHandler';
-import {
-    isApplicationCommand,
-    isAutocomplete,
-    isMessageComponent,
-    isModalSubmit,
-} from '../utilities/predicates';
-import * as Files from '../utilities/readFile';
-import type { CommandModule } from '../structures/module';
 import { SernError } from '../structures/errors';
 import { CommandType, PayloadType } from '../structures/enums';
 import { match, P } from 'ts-pattern';
@@ -24,69 +16,69 @@ import {
 import type {
     ButtonInteraction,
     ModalSubmitInteraction,
-    SelectMenuInteraction,
     UserContextMenuCommandInteraction,
     MessageContextMenuCommandInteraction,
 } from 'discord.js';
 import { executeModule } from './observableHandling';
+import type { CommandModule } from '../../types/module';
+import { handleError } from '../contracts/errorHandling';
+import type { ModuleStore } from '../structures/moduleStore';
+import type { MessageComponentInteraction } from 'discord.js';
 
 export default class InteractionHandler extends EventsHandler<{
     event: Interaction;
     mod: CommandModule;
 }> {
     protected override discordEvent: Observable<Interaction>;
-
-    constructor(protected wrapper: Wrapper) {
+    constructor(wrapper: Wrapper) {
         super(wrapper);
-        this.discordEvent = <Observable<Interaction>>fromEvent(wrapper.client, 'interactionCreate');
+        this.discordEvent = <Observable<Interaction>>fromEvent(this.client, 'interactionCreate');
         this.init();
 
         this.payloadSubject
             .pipe(
                 map(this.processModules),
-                concatMap(({ mod, execute, eventPluginRes }) => {
-                    //resolve all the Results from event plugins
-                    return from(eventPluginRes).pipe(map(res => ({ mod, res, execute })));
-                }),
+                concatMap(({ mod, execute, eventPluginRes }) =>
+                    from(eventPluginRes).pipe(map(res => ({ mod, res, execute }))) //resolve all the Results from event plugins
+                ),
                 concatMap(payload => executeModule(wrapper, payload)),
-                catchError((err, caught) => {
-                    wrapper.sernEmitter?.emit('error', err);
-                    return caught;
-                }),
+                catchError(handleError(this.crashHandler, this.logger)),
             )
             .subscribe();
     }
 
     override init() {
+        const get = (cb: (ms: ModuleStore) => CommandModule|undefined) => {
+           return this.modules.get(cb);
+        };
         this.discordEvent.subscribe({
             next: event => {
-                if (isMessageComponent(event)) {
-                    const mod = Files.MessageCompCommands[event.componentType].get(event.customId);
+                if (event.isMessageComponent()) {
+                    const mod = get(ms  =>
+                        ms.InteractionHandlers[event.componentType].get(event.customId));
                     this.setState({ event, mod });
-                } else if (isApplicationCommand(event) || isAutocomplete(event)) {
-                    const mod =
-                        Files.ApplicationCommands[event.commandType].get(event.commandName) ??
-                        Files.BothCommands.get(event.commandName);
+                } else if (event.isCommand() || event.isAutocomplete()) {
+                    const mod = get(ms =>
+                        ms.ApplicationCommands[event.commandType].get(event.commandName) ??
+                        ms.BothCommands.get(event.commandName)
+                    );
                     this.setState({ event, mod });
-                } else if (isModalSubmit(event)) {
-                    /**
-                     * maybe move modal submits into message component object maps?
-                     */
-                    const mod = Files.ModalSubmitCommands.get(event.customId);
+                } else if (event.isModalSubmit()) {
+                    const mod = get((ms) => ms.InteractionHandlers[5].get(event.customId));
                     this.setState({ event, mod });
                 } else {
                     throw Error('This interaction is not supported yet');
                 }
             },
             error: reason => {
-                this.wrapper.sernEmitter?.emit('error', { type: PayloadType.Failure, reason });
+                this.emitter.emit('error', { type: PayloadType.Failure, reason });
             },
         });
     }
 
     protected setState(state: { event: Interaction; mod: CommandModule | undefined }): void {
         if (state.mod === undefined) {
-            this.wrapper?.sernEmitter?.emit('warning', 'Found no module for this interaction');
+            this.emitter.emit('warning',{ type: PayloadType.Warning, reason: 'Found no module for this interaction' });
         } else {
             //if statement above checks already, safe cast
             this.payloadSubject.next(state as { event: Interaction; mod: CommandModule });
@@ -105,19 +97,23 @@ export default class InteractionHandler extends EventsHandler<{
             )
             .with({ type: CommandType.Button }, buttonCommandDispatcher(event as ButtonInteraction))
             .with(
-                { type: CommandType.MenuSelect },
-                selectMenuCommandDispatcher(event as SelectMenuInteraction),
+                { type: P.union(
+                        CommandType.RoleSelect,
+                        CommandType.StringSelect,
+                        CommandType.UserSelect,
+                        CommandType.MentionableSelect,
+                        CommandType.ChannelSelect
+                    ) },
+                selectMenuCommandDispatcher(event as MessageComponentInteraction),
             )
             .with(
-                { type: CommandType.MenuUser },
+                { type: CommandType.CtxUser },
                 ctxMenuUserDispatcher(event as UserContextMenuCommandInteraction),
             )
             .with(
-                { type: CommandType.MenuMsg },
+                { type: CommandType.CtxMsg },
                 ctxMenuMsgDispatcher(event as MessageContextMenuCommandInteraction),
             )
-            .otherwise(() => {
-                throw Error(SernError.MismatchModule);
-            });
+            .otherwise(() => this.crashHandler.crash(Error(SernError.MismatchModule)));
     }
 }

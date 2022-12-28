@@ -1,16 +1,8 @@
 import type Wrapper from './structures/wrapper';
-import { Err, Ok } from 'ts-results-es';
-import { ExternalEventEmitters } from './utilities/readFile';
-import type { EventEmitter } from 'events';
 import { processEvents } from './events/userDefinedEventsHandling';
-import type {
-    CommandModule,
-    CommandModuleDefs,
-    EventModule,
-    EventModuleDefs,
-} from './structures/module';
 import { CommandType, EventType, PluginType } from './structures/enums';
 import type {
+    Plugin,
     CommandPlugin,
     EventModuleCommandPluginDefs,
     EventModuleEventPluginDefs,
@@ -18,11 +10,15 @@ import type {
     InputCommandModule,
     InputEventModule,
 } from './plugins/plugin';
-import { SernError } from './structures/errors';
 import InteractionHandler from './events/interactionHandler';
 import ReadyHandler from './events/readyHandler';
 import MessageHandler from './events/messageHandler';
-
+import type { CommandModule, CommandModuleDefs, EventModule, EventModuleDefs } from '../types/module';
+import { Container, createContainer } from 'iti';
+import type { Dependencies, OptionalDependencies } from '../types/handler';
+import { composeRoot, containerSubject, useContainer } from './dependencies/provider';
+import type { Logging } from './contracts';
+import { err, ok, partition } from './utilities/functions';
 /**
  *
  * @param wrapper Options to pass into sern.
@@ -30,58 +26,35 @@ import MessageHandler from './events/messageHandler';
  * @example
  * ```ts title="src/index.ts"
  * Sern.init({
- *     client,
  *     defaultPrefix: '!',
  *     commands: 'dist/commands',
+ *     events: 'dist/events',
+ *     containerConfig : {
+ *         get: useContainer
+ *     }
  * })
  * ```
  */
 export function init(wrapper: Wrapper) {
+    const logger = wrapper.containerConfig.get('@sern/logger')[0] as Logging | undefined;
+    const startTime = performance.now();
     const { events } = wrapper;
     if (events !== undefined) {
-        processEvents(wrapper, events);
+        processEvents(wrapper);
     }
     new ReadyHandler(wrapper);
     new MessageHandler(wrapper);
     new InteractionHandler(wrapper);
-}
-
-/**
- * @deprecated - use Sern#makeDependencies instead
- * @param emitter Any external event emitter.
- * The object will be stored in a map, and then fetched by the name of the instance's class.
- * As there are infinite possibilities to adding external event emitters,
- * Most types aren't provided and are as narrow as possibly can.
- * @example
- * ```ts title="src/index.ts"
- * //Add this before initiating Sern!
- * Sern.addExternal(new Level())
- * ```
- * @example
- * ```ts title="events/level.ts"
- *  export default eventModule({
- *      emitter: 'Level',
- *      type : EventType.External,
- *      name: 'error',
- *      execute(args) {
- *          console.log(args)
- *      }
- *  })
- * ```
- */
-export function addExternal<T extends EventEmitter>(emitter: T) {
-    if (ExternalEventEmitters.has(emitter.constructor.name)) {
-        throw Error(`${emitter.constructor.name} already exists!`);
-    }
-    ExternalEventEmitters.set(emitter.constructor.name, emitter);
+    const endTime = performance.now();
+    logger?.info({ message: `sern : ${(endTime-startTime).toFixed(2)} ms` });
 }
 
 /**
  * The object passed into every plugin to control a command's behavior
  */
 export const controller = {
-    next: () => Ok.EMPTY,
-    stop: () => Err.EMPTY,
+    next: ok,
+    stop: err,
 };
 
 /**
@@ -89,16 +62,7 @@ export const controller = {
  * @param mod
  */
 export function commandModule(mod: InputCommandModule): CommandModule {
-    const onEvent: EventPlugin[] = [];
-    const plugins: CommandPlugin[] = [];
-    for (const pl of mod.plugins ?? []) {
-        if (pl.type === PluginType.Event) {
-            onEvent.push(pl);
-        } else {
-            plugins.push(pl as CommandPlugin);
-        }
-    }
-
+    const [onEvent, plugins] = partition(mod.plugins ?? [], el => (el as Plugin).type === PluginType.Event);
     return {
         ...mod,
         onEvent,
@@ -110,19 +74,24 @@ export function commandModule(mod: InputCommandModule): CommandModule {
  * @param mod
  */
 export function eventModule(mod: InputEventModule): EventModule {
-    const onEvent: EventModuleEventPluginDefs[EventType][] = [];
-    const plugins: EventModuleCommandPluginDefs[EventType][] = [];
-    const hasPlugins = mod.plugins && mod.plugins.length > 0;
-    if (hasPlugins) {
-        throw Error(
-            SernError.NotSupportedYet + `: Plugins on event listeners are not supported yet`,
-        );
-    }
-    return {
+    const [onEvent, plugins] = partition(mod.plugins ?? [], el => (el as Plugin).type === PluginType.Event);
+        return {
         ...mod,
         onEvent,
         plugins,
     } as EventModule;
+}
+/**
+ * @param conf a configuration for creating your project dependencies
+ */
+export function makeDependencies<T extends Dependencies>(conf: {
+    exclude?: Set<OptionalDependencies>,
+    build: (root: Container<Record<string,any>, {}>) => Container<Partial<T>, T>,
+}) {
+    const container = conf.build(createContainer());
+    composeRoot(container, conf.exclude ?? new Set());
+    containerSubject.next(container as unknown as Container<Dependencies, {}>);
+    return useContainer<T>();
 }
 
 export abstract class CommandExecutable<Type extends CommandType> {

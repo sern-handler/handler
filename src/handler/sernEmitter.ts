@@ -27,7 +27,7 @@ class SernEmitter extends EventEmitter {
     /**
      * Listening to sern events with on. This event stays on until a crash or a normal exit
      * @param eventName
-     * @param args the arguments for emitting the  { eventName }
+     * @param args the arguments for emitting the eventName
      */
     public override emit<T extends keyof SernEventsMapping>(
         eventName: T,

@@ -5,11 +5,12 @@ import type { Message } from 'discord.js';
 import { executeModule, ignoreNonBot, isOneOfCorrectModules } from './observableHandling';
 import { fmt } from '../utilities/messageHelpers';
 import Context from '../structures/context';
-import * as Files from '../utilities/readFile';
-import type { TextCommand } from '../structures/module';
 import { CommandType, PayloadType } from '../structures/enums';
-import { asyncResolveArray } from '../utilities/asyncResolveArray';
+import { arrAsync } from '../utilities/arrAsync';
 import { controller } from '../sern';
+import type { CommandModule, TextCommand } from '../../types/module';
+import { handleError } from '../contracts/errorHandling';
+import type { ModuleStore } from '../structures/moduleStore';
 
 export default class MessageHandler extends EventsHandler<{
     ctx: Context;
@@ -17,29 +18,22 @@ export default class MessageHandler extends EventsHandler<{
     mod: TextCommand;
 }> {
     protected discordEvent: Observable<Message>;
-    public constructor(wrapper: Wrapper) {
+    public constructor(protected wrapper: Wrapper) {
         super(wrapper);
-        this.discordEvent = <Observable<Message>>fromEvent(wrapper.client, 'messageCreate');
+        this.discordEvent = <Observable<Message>>fromEvent(this.client, 'messageCreate');
         this.init();
         this.payloadSubject
             .pipe(
                 switchMap(({ mod, ctx, args }) => {
-                    const res = asyncResolveArray(
-                        mod.onEvent.map(ePlug => {
-                            return ePlug.execute([ctx, args], controller);
-                        }),
+                    const res = arrAsync(
+                            mod.onEvent.map(ep => ep.execute([ctx, args], controller)),
                     );
-                    const execute = () => {
-                        return mod.execute(ctx, args);
-                    };
+                    const execute = () => mod.execute(ctx, args);
                     //resolves the promise and re-emits it back into source
                     return from(res).pipe(map(res => ({ mod, execute, res })));
                 }),
                 concatMap(payload => executeModule(wrapper, payload)),
-                catchError((err, caught) => {
-                    wrapper.sernEmitter?.emit('error', err);
-                    return caught;
-                }),
+                catchError(handleError(this.crashHandler, this.logger)),
             )
             .subscribe();
     }
@@ -47,6 +41,9 @@ export default class MessageHandler extends EventsHandler<{
     protected init(): void {
         if (this.wrapper.defaultPrefix === undefined) return; //for now, just ignore if prefix doesn't exist
         const { defaultPrefix } = this.wrapper;
+        const get = (cb: (ms: ModuleStore) => CommandModule | undefined) => {
+              return this.modules.get(cb);
+        };
         this.discordEvent
             .pipe(
                 ignoreNonBot(this.wrapper.defaultPrefix),
@@ -55,10 +52,10 @@ export default class MessageHandler extends EventsHandler<{
                     return {
                         ctx: Context.wrap(message),
                         args: <['text', string[]]>['text', rest],
-                        mod:
-                            Files.TextCommands.text.get(prefix) ??
-                            Files.BothCommands.get(prefix) ??
-                            Files.TextCommands.aliases.get(prefix),
+                        mod: get(ms =>
+                            ms.TextCommands.get(prefix) ??
+                            ms.BothCommands.get(prefix)
+                        ),
                     };
                 }),
                 concatMap(element =>
@@ -71,7 +68,7 @@ export default class MessageHandler extends EventsHandler<{
             .subscribe({
                 next: value => this.setState(value),
                 error: reason =>
-                    this.wrapper.sernEmitter?.emit('error', { type: PayloadType.Failure, reason }),
+                    this.emitter.emit('error', { type: PayloadType.Failure, reason }),
             });
     }
 

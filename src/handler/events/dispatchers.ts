@@ -1,32 +1,36 @@
-import type {
-    BothCommand,
-    ButtonCommand,
-    ContextMenuMsg,
-    ContextMenuUser,
-    ModalSubmitCommand,
-    SelectMenuCommand,
-    SlashCommand,
-} from '../structures/module';
 import Context from '../structures/context';
-import type { SlashOptions } from '../../types/handler';
-import { asyncResolveArray } from '../utilities/asyncResolveArray';
+import type { Payload, SlashOptions } from '../../types/handler';
+import { arrAsync } from '../utilities/arrAsync';
 import { controller } from '../sern';
 import type {
     ButtonInteraction,
     ModalSubmitInteraction,
-    SelectMenuInteraction,
     AutocompleteInteraction,
     ChatInputCommandInteraction,
     Interaction,
     UserContextMenuCommandInteraction,
     MessageContextMenuCommandInteraction,
 } from 'discord.js';
-import { isAutocomplete } from '../utilities/predicates';
 import { SernError } from '../structures/errors';
 import treeSearch from '../utilities/treeSearch';
+import type {
+    BothCommand,
+    ButtonCommand, ContextMenuMsg,
+    ContextMenuUser,
+    ModalSubmitCommand,
+    StringSelectCommand,
+    SlashCommand, UserSelectCommand, ChannelSelectCommand, MentionableSelectCommand, RoleSelectCommand,
+} from '../../types/module';
+import type SernEmitter from '../sernEmitter';
+import { EventEmitter } from 'events';
+import type { DiscordEventCommand, ExternalEventCommand, SernEventCommand } from '../structures/events';
+import * as assert from 'assert';
+import { reducePlugins } from '../utilities/functions';
+import { concatMap, from, fromEvent, map, of } from 'rxjs';
+import type { MessageComponentInteraction } from 'discord.js';
 
 export function applicationCommandDispatcher(interaction: Interaction) {
-    if (isAutocomplete(interaction)) {
+    if (interaction.isAutocomplete()) {
         return dispatchAutocomplete(interaction);
     } else {
         const ctx = Context.wrap(interaction as ChatInputCommandInteraction);
@@ -34,7 +38,7 @@ export function applicationCommandDispatcher(interaction: Interaction) {
         return (mod: BothCommand | SlashCommand) => ({
             mod,
             execute: () => mod.execute(ctx, args),
-            eventPluginRes: asyncResolveArray(
+            eventPluginRes: arrAsync(
                 mod.onEvent.map(plugs => plugs.execute([ctx, args], controller)),
             ),
         });
@@ -48,7 +52,7 @@ export function dispatchAutocomplete(interaction: AutocompleteInteraction) {
             return {
                 mod,
                 execute: () => selectedOption.command.execute(interaction),
-                eventPluginRes: asyncResolveArray(
+                eventPluginRes: arrAsync(
                     selectedOption.command.onEvent.map(e => e.execute(interaction, controller)),
                 ),
             };
@@ -63,7 +67,7 @@ export function modalCommandDispatcher(interaction: ModalSubmitInteraction) {
     return (mod: ModalSubmitCommand) => ({
         mod,
         execute: () => mod.execute(interaction),
-        eventPluginRes: asyncResolveArray(
+        eventPluginRes: arrAsync(
             mod.onEvent.map(plugs => plugs.execute([interaction], controller)),
         ),
     });
@@ -73,18 +77,19 @@ export function buttonCommandDispatcher(interaction: ButtonInteraction) {
     return (mod: ButtonCommand) => ({
         mod,
         execute: () => mod.execute(interaction),
-        eventPluginRes: asyncResolveArray(
+        eventPluginRes: arrAsync(
             mod.onEvent.map(plugs => plugs.execute([interaction], controller)),
         ),
     });
 }
 
-export function selectMenuCommandDispatcher(interaction: SelectMenuInteraction) {
-    return (mod: SelectMenuCommand) => ({
+export function selectMenuCommandDispatcher(interaction: MessageComponentInteraction) {
+    //safe casts because command type runtime check
+    return (mod: StringSelectCommand | UserSelectCommand | ChannelSelectCommand | MentionableSelectCommand | RoleSelectCommand) => ({
         mod,
-        execute: () => mod.execute(interaction),
-        eventPluginRes: asyncResolveArray(
-            mod.onEvent.map(plugs => plugs.execute([interaction], controller)),
+        execute: () => mod.execute(interaction as never),
+        eventPluginRes: arrAsync(
+            mod.onEvent.map(plugs => plugs.execute([interaction as never], controller)),
         ),
     });
 }
@@ -93,7 +98,7 @@ export function ctxMenuUserDispatcher(interaction: UserContextMenuCommandInterac
     return (mod: ContextMenuUser) => ({
         mod,
         execute: () => mod.execute(interaction),
-        eventPluginRes: asyncResolveArray(
+        eventPluginRes: arrAsync(
             mod.onEvent.map(plugs => plugs.execute([interaction], controller)),
         ),
     });
@@ -103,8 +108,63 @@ export function ctxMenuMsgDispatcher(interaction: MessageContextMenuCommandInter
     return (mod: ContextMenuMsg) => ({
         mod,
         execute: () => mod.execute(interaction),
-        eventPluginRes: asyncResolveArray(
+        eventPluginRes: arrAsync(
             mod.onEvent.map(plugs => plugs.execute([interaction], controller)),
         ),
     });
+}
+
+export function sernEmitterDispatcher(e: SernEmitter) {
+    return(cmd: SernEventCommand & { name: string }) => ({
+        source: e,
+        cmd,
+        execute: fromEvent(e, cmd.name)
+            .pipe( map( event => ({
+                event,
+                executeEvent: of(event).pipe(concatMap(event =>
+                        reducePlugins(from(
+                        arrAsync(
+                            cmd.onEvent.map(plug => plug.execute([event as Payload], controller))
+                        ))
+                    )))
+            })))
+    });
+}
+
+export function discordEventDispatcher(e: EventEmitter) {
+    return (cmd: DiscordEventCommand & { name: string }) => ({
+        source: e,
+        cmd,
+        execute: fromEvent(e, cmd.name)
+                .pipe( map( event => ({
+                    event,
+                    executeEvent: of(event).pipe(concatMap( event =>
+                        reducePlugins(from(
+                        arrAsync(
+                            // god forbid I use any!!!
+                            cmd.onEvent.map(plug => plug.execute([event as any], controller))
+                        ))
+                      )))
+                })))
+    });
+}
+
+export function externalEventDispatcher(e: (e:ExternalEventCommand) => unknown) {
+    return (cmd: ExternalEventCommand & { name: string}) => {
+        const external = e(cmd);
+        assert.ok(external instanceof EventEmitter, `${e} is not an EventEmitter`);
+        return {
+            source: external,
+            cmd,
+            execute: fromEvent(external, cmd.name)
+                    .pipe(map(event => ({
+                        event,
+                        executeEvent : of(event).pipe(concatMap(event =>
+                            reducePlugins(from(arrAsync(
+                                cmd.onEvent.map(plug => plug.execute([event], controller))
+                            )))
+                        )),
+                    })))
+        };
+    };
 }

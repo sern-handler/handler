@@ -1,48 +1,36 @@
-import type { APIGuildMember } from 'discord-api-types/v10';
 import type {
     ChatInputCommandInteraction,
     Client,
-    Guild,
-    GuildMember,
     InteractionReplyOptions,
     Message,
     Snowflake,
-    TextBasedChannel,
     MessageReplyOptions,
     User,
 } from 'discord.js';
-import { type Option, None, Some } from 'ts-results-es';
-import type { Nullish, ReplyOptions } from '../../types/handler';
+import { Result as Either, Ok as Left, Err as Right } from 'ts-results-es';
+import type { ReplyOptions } from '../../types/handler';
 import { SernError } from './errors';
 
-function firstSome<T>(...args: Option<T>[]): Nullish<T> {
-    for (const op of args) {
-        if (op.some) return op.val;
-    }
-    return null;
-}
 
-//Could I refactor with Either monad?
+function safeUnwrap<T>(res: Either<T, T>) {
+    return res.val;
+}
 /**
  * Provides values shared between
  * Message and ChatInputCommandInteraction
  */
 export default class Context {
     private constructor(
-        private oMsg: Option<Message> = None,
-        private oInterac: Option<ChatInputCommandInteraction> = None,
-    ) {
-        this.oMsg = oMsg;
-        this.oInterac = oInterac;
-    }
+        private ctx: Either<Message, ChatInputCommandInteraction>,
+    ) {}
 
     /**
      * Getting the Message object. Crashes if module type is
      * CommandType.Slash or the event fired in a Both command was
      * ChatInputCommandInteraction
      */
-    public get message() {
-        return this.oMsg.expect(SernError.MismatchEvent);
+    public get message()  {
+        return this.ctx.expect(SernError.MismatchEvent);
     }
     /**
      * Getting the ChatInputCommandInteraction object. Crashes if module type is
@@ -50,96 +38,95 @@ export default class Context {
      * Message
      */
     public get interaction() {
-        return this.oInterac.expect(SernError.MismatchEvent);
+        return this.ctx.expectErr(SernError.MismatchEvent);
     }
 
     public get id(): Snowflake {
-        return firstSome(
-            this.oInterac.map(i => i.id),
-            this.oMsg.map(m => m.id),
-        )!;
+        return safeUnwrap(
+            this.ctx
+            .map(m => m.id)
+            .mapErr(i => i.id));
     }
 
-    public get channel(): Nullish<TextBasedChannel> {
-        return firstSome(
-            this.oMsg.map(m => m.channel),
-            this.oInterac.map(i => i.channel),
+    public get channel() {
+        return safeUnwrap(this.ctx
+            .map(m => m.channel)
+            .mapErr(i => i.channel));
+    }
+    /**
+     * If context is holding a message, message.author
+     * else, interaction.user
+     */
+    public get user(): User {
+        return safeUnwrap(this.ctx
+            .map(m => m.author)
+            .mapErr(i => i.user)
         );
     }
 
-    public get user(): User {
-        return firstSome(
-            this.oMsg.map(m => m.author),
-            this.oInterac.map(i => i.user),
-        )!;
-    }
-
     public get createdTimestamp(): number {
-        return firstSome(
-            this.oMsg.map(m => m.createdTimestamp),
-            this.oInterac.map(i => i.createdTimestamp),
-        )!;
+        return safeUnwrap(this.ctx
+            .map(m => m.createdTimestamp)
+            .mapErr(i => i.createdTimestamp)
+        );
     }
 
-    public get guild(): Guild {
-        return firstSome(
-            this.oMsg.map(m => m.guild),
-            this.oInterac.map(i => i.guild),
-        )!;
+    public get guild() {
+        return safeUnwrap(this.ctx
+            .map(m => m.guild)
+            .mapErr(i => i.guild)
+        );
     }
 
-    public get guildId(): Snowflake {
-        return firstSome(
-            this.oMsg.map(m => m.guildId),
-            this.oInterac.map(i => i.guildId),
-        )!;
+    public get guildId() {
+        return safeUnwrap(this.ctx
+            .map(m => m.guildId)
+            .mapErr(i => i.guildId)
+        );
     }
 
     /*
      * interactions can return APIGuildMember if the guild it is emitted from is not cached
      */
-    public get member(): Nullish<GuildMember | APIGuildMember> {
-        return firstSome(
-            this.oMsg.map(m => m.member),
-            this.oInterac.map(i => i.member),
+    public get member() {
+        return safeUnwrap(this.ctx
+            .map(m => m.member)
+            .mapErr(i => i.member)
         );
     }
 
     public get client(): Client {
-        return firstSome(
-            this.oMsg.map(m => m.client),
-            this.oInterac.map(i => i.client),
-        )!;
+        return safeUnwrap(this.ctx
+            .map(m => m.client)
+            .mapErr(i => i.client)
+        );
     }
 
     public get inGuild(): boolean {
-        return firstSome(
-            this.oMsg.map(m => m.inGuild()),
-            this.oInterac.map(i => i.inGuild()),
-        )!;
+        return safeUnwrap(this.ctx
+            .map(m=>m.inGuild())
+            .mapErr(i => i.inGuild())
+        );
+    }
+    public isMessage() {
+        return this.ctx.map(() => true).unwrapOr(false);
+    }
+
+    public isSlash() {
+        return !this.isMessage();
     }
 
     static wrap(wrappable: ChatInputCommandInteraction | Message): Context {
         if ('token' in wrappable) {
-            return new Context(None, Some(wrappable));
+            return new Context(Right(wrappable));
         }
-        return new Context(Some(wrappable), None);
+        return new Context(Left(wrappable));
     }
 
-    public isEmpty() {
-        return this.oMsg.none && this.oInterac.none;
-    }
-    //Make queueable
     public reply(content: ReplyOptions) {
-        return firstSome(
-            this.oInterac.map(i => {
-                return i
-                    .reply(content as string | InteractionReplyOptions)
-                    .then(() => i.fetchReply());
-            }),
-            this.oMsg.map(m => {
-                return m.reply(content as string | MessageReplyOptions);
-            }),
-        )!;
+        return safeUnwrap(this.ctx
+            .map( m => m.reply(content as string | MessageReplyOptions))
+            .mapErr(i => i.reply(content as string | InteractionReplyOptions).then(() => i.fetchReply()))
+        );
     }
 }
