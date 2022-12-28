@@ -1,13 +1,13 @@
-import type { SernAutocompleteData, SernOptionsData } from '../structures/module';
 import { ApplicationCommandOptionType, AutocompleteInteraction } from 'discord.js';
+import type { SernAutocompleteData, SernOptionsData } from '../../types/module';
 
 export default function treeSearch(
     iAutocomplete: AutocompleteInteraction,
     options: SernOptionsData[] | undefined,
-): SernAutocompleteData {
+): SernAutocompleteData | undefined {
     if (options === undefined) return undefined;
     const _options = options.slice(); // required to prevent direct mutation of options
-    let autocompleteData: SernAutocompleteData;
+    let autocompleteData: SernAutocompleteData | undefined;
 
     while (_options.length > 0) {
         const cur = _options.pop()!;
