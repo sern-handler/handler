@@ -34,5 +34,5 @@ export enum SernError {
     /**
      * Required Dependency not found
      */
-    MissingRequired = `@sern/client is required, was not found`
+    MissingRequired = `@sern/client is required but was not found`
 }
