@@ -85,7 +85,9 @@ export function executeModule(
 ) {
     const emitter = wrapper.containerConfig.get('@sern/emitter')[0] as SernEmitter;
     if (payload.res.every(el => el.ok)) {
-        const executeFn = Result.wrapAsync<unknown, Error | string>(() => Promise.resolve(payload.execute()));
+        const executeFn = Result.wrapAsync<unknown, Error | string>(() =>
+            Promise.resolve(payload.execute()),
+        );
         return from(executeFn).pipe(
             concatMap(res => {
                 if (res.err) {
@@ -115,7 +117,10 @@ export function executeModule(
     }
 }
 
-export function resolvePlugins({ mod, cmdPluginRes }: {
+export function resolvePlugins({
+    mod,
+    cmdPluginRes,
+}: {
     mod: DefinedCommandModule | DefinedEventModule;
     cmdPluginRes: {
         execute: Awaitable<Result<void, void>>;
@@ -137,7 +142,10 @@ export function resolvePlugins({ mod, cmdPluginRes }: {
     );
 }
 
-export function processPlugins(payload: { mod: DefinedCommandModule | DefinedEventModule; absPath: string }) {
+export function processPlugins(payload: {
+    mod: DefinedCommandModule | DefinedEventModule;
+    absPath: string;
+}) {
     const cmdPluginRes = processCommandPlugins(payload);
     return of({ mod: payload.mod, cmdPluginRes });
 }

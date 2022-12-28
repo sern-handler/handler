@@ -8,8 +8,8 @@ interface Wrapper {
     readonly defaultPrefix?: string;
     readonly commands: string;
     readonly events?: string;
-    readonly containerConfig : {
+    readonly containerConfig: {
         get: (...keys: (keyof Dependencies)[]) => unknown[];
-    }
+    };
 }
 export default Wrapper;

@@ -51,8 +51,8 @@ export enum CommandType {
      */
     ChannelSelect = 256,
     MentionableSelect = 512,
-    RoleSelect= 1024,
-    UserSelect= 2048
+    RoleSelect = 1024,
+    UserSelect = 2048,
 }
 
 /**

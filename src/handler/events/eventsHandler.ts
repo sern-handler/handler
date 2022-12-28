@@ -13,14 +13,14 @@ export abstract class EventsHandler<T> {
     protected logger?: Logging;
     protected modules: ModuleManager;
     protected constructor({ containerConfig }: Wrapper) {
-        const [
-            client,
-            emitter,
-            crash,
-            modules,
-            logger,
-        ] = containerConfig.get('@sern/client', '@sern/emitter', '@sern/errors', '@sern/modules', '@sern/logger');
-        this.logger = logger as Logging|undefined;
+        const [client, emitter, crash, modules, logger] = containerConfig.get(
+            '@sern/client',
+            '@sern/emitter',
+            '@sern/errors',
+            '@sern/modules',
+            '@sern/logger',
+        );
+        this.logger = logger as Logging | undefined;
         this.modules = modules as ModuleManager;
         this.client = client as EventEmitter;
         this.emitter = emitter as SernEmitter;

@@ -1,3 +1,1 @@
-export {
-    useContainer
-} from './provider';
+export { useContainer } from './provider';

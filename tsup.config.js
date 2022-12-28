@@ -4,7 +4,7 @@ const shared = {
     external: ['discord.js'],
     platform: 'node',
     clean: true,
-    sourcemap: false
+    sourcemap: false,
 };
 export default defineConfig([
     {
@@ -19,7 +19,7 @@ export default defineConfig([
                 js: '.mjs',
             };
         },
-        ...shared
+        ...shared,
     },
     {
         format: 'cjs',
@@ -33,6 +33,6 @@ export default defineConfig([
                 js: '.cjs',
             };
         },
-        ...shared
+        ...shared,
     },
 ]);

@@ -6,19 +6,19 @@ export interface ErrorHandling {
     /**
      * Number of times the process should throw an error until crashing and exiting
      */
-    keepAlive : number
+    keepAlive: number;
 
     /**
      * Utility function to crash
      * @param error
      */
-    crash(error : Error) : never
+    crash(error: Error): never;
 
     /**
      * A function that is called on every crash. Updates keepAlive
      * @param error
      */
-    updateAlive(error: Error): void
+    updateAlive(error: Error): void;
 }
 
 export class DefaultErrorHandling implements ErrorHandling {
@@ -35,10 +35,12 @@ export function handleError<C>(crashHandler: ErrorHandling, logging?: Logging) {
     return (pload: unknown, caught: Observable<C>) => {
         // This is done to fit the ErrorHandling contract
         const err = pload instanceof Error ? pload : Error(util.format(pload));
-        if(crashHandler.keepAlive == 0) {
-            useContainerRaw()?.disposeAll().then(() => {
-                logging?.info({ message: 'Cleaning container and crashing' });
-            });
+        if (crashHandler.keepAlive == 0) {
+            useContainerRaw()
+                ?.disposeAll()
+                .then(() => {
+                    logging?.info({ message: 'Cleaning container and crashing' });
+                });
             crashHandler.crash(err);
         }
         //formatted payload

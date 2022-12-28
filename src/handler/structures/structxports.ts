@@ -3,8 +3,4 @@ import type Wrapper from './wrapper';
 import { ModuleStore } from './moduleStore';
 
 export * from './enums';
-export {
-    Context,
-    Wrapper,
-    ModuleStore
-};
+export { Context, Wrapper, ModuleStore };
