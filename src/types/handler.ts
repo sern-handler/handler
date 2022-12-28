@@ -22,36 +22,43 @@ export type SlashOptions = Omit<CommandInteractionOptionResolver, 'getMessage' |
  */
 export type DefinedCommandModule = CommandModule & { name: string; description: string };
 export type DefinedEventModule = EventModule & { name: string };
-export type AnyDefinedModule = DefinedCommandModule | DefinedEventModule
+export type AnyDefinedModule = DefinedCommandModule | DefinedEventModule;
 export type Payload =
     | { type: PayloadType.Success; module: AnyModule }
     | { type: PayloadType.Failure; module?: AnyModule; reason: string | Error }
-    | { type: PayloadType.Warning; reason: string};
+    | { type: PayloadType.Warning; reason: string };
 export type SernEventsMapping = {
     'module.register': [Payload];
     'module.activate': [Payload];
-    'error': [Payload];
-    'warning': [Payload];
+    error: [Payload];
+    warning: [Payload];
 };
-export type LogPayload<T = unknown> = { message: T }
-export type Singleton<T> = () => T
+export type LogPayload<T = unknown> = { message: T };
+export type Singleton<T> = () => T;
 export type Transient<T> = () => () => T;
 
 export interface Dependencies {
     '@sern/client': Singleton<EventEmitter>;
     '@sern/logger'?: Singleton<Logging>;
     '@sern/emitter': Singleton<SernEmitter>;
-    '@sern/store' : Singleton<ModuleStore>;
-    '@sern/modules' : Singleton<ModuleManager>;
+    '@sern/store': Singleton<ModuleStore>;
+    '@sern/modules': Singleton<ModuleManager>;
     '@sern/errors': Singleton<ErrorHandling>;
 }
 
-export type ReplyOptions = string | Omit<InteractionReplyOptions, 'fetchReply'> | MessageReplyOptions;
+export type ReplyOptions =
+    | string
+    | Omit<InteractionReplyOptions, 'fetchReply'>
+    | MessageReplyOptions;
 
-export type MapDeps<
-    Deps extends Dependencies,
-    T extends readonly unknown[]
-    > = T extends [infer First extends keyof Deps, ...infer Rest extends readonly unknown[]]
-    ? [ UnpackFunction<Deps[First]>, ...(MapDeps<Deps, Rest> extends [never] ? [] : MapDeps<Deps,Rest>)] : [never]
+export type MapDeps<Deps extends Dependencies, T extends readonly unknown[]> = T extends [
+    infer First extends keyof Deps,
+    ...infer Rest extends readonly unknown[],
+]
+    ? [
+          UnpackFunction<Deps[First]>,
+          ...(MapDeps<Deps, Rest> extends [never] ? [] : MapDeps<Deps, Rest>),
+      ]
+    : [never];
 //Basically, '@sern/client' | '@sern/store' | '@sern/modules' | '@sern/error' | '@sern/emitter' will be provided defaults, and you can exclude the rest
 export type OptionalDependencies = '@sern/logger';

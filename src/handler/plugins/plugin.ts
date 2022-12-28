@@ -31,31 +31,32 @@ export interface Plugin {
     name?: string;
     /** @deprecated will be removed in the next update */
     description?: string;
-    type: PluginType
+    type: PluginType;
 }
 
-export interface CommandPlugin<T extends keyof CommandModuleDefs = keyof CommandModuleDefs> extends Plugin {
+export interface CommandPlugin<T extends keyof CommandModuleDefs = keyof CommandModuleDefs>
+    extends Plugin {
     type: PluginType.Command;
     execute: (
         payload: {
-            mod: CommandModuleDefs[T] & { name : string; description : string };
+            mod: CommandModuleDefs[T] & { name: string; description: string };
             absPath: string;
         },
         controller: Controller,
     ) => Awaitable<Result<void, void>>;
 }
 export interface DiscordEmitterPlugin extends Plugin {
-        type: PluginType.Command;
-        execute: (
-            payload: { mod: DiscordEventCommand & { name: string }; absPath: string },
-            controller: Controller,
-        ) => Awaitable<Result<void, void>>;
+    type: PluginType.Command;
+    execute: (
+        payload: { mod: DiscordEventCommand & { name: string }; absPath: string },
+        controller: Controller,
+    ) => Awaitable<Result<void, void>>;
 }
 
 export interface ExternalEmitterPlugin extends Plugin {
     type: PluginType.Command;
     execute: (
-        payload: { mod: ExternalEventCommand &  { name : string }; absPath: string } ,
+        payload: { mod: ExternalEventCommand & { name: string }; absPath: string },
         controller: Controller,
     ) => Awaitable<Result<void, void>>;
 }
@@ -63,7 +64,7 @@ export interface ExternalEmitterPlugin extends Plugin {
 export interface SernEmitterPlugin extends Plugin {
     type: PluginType.Command;
     execute: (
-        payload: { mod : SernEventCommand & { name : string }; absPath: string },
+        payload: { mod: SernEventCommand & { name: string }; absPath: string },
         controller: Controller,
     ) => Awaitable<Result<void, void>>;
 }
@@ -76,8 +77,8 @@ export interface AutocompletePlugin extends Plugin {
     ) => Awaitable<Result<void, void>>;
 }
 
-
-export interface EventPlugin<K extends keyof CommandModuleDefs = keyof CommandModuleDefs> extends Plugin {
+export interface EventPlugin<K extends keyof CommandModuleDefs = keyof CommandModuleDefs>
+    extends Plugin {
     type: PluginType.Event;
     execute: (
         event: Parameters<CommandModuleDefs[K]['execute']>,
@@ -85,13 +86,11 @@ export interface EventPlugin<K extends keyof CommandModuleDefs = keyof CommandMo
     ) => Awaitable<Result<void, void>>;
 }
 
-export interface SernEventPlugin<T extends keyof SernEventsMapping = keyof SernEventsMapping> extends Plugin {
+export interface SernEventPlugin<T extends keyof SernEventsMapping = keyof SernEventsMapping>
+    extends Plugin {
     name?: T;
     type: PluginType.Event;
-    execute: (
-        args: SernEventsMapping[T],
-        controller: Controller,
-    ) => Awaitable<Result<void, void>>;
+    execute: (args: SernEventsMapping[T], controller: Controller) => Awaitable<Result<void, void>>;
 }
 
 export interface ExternalEventPlugin extends Plugin {
@@ -99,7 +98,8 @@ export interface ExternalEventPlugin extends Plugin {
     execute: (args: unknown[], controller: Controller) => Awaitable<Result<void, void>>;
 }
 
-export interface DiscordEventPlugin<T extends keyof ClientEvents = keyof ClientEvents> extends Plugin {
+export interface DiscordEventPlugin<T extends keyof ClientEvents = keyof ClientEvents>
+    extends Plugin {
     name?: T;
     type: PluginType.Event;
     execute: (args: ClientEvents[T], controller: Controller) => Awaitable<Result<void, void>>;

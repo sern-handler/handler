@@ -37,10 +37,8 @@ export default class ReadyHandler extends EventsHandler<{
         );
         this.init();
         this.payloadSubject
-            .pipe(
-                concatMap(processPlugins),
-                concatMap(resolvePlugins),
-            ).subscribe(payload => {
+            .pipe(concatMap(processPlugins), concatMap(resolvePlugins))
+            .subscribe(payload => {
                 const allPluginsSuccessful = payload.pluginRes.every(({ execute }) => execute.ok);
                 if (allPluginsSuccessful) {
                     const res = registerModule(this.modules, payload.mod);
@@ -85,7 +83,10 @@ export default class ReadyHandler extends EventsHandler<{
     }
 }
 
-function registerModule(manager: ModuleManager, mod: DefinedCommandModule | DefinedEventModule): Result<void, void> {
+function registerModule(
+    manager: ModuleManager,
+    mod: DefinedCommandModule | DefinedEventModule,
+): Result<void, void> {
     const name = mod.name;
     const insert = (cb: (ms: ModuleStore) => void) => {
         const set = Result.wrap(_const(manager.set(cb)));
@@ -97,38 +98,36 @@ function registerModule(manager: ModuleManager, mod: DefinedCommandModule | Defi
             return insert(ms => ms.TextCommands.set(name, mod));
         })
         .with({ type: CommandType.Slash }, mod =>
-            insert(ms => ms.ApplicationCommands[ApplicationCommandType.ChatInput].set(name, mod))
+            insert(ms => ms.ApplicationCommands[ApplicationCommandType.ChatInput].set(name, mod)),
         )
         .with({ type: CommandType.Both }, mod => {
             mod.alias?.forEach(a => insert(ms => ms.TextCommands.set(a, mod)));
-            return insert( ms => ms.BothCommands.set(name, mod));
+            return insert(ms => ms.BothCommands.set(name, mod));
         })
         .with({ type: CommandType.CtxUser }, mod =>
-             insert(ms => ms.ApplicationCommands[ApplicationCommandType.User].set(name, mod))
+            insert(ms => ms.ApplicationCommands[ApplicationCommandType.User].set(name, mod)),
         )
         .with({ type: CommandType.CtxMsg }, mod =>
-             insert(ms => ms.ApplicationCommands[ApplicationCommandType.Message].set(name, mod))
+            insert(ms => ms.ApplicationCommands[ApplicationCommandType.Message].set(name, mod)),
         )
         .with({ type: CommandType.Button }, mod =>
-             insert(ms => ms.InteractionHandlers[ComponentType.Button].set(name, mod))
+            insert(ms => ms.InteractionHandlers[ComponentType.Button].set(name, mod)),
         )
         .with({ type: CommandType.StringSelect }, mod =>
-             insert(ms => ms.InteractionHandlers[ComponentType.StringSelect].set(name, mod))
+            insert(ms => ms.InteractionHandlers[ComponentType.StringSelect].set(name, mod)),
         )
-        .with( { type: CommandType.MentionableSelect }, mod =>
-            insert (ms => ms.InteractionHandlers[ComponentType.MentionableSelect].set(name, mod))
+        .with({ type: CommandType.MentionableSelect }, mod =>
+            insert(ms => ms.InteractionHandlers[ComponentType.MentionableSelect].set(name, mod)),
         )
-        .with( { type: CommandType.ChannelSelect }, mod =>
-            insert ( ms => ms.InteractionHandlers[ComponentType.ChannelSelect].set(name, mod))
+        .with({ type: CommandType.ChannelSelect }, mod =>
+            insert(ms => ms.InteractionHandlers[ComponentType.ChannelSelect].set(name, mod)),
         )
-        .with( { type: CommandType.UserSelect }, mod =>
-            insert ( ms => ms.InteractionHandlers[ComponentType.UserSelect].set(name, mod))
+        .with({ type: CommandType.UserSelect }, mod =>
+            insert(ms => ms.InteractionHandlers[ComponentType.UserSelect].set(name, mod)),
         )
-        .with( { type: CommandType.RoleSelect}, mod =>
-            insert ( ms => ms.InteractionHandlers[ComponentType.RoleSelect].set(name, mod))
+        .with({ type: CommandType.RoleSelect }, mod =>
+            insert(ms => ms.InteractionHandlers[ComponentType.RoleSelect].set(name, mod)),
         )
-        .with({ type: CommandType.Modal }, mod =>
-            insert(ms => ms.ModalSubmit.set(name, mod))
-        )
+        .with({ type: CommandType.Modal }, mod => insert(ms => ms.ModalSubmit.set(name, mod)))
         .otherwise(err);
 }

@@ -15,15 +15,24 @@ import { SernError } from '../structures/errors';
 import treeSearch from '../utilities/treeSearch';
 import type {
     BothCommand,
-    ButtonCommand, ContextMenuMsg,
+    ButtonCommand,
+    ContextMenuMsg,
     ContextMenuUser,
     ModalSubmitCommand,
     StringSelectCommand,
-    SlashCommand, UserSelectCommand, ChannelSelectCommand, MentionableSelectCommand, RoleSelectCommand,
+    SlashCommand,
+    UserSelectCommand,
+    ChannelSelectCommand,
+    MentionableSelectCommand,
+    RoleSelectCommand,
 } from '../../types/module';
 import type SernEmitter from '../sernEmitter';
 import { EventEmitter } from 'events';
-import type { DiscordEventCommand, ExternalEventCommand, SernEventCommand } from '../structures/events';
+import type {
+    DiscordEventCommand,
+    ExternalEventCommand,
+    SernEventCommand,
+} from '../structures/events';
 import * as assert from 'assert';
 import { reducePlugins } from '../utilities/functions';
 import { concatMap, from, fromEvent, map, of } from 'rxjs';
@@ -85,7 +94,14 @@ export function buttonCommandDispatcher(interaction: ButtonInteraction) {
 
 export function selectMenuCommandDispatcher(interaction: MessageComponentInteraction) {
     //safe casts because command type runtime check
-    return (mod: StringSelectCommand | UserSelectCommand | ChannelSelectCommand | MentionableSelectCommand | RoleSelectCommand) => ({
+    return (
+        mod:
+            | StringSelectCommand
+            | UserSelectCommand
+            | ChannelSelectCommand
+            | MentionableSelectCommand
+            | RoleSelectCommand,
+    ) => ({
         mod,
         execute: () => mod.execute(interaction as never),
         eventPluginRes: arrAsync(
@@ -115,19 +131,27 @@ export function ctxMenuMsgDispatcher(interaction: MessageContextMenuCommandInter
 }
 
 export function sernEmitterDispatcher(e: SernEmitter) {
-    return(cmd: SernEventCommand & { name: string }) => ({
+    return (cmd: SernEventCommand & { name: string }) => ({
         source: e,
         cmd,
-        execute: fromEvent(e, cmd.name)
-            .pipe( map( event => ({
+        execute: fromEvent(e, cmd.name).pipe(
+            map(event => ({
                 event,
-                executeEvent: of(event).pipe(concatMap(event =>
-                        reducePlugins(from(
-                        arrAsync(
-                            cmd.onEvent.map(plug => plug.execute([event as Payload], controller))
-                        ))
-                    )))
-            })))
+                executeEvent: of(event).pipe(
+                    concatMap(event =>
+                        reducePlugins(
+                            from(
+                                arrAsync(
+                                    cmd.onEvent.map(plug =>
+                                        plug.execute([event as Payload], controller),
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+            })),
+        ),
     });
 }
 
@@ -135,36 +159,51 @@ export function discordEventDispatcher(e: EventEmitter) {
     return (cmd: DiscordEventCommand & { name: string }) => ({
         source: e,
         cmd,
-        execute: fromEvent(e, cmd.name)
-                .pipe( map( event => ({
-                    event,
-                    executeEvent: of(event).pipe(concatMap( event =>
-                        reducePlugins(from(
-                        arrAsync(
-                            // god forbid I use any!!!
-                            cmd.onEvent.map(plug => plug.execute([event as any], controller))
-                        ))
-                      )))
-                })))
+        execute: fromEvent(e, cmd.name).pipe(
+            map(event => ({
+                event,
+                executeEvent: of(event).pipe(
+                    concatMap(event =>
+                        reducePlugins(
+                            from(
+                                arrAsync(
+                                    // god forbid I use any!!!
+                                    cmd.onEvent.map(plug =>
+                                        plug.execute([event as any], controller),
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+            })),
+        ),
     });
 }
 
-export function externalEventDispatcher(e: (e:ExternalEventCommand) => unknown) {
-    return (cmd: ExternalEventCommand & { name: string}) => {
+export function externalEventDispatcher(e: (e: ExternalEventCommand) => unknown) {
+    return (cmd: ExternalEventCommand & { name: string }) => {
         const external = e(cmd);
         assert.ok(external instanceof EventEmitter, `${e} is not an EventEmitter`);
         return {
             source: external,
             cmd,
-            execute: fromEvent(external, cmd.name)
-                    .pipe(map(event => ({
-                        event,
-                        executeEvent : of(event).pipe(concatMap(event =>
-                            reducePlugins(from(arrAsync(
-                                cmd.onEvent.map(plug => plug.execute([event], controller))
-                            )))
-                        )),
-                    })))
+            execute: fromEvent(external, cmd.name).pipe(
+                map(event => ({
+                    event,
+                    executeEvent: of(event).pipe(
+                        concatMap(event =>
+                            reducePlugins(
+                                from(
+                                    arrAsync(
+                                        cmd.onEvent.map(plug => plug.execute([event], controller)),
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                })),
+            ),
         };
     };
 }

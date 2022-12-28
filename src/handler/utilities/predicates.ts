@@ -1,4 +1,8 @@
-import type { DiscordEventCommand, ExternalEventCommand, SernEventCommand } from '../structures/events';
+import type {
+    DiscordEventCommand,
+    ExternalEventCommand,
+    SernEventCommand,
+} from '../structures/events';
 import { CommandModule, EventType } from '../..';
 import type { AnyModule, CommandModuleDefs, EventModule } from '../../types/module';
 
@@ -10,7 +14,6 @@ export function correctModuleType<T extends keyof CommandModuleDefs>(
     // It will check based on flag system instead
     return plug !== undefined && (plug.type & type) !== 0;
 }
-
 
 export function isDiscordEvent(el: EventModule | CommandModule): el is DiscordEventCommand {
     return el.type === EventType.Discord;

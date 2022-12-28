@@ -13,7 +13,12 @@ import type {
 import InteractionHandler from './events/interactionHandler';
 import ReadyHandler from './events/readyHandler';
 import MessageHandler from './events/messageHandler';
-import type { CommandModule, CommandModuleDefs, EventModule, EventModuleDefs } from '../types/module';
+import type {
+    CommandModule,
+    CommandModuleDefs,
+    EventModule,
+    EventModuleDefs,
+} from '../types/module';
 import { Container, createContainer } from 'iti';
 import type { Dependencies, OptionalDependencies } from '../types/handler';
 import { composeRoot, containerSubject, useContainer } from './dependencies/provider';
@@ -46,7 +51,7 @@ export function init(wrapper: Wrapper) {
     new MessageHandler(wrapper);
     new InteractionHandler(wrapper);
     const endTime = performance.now();
-    logger?.info({ message: `sern : ${(endTime-startTime).toFixed(2)} ms` });
+    logger?.info({ message: `sern : ${(endTime - startTime).toFixed(2)} ms` });
 }
 
 /**
@@ -62,7 +67,10 @@ export const controller = {
  * @param mod
  */
 export function commandModule(mod: InputCommandModule): CommandModule {
-    const [onEvent, plugins] = partition(mod.plugins ?? [], el => (el as Plugin).type === PluginType.Event);
+    const [onEvent, plugins] = partition(
+        mod.plugins ?? [],
+        el => (el as Plugin).type === PluginType.Event,
+    );
     return {
         ...mod,
         onEvent,
@@ -74,8 +82,11 @@ export function commandModule(mod: InputCommandModule): CommandModule {
  * @param mod
  */
 export function eventModule(mod: InputEventModule): EventModule {
-    const [onEvent, plugins] = partition(mod.plugins ?? [], el => (el as Plugin).type === PluginType.Event);
-        return {
+    const [onEvent, plugins] = partition(
+        mod.plugins ?? [],
+        el => (el as Plugin).type === PluginType.Event,
+    );
+    return {
         ...mod,
         onEvent,
         plugins,
@@ -85,8 +96,8 @@ export function eventModule(mod: InputEventModule): EventModule {
  * @param conf a configuration for creating your project dependencies
  */
 export function makeDependencies<T extends Dependencies>(conf: {
-    exclude?: Set<OptionalDependencies>,
-    build: (root: Container<Record<string,any>, {}>) => Container<Partial<T>, T>,
+    exclude?: Set<OptionalDependencies>;
+    build: (root: Container<Record<string, any>, {}>) => Container<Partial<T>, T>;
 }) {
     const container = conf.build(createContainer());
     composeRoot(container, conf.exclude ?? new Set());

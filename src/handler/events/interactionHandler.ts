@@ -38,8 +38,9 @@ export default class InteractionHandler extends EventsHandler<{
         this.payloadSubject
             .pipe(
                 map(this.processModules),
-                concatMap(({ mod, execute, eventPluginRes }) =>
-                    from(eventPluginRes).pipe(map(res => ({ mod, res, execute }))) //resolve all the Results from event plugins
+                concatMap(
+                    ({ mod, execute, eventPluginRes }) =>
+                        from(eventPluginRes).pipe(map(res => ({ mod, res, execute }))), //resolve all the Results from event plugins
                 ),
                 concatMap(payload => executeModule(wrapper, payload)),
                 catchError(handleError(this.crashHandler, this.logger)),
@@ -48,23 +49,25 @@ export default class InteractionHandler extends EventsHandler<{
     }
 
     override init() {
-        const get = (cb: (ms: ModuleStore) => CommandModule|undefined) => {
-           return this.modules.get(cb);
+        const get = (cb: (ms: ModuleStore) => CommandModule | undefined) => {
+            return this.modules.get(cb);
         };
         this.discordEvent.subscribe({
             next: event => {
                 if (event.isMessageComponent()) {
-                    const mod = get(ms  =>
-                        ms.InteractionHandlers[event.componentType].get(event.customId));
+                    const mod = get(ms =>
+                        ms.InteractionHandlers[event.componentType].get(event.customId),
+                    );
                     this.setState({ event, mod });
                 } else if (event.isCommand() || event.isAutocomplete()) {
-                    const mod = get(ms =>
-                        ms.ApplicationCommands[event.commandType].get(event.commandName) ??
-                        ms.BothCommands.get(event.commandName)
+                    const mod = get(
+                        ms =>
+                            ms.ApplicationCommands[event.commandType].get(event.commandName) ??
+                            ms.BothCommands.get(event.commandName),
                     );
                     this.setState({ event, mod });
                 } else if (event.isModalSubmit()) {
-                    const mod = get((ms) => ms.InteractionHandlers[5].get(event.customId));
+                    const mod = get(ms => ms.InteractionHandlers[5].get(event.customId));
                     this.setState({ event, mod });
                 } else {
                     throw Error('This interaction is not supported yet');
@@ -78,7 +81,10 @@ export default class InteractionHandler extends EventsHandler<{
 
     protected setState(state: { event: Interaction; mod: CommandModule | undefined }): void {
         if (state.mod === undefined) {
-            this.emitter.emit('warning',{ type: PayloadType.Warning, reason: 'Found no module for this interaction' });
+            this.emitter.emit('warning', {
+                type: PayloadType.Warning,
+                reason: 'Found no module for this interaction',
+            });
         } else {
             //if statement above checks already, safe cast
             this.payloadSubject.next(state as { event: Interaction; mod: CommandModule });
@@ -97,13 +103,15 @@ export default class InteractionHandler extends EventsHandler<{
             )
             .with({ type: CommandType.Button }, buttonCommandDispatcher(event as ButtonInteraction))
             .with(
-                { type: P.union(
+                {
+                    type: P.union(
                         CommandType.RoleSelect,
                         CommandType.StringSelect,
                         CommandType.UserSelect,
                         CommandType.MentionableSelect,
-                        CommandType.ChannelSelect
-                    ) },
+                        CommandType.ChannelSelect,
+                    ),
+                },
                 selectMenuCommandDispatcher(event as MessageComponentInteraction),
             )
             .with(

@@ -4,7 +4,6 @@ import { type Observable, from, concatAll } from 'rxjs';
 import { SernError } from '../structures/errors';
 import { type Result, Err, Ok } from 'ts-results-es';
 
-
 // Courtesy @Townsy45
 function readPath(dir: string, arrayOfFiles: string[] = []): string[] {
     try {
