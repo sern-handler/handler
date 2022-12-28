@@ -18,7 +18,7 @@ import type {
     ChannelSelectMenuInteraction,
     MentionableSelectMenuInteraction,
     RoleSelectMenuInteraction,
-    StringSelectMenuInteraction
+    StringSelectMenuInteraction,
 } from 'discord.js';
 import type {
     DiscordEventCommand,
@@ -36,7 +36,7 @@ export interface Module {
     type?: CommandType | EventType;
     name?: string;
     description?: string;
-    execute: (...args: any[]) => any
+    execute: (...args: any[]) => any;
 }
 
 export interface TextCommand extends Module {
@@ -162,10 +162,10 @@ export type CommandModuleDefs = {
     [CommandType.CtxUser]: ContextMenuUser;
     [CommandType.Button]: ButtonCommand;
     [CommandType.StringSelect]: StringSelectCommand;
-    [CommandType.RoleSelect] : RoleSelectCommand;
-    [CommandType.ChannelSelect] : ChannelSelectCommand;
-    [CommandType.MentionableSelect] : MentionableSelectCommand;
-    [CommandType.UserSelect] : UserSelectCommand;
+    [CommandType.RoleSelect]: RoleSelectCommand;
+    [CommandType.ChannelSelect]: ChannelSelectCommand;
+    [CommandType.MentionableSelect]: MentionableSelectCommand;
+    [CommandType.UserSelect]: UserSelectCommand;
     [CommandType.Modal]: ModalSubmitCommand;
 };
 
@@ -175,7 +175,8 @@ export type EventModuleDefs = {
     [EventType.External]: ExternalEventCommand;
 };
 
-export interface SernAutocompleteData extends Omit<BaseApplicationCommandOptionsData, 'autocomplete'> {
+export interface SernAutocompleteData
+    extends Omit<BaseApplicationCommandOptionsData, 'autocomplete'> {
     autocomplete: true;
     type:
         | ApplicationCommandOptionType.String

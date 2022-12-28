@@ -26,7 +26,7 @@ export default class MessageHandler extends EventsHandler<{
             .pipe(
                 switchMap(({ mod, ctx, args }) => {
                     const res = arrAsync(
-                            mod.onEvent.map(ep => ep.execute([ctx, args], controller)),
+                        mod.onEvent.map(ep => ep.execute([ctx, args], controller)),
                     );
                     const execute = () => mod.execute(ctx, args);
                     //resolves the promise and re-emits it back into source
@@ -42,7 +42,7 @@ export default class MessageHandler extends EventsHandler<{
         if (this.wrapper.defaultPrefix === undefined) return; //for now, just ignore if prefix doesn't exist
         const { defaultPrefix } = this.wrapper;
         const get = (cb: (ms: ModuleStore) => CommandModule | undefined) => {
-              return this.modules.get(cb);
+            return this.modules.get(cb);
         };
         this.discordEvent
             .pipe(
@@ -52,10 +52,7 @@ export default class MessageHandler extends EventsHandler<{
                     return {
                         ctx: Context.wrap(message),
                         args: <['text', string[]]>['text', rest],
-                        mod: get(ms =>
-                            ms.TextCommands.get(prefix) ??
-                            ms.BothCommands.get(prefix)
-                        ),
+                        mod: get(ms => ms.TextCommands.get(prefix) ?? ms.BothCommands.get(prefix)),
                     };
                 }),
                 concatMap(element =>
@@ -67,8 +64,7 @@ export default class MessageHandler extends EventsHandler<{
             )
             .subscribe({
                 next: value => this.setState(value),
-                error: reason =>
-                    this.emitter.emit('error', { type: PayloadType.Failure, reason }),
+                error: reason => this.emitter.emit('error', { type: PayloadType.Failure, reason }),
             });
     }
 

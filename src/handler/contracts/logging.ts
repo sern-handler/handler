@@ -1,10 +1,10 @@
 import type { LogPayload } from '../../types/handler';
 
 export interface Logging<T = unknown> {
-    error(payload : LogPayload<T>) : void;
-    warning(payload : LogPayload<T>) : void;
-    info(payload : LogPayload<T>) : void
-    debug(payload : LogPayload<T>) : void
+    error(payload: LogPayload<T>): void;
+    warning(payload: LogPayload<T>): void;
+    info(payload: LogPayload<T>): void;
+    debug(payload: LogPayload<T>): void;
 }
 
 export class DefaultLogging implements Logging {
@@ -24,5 +24,4 @@ export class DefaultLogging implements Logging {
     warning(payload: LogPayload): void {
         console.warn(`WARN: ${this.date().toISOString()} -> ${payload.message}`);
     }
-
 }
