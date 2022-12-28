@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.0.0](https://github.com/sern-handler/handler/compare/v1.2.1...v2.0.0) (2022-12-28)
+
+
+### ⚠ BREAKING CHANGES
+
+* (2.0 global services) ([#156](https://github.com/sern-handler/handler/issues/156))
+
+### Features
+
+* (2.0 global services) ([#156](https://github.com/sern-handler/handler/issues/156)) ([1455622](https://github.com/sern-handler/handler/commit/14556223fd6f79b797fb2aee03e795d4f4e94a8b))
+
 ## [1.2.1](https://github.com/sern-handler/handler/compare/v1.2.0...v1.2.1) (2022-10-03)
 
 
