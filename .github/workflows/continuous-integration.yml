@@ -24,14 +24,15 @@ jobs:
         with:
           node-version: 17
 
+      - name: infer source
+        run: source ~/.bashrc
+
       - name: Install pnpm
         run: npm i -g pnpm
 
       - name: setup pnpm
         run: pnpm setup
 
-      - name: Set global dir
-        run: source ~/.bashrc
       # Prettier must be in `package.json`
       - name: Install Node.js dependencies
         run:  pnpm add -g prettier && pnpm i
