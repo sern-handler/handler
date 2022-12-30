@@ -96,7 +96,7 @@ export function processEvents({ containerConfig, events }: Wrapper) {
                     executeEvent.pipe(
                         tap(success => {
                             if (success) {
-                                if(Array.isArray(event)) {
+                                if (Array.isArray(event)) {
                                     payload.cmd.execute(...event);
                                 } else {
                                     payload.cmd.execute(event as never);
