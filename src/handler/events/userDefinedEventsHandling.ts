@@ -95,7 +95,13 @@ export function processEvents({ containerConfig, events }: Wrapper) {
                 concatMap(({ event, executeEvent }) =>
                     executeEvent.pipe(
                         tap(success => {
-                            if (success) payload.cmd.execute(event as never);
+                            if (success) {
+                                if(Array.isArray(event)) {
+                                    payload.cmd.execute(...event);
+                                } else {
+                                    payload.cmd.execute(event as never);
+                                }
+                            }
                         }),
                         catchError(handleError(error, logging)),
                     ),
