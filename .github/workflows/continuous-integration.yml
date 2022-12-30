@@ -24,6 +24,9 @@ jobs:
         with:
           node-version: 17
 
+      - name : Install pnpm
+      - run: npm i -g pnpm
+
       # Prettier must be in `package.json`
       - name: Install Node.js dependencies
         run: pnpm i -D prettier && pnpm i
