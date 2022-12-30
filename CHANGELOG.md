@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.1.0](https://github.com/sern-handler/handler/compare/v2.0.0...v2.1.0) (2022-12-30)
+
+
+### Features
+
+* grammar ([c30aac4](https://github.com/sern-handler/handler/commit/c30aac476cdc2094de34f9f67b5805204cc5e4dd))
+
+
+### Bug Fixes
+
+* multi parameter events ([e986535](https://github.com/sern-handler/handler/commit/e98653593566ef4635493e0c997bd107a7a3a2a2))
+
 ## [2.0.0](https://github.com/sern-handler/handler/compare/v1.2.1...v2.0.0) (2022-12-28)
 
 
