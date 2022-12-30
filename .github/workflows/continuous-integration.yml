@@ -27,6 +27,8 @@ jobs:
       - name: Install pnpm
         run: npm i -g pnpm
 
+      - name: Set global dir
+        run: source ~/.bashrc
       # Prettier must be in `package.json`
       - name: Install Node.js dependencies
         run:  pnpm add -g prettier && pnpm i
