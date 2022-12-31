@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.1](https://github.com/sern-handler/handler/compare/v2.1.0...v2.1.1) (2022-12-31)
+
+
+### Bug Fixes
+
+* modals remapping ([a13df6f](https://github.com/sern-handler/handler/commit/a13df6fb424d256476284da49024dbe56e82baab))
+
 ## [2.1.0](https://github.com/sern-handler/handler/compare/v2.0.0...v2.1.0) (2022-12-30)
 
 
