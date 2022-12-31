@@ -67,7 +67,7 @@ export default class InteractionHandler extends EventsHandler<{
                     );
                     this.setState({ event, mod });
                 } else if (event.isModalSubmit()) {
-                    const mod = get(ms => ms.InteractionHandlers[5].get(event.customId));
+                    const mod = get(ms => ms.ModalSubmit.get(event.customId));
                     this.setState({ event, mod });
                 } else {
                     throw Error('This interaction is not supported yet');
