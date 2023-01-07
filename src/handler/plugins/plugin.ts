@@ -11,98 +11,35 @@
  * Plugins are reminiscent of middleware in express.
  */
 
-import type { AutocompleteInteraction, Awaitable, ClientEvents } from 'discord.js';
+import type {  Awaitable } from 'discord.js';
 import type { Result, Ok, Err } from 'ts-results-es';
-import type { CommandType, SernEventsMapping } from '../../index';
-import { EventType, PluginType } from '../../index';
+import type { CommandType } from '../structures/enums';
 import type { CommandModuleDefs, EventModuleDefs } from '../../types/module';
-import type {
-    DiscordEventCommand,
-    ExternalEventCommand,
-    SernEventCommand,
-} from '../structures/events';
+
+import type { EventType, PluginType } from '../structures/enums';
+import type { InitArgs } from './args';
+import type { AnyDefinedModule, DefinedCommandModule, DefinedEventModule } from '../../types/handler';
+export type PluginResult = Awaitable<Result<void, void>>;
 
 export interface Controller {
     next: () => Ok<void>;
     stop: () => Err<void>;
 }
-export interface Plugin {
-    /** @deprecated will be removed in the next update */
+export interface Plugin<Args extends any[] = any[]> {
     name?: string;
     /** @deprecated will be removed in the next update */
     description?: string;
     type: PluginType;
+    execute: (...args: Args) => any
 }
 
-export interface CommandPlugin<T extends keyof CommandModuleDefs = keyof CommandModuleDefs>
-    extends Plugin {
-    type: PluginType.Command;
-    execute: (
-        payload: {
-            mod: CommandModuleDefs[T] & { name: string; description: string };
-            absPath: string;
-        },
-        controller: Controller,
-    ) => Awaitable<Result<void, void>>;
-}
-export interface DiscordEmitterPlugin extends Plugin {
-    type: PluginType.Command;
-    execute: (
-        payload: { mod: DiscordEventCommand & { name: string }; absPath: string },
-        controller: Controller,
-    ) => Awaitable<Result<void, void>>;
+export interface InitPlugin<T extends AnyDefinedModule = AnyDefinedModule> extends Plugin {
+    type: PluginType.Init;
+    execute: (args: InitArgs<T>) => PluginResult
 }
 
-export interface ExternalEmitterPlugin extends Plugin {
-    type: PluginType.Command;
-    execute: (
-        payload: { mod: ExternalEventCommand & { name: string }; absPath: string },
-        controller: Controller,
-    ) => Awaitable<Result<void, void>>;
-}
-
-export interface SernEmitterPlugin extends Plugin {
-    type: PluginType.Command;
-    execute: (
-        payload: { mod: SernEventCommand & { name: string }; absPath: string },
-        controller: Controller,
-    ) => Awaitable<Result<void, void>>;
-}
-
-export interface AutocompletePlugin extends Plugin {
-    type: PluginType.Event;
-    execute: (
-        autocmp: AutocompleteInteraction,
-        controlller: Controller,
-    ) => Awaitable<Result<void, void>>;
-}
-
-export interface EventPlugin<K extends keyof CommandModuleDefs = keyof CommandModuleDefs>
-    extends Plugin {
-    type: PluginType.Event;
-    execute: (
-        event: Parameters<CommandModuleDefs[K]['execute']>,
-        controller: Controller,
-    ) => Awaitable<Result<void, void>>;
-}
-
-export interface SernEventPlugin<T extends keyof SernEventsMapping = keyof SernEventsMapping>
-    extends Plugin {
-    name?: T;
-    type: PluginType.Event;
-    execute: (args: SernEventsMapping[T], controller: Controller) => Awaitable<Result<void, void>>;
-}
-
-export interface ExternalEventPlugin extends Plugin {
-    type: PluginType.Event;
-    execute: (args: unknown[], controller: Controller) => Awaitable<Result<void, void>>;
-}
-
-export interface DiscordEventPlugin<T extends keyof ClientEvents = keyof ClientEvents>
-    extends Plugin {
-    name?: T;
-    type: PluginType.Event;
-    execute: (args: ClientEvents[T], controller: Controller) => Awaitable<Result<void, void>>;
+export interface ControlPlugin extends Plugin {
+    type: PluginType.Control;
 }
 
 export type CommandModuleNoPlugins = {
@@ -111,37 +48,15 @@ export type CommandModuleNoPlugins = {
 export type EventModulesNoPlugins = {
     [T in EventType]: Omit<EventModuleDefs[T], 'plugins' | 'onEvent'>;
 };
-/**
- * Event Module Event Plugins
- */
-export type EventModuleEventPluginDefs = {
-    [EventType.Discord]: DiscordEventPlugin;
-    [EventType.Sern]: SernEventPlugin;
-    [EventType.External]: ExternalEventPlugin;
-};
 
-/**
- * Event Module Command Plugins
- */
-export type EventModuleCommandPluginDefs = {
-    [EventType.Discord]: DiscordEmitterPlugin;
-    [EventType.Sern]: SernEmitterPlugin;
-    [EventType.External]: ExternalEmitterPlugin;
-};
+export type AnyPlugin = ControlPlugin | InitPlugin;
+export type AnyCommandPlugin = ControlPlugin | InitPlugin<DefinedCommandModule>;
+export type AnyEventPlugin = ControlPlugin | InitPlugin<DefinedEventModule>;
 
-export type EventModulePlugin<T extends EventType> =
-    | EventModuleEventPluginDefs[T]
-    | EventModuleCommandPluginDefs[T];
+export type InputEvent = {
+    [T in EventType]: EventModulesNoPlugins[T] & { plugins?: AnyEventPlugin[] };
+}[EventType];
 
-export type CommandModulePlugin<T extends CommandType> = EventPlugin<T> | CommandPlugin<T>;
-
-/**
- * User inputs this type. Sern processes behind the scenes for better usage
- */
-export type InputCommandModule = {
-    [T in CommandType]: CommandModuleNoPlugins[T] & { plugins?: CommandModulePlugin<T>[] };
-}[CommandType];
-
-export type InputEventModule = {
-    [T in EventType]: EventModulesNoPlugins[T] & { plugins?: EventModulePlugin<T>[] };
+export type InputCommand = {
+    [T in CommandType]: CommandModuleNoPlugins[T] & { plugins?: AnyCommandPlugin[] };
 }[EventType];

@@ -9,7 +9,7 @@ import type {
     ChatInputCommandInteraction,
     Interaction,
     UserContextMenuCommandInteraction,
-    MessageContextMenuCommandInteraction,
+    MessageContextMenuCommandInteraction, ClientEvents,
 } from 'discord.js';
 import { SernError } from '../structures/errors';
 import treeSearch from '../utilities/treeSearch';
@@ -47,9 +47,7 @@ export function applicationCommandDispatcher(interaction: Interaction) {
         return (mod: BothCommand | SlashCommand) => ({
             mod,
             execute: () => mod.execute(ctx, args),
-            eventPluginRes: arrAsync(
-                mod.onEvent.map(plugs => plugs.execute([ctx, args], controller)),
-            ),
+            eventPluginRes: arrAsync(mod.onEvent.map(plugs => plugs.execute(ctx, args))),
         });
     }
 }
@@ -62,7 +60,7 @@ export function dispatchAutocomplete(interaction: AutocompleteInteraction) {
                 mod,
                 execute: () => selectedOption.command.execute(interaction),
                 eventPluginRes: arrAsync(
-                    selectedOption.command.onEvent.map(e => e.execute(interaction, controller)),
+                    selectedOption.command.onEvent.map(e => e.execute(interaction)),
                 ),
             };
         }
@@ -77,7 +75,7 @@ export function modalCommandDispatcher(interaction: ModalSubmitInteraction) {
         mod,
         execute: () => mod.execute(interaction),
         eventPluginRes: arrAsync(
-            mod.onEvent.map(plugs => plugs.execute([interaction], controller)),
+            mod.onEvent.map(plugs => plugs.execute(interaction)),
         ),
     });
 }
@@ -87,7 +85,7 @@ export function buttonCommandDispatcher(interaction: ButtonInteraction) {
         mod,
         execute: () => mod.execute(interaction),
         eventPluginRes: arrAsync(
-            mod.onEvent.map(plugs => plugs.execute([interaction], controller)),
+            mod.onEvent.map(plugs => plugs.execute(interaction)),
         ),
     });
 }
@@ -105,7 +103,7 @@ export function selectMenuCommandDispatcher(interaction: MessageComponentInterac
         mod,
         execute: () => mod.execute(interaction as never),
         eventPluginRes: arrAsync(
-            mod.onEvent.map(plugs => plugs.execute([interaction as never], controller)),
+            mod.onEvent.map(plugs => plugs.execute(interaction)),
         ),
     });
 }
@@ -115,7 +113,7 @@ export function ctxMenuUserDispatcher(interaction: UserContextMenuCommandInterac
         mod,
         execute: () => mod.execute(interaction),
         eventPluginRes: arrAsync(
-            mod.onEvent.map(plugs => plugs.execute([interaction], controller)),
+            mod.onEvent.map(plugs => plugs.execute(interaction)),
         ),
     });
 }
@@ -125,7 +123,7 @@ export function ctxMenuMsgDispatcher(interaction: MessageContextMenuCommandInter
         mod,
         execute: () => mod.execute(interaction),
         eventPluginRes: arrAsync(
-            mod.onEvent.map(plugs => plugs.execute([interaction], controller)),
+            mod.onEvent.map(plugs => plugs.execute(interaction)),
         ),
     });
 }
@@ -142,9 +140,7 @@ export function sernEmitterDispatcher(e: SernEmitter) {
                         reducePlugins(
                             from(
                                 arrAsync(
-                                    cmd.onEvent.map(plug =>
-                                        plug.execute([event as Payload], controller),
-                                    ),
+                                    cmd.onEvent.map(plug => plug.execute(event as Payload)),
                                 ),
                             ),
                         ),
@@ -167,10 +163,7 @@ export function discordEventDispatcher(e: EventEmitter) {
                         reducePlugins(
                             from(
                                 arrAsync(
-                                    // god forbid I use any!!!
-                                    cmd.onEvent.map(plug =>
-                                        plug.execute([event as any], controller),
-                                    ),
+                                    cmd.onEvent.map(plug => plug.execute(...event as ClientEvents[keyof ClientEvents])),
                                 ),
                             ),
                         ),
@@ -196,7 +189,7 @@ export function externalEventDispatcher(e: (e: ExternalEventCommand) => unknown)
                             reducePlugins(
                                 from(
                                     arrAsync(
-                                        cmd.onEvent.map(plug => plug.execute([event], controller)),
+                                        cmd.onEvent.map(plug => plug.execute(event, controller)),
                                     ),
                                 ),
                             ),

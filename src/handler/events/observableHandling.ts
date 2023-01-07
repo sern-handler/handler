@@ -124,7 +124,7 @@ export function resolvePlugins({
     mod: DefinedCommandModule | DefinedEventModule;
     cmdPluginRes: {
         execute: Awaitable<Result<void, void>>;
-        type: PluginType.Command;
+        type: PluginType.Init;
     }[];
 }) {
     if (mod.plugins.length === 0) {

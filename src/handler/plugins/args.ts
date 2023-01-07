@@ -1,0 +1,104 @@
+import type { CommandType } from '../structures/enums';
+import type { PluginType } from '../structures/enums';
+import type { ClientEvents, Message } from 'discord.js';
+import type {
+    BothCommand,
+    ButtonCommand, ChannelSelectCommand,
+    ContextMenuUser, MentionableSelectCommand, ModalSubmitCommand,
+    Module, RoleSelectCommand,
+    SlashCommand, StringSelectCommand,
+    TextCommand, UserSelectCommand,
+} from '../../types/module';
+import type { AnyDefinedModule, Args, Payload, Processed, SlashOptions } from '../../types/handler';
+import type Context from '../structures/context';
+import type { MessageContextMenuCommandInteraction } from 'discord.js';
+import type { ContextMenuMsg } from '../../types/module';
+import type {
+    ButtonInteraction,
+    RoleSelectMenuInteraction,
+    StringSelectMenuInteraction,
+    UserContextMenuCommandInteraction,
+} from 'discord.js';
+import type {
+    ChannelSelectMenuInteraction,
+    MentionableSelectMenuInteraction,
+    ModalSubmitInteraction,
+    UserSelectMenuInteraction,
+} from 'discord.js';
+import { EventType } from '../structures/enums';
+import type { DiscordEventCommand, ExternalEventCommand, SernEventCommand } from '../structures/events';
+
+
+type CommandArgsMatrix = {
+    [CommandType.Text]: {
+        [PluginType.Control] : /* library coupled */ [Message]
+        [PluginType.Init] : [InitArgs<Processed<TextCommand>>]
+    };
+    [CommandType.Slash]: {
+        [PluginType.Control] : [Context, ['slash', /* library coupled */ SlashOptions]]
+        [PluginType.Init] : [InitArgs<Processed<SlashCommand>>]
+    };
+    [CommandType.Both]: {
+        [PluginType.Control] : [Context, ['slash'|'text', /* library coupled */ Args]]
+        [PluginType.Init] : [InitArgs<Processed<BothCommand>>]
+    };
+    [CommandType.CtxMsg]: {
+        [PluginType.Control] : [/* library coupled */MessageContextMenuCommandInteraction]
+        [PluginType.Init] : [InitArgs<Processed<ContextMenuMsg>>]
+    };
+    [CommandType.CtxUser]: {
+        [PluginType.Control] : [/* library coupled */UserContextMenuCommandInteraction]
+        [PluginType.Init] : [InitArgs<Processed<ContextMenuUser>>]
+    };
+    [CommandType.Button]: {
+        [PluginType.Control] : [/* library coupled */ButtonInteraction]
+        [PluginType.Init] : [InitArgs<Processed<ButtonCommand>>]
+    };
+    [CommandType.StringSelect]: {
+        [PluginType.Control] : [/* library coupled */StringSelectMenuInteraction]
+        [PluginType.Init] : [InitArgs<Processed<StringSelectCommand>>]
+    };
+    [CommandType.RoleSelect]: {
+        [PluginType.Control] : [/* library coupled */RoleSelectMenuInteraction]
+        [PluginType.Init] : [InitArgs<Processed<RoleSelectCommand>>]
+    };
+    [CommandType.ChannelSelect]: {
+        [PluginType.Control] : [/* library coupled */ChannelSelectMenuInteraction]
+        [PluginType.Init] : [InitArgs<Processed<ChannelSelectCommand>>]
+    };
+    [CommandType.MentionableSelect]: {
+        [PluginType.Control] : [/* library coupled */MentionableSelectMenuInteraction]
+        [PluginType.Init] : [InitArgs<Processed<MentionableSelectCommand>>]
+    };
+    [CommandType.UserSelect]: {
+        [PluginType.Control] : [/* library coupled */UserSelectMenuInteraction]
+        [PluginType.Init] : [InitArgs<Processed<UserSelectCommand>>]
+    };
+    [CommandType.Modal]: {
+        [PluginType.Control] : [/* library coupled */ModalSubmitInteraction]
+        [PluginType.Init] : [ModalSubmitCommand]
+    };
+};
+
+type EventArgsMatrix = {
+    [EventType.Discord] : {
+       [PluginType.Control] : [/* library coupled */ClientEvents[keyof ClientEvents]]
+       [PluginType.Init] : [InitArgs<Processed<DiscordEventCommand>>]
+    };
+    [EventType.Sern] : {
+        [PluginType.Control] : [Payload]
+        [PluginType.Init] : [[InitArgs<Processed<SernEventCommand>>]]
+    };
+    [EventType.External] : {
+        [PluginType.Control] : [unknown[]]
+        [PluginType.Init] : [ExternalEventCommand]
+    }
+}
+
+export interface InitArgs<T extends AnyDefinedModule> {
+    mod: T;
+    absPath: string;
+}
+
+export type CommandArgs<I extends CommandType, J extends PluginType> = CommandArgsMatrix[I][J]
+export type EventArgs<I extends EventType, J extends PluginType> = EventArgsMatrix[I][J]

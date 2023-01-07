@@ -28,7 +28,7 @@ import type {
 import { CommandType } from '../handler/structures/enums';
 import type { Args, SlashOptions } from './handler';
 import type Context from '../handler/structures/context';
-import type { AutocompletePlugin, CommandPlugin, EventPlugin } from '../handler/plugins/plugin';
+import type { InitPlugin, ControlPlugin } from '../handler/plugins/plugin';
 import { EventType } from '../handler/structures/enums';
 import type { UserSelectMenuInteraction } from 'discord.js';
 
@@ -41,24 +41,24 @@ export interface Module {
 
 export interface TextCommand extends Module {
     type: CommandType.Text;
-    onEvent: EventPlugin<CommandType.Text>[];
-    plugins: CommandPlugin[];
+    onEvent: ControlPlugin[];
+    plugins: InitPlugin[];
     alias?: string[];
     execute: (ctx: Context, args: ['text', string[]]) => Awaitable<unknown>;
 }
 
 export interface SlashCommand extends Module {
     type: CommandType.Slash;
-    onEvent: EventPlugin<CommandType.Slash>[];
-    plugins: CommandPlugin[];
+    onEvent: ControlPlugin[];
+    plugins: InitPlugin[];
     options?: SernOptionsData[];
     execute: (ctx: Context, args: ['slash', SlashOptions]) => Awaitable<unknown>;
 }
 
 export interface BothCommand extends Module {
     type: CommandType.Both;
-    onEvent: EventPlugin<CommandType.Both>[];
-    plugins: CommandPlugin[];
+    onEvent: ControlPlugin[];
+    plugins: InitPlugin[];
     alias?: string[];
     options?: SernOptionsData[];
     execute: (ctx: Context, args: Args) => Awaitable<unknown>;
@@ -66,64 +66,64 @@ export interface BothCommand extends Module {
 
 export interface ContextMenuUser extends Module {
     type: CommandType.CtxUser;
-    onEvent: EventPlugin<CommandType.CtxUser>[];
-    plugins: CommandPlugin[];
+    onEvent: ControlPlugin[];
+    plugins: InitPlugin[];
     execute: (ctx: UserContextMenuCommandInteraction) => Awaitable<unknown>;
 }
 
 export interface ContextMenuMsg extends Module {
     type: CommandType.CtxMsg;
-    onEvent: EventPlugin<CommandType.CtxMsg>[];
-    plugins: CommandPlugin[];
+    onEvent: ControlPlugin[];
+    plugins: InitPlugin[];
     execute: (ctx: MessageContextMenuCommandInteraction) => Awaitable<unknown>;
 }
 
 export interface ButtonCommand extends Module {
     type: CommandType.Button;
-    onEvent: EventPlugin<CommandType.Button>[];
-    plugins: CommandPlugin[];
+    onEvent: ControlPlugin[];
+    plugins: InitPlugin[];
     execute: (ctx: ButtonInteraction) => Awaitable<unknown>;
 }
 
 export interface StringSelectCommand extends Module {
     type: CommandType.StringSelect;
-    onEvent: EventPlugin<CommandType.StringSelect>[];
-    plugins: CommandPlugin[];
+    onEvent: ControlPlugin[];
+    plugins: InitPlugin[];
     execute: (ctx: StringSelectMenuInteraction) => Awaitable<unknown>;
 }
 
 export interface ChannelSelectCommand extends Module {
     type: CommandType.ChannelSelect;
-    onEvent: EventPlugin<CommandType.ChannelSelect>[];
-    plugins: CommandPlugin[];
+    onEvent: ControlPlugin[];
+    plugins: InitPlugin[];
     execute: (ctx: ChannelSelectMenuInteraction) => Awaitable<unknown>;
 }
 
 export interface RoleSelectCommand extends Module {
     type: CommandType.RoleSelect;
-    onEvent: EventPlugin<CommandType.RoleSelect>[];
-    plugins: CommandPlugin[];
+    onEvent: ControlPlugin[];
+    plugins: InitPlugin[];
     execute: (ctx: RoleSelectMenuInteraction) => Awaitable<unknown>;
 }
 
 export interface MentionableSelectCommand extends Module {
     type: CommandType.MentionableSelect;
-    onEvent: EventPlugin<CommandType.MentionableSelect>[];
-    plugins: CommandPlugin[];
+    onEvent: ControlPlugin[];
+    plugins: InitPlugin[];
     execute: (ctx: MentionableSelectMenuInteraction) => Awaitable<unknown>;
 }
 
 export interface UserSelectCommand extends Module {
     type: CommandType.UserSelect;
-    onEvent: EventPlugin<CommandType.UserSelect>[];
-    plugins: CommandPlugin[];
+    onEvent: ControlPlugin[];
+    plugins: InitPlugin[];
     execute: (ctx: UserSelectMenuInteraction) => Awaitable<unknown>;
 }
 
 export interface ModalSubmitCommand extends Module {
     type: CommandType.Modal;
-    onEvent: EventPlugin<CommandType.Modal>[];
-    plugins: CommandPlugin[];
+    onEvent: ControlPlugin[];
+    plugins: InitPlugin[];
     execute: (ctx: ModalSubmitInteraction) => Awaitable<unknown>;
 }
 
@@ -131,7 +131,7 @@ export interface AutocompleteCommand extends Module {
     name?: never;
     description?: never;
     type?: never;
-    onEvent: AutocompletePlugin[];
+    onEvent: ControlPlugin[];
     execute: (ctx: AutocompleteInteraction) => Awaitable<unknown>;
 }
 

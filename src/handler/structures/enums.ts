@@ -102,13 +102,13 @@ export enum EventType {
  */
 export enum PluginType {
     /**
-     * The PluginType for CommandPlugins
+     * The PluginType for InitPlugins
      */
-    Command = 1,
+    Init = 1,
     /**
      * The PluginType for EventPlugins
      */
-    Event = 2,
+    Control = 2,
 }
 /**
  * @enum { string }

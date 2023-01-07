@@ -19,8 +19,6 @@ import {
 import type { ErrorHandling, Logging } from '../contracts';
 import { SernError } from '../structures/errors';
 import { handleError } from '../contracts/errorHandling';
-import type { Awaitable } from 'discord.js';
-import type { Result } from 'ts-results-es';
 
 /**
  * Utility function to process command plugins for all Modules
@@ -31,10 +29,10 @@ export function processCommandPlugins<
 >(payload: {
     mod: T;
     absPath: string;
-}): { type: PluginType.Command; execute: Awaitable<Result<void, void>> }[] {
+}) {
     return payload.mod.plugins.map(plug => ({
         type: plug.type,
-        execute: plug.execute(payload as any, controller),
+        execute: plug.execute(payload),
     }));
 }
 
