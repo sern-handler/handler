@@ -1,6 +1,7 @@
 import { CommandType, EventType, PluginType } from '../structures/enums';
 import type { Plugin, PluginResult } from './plugin';
 import type { CommandArgs, EventArgs } from './args';
+import type { ClientEvents } from 'discord.js';
 
 export function makePlugin<V extends unknown[]>(
     type: PluginType,
@@ -33,5 +34,14 @@ export function CommandControlPlugin<I extends CommandType>(
 export function EventControlPlugin<I extends EventType>(
     execute: (...args: EventArgs<I, PluginType.Control>) => PluginResult
 ) {
+    return makePlugin(PluginType.Control, execute);
+}
+
+/**
+ * @Experimental
+ * A specialized function for creating control plugins with discord.js ClientEvents.
+ * Will probably be moved one day!
+ */
+export function DiscordEventControlPlugin<T extends keyof ClientEvents>(name: T, execute: (...args : ClientEvents[T]) => PluginResult) {
     return makePlugin(PluginType.Control, execute);
 }
