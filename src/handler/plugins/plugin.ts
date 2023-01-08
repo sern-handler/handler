@@ -20,17 +20,17 @@ import type { EventType, PluginType } from '../structures/enums';
 import type { DefinedCommandModule, DefinedEventModule } from '../../types/handler';
 export type PluginResult = Awaitable<Result<void, void>>;
 
-export interface Plugin<Args extends any[] = any[]> {
+export interface Plugin<Args extends any[] = unknown[]> {
     type: PluginType;
-    execute: (...args: Args) => any
+    execute: (...args: Args) => PluginResult
 }
 
-export interface InitPlugin<Args extends any[] = any[]> extends Plugin {
+export interface InitPlugin<Args extends unknown[] = unknown[]> extends Plugin<Args> {
     type: PluginType.Init;
     execute: (...args: Args) => PluginResult
 }
 
-export interface ControlPlugin<Args extends any[] = any[]> extends Plugin {
+export interface ControlPlugin<Args extends unknown[] = unknown[]> extends Plugin<Args> {
     type: PluginType.Control;
     execute: (...args: Args) => PluginResult
 }
