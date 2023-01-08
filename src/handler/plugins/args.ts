@@ -96,7 +96,7 @@ type EventArgsMatrix = {
 }
 
 export interface InitArgs<T extends AnyDefinedModule> {
-    mod: T;
+    module: T;
     absPath: string;
 }
 
