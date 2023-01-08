@@ -6,28 +6,19 @@ import { SernError } from '../structures/errors';
 import { CommandType, PayloadType } from '../structures/enums';
 import { match, P } from 'ts-pattern';
 import {
-    applicationCommandDispatcher,
-    buttonCommandDispatcher,
-    ctxMenuMsgDispatcher,
-    ctxMenuUserDispatcher,
-    modalCommandDispatcher,
-    selectMenuCommandDispatcher,
+    interactionArg,
+    contextArgs,
+    commandDispatcher,
+    dispatchAutocomplete, dispatcher,
 } from './dispatchers';
-import type {
-    ButtonInteraction,
-    ModalSubmitInteraction,
-    UserContextMenuCommandInteraction,
-    MessageContextMenuCommandInteraction,
-} from 'discord.js';
 import { executeModule } from './observableHandling';
 import type { CommandModule } from '../../types/module';
 import { handleError } from '../contracts/errorHandling';
 import type { ModuleStore } from '../structures/moduleStore';
-import type { MessageComponentInteraction } from 'discord.js';
 
 export default class InteractionHandler extends EventsHandler<{
     event: Interaction;
-    mod: CommandModule;
+    module: CommandModule;
 }> {
     protected override discordEvent: Observable<Interaction>;
     constructor(wrapper: Wrapper) {
@@ -39,8 +30,8 @@ export default class InteractionHandler extends EventsHandler<{
             .pipe(
                 map(this.processModules),
                 concatMap(
-                    ({ mod, execute, eventPluginRes }) =>
-                        from(eventPluginRes).pipe(map(res => ({ mod, res, execute }))), //resolve all the Results from event plugins
+                    ({ module, execute, controlResult }) =>
+                        from(controlResult()).pipe(map(res => ({ module, res, execute }))), //resolve all the Results from event plugins
                 ),
                 concatMap(payload => executeModule(wrapper, payload)),
                 catchError(handleError(this.crashHandler, this.logger)),
@@ -55,20 +46,20 @@ export default class InteractionHandler extends EventsHandler<{
         this.discordEvent.subscribe({
             next: event => {
                 if (event.isMessageComponent()) {
-                    const mod = get(ms =>
+                    const module = get(ms =>
                         ms.InteractionHandlers[event.componentType].get(event.customId),
                     );
-                    this.setState({ event, mod });
+                    this.setState({ event, module });
                 } else if (event.isCommand() || event.isAutocomplete()) {
-                    const mod = get(
+                    const module = get(
                         ms =>
                             ms.ApplicationCommands[event.commandType].get(event.commandName) ??
                             ms.BothCommands.get(event.commandName),
                     );
-                    this.setState({ event, mod });
+                    this.setState({ event, module });
                 } else if (event.isModalSubmit()) {
-                    const mod = get(ms => ms.ModalSubmit.get(event.customId));
-                    this.setState({ event, mod });
+                    const module = get(ms => ms.ModalSubmit.get(event.customId));
+                    this.setState({ event, module });
                 } else {
                     throw Error('This interaction is not supported yet');
                 }
@@ -79,49 +70,37 @@ export default class InteractionHandler extends EventsHandler<{
         });
     }
 
-    protected setState(state: { event: Interaction; mod: CommandModule | undefined }): void {
-        if (state.mod === undefined) {
+    protected setState(state: { event: Interaction; module: CommandModule | undefined }): void {
+        if (state.module === undefined) {
             this.emitter.emit('warning', {
                 type: PayloadType.Warning,
                 reason: 'Found no module for this interaction',
             });
         } else {
             //if statement above checks already, safe cast
-            this.payloadSubject.next(state as { event: Interaction; mod: CommandModule });
+            this.payloadSubject.next(state as { event: Interaction; module: CommandModule });
         }
     }
 
-    protected processModules({ mod, event }: { event: Interaction; mod: CommandModule }) {
-        return match(mod)
-            .with(
-                { type: P.union(CommandType.Slash, CommandType.Both) },
-                applicationCommandDispatcher(event),
-            )
-            .with(
-                { type: CommandType.Modal },
-                modalCommandDispatcher(event as ModalSubmitInteraction),
-            )
-            .with({ type: CommandType.Button }, buttonCommandDispatcher(event as ButtonInteraction))
-            .with(
-                {
-                    type: P.union(
-                        CommandType.RoleSelect,
-                        CommandType.StringSelect,
-                        CommandType.UserSelect,
-                        CommandType.MentionableSelect,
-                        CommandType.ChannelSelect,
-                    ),
-                },
-                selectMenuCommandDispatcher(event as MessageComponentInteraction),
-            )
-            .with(
-                { type: CommandType.CtxUser },
-                ctxMenuUserDispatcher(event as UserContextMenuCommandInteraction),
-            )
-            .with(
-                { type: CommandType.CtxMsg },
-                ctxMenuMsgDispatcher(event as MessageContextMenuCommandInteraction),
-            )
-            .otherwise(() => this.crashHandler.crash(Error(SernError.MismatchModule)));
+    protected processModules({ module, event }: { event: Interaction; module: CommandModule }) {
+        return match(module)
+            .with({ type: P.union(CommandType.Slash, CommandType.Both) }, module => {
+                if(event.isAutocomplete()) {
+                    /**
+                     * Autocomplete is a special case that
+                     * must be handled separately, since it's
+                     * too different from regular command modules
+                     */
+                    return dispatchAutocomplete(module, event);
+                } else {
+                    return commandDispatcher(module, contextArgs(event));
+                }
+            })
+            .with({ type: CommandType.Text }, () => this.crashHandler.crash(Error(SernError.MismatchEvent)))
+            /**
+             * Every other command module takes a one argument parameter, its corresponding interaction
+             * this makes this usage safe
+             */
+            .otherwise((mod) => dispatcher(mod, interactionArg(event)));
     }
 }

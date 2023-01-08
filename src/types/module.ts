@@ -35,30 +35,26 @@ import type { UserSelectMenuInteraction } from 'discord.js';
 export interface Module {
     type?: CommandType | EventType;
     name?: string;
+    onEvent: ControlPlugin[];
+    plugins: InitPlugin[];
     description?: string;
-    execute: (...args: any[]) => any;
+    execute: (...args: any[]) => Awaitable<any>;
 }
 
 export interface TextCommand extends Module {
     type: CommandType.Text;
-    onEvent: ControlPlugin[];
-    plugins: InitPlugin[];
     alias?: string[];
     execute: (ctx: Context, args: ['text', string[]]) => Awaitable<unknown>;
 }
 
 export interface SlashCommand extends Module {
     type: CommandType.Slash;
-    onEvent: ControlPlugin[];
-    plugins: InitPlugin[];
     options?: SernOptionsData[];
     execute: (ctx: Context, args: ['slash', SlashOptions]) => Awaitable<unknown>;
 }
 
 export interface BothCommand extends Module {
     type: CommandType.Both;
-    onEvent: ControlPlugin[];
-    plugins: InitPlugin[];
     alias?: string[];
     options?: SernOptionsData[];
     execute: (ctx: Context, args: Args) => Awaitable<unknown>;
@@ -66,64 +62,46 @@ export interface BothCommand extends Module {
 
 export interface ContextMenuUser extends Module {
     type: CommandType.CtxUser;
-    onEvent: ControlPlugin[];
-    plugins: InitPlugin[];
     execute: (ctx: UserContextMenuCommandInteraction) => Awaitable<unknown>;
 }
 
 export interface ContextMenuMsg extends Module {
     type: CommandType.CtxMsg;
-    onEvent: ControlPlugin[];
-    plugins: InitPlugin[];
     execute: (ctx: MessageContextMenuCommandInteraction) => Awaitable<unknown>;
 }
 
 export interface ButtonCommand extends Module {
     type: CommandType.Button;
-    onEvent: ControlPlugin[];
-    plugins: InitPlugin[];
     execute: (ctx: ButtonInteraction) => Awaitable<unknown>;
 }
 
 export interface StringSelectCommand extends Module {
     type: CommandType.StringSelect;
-    onEvent: ControlPlugin[];
-    plugins: InitPlugin[];
     execute: (ctx: StringSelectMenuInteraction) => Awaitable<unknown>;
 }
 
 export interface ChannelSelectCommand extends Module {
     type: CommandType.ChannelSelect;
-    onEvent: ControlPlugin[];
-    plugins: InitPlugin[];
     execute: (ctx: ChannelSelectMenuInteraction) => Awaitable<unknown>;
 }
 
 export interface RoleSelectCommand extends Module {
     type: CommandType.RoleSelect;
-    onEvent: ControlPlugin[];
-    plugins: InitPlugin[];
     execute: (ctx: RoleSelectMenuInteraction) => Awaitable<unknown>;
 }
 
 export interface MentionableSelectCommand extends Module {
     type: CommandType.MentionableSelect;
-    onEvent: ControlPlugin[];
-    plugins: InitPlugin[];
     execute: (ctx: MentionableSelectMenuInteraction) => Awaitable<unknown>;
 }
 
 export interface UserSelectCommand extends Module {
     type: CommandType.UserSelect;
-    onEvent: ControlPlugin[];
-    plugins: InitPlugin[];
     execute: (ctx: UserSelectMenuInteraction) => Awaitable<unknown>;
 }
 
 export interface ModalSubmitCommand extends Module {
     type: CommandType.Modal;
-    onEvent: ControlPlugin[];
-    plugins: InitPlugin[];
     execute: (ctx: ModalSubmitInteraction) => Awaitable<unknown>;
 }
 
@@ -131,6 +109,7 @@ export interface AutocompleteCommand extends Module {
     name?: never;
     description?: never;
     type?: never;
+    plugins: never;
     onEvent: ControlPlugin[];
     execute: (ctx: AutocompleteInteraction) => Awaitable<unknown>;
 }

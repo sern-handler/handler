@@ -15,10 +15,10 @@ import type { ModuleStore } from '../structures/moduleStore';
 import { _const, err, nameOrFilename, ok } from '../utilities/functions';
 
 export default class ReadyHandler extends EventsHandler<{
-    mod: DefinedCommandModule;
+    module: DefinedCommandModule;
     absPath: string;
 }> {
-    protected discordEvent!: Observable<{ mod: CommandModule; absPath: string }>;
+    protected discordEvent!: Observable<{ module: CommandModule; absPath: string }>;
     constructor(wrapper: Wrapper) {
         super(wrapper);
         const ready$ = fromEvent(this.client, 'ready').pipe(take(1));
@@ -41,33 +41,33 @@ export default class ReadyHandler extends EventsHandler<{
             .subscribe(payload => {
                 const allPluginsSuccessful = payload.pluginRes.every(({ execute }) => execute.ok);
                 if (allPluginsSuccessful) {
-                    const res = registerModule(this.modules, payload.mod);
+                    const res = registerModule(this.modules, payload.module);
                     if (res.err) {
                         this.crashHandler.crash(Error(SernError.InvalidModuleType));
                     }
                     this.emitter.emit('module.register', {
                         type: PayloadType.Success,
-                        module: payload.mod,
+                        module: payload.module,
                     });
                 } else {
                     this.emitter.emit('module.register', {
                         type: PayloadType.Failure,
-                        module: payload.mod,
+                        module: payload.module,
                         reason: SernError.PluginFailure,
                     });
                 }
             });
     }
-    private static intoDefinedModule({ absPath, mod }: { absPath: string; mod: CommandModule }): {
+    private static intoDefinedModule({ absPath, module }: { absPath: string; module: CommandModule }): {
         absPath: string;
-        mod: DefinedCommandModule;
+        module: DefinedCommandModule;
     } {
         return {
             absPath,
-            mod: {
-                name: nameOrFilename(mod.name, absPath),
-                description: mod?.description ?? '...',
-                ...mod,
+            module: {
+                name: nameOrFilename(module.name, absPath),
+                description: module?.description ?? '...',
+                ...module,
             },
         };
     }
@@ -78,7 +78,7 @@ export default class ReadyHandler extends EventsHandler<{
             complete: () => this.payloadSubject.unsubscribe(),
         });
     }
-    protected setState(state: { absPath: string; mod: DefinedCommandModule }): void {
+    protected setState(state: { absPath: string; module: DefinedCommandModule }): void {
         this.payloadSubject.next(state);
     }
 }

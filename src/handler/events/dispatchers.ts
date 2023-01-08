@@ -1,131 +1,78 @@
 import Context from '../structures/context';
-import type { Payload, SlashOptions } from '../../types/handler';
+import type { Args, Payload } from '../../types/handler';
 import { arrAsync } from '../utilities/arrAsync';
 import { controller } from '../sern';
 import type {
-    ButtonInteraction,
-    ModalSubmitInteraction,
     AutocompleteInteraction,
     ChatInputCommandInteraction,
+    ClientEvents,
     Interaction,
-    UserContextMenuCommandInteraction,
-    MessageContextMenuCommandInteraction, ClientEvents,
 } from 'discord.js';
 import { SernError } from '../structures/errors';
 import treeSearch from '../utilities/treeSearch';
 import type {
     BothCommand,
-    ButtonCommand,
-    ContextMenuMsg,
-    ContextMenuUser,
-    ModalSubmitCommand,
-    StringSelectCommand,
+    CommandModule,
+    EventModule,
+    Module,
     SlashCommand,
-    UserSelectCommand,
-    ChannelSelectCommand,
-    MentionableSelectCommand,
-    RoleSelectCommand,
 } from '../../types/module';
 import type SernEmitter from '../sernEmitter';
 import { EventEmitter } from 'events';
-import type {
-    DiscordEventCommand,
-    ExternalEventCommand,
-    SernEventCommand,
-} from '../structures/events';
+import type { DiscordEventCommand, ExternalEventCommand, SernEventCommand } from '../structures/events';
 import * as assert from 'assert';
 import { reducePlugins } from '../utilities/functions';
 import { concatMap, from, fromEvent, map, of } from 'rxjs';
-import type { MessageComponentInteraction } from 'discord.js';
+import type { CommandArgs, EventArgs } from '../plugins';
+import type { CommandType, EventType, PluginType } from '../structures/enums';
+import type { Message } from 'discord.js';
 
-export function applicationCommandDispatcher(interaction: Interaction) {
-    if (interaction.isAutocomplete()) {
-        return dispatchAutocomplete(interaction);
-    } else {
-        const ctx = Context.wrap(interaction as ChatInputCommandInteraction);
-        const args: ['slash', SlashOptions] = ['slash', ctx.interaction.options];
-        return (mod: BothCommand | SlashCommand) => ({
-            mod,
-            execute: () => mod.execute(ctx, args),
-            eventPluginRes: arrAsync(mod.onEvent.map(plugs => plugs.execute(ctx, args))),
-        });
-    }
-}
-
-export function dispatchAutocomplete(interaction: AutocompleteInteraction) {
-    return (mod: BothCommand | SlashCommand) => {
-        const selectedOption = treeSearch(interaction, mod.options);
-        if (selectedOption !== undefined) {
-            return {
-                mod,
-                execute: () => selectedOption.command.execute(interaction),
-                eventPluginRes: arrAsync(
-                    selectedOption.command.onEvent.map(e => e.execute(interaction)),
-                ),
-            };
-        }
-        throw Error(
-            SernError.NotSupportedInteraction + ` There is no autocomplete tag for this option`,
-        );
+export function dispatcher(
+    module: Module,
+    createArgs: () => unknown[],
+) {
+    const args = createArgs();
+    return {
+        module,
+        execute: () => module.execute(args),
+        controlResult: () => arrAsync(module.onEvent.map(plugs => plugs.execute(args))),
     };
 }
 
-export function modalCommandDispatcher(interaction: ModalSubmitInteraction) {
-    return (mod: ModalSubmitCommand) => ({
-        mod,
-        execute: () => mod.execute(interaction),
-        eventPluginRes: arrAsync(
-            mod.onEvent.map(plugs => plugs.execute(interaction)),
-        ),
-    });
+export function commandDispatcher<V extends CommandType>(
+    module: CommandModule,
+    createArgs: () => CommandArgs<V, PluginType.Control>,
+) {
+    return dispatcher(module, createArgs);
 }
 
-export function buttonCommandDispatcher(interaction: ButtonInteraction) {
-    return (mod: ButtonCommand) => ({
-        mod,
-        execute: () => mod.execute(interaction),
-        eventPluginRes: arrAsync(
-            mod.onEvent.map(plugs => plugs.execute(interaction)),
-        ),
-    });
+function eventDispatcher<V extends EventType>(
+    module: EventModule,
+    createArgs: () => EventArgs<V, PluginType.Control>,
+) {
+    return dispatcher(module, createArgs);
 }
 
-export function selectMenuCommandDispatcher(interaction: MessageComponentInteraction) {
-    //safe casts because command type runtime check
-    return (
-        mod:
-            | StringSelectCommand
-            | UserSelectCommand
-            | ChannelSelectCommand
-            | MentionableSelectCommand
-            | RoleSelectCommand,
-    ) => ({
-        mod,
-        execute: () => mod.execute(interaction as never),
-        eventPluginRes: arrAsync(
-            mod.onEvent.map(plugs => plugs.execute(interaction)),
-        ),
-    });
+export function contextArgs(i: Interaction | Message) {
+    const ctx = Context.wrap(i as ChatInputCommandInteraction | Message);
+    const args = ['slash', ctx.interaction.options];
+    return () => [ctx, args] as [Context, ['slash', Args]];
 }
-
-export function ctxMenuUserDispatcher(interaction: UserContextMenuCommandInteraction) {
-    return (mod: ContextMenuUser) => ({
-        mod,
-        execute: () => mod.execute(interaction),
-        eventPluginRes: arrAsync(
-            mod.onEvent.map(plugs => plugs.execute(interaction)),
-        ),
-    });
+export function interactionArg<T extends Interaction>(interaction : T) {
+    return () => [interaction] as [T];
 }
-
-export function ctxMenuMsgDispatcher(interaction: MessageContextMenuCommandInteraction) {
-    return (mod: ContextMenuMsg) => ({
-        mod,
-        execute: () => mod.execute(interaction),
-        eventPluginRes: arrAsync(
-            mod.onEvent.map(plugs => plugs.execute(interaction)),
-        ),
-    });
+export function dispatchAutocomplete(module: BothCommand | SlashCommand, interaction: AutocompleteInteraction) {
+    const option = treeSearch(interaction, module.options);
+    if (option !== undefined) {
+        return {
+            module,
+            execute: () => option.command.execute(interaction),
+            controlResult: () => arrAsync(option.command.onEvent.map(e => e.execute(interaction))),
+        };
+    }
+    throw Error(
+        SernError.NotSupportedInteraction + ` There is no autocomplete tag for this option`,
+    );
 }
 
 export function sernEmitterDispatcher(e: SernEmitter) {

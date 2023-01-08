@@ -7,7 +7,6 @@ import { fmt } from '../utilities/messageHelpers';
 import Context from '../structures/context';
 import { CommandType, PayloadType } from '../structures/enums';
 import { arrAsync } from '../utilities/arrAsync';
-import { controller } from '../sern';
 import type { CommandModule, TextCommand } from '../../types/module';
 import { handleError } from '../contracts/errorHandling';
 import type { ModuleStore } from '../structures/moduleStore';
@@ -15,7 +14,7 @@ import type { ModuleStore } from '../structures/moduleStore';
 export default class MessageHandler extends EventsHandler<{
     ctx: Context;
     args: ['text', string[]];
-    mod: TextCommand;
+    module: TextCommand;
 }> {
     protected discordEvent: Observable<Message>;
     public constructor(protected wrapper: Wrapper) {
@@ -24,13 +23,14 @@ export default class MessageHandler extends EventsHandler<{
         this.init();
         this.payloadSubject
             .pipe(
-                switchMap(({ mod, ctx, args }) => {
-                    const res = arrAsync(
-                        mod.onEvent.map(ep => ep.execute([ctx, args], controller)),
+                switchMap(({ module, ctx, args }) => {
+                    //refactor to model interaction handler usage
+                    const controlResult = arrAsync(
+                        module.onEvent.map(ep => ep.execute(ctx, args)),
                     );
-                    const execute = () => mod.execute(ctx, args);
+                    const execute = () => module.execute(ctx, args);
                     //resolves the promise and re-emits it back into source
-                    return from(res).pipe(map(res => ({ mod, execute, res })));
+                    return from(controlResult).pipe(map(res => ({ module, execute, res })));
                 }),
                 concatMap(payload => executeModule(wrapper, payload)),
                 catchError(handleError(this.crashHandler, this.logger)),
@@ -52,13 +52,13 @@ export default class MessageHandler extends EventsHandler<{
                     return {
                         ctx: Context.wrap(message),
                         args: <['text', string[]]>['text', rest],
-                        mod: get(ms => ms.TextCommands.get(prefix) ?? ms.BothCommands.get(prefix)),
+                        module: get(ms => ms.TextCommands.get(prefix) ?? ms.BothCommands.get(prefix)),
                     };
                 }),
                 concatMap(element =>
-                    of(element.mod).pipe(
+                    of(element.module).pipe(
                         isOneOfCorrectModules(CommandType.Text),
-                        map(mod => ({ ...element, mod })),
+                        map(module => ({ ...element, module })),
                     ),
                 ),
             )
@@ -68,7 +68,7 @@ export default class MessageHandler extends EventsHandler<{
             });
     }
 
-    protected setState(state: { ctx: Context; args: ['text', string[]]; mod: TextCommand }) {
+    protected setState(state: { ctx: Context; args: ['text', string[]]; module: TextCommand }) {
         this.payloadSubject.next(state);
     }
 }

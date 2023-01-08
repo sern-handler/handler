@@ -5,7 +5,7 @@ import { Result } from 'ts-results-es';
 import type { CommandType } from '../structures/enums';
 import type Wrapper from '../structures/wrapper';
 import { PayloadType, PluginType } from '../structures/enums';
-import type { CommandModule, CommandModuleDefs, AnyModule } from '../../types/module';
+import type { CommandModule, CommandModuleDefs, AnyModule, Module } from '../../types/module';
 import { _const } from '../utilities/functions';
 import type SernEmitter from '../sernEmitter';
 import type { DefinedCommandModule, DefinedEventModule } from '../../types/handler';
@@ -37,8 +37,8 @@ export function ignoreNonBot(prefix: string) {
  * @param cb
  */
 export function errTap<T extends AnyModule>(cb: (err: SernError) => void) {
-    return (src: Observable<Result<{ mod: T; absPath: string }, SernError>>) =>
-        new Observable<{ mod: T; absPath: string }>(subscriber => {
+    return (src: Observable<Result<{ module: T; absPath: string }, SernError>>) =>
+        new Observable<{ module: T; absPath: string }>(subscriber => {
             return src.subscribe({
                 next(value) {
                     if (value.err) {
@@ -78,7 +78,7 @@ export function isOneOfCorrectModules<T extends readonly CommandType[]>(...input
 export function executeModule(
     wrapper: Wrapper,
     payload: {
-        mod: CommandModule;
+        module: Module;
         execute: () => unknown;
         res: Result<void, void>[];
     },
@@ -94,14 +94,14 @@ export function executeModule(
                     return throwError(() => ({
                         type: PayloadType.Failure,
                         reason: res.val,
-                        module: payload.mod,
+                        module: payload.module,
                     }));
                 }
                 return of(res.val).pipe(
                     tap(() =>
                         emitter.emit('module.activate', {
                             type: PayloadType.Success,
-                            module: payload.mod,
+                            module: payload.module as AnyModule,
                         }),
                     ),
                 );
@@ -110,7 +110,7 @@ export function executeModule(
     } else {
         emitter.emit('module.activate', {
             type: PayloadType.Failure,
-            module: payload.mod,
+            module: payload.module as AnyModule,
             reason: SernError.PluginFailure,
         });
         return of(undefined);
@@ -118,17 +118,17 @@ export function executeModule(
 }
 
 export function resolvePlugins({
-    mod,
+    module,
     cmdPluginRes,
 }: {
-    mod: DefinedCommandModule | DefinedEventModule;
+    module: DefinedCommandModule | DefinedEventModule;
     cmdPluginRes: {
         execute: Awaitable<Result<void, void>>;
         type: PluginType.Init;
     }[];
 }) {
-    if (mod.plugins.length === 0) {
-        return of({ mod, pluginRes: [] });
+    if (module.plugins.length === 0) {
+        return of({ module, pluginRes: [] });
     }
     // modules with no event plugins are ignored in the previous
     return from(cmdPluginRes).pipe(
@@ -138,14 +138,14 @@ export function resolvePlugins({
                 toArray(),
             ),
         ),
-        map(pluginRes => ({ mod, pluginRes })),
+        map(pluginRes => ({ module, pluginRes })),
     );
 }
 
 export function processPlugins(payload: {
-    mod: DefinedCommandModule | DefinedEventModule;
+    module: DefinedCommandModule | DefinedEventModule;
     absPath: string;
 }) {
     const cmdPluginRes = processCommandPlugins(payload);
-    return of({ mod: payload.mod, cmdPluginRes });
+    return of({ module: payload.module, cmdPluginRes });
 }

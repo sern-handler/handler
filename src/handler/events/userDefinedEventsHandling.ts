@@ -1,8 +1,7 @@
 import { catchError, concatMap, filter, from, iif, map, of, tap, toArray } from 'rxjs';
 import { buildData } from '../utilities/readFile';
-import { controller } from '../sern';
 import type { DefinedCommandModule, DefinedEventModule, Dependencies } from '../../types/handler';
-import { PayloadType, PluginType } from '../structures/enums';
+import { PayloadType } from '../structures/enums';
 import type Wrapper from '../structures/wrapper';
 import { isDiscordEvent, isExternalEvent, isSernEvent } from '../utilities/predicates';
 import { errTap, processPlugins, resolvePlugins } from './observableHandling';
@@ -27,10 +26,10 @@ import { handleError } from '../contracts/errorHandling';
 export function processCommandPlugins<
     T extends DefinedCommandModule | DefinedEventModule,
 >(payload: {
-    mod: T;
+    module: T;
     absPath: string;
 }) {
-    return payload.mod.plugins.map(plug => ({
+    return payload.module.plugins.map(plug => ({
         type: plug.type,
         execute: plug.execute(payload),
     }));
@@ -45,37 +44,37 @@ export function processEvents({ containerConfig, events }: Wrapper) {
     ) as [EventEmitter, ErrorHandling, SernEmitter, Logging?];
     const lazy = (k: string) => containerConfig.get(k as keyof Dependencies)[0];
     const eventStream$ = eventObservable$(events!, sernEmitter);
-    const emitSuccess$ = (mod: AnyModule) =>
-        of({ type: PayloadType.Failure, module: mod, reason: SernError.PluginFailure }).pipe(
+    const emitSuccess$ = (module: AnyModule) =>
+        of({ type: PayloadType.Failure, module, reason: SernError.PluginFailure }).pipe(
             tap(it => sernEmitter.emit('module.register', it)),
         );
-    const emitFailure$ = (mod: AnyModule) =>
-        of({ type: PayloadType.Success, module: mod } as const).pipe(
+    const emitFailure$ = (module: AnyModule) =>
+        of({ type: PayloadType.Success, module } as const).pipe(
             tap(it => sernEmitter.emit('module.register', it)),
         );
     const eventCreation$ = eventStream$.pipe(
-        map(({ mod, absPath }) => ({
-            mod: {
-                name: nameOrFilename(mod.name, absPath),
-                ...mod,
+        map(({ module, absPath }) => ({
+            module: {
+                name: nameOrFilename(module.name, absPath),
+                ...module,
             } as DefinedEventModule,
             absPath,
         })),
         concatMap(processPlugins),
         concatMap(resolvePlugins),
         //Reduces pluginRes (generated from above) into a single boolean
-        concatMap(({ pluginRes, mod }) =>
+        concatMap(({ pluginRes, module }) =>
             from(pluginRes).pipe(
                 map(pl => pl.execute),
                 toArray(),
                 reducePlugins,
-                map(success => ({ success, mod })),
+                map(success => ({ success, module })),
             ),
         ),
-        concatMap(({ success, mod }) =>
-            iif(() => success, emitFailure$(mod), emitSuccess$(mod)).pipe(
+        concatMap(({ success, module }) =>
+            iif(() => success, emitFailure$(module), emitSuccess$(module)).pipe(
                 filter(res => res.type === PayloadType.Success),
-                map(() => mod),
+                map(() => module),
             ),
         ),
     );

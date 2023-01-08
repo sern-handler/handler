@@ -5,7 +5,7 @@ import type {
     BothCommand,
     ButtonCommand, ChannelSelectCommand,
     ContextMenuUser, MentionableSelectCommand, ModalSubmitCommand,
-    Module, RoleSelectCommand,
+    RoleSelectCommand,
     SlashCommand, StringSelectCommand,
     TextCommand, UserSelectCommand,
 } from '../../types/module';
@@ -100,5 +100,5 @@ export interface InitArgs<T extends AnyDefinedModule> {
     absPath: string;
 }
 
-export type CommandArgs<I extends CommandType, J extends PluginType> = CommandArgsMatrix[I][J]
+export type CommandArgs<I extends CommandType = CommandType, J extends PluginType = PluginType> = CommandArgsMatrix[I][J]
 export type EventArgs<I extends EventType, J extends PluginType> = EventArgsMatrix[I][J]
