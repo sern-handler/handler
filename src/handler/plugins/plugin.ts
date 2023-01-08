@@ -12,34 +12,27 @@
  */
 
 import type {  Awaitable } from 'discord.js';
-import type { Result, Ok, Err } from 'ts-results-es';
+import type { Result} from 'ts-results-es';
 import type { CommandType } from '../structures/enums';
 import type { CommandModuleDefs, EventModuleDefs } from '../../types/module';
 
 import type { EventType, PluginType } from '../structures/enums';
-import type { InitArgs } from './args';
-import type { AnyDefinedModule, DefinedCommandModule, DefinedEventModule } from '../../types/handler';
+import type { DefinedCommandModule, DefinedEventModule } from '../../types/handler';
 export type PluginResult = Awaitable<Result<void, void>>;
 
-export interface Controller {
-    next: () => Ok<void>;
-    stop: () => Err<void>;
-}
 export interface Plugin<Args extends any[] = any[]> {
-    name?: string;
-    /** @deprecated will be removed in the next update */
-    description?: string;
     type: PluginType;
     execute: (...args: Args) => any
 }
 
-export interface InitPlugin<T extends AnyDefinedModule = AnyDefinedModule> extends Plugin {
+export interface InitPlugin<Args extends any[] = any[]> extends Plugin {
     type: PluginType.Init;
-    execute: (args: InitArgs<T>) => PluginResult
+    execute: (...args: Args) => PluginResult
 }
 
-export interface ControlPlugin extends Plugin {
+export interface ControlPlugin<Args extends any[] = any[]> extends Plugin {
     type: PluginType.Control;
+    execute: (...args: Args) => PluginResult
 }
 
 export type CommandModuleNoPlugins = {
@@ -49,9 +42,8 @@ export type EventModulesNoPlugins = {
     [T in EventType]: Omit<EventModuleDefs[T], 'plugins' | 'onEvent'>;
 };
 
-export type AnyPlugin = ControlPlugin | InitPlugin;
-export type AnyCommandPlugin = ControlPlugin | InitPlugin<DefinedCommandModule>;
-export type AnyEventPlugin = ControlPlugin | InitPlugin<DefinedEventModule>;
+export type AnyCommandPlugin = ControlPlugin | InitPlugin<[DefinedCommandModule]>;
+export type AnyEventPlugin = ControlPlugin | InitPlugin<[DefinedEventModule]>;
 
 export type InputEvent = {
     [T in EventType]: EventModulesNoPlugins[T] & { plugins?: AnyEventPlugin[] };

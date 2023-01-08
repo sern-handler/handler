@@ -2,42 +2,36 @@ import { CommandType, EventType, PluginType } from '../structures/enums';
 import type { Plugin, PluginResult } from './plugin';
 import type { CommandArgs, EventArgs } from './args';
 
-export function Plugin<T extends PluginType>(
-    name: string,
+export function makePlugin<T extends PluginType>(
     type: T,
     execute: (...args: any[]) => any
-) : Plugin {
+): Plugin {
     return {
-        name,
         type,
         execute
     };
 }
 
-export function EventInit<I extends EventType>(
-    name: string,
+export function EventInitPlugin<I extends EventType>(
     execute: (...args: EventArgs<I, PluginType.Init>) => PluginResult
 ) {
-    return Plugin(name, PluginType.Init, execute);
+    return makePlugin(PluginType.Init, execute);
 }
 
-export function CommandInit<I extends CommandType>(
-    name: string,
+export function CommandInitPlugin<I extends CommandType>(
     execute: (...args: CommandArgs<I, PluginType.Init>) => PluginResult
 ) {
-    return Plugin(name, PluginType.Init, execute);
+    return makePlugin(PluginType.Init, execute);
 }
 
-export function ControlCommand<I extends CommandType>(
-    name: string,
+export function CommandControlPlugin<I extends CommandType>(
     execute: (...args: CommandArgs<I, PluginType.Control>) => PluginResult
-) {
-    return Plugin(name, PluginType.Control, execute);
+)  {
+    return makePlugin(PluginType.Control, execute);
 }
 
-export function ControlEvent<I extends EventType>(
-    name: string,
+export function EventControlPlugin<I extends EventType>(
     execute: (...args: EventArgs<I, PluginType.Control>) => PluginResult
 ) {
-    return Plugin(name, PluginType.Control, execute);
+    return makePlugin(PluginType.Control, execute);
 }

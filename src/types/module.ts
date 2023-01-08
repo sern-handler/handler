@@ -28,7 +28,7 @@ import type {
 import { CommandType } from '../handler/structures/enums';
 import type { Args, SlashOptions } from './handler';
 import type Context from '../handler/structures/context';
-import type { InitPlugin, ControlPlugin } from '../handler/plugins/plugin';
+import type { InitPlugin, ControlPlugin } from '../handler/plugins';
 import { EventType } from '../handler/structures/enums';
 import type { UserSelectMenuInteraction } from 'discord.js';
 
