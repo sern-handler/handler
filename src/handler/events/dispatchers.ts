@@ -26,7 +26,6 @@ import { concatMap, from, fromEvent, map, of } from 'rxjs';
 import type { CommandArgs, EventArgs } from '../plugins';
 import type { CommandType, EventType, PluginType } from '../structures/enums';
 import type { Message } from 'discord.js';
-
 export function dispatcher(
     module: Module,
     createArgs: () => unknown[],
@@ -34,8 +33,8 @@ export function dispatcher(
     const args = createArgs();
     return {
         module,
-        execute: () => module.execute(args),
-        controlResult: () => arrAsync(module.onEvent.map(plugs => plugs.execute(args))),
+        execute: () => module.execute(...args),
+        controlResult: () => arrAsync(module.onEvent.map(plugs => plugs.execute(...args))),
     };
 }
 

@@ -2,10 +2,10 @@ import { CommandType, EventType, PluginType } from '../structures/enums';
 import type { Plugin, PluginResult } from './plugin';
 import type { CommandArgs, EventArgs } from './args';
 
-export function makePlugin<T extends PluginType>(
-    type: T,
+export function makePlugin<V extends unknown[]>(
+    type: PluginType,
     execute: (...args: any[]) => any
-): Plugin {
+): Plugin<V> {
     return {
         type,
         execute

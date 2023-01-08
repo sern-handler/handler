@@ -84,6 +84,7 @@ export default class InteractionHandler extends EventsHandler<{
 
     protected processModules({ module, event }: { event: Interaction; module: CommandModule }) {
         return match(module)
+            .with({ type: CommandType.Text }, () => this.crashHandler.crash(Error(SernError.MismatchEvent)))
             .with({ type: P.union(CommandType.Slash, CommandType.Both) }, module => {
                 if(event.isAutocomplete()) {
                     /**
@@ -96,7 +97,6 @@ export default class InteractionHandler extends EventsHandler<{
                     return commandDispatcher(module, contextArgs(event));
                 }
             })
-            .with({ type: CommandType.Text }, () => this.crashHandler.crash(Error(SernError.MismatchEvent)))
             /**
              * Every other command module takes a one argument parameter, its corresponding interaction
              * this makes this usage safe
