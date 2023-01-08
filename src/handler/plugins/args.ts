@@ -1,6 +1,6 @@
 import type { CommandType } from '../structures/enums';
 import type { PluginType } from '../structures/enums';
-import type { ClientEvents, Message } from 'discord.js';
+import type { ClientEvents } from 'discord.js';
 import type {
     BothCommand,
     ButtonCommand, ChannelSelectCommand,
@@ -31,7 +31,7 @@ import type { DiscordEventCommand, ExternalEventCommand, SernEventCommand } from
 
 type CommandArgsMatrix = {
     [CommandType.Text]: {
-        [PluginType.Control] : /* library coupled */ [Message]
+        [PluginType.Control] :  [Context, ['text', string[]]]
         [PluginType.Init] : [InitArgs<Processed<TextCommand>>]
     };
     [CommandType.Slash]: {
@@ -39,7 +39,7 @@ type CommandArgsMatrix = {
         [PluginType.Init] : [InitArgs<Processed<SlashCommand>>]
     };
     [CommandType.Both]: {
-        [PluginType.Control] : [Context, ['slash'|'text', /* library coupled */ Args]]
+        [PluginType.Control] : [Context, Args]
         [PluginType.Init] : [InitArgs<Processed<BothCommand>>]
     };
     [CommandType.CtxMsg]: {
