@@ -16,6 +16,7 @@ import { reducePlugins } from '../utilities/functions';
 import { concatMap, fromEvent, map, Observable, of } from 'rxjs';
 import type { CommandArgs } from '../plugins';
 import type { CommandType, PluginType } from '../structures/enums';
+import { Err } from 'ts-results-es';
 
 export function dispatcher(
     module: Module,
@@ -46,10 +47,15 @@ export function eventDispatcher(
     source: unknown,
 ) {
     assert.ok(source instanceof EventEmitter, `${source} is not an EventEmitter`);
+    /**
+     * Sometimes fromEvent emits a single parameter, which is not an Array. This
+     * operator function flattens events into an array
+     * @param src
+     */
     const arrayifySource$ = (src: Observable<unknown>) => src.pipe(map(event => Array.isArray(event) ? event : [event]));
-    const promisifiedPlugins = (args: any[]) => module.onEvent.map(plugin => plugin.execute(...args));
     const createResult$ = (src: Observable<any[]>) => {
         if(module.onEvent.length > 0) {
+            const promisifiedPlugins = (args: any[]) => module.onEvent.map(plugin => plugin.execute(...args));
             return src.pipe(
                 concatMap(args => of(args)
                     .pipe(
@@ -66,7 +72,7 @@ export function eventDispatcher(
     };
     const execute$ = (src: Observable<{ success: boolean, args: any[] }>) => src.pipe(
         concatMap(({success, args}) =>
-            Promise.resolve(success ? module.execute(...args) : null)
+            Promise.resolve(success ? module.execute(...args) : Err.EMPTY)
         )
     );
     return fromEvent(source, module.name)
