@@ -4,10 +4,10 @@ import { SernError } from '../structures/errors';
 import { Result } from 'ts-results-es';
 import type { CommandType } from '../structures/enums';
 import { PayloadType } from '../structures/enums';
-import type { AnyModule, CommandModule, CommandModuleDefs, EventModule, Module } from '../../types/module';
+import type { AnyModule, CommandModule, CommandModuleDefs, Module } from '../../types/module';
 import { _const, isEmpty, nameOrFilename } from '../utilities/functions';
 import type SernEmitter from '../sernEmitter';
-import type { AnyDefinedModule, DefinedCommandModule, DefinedEventModule } from '../../types/handler';
+import type { AnyDefinedModule } from '../../types/handler';
 import { processCommandPlugins } from './userDefinedEventsHandling';
 import type { PluginResult } from '../plugins';
 

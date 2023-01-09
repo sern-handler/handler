@@ -1,6 +1,6 @@
-import { catchError, concatMap, filter, from, iif, map, of, tap, toArray } from 'rxjs';
+import { catchError, concatMap, filter, iif, map, of, tap } from 'rxjs';
 import { buildData } from '../utilities/readFile';
-import type { AnyDefinedModule, DefinedCommandModule, DefinedEventModule, Dependencies } from '../../types/handler';
+import type { AnyDefinedModule,  Dependencies } from '../../types/handler';
 import { EventType, PayloadType } from '../structures/enums';
 import type Wrapper from '../structures/wrapper';
 import { defineAllFields$, errTap, processPlugins, reduceResults$, resolveInitPlugins$ } from './observableHandling';
@@ -51,7 +51,7 @@ export function processEvents({ containerConfig, events }: Wrapper) {
             ),
         ),
     );
-    const intoDispatcher = (e: DefinedEventModule | DefinedCommandModule) => match(e)
+    const intoDispatcher = (e: AnyDefinedModule) => match(e)
         .with({ type: EventType.Sern }, m => eventDispatcher(m, sernEmitter))
         .with({ type: EventType.Discord }, m => eventDispatcher(m, client))
         .with({ type: EventType.External }, m => eventDispatcher(m, lazy(m.emitter)))
