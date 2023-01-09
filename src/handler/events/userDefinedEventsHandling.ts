@@ -1,31 +1,25 @@
 import { catchError, concatMap, filter, from, iif, map, of, tap, toArray } from 'rxjs';
 import { buildData } from '../utilities/readFile';
 import type { DefinedCommandModule, DefinedEventModule, Dependencies } from '../../types/handler';
-import { PayloadType } from '../structures/enums';
+import { EventType, PayloadType } from '../structures/enums';
 import type Wrapper from '../structures/wrapper';
-import { isDiscordEvent, isExternalEvent, isSernEvent } from '../utilities/predicates';
 import { errTap, processPlugins, resolvePlugins } from './observableHandling';
 import type { AnyModule, EventModule } from '../../types/module';
 import type { EventEmitter } from 'events';
 import type SernEmitter from '../sernEmitter';
 import { nameOrFilename, reducePlugins } from '../utilities/functions';
 import { match } from 'ts-pattern';
-import {
-    discordEventDispatcher,
-    externalEventDispatcher,
-    sernEmitterDispatcher,
-} from './dispatchers';
 import type { ErrorHandling, Logging } from '../contracts';
 import { SernError } from '../structures/errors';
+import { eventDispatcher } from './dispatchers';
 import { handleError } from '../contracts/errorHandling';
 
 /**
  * Utility function to process command plugins for all Modules
  * @param payload
  */
-export function processCommandPlugins<
-    T extends DefinedCommandModule | DefinedEventModule,
->(payload: {
+export function processCommandPlugins<T extends DefinedCommandModule | DefinedEventModule,
+    >(payload: {
     module: T;
     absPath: string;
 }) {
@@ -36,7 +30,7 @@ export function processCommandPlugins<
 }
 
 export function processEvents({ containerConfig, events }: Wrapper) {
-    const [client, error, sernEmitter, logging] = containerConfig.get(
+    const [client, errorHandling, sernEmitter, logging] = containerConfig.get(
         '@sern/client',
         '@sern/errors',
         '@sern/emitter',
@@ -78,34 +72,17 @@ export function processEvents({ containerConfig, events }: Wrapper) {
             ),
         ),
     );
-    eventCreation$.subscribe(e => {
-        const payload = match(e)
-            .when(isSernEvent, sernEmitterDispatcher(sernEmitter))
-            .when(isDiscordEvent, discordEventDispatcher(client))
-            .when(
-                isExternalEvent,
-                externalEventDispatcher(e => lazy(e.emitter)),
-            )
-            .otherwise(() => error.crash(Error(SernError.InvalidModuleType)));
-        payload.execute
-            .pipe(
-                concatMap(({ event, executeEvent }) =>
-                    executeEvent.pipe(
-                        tap(success => {
-                            if (success) {
-                                if (Array.isArray(event)) {
-                                    payload.cmd.execute(...event);
-                                } else {
-                                    payload.cmd.execute(event as never);
-                                }
-                            }
-                        }),
-                        catchError(handleError(error, logging)),
-                    ),
-                ),
-            )
-            .subscribe();
-    });
+    const intoDispatcher = (e: DefinedEventModule | DefinedCommandModule) => match(e)
+        .with({ type: EventType.Sern }, m => eventDispatcher(m, sernEmitter))
+        .with({ type: EventType.Discord }, m => eventDispatcher(m,  client))
+        .with({ type: EventType.External }, m => eventDispatcher(m, lazy(m.emitter)))
+        .otherwise(() => errorHandling.crash(Error(SernError.InvalidModuleType)));
+
+    eventCreation$.pipe(
+        map(intoDispatcher),
+        tap(dispatcher => dispatcher.subscribe()),
+        catchError(handleError(errorHandling, logging))
+    ).subscribe();
 }
 
 function eventObservable$(events: string, emitter: SernEmitter) {

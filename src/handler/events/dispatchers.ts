@@ -1,31 +1,22 @@
 import Context from '../structures/context';
-import type { Args, Payload } from '../../types/handler';
+import type { DefinedEventModule, SlashOptions } from '../../types/handler';
 import { arrAsync } from '../utilities/arrAsync';
-import { controller } from '../sern';
 import type {
     AutocompleteInteraction,
     ChatInputCommandInteraction,
-    ClientEvents,
     Interaction,
+    Message,
 } from 'discord.js';
 import { SernError } from '../structures/errors';
 import treeSearch from '../utilities/treeSearch';
-import type {
-    BothCommand,
-    CommandModule,
-    EventModule,
-    Module,
-    SlashCommand,
-} from '../../types/module';
-import type SernEmitter from '../sernEmitter';
+import type { BothCommand, CommandModule, Module, SlashCommand } from '../../types/module';
 import { EventEmitter } from 'events';
-import type { DiscordEventCommand, ExternalEventCommand, SernEventCommand } from '../structures/events';
 import * as assert from 'assert';
 import { reducePlugins } from '../utilities/functions';
-import { concatMap, from, fromEvent, map, of } from 'rxjs';
-import type { CommandArgs, EventArgs } from '../plugins';
-import type { CommandType, EventType, PluginType } from '../structures/enums';
-import type { Message } from 'discord.js';
+import { concatMap, fromEvent, map, Observable, of } from 'rxjs';
+import type { CommandArgs } from '../plugins';
+import type { CommandType, PluginType } from '../structures/enums';
+
 export function dispatcher(
     module: Module,
     createArgs: () => unknown[],
@@ -45,21 +36,57 @@ export function commandDispatcher<V extends CommandType>(
     return dispatcher(module, createArgs);
 }
 
-function eventDispatcher<V extends EventType>(
-    module: EventModule,
-    createArgs: () => EventArgs<V, PluginType.Control>,
+/**
+ * Creates an observable from { source }
+ * @param module
+ * @param source
+ */
+export function eventDispatcher(
+    module: DefinedEventModule,
+    source: unknown,
 ) {
-    return dispatcher(module, createArgs);
+    assert.ok(source instanceof EventEmitter, `${source} is not an EventEmitter`);
+    const arrayifySource$ = (src: Observable<unknown>) => src.pipe(map(event => Array.isArray(event) ? event : [event]));
+    const promisifiedPlugins = (args: any[]) => module.onEvent.map(plugin => plugin.execute(...args));
+    const createResult$ = (src: Observable<any[]>) => {
+        if(module.onEvent.length > 0) {
+            return src.pipe(
+                concatMap(args => of(args)
+                    .pipe(
+                        //Awaits all the plugins and executes them,
+                        concatMap(args => Promise.all(promisifiedPlugins(args))),
+                        reducePlugins,
+                        map(success => ({ success, args }))
+                    )
+                ),
+            );
+        } else {
+            return src.pipe(map(args => ({ success: true, args })));
+        }
+    };
+    const execute$ = (src: Observable<{ success: boolean, args: any[] }>) => src.pipe(
+        concatMap(({success, args}) =>
+            Promise.resolve(success ? module.execute(...args) : null)
+        )
+    );
+    return fromEvent(source, module.name)
+        .pipe(
+            arrayifySource$,
+            createResult$,
+            execute$
+        );
 }
 
 export function contextArgs(i: Interaction | Message) {
     const ctx = Context.wrap(i as ChatInputCommandInteraction | Message);
     const args = ['slash', ctx.interaction.options];
-    return () => [ctx, args] as [Context, ['slash', Args]];
+    return () => [ctx, args] as [Context, ['slash', SlashOptions]];
 }
-export function interactionArg<T extends Interaction>(interaction : T) {
+
+export function interactionArg<T extends Interaction>(interaction: T) {
     return () => [interaction] as [T];
 }
+
 export function dispatchAutocomplete(module: BothCommand | SlashCommand, interaction: AutocompleteInteraction) {
     const option = treeSearch(interaction, module.options);
     if (option !== undefined) {
@@ -72,77 +99,4 @@ export function dispatchAutocomplete(module: BothCommand | SlashCommand, interac
     throw Error(
         SernError.NotSupportedInteraction + ` There is no autocomplete tag for this option`,
     );
-}
-
-export function sernEmitterDispatcher(e: SernEmitter) {
-    return (cmd: SernEventCommand & { name: string }) => ({
-        source: e,
-        cmd,
-        execute: fromEvent(e, cmd.name).pipe(
-            map(event => ({
-                event,
-                executeEvent: of(event).pipe(
-                    concatMap(event =>
-                        reducePlugins(
-                            from(
-                                arrAsync(
-                                    cmd.onEvent.map(plug => plug.execute(event as Payload)),
-                                ),
-                            ),
-                        ),
-                    ),
-                ),
-            })),
-        ),
-    });
-}
-
-export function discordEventDispatcher(e: EventEmitter) {
-    return (cmd: DiscordEventCommand & { name: string }) => ({
-        source: e,
-        cmd,
-        execute: fromEvent(e, cmd.name).pipe(
-            map(event => ({
-                event,
-                executeEvent: of(event).pipe(
-                    concatMap(event =>
-                        reducePlugins(
-                            from(
-                                arrAsync(
-                                    cmd.onEvent.map(plug => plug.execute(...event as ClientEvents[keyof ClientEvents])),
-                                ),
-                            ),
-                        ),
-                    ),
-                ),
-            })),
-        ),
-    });
-}
-
-export function externalEventDispatcher(e: (e: ExternalEventCommand) => unknown) {
-    return (cmd: ExternalEventCommand & { name: string }) => {
-        const external = e(cmd);
-        assert.ok(external instanceof EventEmitter, `${e} is not an EventEmitter`);
-        return {
-            source: external,
-            cmd,
-            execute: fromEvent(external, cmd.name).pipe(
-                map(event => ({
-                    event,
-                    executeEvent: of(event).pipe(
-                        concatMap(event =>
-                            reducePlugins(
-                                from(
-                                    arrAsync(
-                                        cmd.onEvent.map(plug => plug.execute(event, controller)),
-                                    ),
-                                ),
-                            ),
-                        ),
-                    ),
-                })),
-            ),
-        };
-    };
 }

@@ -142,8 +142,8 @@ export function resolvePlugins({
     );
 }
 
-export function processPlugins(payload: {
-    module: DefinedCommandModule | DefinedEventModule;
+export function processPlugins<T extends DefinedCommandModule | DefinedEventModule>(payload: {
+    module: T;
     absPath: string;
 }) {
     const cmdPluginRes = processCommandPlugins(payload);

@@ -42,6 +42,11 @@ export function partition<T, V>(arr: (T & V)[], condition: (e: T & V) => boolean
     return [t, v];
 }
 
+/**
+ * Reduces a stream of results into a single boolean value
+ * possible refactor in future to lazily check?
+ * @param src
+ */
 export function reducePlugins(src: Observable<Result<void, void>[]>): Observable<boolean> {
     return src.pipe(switchMap(s => of(s.every(a => a.ok))));
 }
