@@ -3,7 +3,7 @@ import { buildData } from '../utilities/readFile';
 import type { DefinedCommandModule, DefinedEventModule, Dependencies } from '../../types/handler';
 import { EventType, PayloadType } from '../structures/enums';
 import type Wrapper from '../structures/wrapper';
-import { errTap, processPlugins, resolvePlugins } from './observableHandling';
+import { defineAllFields$, errTap, processPlugins, resolvePlugins } from './observableHandling';
 import type { AnyModule, EventModule } from '../../types/module';
 import type { EventEmitter } from 'events';
 import type SernEmitter from '../sernEmitter';
@@ -47,13 +47,7 @@ export function processEvents({ containerConfig, events }: Wrapper) {
             tap(it => sernEmitter.emit('module.register', it)),
         );
     const eventCreation$ = eventStream$.pipe(
-        map(({ module, absPath }) => ({
-            module: {
-                name: nameOrFilename(module.name, absPath),
-                ...module,
-            } as DefinedEventModule,
-            absPath,
-        })),
+        defineAllFields$,
         concatMap(processPlugins),
         concatMap(resolvePlugins),
         //Reduces pluginRes (generated from above) into a single boolean
@@ -74,14 +68,14 @@ export function processEvents({ containerConfig, events }: Wrapper) {
     );
     const intoDispatcher = (e: DefinedEventModule | DefinedCommandModule) => match(e)
         .with({ type: EventType.Sern }, m => eventDispatcher(m, sernEmitter))
-        .with({ type: EventType.Discord }, m => eventDispatcher(m,  client))
+        .with({ type: EventType.Discord }, m => eventDispatcher(m, client))
         .with({ type: EventType.External }, m => eventDispatcher(m, lazy(m.emitter)))
         .otherwise(() => errorHandling.crash(Error(SernError.InvalidModuleType)));
 
     eventCreation$.pipe(
         map(intoDispatcher),
         tap(dispatcher => dispatcher.subscribe()),
-        catchError(handleError(errorHandling, logging))
+        catchError(handleError(errorHandling, logging)),
     ).subscribe();
 }
 

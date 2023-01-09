@@ -1,4 +1,4 @@
-import type { SernEventsMapping } from '../../types/handler';
+import type { Payload, SernEventsMapping } from '../../types/handler';
 import type {
     ControlPlugin,
     InitPlugin,
@@ -13,7 +13,7 @@ export interface SernEventCommand<T extends keyof SernEventsMapping = keyof Sern
     type: EventType.Sern;
     onEvent: ControlPlugin[];
     plugins: InitPlugin[];
-    execute(...args: SernEventsMapping[T]): Awaitable<unknown>;
+    execute(args: Payload): Awaitable<unknown>;
 }
 
 export interface DiscordEventCommand<T extends keyof ClientEvents = keyof ClientEvents>
@@ -22,7 +22,7 @@ export interface DiscordEventCommand<T extends keyof ClientEvents = keyof Client
     type: EventType.Discord;
     onEvent: ControlPlugin[];
     plugins: InitPlugin[];
-    execute(...args: ClientEvents[T]): Awaitable<unknown>;
+    execute(args: ClientEvents[T]): Awaitable<unknown>;
 }
 
 export interface ExternalEventCommand extends Module {
@@ -31,5 +31,5 @@ export interface ExternalEventCommand extends Module {
     type: EventType.External;
     onEvent: ControlPlugin[];
     plugins: InitPlugin[];
-    execute(...args: unknown[]): Awaitable<unknown>;
+    execute(args: unknown[]): Awaitable<unknown>;
 }

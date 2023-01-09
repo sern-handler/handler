@@ -32,7 +32,7 @@ export default class MessageHandler extends EventsHandler<{
                     //resolves the promise and re-emits it back into source
                     return from(controlResult).pipe(map(res => ({ module, execute, res })));
                 }),
-                concatMap(payload => executeModule(wrapper, payload)),
+                concatMap(payload => executeModule(this.emitter, payload)),
                 catchError(handleError(this.crashHandler, this.logger)),
             )
             .subscribe();

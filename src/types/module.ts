@@ -38,7 +38,7 @@ export interface Module {
     onEvent: ControlPlugin[];
     plugins: InitPlugin[];
     description?: string;
-    execute: (...args: any[]) => Awaitable<any>;
+    execute: (...args: any[]) => Awaitable<unknown>;
 }
 
 export interface TextCommand extends Module {
@@ -49,6 +49,7 @@ export interface TextCommand extends Module {
 
 export interface SlashCommand extends Module {
     type: CommandType.Slash;
+    description: string,
     options?: SernOptionsData[];
     execute: (ctx: Context, args: ['slash', SlashOptions]) => Awaitable<unknown>;
 }
@@ -56,6 +57,7 @@ export interface SlashCommand extends Module {
 export interface BothCommand extends Module {
     type: CommandType.Both;
     alias?: string[];
+    description: string,
     options?: SernOptionsData[];
     execute: (ctx: Context, args: Args) => Awaitable<unknown>;
 }

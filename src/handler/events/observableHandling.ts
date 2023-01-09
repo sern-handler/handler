@@ -5,10 +5,10 @@ import { Result } from 'ts-results-es';
 import type { CommandType } from '../structures/enums';
 import type Wrapper from '../structures/wrapper';
 import { PayloadType, PluginType } from '../structures/enums';
-import type { CommandModule, CommandModuleDefs, AnyModule, Module } from '../../types/module';
-import { _const } from '../utilities/functions';
+import type { CommandModule, CommandModuleDefs, AnyModule, Module, EventModule } from '../../types/module';
+import { _const, nameOrFilename } from '../utilities/functions';
 import type SernEmitter from '../sernEmitter';
-import type { DefinedCommandModule, DefinedEventModule } from '../../types/handler';
+import type { AnyDefinedModule, DefinedCommandModule, DefinedEventModule, Processed } from '../../types/handler';
 import type { Awaitable } from 'discord.js';
 import { processCommandPlugins } from './userDefinedEventsHandling';
 
@@ -76,14 +76,13 @@ export function isOneOfCorrectModules<T extends readonly CommandType[]>(...input
 }
 
 export function executeModule(
-    wrapper: Wrapper,
+    emitter: SernEmitter,
     payload: {
         module: Module;
         execute: () => unknown;
         res: Result<void, void>[];
     },
 ) {
-    const emitter = wrapper.containerConfig.get('@sern/emitter')[0] as SernEmitter;
     if (payload.res.every(el => el.ok)) {
         const executeFn = Result.wrapAsync<unknown, Error | string>(() =>
             Promise.resolve(payload.execute()),
@@ -148,4 +147,24 @@ export function processPlugins<T extends DefinedCommandModule | DefinedEventModu
 }) {
     const cmdPluginRes = processCommandPlugins(payload);
     return of({ module: payload.module, cmdPluginRes });
+}
+
+/**
+ * fills the defaults for modules
+ * signature : Observable<{ absPath: string; module: CommandModule | EventModule }> -> Observable<{ absPath: string; module: Processed<CommandModule | EventModule> }>
+ */
+export function defineAllFields$<T extends CommandModule | EventModule>(
+    src: Observable<{ absPath: string; module: T }>
+) {
+    const fillFields = ({ absPath, module }: { absPath: string; module: T }) => ({
+        absPath,
+        module : {
+            name : nameOrFilename(module.name, absPath),
+            description: module.description ?? '...',
+            ...module
+        }
+    });
+    return src.pipe(
+        map(fillFields)
+    );
 }

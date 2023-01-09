@@ -2,7 +2,7 @@ import { EventsHandler } from './eventsHandler';
 import type Wrapper from '../structures/wrapper';
 import { concatMap, fromEvent, Observable, map, take } from 'rxjs';
 import * as Files from '../utilities/readFile';
-import { errTap, processPlugins, resolvePlugins } from './observableHandling';
+import { defineAllFields$, errTap, processPlugins, resolvePlugins } from './observableHandling';
 import { CommandType, PayloadType } from '../structures/enums';
 import { SernError } from '../structures/errors';
 import { match } from 'ts-pattern';
@@ -12,7 +12,7 @@ import type { CommandModule } from '../../types/module';
 import type { DefinedCommandModule, DefinedEventModule } from '../../types/handler';
 import type { ModuleManager } from '../contracts';
 import type { ModuleStore } from '../structures/moduleStore';
-import { _const, err, nameOrFilename, ok } from '../utilities/functions';
+import { _const, err, ok } from '../utilities/functions';
 
 export default class ReadyHandler extends EventsHandler<{
     module: DefinedCommandModule;
@@ -58,22 +58,11 @@ export default class ReadyHandler extends EventsHandler<{
                 }
             });
     }
-    private static intoDefinedModule({ absPath, module }: { absPath: string; module: CommandModule }): {
-        absPath: string;
-        module: DefinedCommandModule;
-    } {
-        return {
-            absPath,
-            module: {
-                name: nameOrFilename(module.name, absPath),
-                description: module?.description ?? '...',
-                ...module,
-            },
-        };
-    }
 
     protected init() {
-        this.discordEvent.pipe(map(ReadyHandler.intoDefinedModule)).subscribe({
+        this.discordEvent.pipe(
+            defineAllFields$
+        ).subscribe({
             next: value => this.setState(value),
             complete: () => this.payloadSubject.unsubscribe(),
         });
@@ -92,7 +81,7 @@ function registerModule(
         const set = Result.wrap(_const(manager.set(cb)));
         return set.ok ? ok() : err();
     };
-    return match<DefinedCommandModule | DefinedEventModule>(mod)
+    return match(mod)
         .with({ type: CommandType.Text }, mod => {
             mod.alias?.forEach(a => insert(ms => ms.TextCommands.set(a, mod)));
             return insert(ms => ms.TextCommands.set(name, mod));

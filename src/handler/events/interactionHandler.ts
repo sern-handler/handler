@@ -29,11 +29,10 @@ export default class InteractionHandler extends EventsHandler<{
         this.payloadSubject
             .pipe(
                 map(this.processModules),
-                concatMap(
-                    ({ module, execute, controlResult }) =>
+                concatMap(({ module, execute, controlResult }) =>
                         from(controlResult()).pipe(map(res => ({ module, res, execute }))), //resolve all the Results from event plugins
                 ),
-                concatMap(payload => executeModule(wrapper, payload)),
+                concatMap(payload => executeModule(this.emitter, payload)),
                 catchError(handleError(this.crashHandler, this.logger)),
             )
             .subscribe();
@@ -85,6 +84,7 @@ export default class InteractionHandler extends EventsHandler<{
     protected processModules({ module, event }: { event: Interaction; module: CommandModule }) {
         return match(module)
             .with({ type: CommandType.Text }, () => this.crashHandler.crash(Error(SernError.MismatchEvent)))
+            //P.union = either CommandType.Slash or CommandType.Both
             .with({ type: P.union(CommandType.Slash, CommandType.Both) }, module => {
                 if(event.isAutocomplete()) {
                     /**
