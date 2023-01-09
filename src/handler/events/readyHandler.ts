@@ -2,7 +2,7 @@ import { EventsHandler } from './eventsHandler';
 import type Wrapper from '../structures/wrapper';
 import { concatMap, fromEvent, Observable, map, take } from 'rxjs';
 import * as Files from '../utilities/readFile';
-import { defineAllFields$, errTap, processPlugins, resolvePlugins } from './observableHandling';
+import { defineAllFields$, errTap, processPlugins, resolveInitPlugins$ } from './observableHandling';
 import { CommandType, PayloadType } from '../structures/enums';
 import { SernError } from '../structures/errors';
 import { match } from 'ts-pattern';
@@ -37,22 +37,21 @@ export default class ReadyHandler extends EventsHandler<{
         );
         this.init();
         this.payloadSubject
-            .pipe(concatMap(processPlugins), concatMap(resolvePlugins))
-            .subscribe(payload => {
-                const allPluginsSuccessful = payload.pluginRes.every(({ execute }) => execute.ok);
-                if (allPluginsSuccessful) {
-                    const res = registerModule(this.modules, payload.module);
+            .pipe(concatMap(processPlugins), resolveInitPlugins$)
+            .subscribe(({success, module }) => {
+                if (success) {
+                    const res = registerModule(this.modules, module);
                     if (res.err) {
                         this.crashHandler.crash(Error(SernError.InvalidModuleType));
                     }
                     this.emitter.emit('module.register', {
                         type: PayloadType.Success,
-                        module: payload.module,
+                        module
                     });
                 } else {
                     this.emitter.emit('module.register', {
                         type: PayloadType.Failure,
-                        module: payload.module,
+                        module,
                         reason: SernError.PluginFailure,
                     });
                 }

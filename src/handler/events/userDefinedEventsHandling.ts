@@ -1,13 +1,12 @@
 import { catchError, concatMap, filter, from, iif, map, of, tap, toArray } from 'rxjs';
 import { buildData } from '../utilities/readFile';
-import type { DefinedCommandModule, DefinedEventModule, Dependencies } from '../../types/handler';
+import type { AnyDefinedModule, DefinedCommandModule, DefinedEventModule, Dependencies } from '../../types/handler';
 import { EventType, PayloadType } from '../structures/enums';
 import type Wrapper from '../structures/wrapper';
-import { defineAllFields$, errTap, processPlugins, resolvePlugins } from './observableHandling';
+import { defineAllFields$, errTap, processPlugins, reduceResults$, resolveInitPlugins$ } from './observableHandling';
 import type { AnyModule, EventModule } from '../../types/module';
 import type { EventEmitter } from 'events';
 import type SernEmitter from '../sernEmitter';
-import { nameOrFilename, reducePlugins } from '../utilities/functions';
 import { match } from 'ts-pattern';
 import type { ErrorHandling, Logging } from '../contracts';
 import { SernError } from '../structures/errors';
@@ -18,15 +17,10 @@ import { handleError } from '../contracts/errorHandling';
  * Utility function to process command plugins for all Modules
  * @param payload
  */
-export function processCommandPlugins<T extends DefinedCommandModule | DefinedEventModule,
-    >(payload: {
-    module: T;
-    absPath: string;
-}) {
-    return payload.module.plugins.map(plug => ({
-        type: plug.type,
-        execute: plug.execute(payload),
-    }));
+export function processCommandPlugins<T extends AnyDefinedModule>(
+    payload: { module: T; absPath: string; }
+) {
+    return payload.module.plugins.map(plug => plug.execute(payload));
 }
 
 export function processEvents({ containerConfig, events }: Wrapper) {
@@ -49,16 +43,7 @@ export function processEvents({ containerConfig, events }: Wrapper) {
     const eventCreation$ = eventStream$.pipe(
         defineAllFields$,
         concatMap(processPlugins),
-        concatMap(resolvePlugins),
-        //Reduces pluginRes (generated from above) into a single boolean
-        concatMap(({ pluginRes, module }) =>
-            from(pluginRes).pipe(
-                map(pl => pl.execute),
-                toArray(),
-                reducePlugins,
-                map(success => ({ success, module })),
-            ),
-        ),
+        resolveInitPlugins$,
         concatMap(({ success, module }) =>
             iif(() => success, emitFailure$(module), emitSuccess$(module)).pipe(
                 filter(res => res.type === PayloadType.Success),

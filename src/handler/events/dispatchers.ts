@@ -12,11 +12,12 @@ import treeSearch from '../utilities/treeSearch';
 import type { BothCommand, CommandModule, Module, SlashCommand } from '../../types/module';
 import { EventEmitter } from 'events';
 import * as assert from 'assert';
-import { reducePlugins } from '../utilities/functions';
+import { reduceResults$ } from './observableHandling';
 import { concatMap, fromEvent, map, Observable, of } from 'rxjs';
 import type { CommandArgs } from '../plugins';
 import type { CommandType, PluginType } from '../structures/enums';
 import { Err } from 'ts-results-es';
+import { isEmpty } from '../utilities/functions';
 
 export function dispatcher(
     module: Module,
@@ -54,14 +55,14 @@ export function eventDispatcher(
      */
     const arrayifySource$ = (src: Observable<unknown>) => src.pipe(map(event => Array.isArray(event) ? event : [event]));
     const createResult$ = (src: Observable<any[]>) => {
-        if(module.onEvent.length > 0) {
+        if(isEmpty(module.onEvent)) {
             const promisifiedPlugins = (args: any[]) => module.onEvent.map(plugin => plugin.execute(...args));
             return src.pipe(
                 concatMap(args => of(args)
                     .pipe(
                         //Awaits all the plugins and executes them,
                         concatMap(args => Promise.all(promisifiedPlugins(args))),
-                        reducePlugins,
+                        reduceResults$,
                         map(success => ({ success, args }))
                     )
                 ),

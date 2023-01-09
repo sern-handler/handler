@@ -1,16 +1,15 @@
 import type { Message } from 'discord.js';
-import { concatMap, from, map, Observable, of, switchMap, tap, throwError, toArray } from 'rxjs';
+import { concatMap, from, map, Observable, of, switchMap, tap, throwError } from 'rxjs';
 import { SernError } from '../structures/errors';
 import { Result } from 'ts-results-es';
 import type { CommandType } from '../structures/enums';
-import type Wrapper from '../structures/wrapper';
-import { PayloadType, PluginType } from '../structures/enums';
-import type { CommandModule, CommandModuleDefs, AnyModule, Module, EventModule } from '../../types/module';
-import { _const, nameOrFilename } from '../utilities/functions';
+import { PayloadType } from '../structures/enums';
+import type { AnyModule, CommandModule, CommandModuleDefs, EventModule, Module } from '../../types/module';
+import { _const, isEmpty, nameOrFilename } from '../utilities/functions';
 import type SernEmitter from '../sernEmitter';
-import type { AnyDefinedModule, DefinedCommandModule, DefinedEventModule, Processed } from '../../types/handler';
-import type { Awaitable } from 'discord.js';
+import type { AnyDefinedModule, DefinedCommandModule, DefinedEventModule } from '../../types/handler';
 import { processCommandPlugins } from './userDefinedEventsHandling';
+import type { PluginResult } from '../plugins';
 
 export function ignoreNonBot(prefix: string) {
     return (src: Observable<Message>) =>
@@ -116,55 +115,60 @@ export function executeModule(
     }
 }
 
-export function resolvePlugins({
-    module,
-    cmdPluginRes,
-}: {
-    module: DefinedCommandModule | DefinedEventModule;
-    cmdPluginRes: {
-        execute: Awaitable<Result<void, void>>;
-        type: PluginType.Init;
-    }[];
-}) {
-    if (module.plugins.length === 0) {
-        return of({ module, pluginRes: [] });
-    }
-    // modules with no event plugins are ignored in the previous
-    return from(cmdPluginRes).pipe(
-        switchMap(pl =>
-            from(pl.execute).pipe(
-                map(execute => ({ ...pl, execute })),
-                toArray(),
-            ),
-        ),
-        map(pluginRes => ({ module, pluginRes })),
+/**
+ * Plugins are successful if all results are ok.
+ * Reduces initResult into a single boolean
+ * @param src
+ */
+export function resolveInitPlugins$<T extends AnyDefinedModule>(
+    src: Observable<{ module: T, initResult: PluginResult[], }>,
+) {
+    return src.pipe(
+        concatMap(({ module, initResult }) => {
+            if (isEmpty(initResult))
+                return of({ module, success: true });
+            else
+                return from(Promise.all(initResult)).pipe(
+                    reduceResults$,
+                    map(success => ({ module, success })),
+                );
+        }),
     );
 }
 
-export function processPlugins<T extends DefinedCommandModule | DefinedEventModule>(payload: {
+export function processPlugins<T extends AnyDefinedModule>(payload: {
     module: T;
     absPath: string;
 }) {
-    const cmdPluginRes = processCommandPlugins(payload);
-    return of({ module: payload.module, cmdPluginRes });
+    const initResult = processCommandPlugins(payload);
+    return of({ module: payload.module, initResult });
 }
 
 /**
  * fills the defaults for modules
  * signature : Observable<{ absPath: string; module: CommandModule | EventModule }> -> Observable<{ absPath: string; module: Processed<CommandModule | EventModule> }>
  */
-export function defineAllFields$<T extends CommandModule | EventModule>(
-    src: Observable<{ absPath: string; module: T }>
+export function defineAllFields$<T extends AnyModule>(
+    src: Observable<{ absPath: string; module: T }>,
 ) {
     const fillFields = ({ absPath, module }: { absPath: string; module: T }) => ({
         absPath,
-        module : {
-            name : nameOrFilename(module.name, absPath),
+        module: {
+            name: nameOrFilename(module.name, absPath),
             description: module.description ?? '...',
-            ...module
-        }
+            ...module,
+        },
     });
     return src.pipe(
-        map(fillFields)
+        map(fillFields),
     );
+}
+
+/**
+ * Reduces a stream of results into a single boolean value
+ * possible refactor in future to lazily check?
+ * @param src
+ */
+export function reduceResults$(src: Observable<Result<void, void>[]>): Observable<boolean> {
+    return src.pipe(switchMap(s => of(s.every(a => a.ok))));
 }
