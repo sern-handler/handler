@@ -1,9 +1,9 @@
 import { EventsHandler } from './eventsHandler';
 import type Wrapper from '../structures/wrapper';
-import { concatMap, fromEvent, Observable, map, take } from 'rxjs';
+import { concatMap, fromEvent, type Observable, take } from 'rxjs';
 import * as Files from '../utilities/readFile';
-import { defineAllFields$, errTap, processPlugins, resolveInitPlugins$ } from './observableHandling';
-import { CommandType, PayloadType } from '../structures/enums';
+import { errTap, scanModule } from './observableHandling';
+import { CommandType } from '../structures/enums';
 import { SernError } from '../structures/errors';
 import { match } from 'ts-pattern';
 import { Result } from 'ts-results-es';
@@ -13,6 +13,8 @@ import type { DefinedCommandModule, DefinedEventModule } from '../../types/handl
 import type { ModuleManager } from '../contracts';
 import type { ModuleStore } from '../structures/moduleStore';
 import { _const, err, ok } from '../utilities/functions';
+import { defineAllFields$ } from './operators';
+import SernEmitter from '../sernEmitter';
 
 export default class ReadyHandler extends EventsHandler<{
     module: DefinedCommandModule;
@@ -25,42 +27,36 @@ export default class ReadyHandler extends EventsHandler<{
         this.discordEvent = ready$.pipe(
             concatMap(() =>
                 Files.buildData<CommandModule>(wrapper.commands).pipe(
-                    errTap(reason =>
-                        this.emitter.emit('module.register', {
-                            type: PayloadType.Failure,
-                            module: undefined,
-                            reason,
-                        }),
-                    ),
-                ),
+                    errTap(reason => {
+                      this.emitter.emit('module.register', SernEmitter.failure(undefined, reason));
+                    }))
             ),
         );
         this.init();
         this.payloadSubject
-            .pipe(concatMap(processPlugins), resolveInitPlugins$)
-            .subscribe(({success, module }) => {
-                if (success) {
-                    const res = registerModule(this.modules, module);
-                    if (res.err) {
-                        this.crashHandler.crash(Error(SernError.InvalidModuleType));
+            .pipe(
+                concatMap(
+                    scanModule({
+                    onFailure: module => {
+                        this.emitter.emit('module.register', SernEmitter.failure(module, SernError.PluginFailure));
+                    },
+                    onSuccess: ( {module} ) => {
+                        this.emitter.emit('module.register', SernEmitter.success(module));
+                        return module;
                     }
-                    this.emitter.emit('module.register', {
-                        type: PayloadType.Success,
-                        module
-                    });
-                } else {
-                    this.emitter.emit('module.register', {
-                        type: PayloadType.Failure,
-                        module,
-                        reason: SernError.PluginFailure,
-                    });
+                })),
+            )
+            .subscribe(module => {
+                const res = registerModule(this.modules, module);
+                if (res.err) {
+                    this.crashHandler.crash(Error(SernError.InvalidModuleType));
                 }
             });
     }
 
     protected init() {
         this.discordEvent.pipe(
-            defineAllFields$
+            defineAllFields$,
         ).subscribe({
             next: value => this.setState(value),
             complete: () => this.payloadSubject.unsubscribe(),

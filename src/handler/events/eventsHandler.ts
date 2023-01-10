@@ -4,6 +4,9 @@ import type { EventEmitter } from 'events';
 import type SernEmitter from '../sernEmitter';
 import type { ErrorHandling, Logging, ModuleManager } from '../contracts';
 
+/**
+ * why did i make this, definitely going to be changed in the future
+ */
 export abstract class EventsHandler<T> {
     protected payloadSubject = new Subject<T>();
     protected abstract discordEvent: Observable<unknown>;

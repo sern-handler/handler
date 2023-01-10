@@ -1,20 +1,19 @@
 import type { Interaction } from 'discord.js';
-import { catchError, concatMap, from, fromEvent, map, Observable } from 'rxjs';
+import { catchError, concatMap, fromEvent, map, Observable } from 'rxjs';
 import type Wrapper from '../structures/wrapper';
 import { EventsHandler } from './eventsHandler';
 import { SernError } from '../structures/errors';
-import { CommandType, PayloadType } from '../structures/enums';
+import { CommandType } from '../structures/enums';
 import { match, P } from 'ts-pattern';
 import {
-    interactionArg,
-    contextArgs,
-    commandDispatcher,
-    dispatchAutocomplete, dispatcher,
+    contextArgs, interactionArg,
+    dispatchAutocomplete, dispatchCommand,
 } from './dispatchers';
-import { executeModule } from './observableHandling';
+import { executeModule, makeModuleExecutor } from './observableHandling';
 import type { CommandModule } from '../../types/module';
 import { handleError } from '../contracts/errorHandling';
 import type { ModuleStore } from '../structures/moduleStore';
+import SernEmitter from '../sernEmitter';
 
 export default class InteractionHandler extends EventsHandler<{
     event: Interaction;
@@ -28,10 +27,12 @@ export default class InteractionHandler extends EventsHandler<{
 
         this.payloadSubject
             .pipe(
-                map(this.processModules),
-                concatMap(({ module, execute, controlResult }) =>
-                        from(controlResult()).pipe(map(res => ({ module, res, execute }))), //resolve all the Results from event plugins
-                ),
+                map(this.createDispatcher),
+                concatMap(
+                    makeModuleExecutor(module => {
+                        this.emitter.emit('module.activate', SernEmitter.failure(module, SernError.PluginFailure));
+                    }
+                )),
                 concatMap(payload => executeModule(this.emitter, payload)),
                 catchError(handleError(this.crashHandler, this.logger)),
             )
@@ -42,6 +43,11 @@ export default class InteractionHandler extends EventsHandler<{
         const get = (cb: (ms: ModuleStore) => CommandModule | undefined) => {
             return this.modules.get(cb);
         };
+        /**
+         * Module retrieval:
+         * ModuleStores are mapped by Discord API values and modules mapped
+         * by customId or command name.
+         */
         this.discordEvent.subscribe({
             next: event => {
                 if (event.isMessageComponent()) {
@@ -50,10 +56,14 @@ export default class InteractionHandler extends EventsHandler<{
                     );
                     this.setState({ event, module });
                 } else if (event.isCommand() || event.isAutocomplete()) {
-                    const module = get(
-                        ms =>
-                            ms.ApplicationCommands[event.commandType].get(event.commandName) ??
-                            ms.BothCommands.get(event.commandName),
+                    const module = get(ms =>
+                        /**
+                         * try to fetch from ApplicationCommands, if nothing, try BothCommands
+                         * map. If nothing again,this means a slash command
+                         * exists on the API but not sern
+                         */
+                        ms.ApplicationCommands[event.commandType].get(event.commandName) ??
+                        ms.BothCommands.get(event.commandName),
                     );
                     this.setState({ event, module });
                 } else if (event.isModalSubmit()) {
@@ -64,24 +74,21 @@ export default class InteractionHandler extends EventsHandler<{
                 }
             },
             error: reason => {
-                this.emitter.emit('error', { type: PayloadType.Failure, reason });
+                this.emitter.emit('error', SernEmitter.failure(undefined, reason));
             },
         });
     }
 
     protected setState(state: { event: Interaction; module: CommandModule | undefined }): void {
         if (state.module === undefined) {
-            this.emitter.emit('warning', {
-                type: PayloadType.Warning,
-                reason: 'Found no module for this interaction',
-            });
+            this.emitter.emit('warning', SernEmitter.warning('Found no module for this interaction'));
         } else {
             //if statement above checks already, safe cast
             this.payloadSubject.next(state as { event: Interaction; module: CommandModule });
         }
     }
 
-    protected processModules({ module, event }: { event: Interaction; module: CommandModule }) {
+    protected createDispatcher({ module, event }: { event: Interaction; module: CommandModule }) {
         return match(module)
             .with({ type: CommandType.Text }, () => this.crashHandler.crash(Error(SernError.MismatchEvent)))
             //P.union = either CommandType.Slash or CommandType.Both
@@ -94,13 +101,13 @@ export default class InteractionHandler extends EventsHandler<{
                      */
                     return dispatchAutocomplete(module, event);
                 } else {
-                    return commandDispatcher(module, contextArgs(event));
+                    return dispatchCommand(module, contextArgs(event));
                 }
             })
             /**
              * Every other command module takes a one argument parameter, its corresponding interaction
              * this makes this usage safe
              */
-            .otherwise((mod) => dispatcher(mod, interactionArg(event)));
+            .otherwise((mod) => dispatchCommand(mod, interactionArg(event)));
     }
 }
