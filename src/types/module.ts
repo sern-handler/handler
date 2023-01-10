@@ -38,7 +38,7 @@ export interface Module {
     onEvent: ControlPlugin[];
     plugins: InitPlugin[];
     description?: string;
-    execute: (...args: any[]) => any;
+    execute: (...args: any[]) => Awaitable<any>;
 }
 
 export interface TextCommand extends Module {

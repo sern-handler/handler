@@ -1,34 +1,28 @@
-import type { Message } from 'discord.js';
-import { concatMap, from, map, Observable, of, switchMap, tap, throwError } from 'rxjs';
-import { SernError } from '../structures/errors';
+import type { Awaitable, Message } from 'discord.js';
+import { concatMap, EMPTY, from, Observable, of, tap, throwError } from 'rxjs';
+import type { SernError } from '../structures/errors';
 import { Result } from 'ts-results-es';
-import type { CommandType } from '../structures/enums';
-import { PayloadType } from '../structures/enums';
-import type { AnyModule, CommandModule, CommandModuleDefs, Module } from '../../types/module';
-import { _const, isEmpty, nameOrFilename } from '../utilities/functions';
-import type SernEmitter from '../sernEmitter';
+import type { AnyModule, Module } from '../../types/module';
+import { _const as i } from '../utilities/functions';
+import SernEmitter from '../sernEmitter';
 import type { AnyDefinedModule } from '../../types/handler';
-import { processCommandPlugins } from './userDefinedEventsHandling';
-import type { PluginResult } from '../plugins';
+import { callPlugin$, everyPluginOk$, filterMapTo$ } from './operators';
 
-export function ignoreNonBot(prefix: string) {
-    return (src: Observable<Message>) =>
-        new Observable<Message>(subscriber => {
-            return src.subscribe({
-                next(m) {
-                    const messageFromHumanAndHasPrefix =
-                        !m.author.bot &&
-                        m.content
-                            .slice(0, prefix.length)
-                            .localeCompare(prefix, undefined, { sensitivity: 'accent' }) === 0;
-                    if (messageFromHumanAndHasPrefix) {
-                        subscriber.next(m);
-                    }
-                },
-                error: e => subscriber.error(e),
-                complete: () => subscriber.complete(),
-            });
-        });
+export function ignoreNonBot<T extends Message>(prefix: string) {
+    return (src: Observable<T>) => new Observable<T>(subscriber => {
+          return src.subscribe({
+              next(m) {
+                  const messageFromHumanAndHasPrefix =
+                      !m.author.bot &&
+                      m.content
+                          .slice(0, prefix.length)
+                          .localeCompare(prefix, undefined, { sensitivity: 'accent' }) === 0;
+                  if (messageFromHumanAndHasPrefix) {
+                      subscriber.next(m);
+                  }
+              },
+         });
+    });
 }
 
 /**
@@ -46,129 +40,88 @@ export function errTap<T extends AnyModule>(cb: (err: SernError) => void) {
                         subscriber.next(value.val);
                     }
                 },
-                error: e => subscriber.error(e),
-                complete: () => subscriber.complete(),
             });
         });
-}
-
-//POG
-export function isOneOfCorrectModules<T extends readonly CommandType[]>(...inputs: [...T]) {
-    return (src: Observable<CommandModule | undefined>) => {
-        return new Observable<CommandModuleDefs[T[number]]>(subscriber => {
-            return src.subscribe({
-                next(mod) {
-                    if (mod === undefined) {
-                        return throwError(_const(SernError.UndefinedModule));
-                    }
-                    if (inputs.some(type => (mod.type & type) !== 0)) {
-                        subscriber.next(mod as CommandModuleDefs[T[number]]);
-                    } else {
-                        return throwError(_const(SernError.MismatchModule));
-                    }
-                },
-                error: e => subscriber.error(e),
-                complete: () => subscriber.complete(),
-            });
-        });
-    };
 }
 
 export function executeModule(
     emitter: SernEmitter,
-    payload: {
+    { module, task }: {
         module: Module;
-        execute: () => unknown;
-        res: Result<void, void>[];
+        task: () => Awaitable<unknown>;
     },
 ) {
-    if (payload.res.every(el => el.ok)) {
-        const executeFn = Result.wrapAsync<unknown, Error | string>(() =>
-            Promise.resolve(payload.execute()),
-        );
-        return from(executeFn).pipe(
-            concatMap(res => {
-                if (res.err) {
-                    return throwError(() => ({
-                        type: PayloadType.Failure,
-                        reason: res.val,
-                        module: payload.module,
-                    }));
-                }
-                return of(res.val).pipe(
-                    tap(() =>
-                        emitter.emit('module.activate', {
-                            type: PayloadType.Success,
-                            module: payload.module as AnyModule,
-                        }),
-                    ),
-                );
-            }),
-        );
-    } else {
-        emitter.emit('module.activate', {
-            type: PayloadType.Failure,
-            module: payload.module as AnyModule,
-            reason: SernError.PluginFailure,
-        });
-        return of(undefined);
-    }
-}
-
-/**
- * Plugins are successful if all results are ok.
- * Reduces initResult into a single boolean
- * @param src
- */
-export function resolveInitPlugins$<T extends AnyDefinedModule>(
-    src: Observable<{ module: T, initResult: PluginResult[], }>,
-) {
-    return src.pipe(
-        concatMap(({ module, initResult }) => {
-            if (isEmpty(initResult))
-                return of({ module, success: true });
-            else
-                return from(Promise.all(initResult)).pipe(
-                    reduceResults$,
-                    map(success => ({ module, success })),
-                );
+    return of(module).pipe(
+        concatMap(() => Result.wrapAsync(async () => task())),
+        concatMap(result => {
+            if (result.ok) {
+                emitter.emit('module.activate', SernEmitter.success(module));
+                return EMPTY;
+            } else {
+                return throwError(i(SernEmitter.failure(module, result.val)));
+            }
         }),
     );
 }
 
-export function processPlugins<T extends AnyDefinedModule>(payload: {
-    module: T;
-    absPath: string;
+/**
+ * A higher order function that
+ * - executes all plugins { config.createStream }
+ * - any failures results to { config.onFailure } being called
+ * - if all plugins are ok, the stream is converted to { config.onSuccess }
+ * emit config.onSuccess Observable
+ * @param config
+ * @returns receiver function for flattening a stream of data
+ */
+export function createPluginResolver<
+    T extends Module,
+    Args extends { module: T; [key: string]: unknown },
+    Output>(
+    config: {
+        onFailure?: (module: T) => unknown;
+        onSuccess: (args: Args) => Output,
+        createStream: (args: Args) => Observable<Result<void, void>>;
+    }) {
+    return (args: Args) => {
+        const task = config.createStream(args);
+        return task.pipe(
+            tap(result => {
+                if (result.err) {
+                    config.onFailure?.(args.module);
+                }
+            }),
+            everyPluginOk$,
+            filterMapTo$(() => config.onSuccess(args)),
+        );
+    };
+}
+
+/**
+ * Calls a module's init plugins and checks for Err. If so, call { onFailure } and
+ * ignore the module
+ */
+export function scanModule<T extends AnyDefinedModule, Args extends { module: T, absPath: string }>(
+    config : {
+        onFailure?: (module: T) => unknown,
+        onSuccess :(module: Args) => T
 }) {
-    const initResult = processCommandPlugins(payload);
-    return of({ module: payload.module, initResult });
-}
-
-/**
- * fills the defaults for modules
- * signature : Observable<{ absPath: string; module: CommandModule | EventModule }> -> Observable<{ absPath: string; module: Processed<CommandModule | EventModule> }>
- */
-export function defineAllFields$<T extends AnyModule>(
-    src: Observable<{ absPath: string; module: T }>,
-) {
-    const fillFields = ({ absPath, module }: { absPath: string; module: T }) => ({
-        absPath,
-        module: {
-            name: nameOrFilename(module.name, absPath),
-            description: module.description ?? '...',
-            ...module,
-        },
+    return createPluginResolver({
+        createStream: (args) => from(args.module.plugins).pipe(callPlugin$(args)),
+        ...config
     });
-    return src.pipe(
-        map(fillFields),
-    );
 }
 
 /**
- * Reduces a stream of results into a single boolean value
- * possible refactor in future to lazily check?
- * @param src
+ * Creates an executable task ( execute the command ) if  all control plugins are successful
+ * @param onFailure emits a failure response to the SernEmitter
  */
-export function reduceResults$(src: Observable<Result<void, void>[]>): Observable<boolean> {
-    return src.pipe(switchMap(s => of(s.every(a => a.ok))));
+export function makeModuleExecutor<M extends Module, Args extends { module: M; args: any[] }>(
+    onFailure: (m: M) => unknown,
+) {
+    const onSuccess = ({ args, module }: Args) => ({ task: () => module.execute(...args), module });
+    return createPluginResolver({
+        onFailure,
+        createStream: ({ args, module }) => from(module.onEvent).pipe(callPlugin$(args)),
+        onSuccess,
+    });
 }
