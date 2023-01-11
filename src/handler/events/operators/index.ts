@@ -1,8 +1,8 @@
 import { concatMap, defaultIfEmpty, EMPTY, every, map, Observable, of } from 'rxjs';
-import type { ControlPlugin, InitPlugin } from '../../plugins';
 import type { AnyModule } from '../../../types/module';
 import { nameOrFilename } from '../../utilities/functions';
 import type { Result } from 'ts-results-es';
+import type { Awaitable } from 'discord.js';
 
 /**
  * if {src} is true, mapTo V, else ignore
@@ -21,7 +21,7 @@ export function filterMapTo$<V>(item: () => V) {
  * @param args if an array, its spread and plugin called.
  */
 export function callPlugin$<V>(args: V) {
-    return (src: Observable<ControlPlugin | InitPlugin>) =>
+    return (src: Observable<{ execute: (...args: any[]) => Awaitable<any>}>) =>
         src.pipe(concatMap(async plugin => {
             if (Array.isArray(args)) {
                 return plugin.execute(...args);

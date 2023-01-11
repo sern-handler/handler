@@ -76,7 +76,7 @@ type CommandArgsMatrix = {
     };
     [CommandType.Modal]: {
         [PluginType.Control] : [/* library coupled */ModalSubmitInteraction]
-        [PluginType.Init] : [ModalSubmitCommand]
+        [PluginType.Init] : [InitArgs<Processed<ModalSubmitCommand>>]
     };
 };
 
@@ -87,11 +87,11 @@ type EventArgsMatrix = {
     };
     [EventType.Sern] : {
         [PluginType.Control] : [Payload]
-        [PluginType.Init] : [[InitArgs<Processed<SernEventCommand>>]]
+        [PluginType.Init] : [InitArgs<Processed<SernEventCommand>>]
     };
     [EventType.External] : {
         [PluginType.Control] : [unknown[]]
-        [PluginType.Init] : [ExternalEventCommand]
+        [PluginType.Init] : [InitArgs<Processed<ExternalEventCommand>>]
     }
 }
 

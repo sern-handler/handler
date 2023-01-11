@@ -18,6 +18,7 @@ import type { CommandModuleDefs, EventModuleDefs } from '../../types/module';
 
 import type { EventType, PluginType } from '../structures/enums';
 import type { DefinedCommandModule, DefinedEventModule } from '../../types/handler';
+import type { InitArgs } from './args';
 export type PluginResult = Awaitable<Result<void, void>>;
 
 export interface Plugin<Args extends any[] = unknown[]> {
@@ -42,8 +43,8 @@ export type EventModulesNoPlugins = {
     [T in EventType]: Omit<EventModuleDefs[T], 'plugins' | 'onEvent'>;
 };
 
-export type AnyCommandPlugin = ControlPlugin | InitPlugin<[DefinedCommandModule]>;
-export type AnyEventPlugin = ControlPlugin | InitPlugin<[DefinedEventModule]>;
+export type AnyCommandPlugin = ControlPlugin | InitPlugin<[InitArgs<DefinedCommandModule>]>;
+export type AnyEventPlugin = ControlPlugin | InitPlugin<[InitArgs<DefinedEventModule>]>;
 
 export type InputEvent = {
     [T in EventType]: EventModulesNoPlugins[T] & { plugins?: AnyEventPlugin[] };

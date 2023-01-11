@@ -2,6 +2,7 @@ import type Wrapper from './structures/wrapper';
 import { processEvents } from './events/userDefinedEventsHandling';
 import { CommandType, EventType, PluginType } from './structures/enums';
 import type {
+    AnyEventPlugin,
     ControlPlugin,
     InitPlugin, InputCommand, InputEvent,
     Plugin,
@@ -15,6 +16,7 @@ import type { Dependencies, OptionalDependencies } from '../types/handler';
 import { composeRoot, containerSubject, useContainer } from './dependencies/provider';
 import type { Logging } from './contracts';
 import { err, ok, partition } from './utilities/functions';
+import type { Awaitable, ClientEvents } from 'discord.js';
 /**
  *
  * @param wrapper Options to pass into sern.
@@ -82,6 +84,21 @@ export function eventModule(mod: InputEvent): EventModule {
         onEvent,
         plugins,
     } as EventModule;
+}
+
+/**
+ * Create event modules from discord.js client events,
+ * This is an {@link eventModule} for discord events,
+ * where typings can be very bad.
+ * @param mod
+ */
+export function discordEvent<T extends keyof ClientEvents>(mod: {
+    name: T;
+    type: EventType.Discord;
+    plugins: AnyEventPlugin[],
+    execute: (...args: ClientEvents[T]) => Awaitable<unknown>
+}) {
+    return eventModule(mod);
 }
 /**
  * @param conf a configuration for creating your project dependencies
