@@ -51,4 +51,4 @@ export type InputEvent = {
 
 export type InputCommand = {
     [T in CommandType]: CommandModuleNoPlugins[T] & { plugins?: AnyCommandPlugin[] };
-}[EventType];
+}[CommandType];
