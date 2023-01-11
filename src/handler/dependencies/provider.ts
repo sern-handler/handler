@@ -76,7 +76,6 @@ export function composeRoot<T extends Dependencies>(
 export function useContainer<T extends Dependencies>() {
     const container = containerSubject.getValue()! as unknown as Container<T, {}>;
     assert.ok(container !== null, 'useContainer was called before Sern#init');
-    //weird edge case, why can i not use _const here?
     return <V extends (keyof T)[]>(...keys: [...V]) =>
         keys.map(key => Result.wrap(() => container.get(key)).unwrapOr(undefined)) as MapDeps<T, V>;
 }
