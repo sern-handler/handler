@@ -7,9 +7,9 @@ import treeSearch from '../../utilities/treeSearch';
 import type { BothCommand, Module, SlashCommand } from '../../../types/module';
 import { EventEmitter } from 'events';
 import * as assert from 'assert';
-import { createPluginResolver } from '../observableHandling';
 import { concatMap, from, fromEvent, map, Observable } from 'rxjs';
 import { callPlugin$ } from '../operators';
+import { createResultResolver } from '../observableHandling';
 
 export function dispatchCommand(
     module: Module,
@@ -41,7 +41,7 @@ export function eventDispatcher(
         map(event => Array.isArray(event) ? event : [event]),
         map( args => ({ module, args }))
     );
-    const createResult$ = createPluginResolver<DefinedEventModule, { module: DefinedEventModule; args: any[] }, any[]>({
+    const createResult$ = createResultResolver<DefinedEventModule, { module: DefinedEventModule; args: any[] }, any[]>({
         onSuccess: ({ args } ) => args,
         createStream: ({ module, args } ) => from(module.onEvent).pipe(callPlugin$(args)),
     });

@@ -31,8 +31,7 @@ export function callPlugin$<V>(args: V) {
 }
 
 /**
- * fills the defaults for modules
- * signature : Observable<{ absPath: string; module: CommandModule | EventModule }> -> Observable<{ absPath: string; module: Processed<CommandModule | EventModule> }>
+ * operator function that fill the defaults for a module,
  */
 export function defineAllFields$<T extends AnyModule>(
     src: Observable<{ absPath: string; module: T }>,

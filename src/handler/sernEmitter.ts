@@ -42,7 +42,7 @@ class SernEmitter extends EventEmitter {
     }
     static failure(module?: Module, reason?: unknown) {
         //The generic cast Payload & { type : PayloadType.* } coerces the type to be a failure payload
-        // same goes to the other static methods
+        // same goes to the other methods below
         return SernEmitter.payload<Payload & { type: PayloadType.Failure }>(PayloadType.Failure, module, reason);
     }
     static success(module: Module) {
