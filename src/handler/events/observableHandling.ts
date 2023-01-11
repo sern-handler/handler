@@ -8,6 +8,10 @@ import SernEmitter from '../sernEmitter';
 import type { AnyDefinedModule } from '../../types/handler';
 import { callPlugin$, everyPluginOk$, filterMapTo$ } from './operators';
 
+/**
+ * Ignores messages from any person / bot except itself
+ * @param prefix
+ */
 export function ignoreNonBot<T extends Message>(prefix: string) {
     return (src: Observable<T>) => new Observable<T>(subscriber => {
           return src.subscribe({
@@ -27,6 +31,7 @@ export function ignoreNonBot<T extends Message>(prefix: string) {
 
 /**
  * If the current value in Result stream is an error, calls callback.
+ * This also extracts the Ok value from Result
  * @param cb
  * @returns Observable<{ module: T; absPath: string }>
  */
@@ -45,6 +50,14 @@ export function errTap<T extends AnyModule>(cb: (err: SernError) => void) {
         });
 }
 
+/**
+ * Wraps the task in a Result as a try / catch.
+ * if the task is ok, an event is emitted and the stream becomes empty
+ * if the task is an error, throw an error down the stream which will be handled by catchError
+ * @param emitter reference to SernEmitter that will emit a successful execution of module
+ * @param module the module that will be executed with task
+ * @param task the deferred execution which will be called
+ */
 export function executeModule(
     emitter: SernEmitter,
     { module, task }: {
@@ -53,6 +66,7 @@ export function executeModule(
     },
 ) {
     return of(module).pipe(
+        //converting the task into a promise so rxjs can resolve the Awaitable properly
         concatMap(() => Result.wrapAsync(async () => task())),
         concatMap(result => {
             if (result.ok) {
