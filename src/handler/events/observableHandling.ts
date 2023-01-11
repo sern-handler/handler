@@ -28,6 +28,7 @@ export function ignoreNonBot<T extends Message>(prefix: string) {
 /**
  * If the current value in Result stream is an error, calls callback.
  * @param cb
+ * @returns Observable<{ module: T; absPath: string }>
  */
 export function errTap<T extends AnyModule>(cb: (err: SernError) => void) {
     return (src: Observable<Result<{ module: T; absPath: string }, SernError>>) =>
@@ -66,14 +67,14 @@ export function executeModule(
 
 /**
  * A higher order function that
- * - executes all plugins { config.createStream }
+ * - creates a stream of Result<void,void> { config.createStream }
  * - any failures results to { config.onFailure } being called
- * - if all plugins are ok, the stream is converted to { config.onSuccess }
+ * - if all results are ok, the stream is converted to { config.onSuccess }
  * emit config.onSuccess Observable
  * @param config
  * @returns receiver function for flattening a stream of data
  */
-export function createPluginResolver<
+export function createResultResolver<
     T extends Module,
     Args extends { module: T; [key: string]: unknown },
     Output>(
@@ -105,7 +106,7 @@ export function scanModule<T extends AnyDefinedModule, Args extends { module: T,
         onFailure?: (module: T) => unknown,
         onSuccess :(module: Args) => T
 }) {
-    return createPluginResolver({
+    return createResultResolver({
         createStream: (args) => from(args.module.plugins).pipe(callPlugin$(args)),
         ...config
     });
@@ -119,7 +120,7 @@ export function makeModuleExecutor<M extends Module, Args extends { module: M; a
     onFailure: (m: M) => unknown,
 ) {
     const onSuccess = ({ args, module }: Args) => ({ task: () => module.execute(...args), module });
-    return createPluginResolver({
+    return createResultResolver({
         onFailure,
         createStream: ({ args, module }) => from(module.onEvent).pipe(callPlugin$(args)),
         onSuccess,

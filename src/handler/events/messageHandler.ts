@@ -25,9 +25,8 @@ export default class MessageHandler extends EventsHandler<{
         this.init();
         this.payloadSubject
             .pipe(
-                concatMap(
-                    makeModuleExecutor(module => {
-                        this.emitter.emit('module.activate', SernEmitter.failure(module, SernError.PluginFailure));
+                concatMap( makeModuleExecutor(module => {
+                    this.emitter.emit('module.activate', SernEmitter.failure(module, SernError.PluginFailure));
                 })),
                 concatMap(payload => executeModule(this.emitter, payload)),
                 catchError(handleError(this.crashHandler, this.logger)),
