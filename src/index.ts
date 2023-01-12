@@ -10,6 +10,7 @@ export {
 export * as Sern from './handler/sern';
 export * from './types/handler';
 export * from './types/module';
+export * from './types/plugin';
 export * from './handler/structures/structxports';
 export * from './handler/plugins';
 export * from './handler/contracts';
