@@ -61,3 +61,4 @@ export type MapDeps<Deps extends Dependencies, T extends readonly unknown[]> = T
 //Basically, '@sern/client' | '@sern/store' | '@sern/modules' | '@sern/error' | '@sern/emitter' will be provided defaults, and you can exclude the rest
 export type OptionalDependencies = '@sern/logger';
 export type Processed<T extends Module> = T & { name: string; description: string };
+export type Deprecated<Message extends string> = [never, Message]

@@ -5,10 +5,8 @@ import type {
     AnyEventPlugin,
     ControlPlugin,
     InitPlugin,
-    InputCommand,
-    InputEvent,
     Plugin,
-} from './plugins/plugin';
+} from '../types/plugin';
 import InteractionHandler from './events/interactionHandler';
 import ReadyHandler from './events/readyHandler';
 import MessageHandler from './events/messageHandler';
@@ -16,7 +14,7 @@ import type {
     CommandModule,
     CommandModuleDefs,
     EventModule,
-    EventModuleDefs,
+    EventModuleDefs, InputCommand, InputEvent
 } from '../types/module';
 import { Container, createContainer } from 'iti';
 import type { Dependencies, OptionalDependencies } from '../types/handler';
