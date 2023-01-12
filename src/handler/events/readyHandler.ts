@@ -1,6 +1,6 @@
 import { EventsHandler } from './eventsHandler';
 import type Wrapper from '../structures/wrapper';
-import { concatMap, first, fromEvent, type Observable, take } from 'rxjs';
+import { concatMap, fromEvent, type Observable, take } from 'rxjs';
 import * as Files from '../utilities/readFile';
 import { errTap, scanModule } from './observableHandling';
 import { CommandType } from '../structures/enums';
@@ -23,7 +23,7 @@ export default class ReadyHandler extends EventsHandler<{
     protected discordEvent!: Observable<{ module: CommandModule; absPath: string }>;
     constructor(wrapper: Wrapper) {
         super(wrapper);
-        const ready$ = fromEvent(this.client, 'ready').pipe(first());
+        const ready$ = fromEvent(this.client, 'ready').pipe(take(1));
         this.discordEvent = ready$.pipe(
             concatMap(() =>
                 Files.buildData<CommandModule>(wrapper.commands).pipe(
