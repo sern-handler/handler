@@ -1,12 +1,7 @@
 import type Wrapper from './structures/wrapper';
 import { processEvents } from './events/userDefinedEventsHandling';
 import { CommandType, EventType, PluginType } from './structures/enums';
-import type {
-    AnyEventPlugin,
-    ControlPlugin,
-    InitPlugin,
-    Plugin,
-} from '../types/plugin';
+import type { AnyEventPlugin, ControlPlugin, InitPlugin, Plugin } from '../types/plugin';
 import InteractionHandler from './events/interactionHandler';
 import ReadyHandler from './events/readyHandler';
 import MessageHandler from './events/messageHandler';
@@ -14,7 +9,9 @@ import type {
     CommandModule,
     CommandModuleDefs,
     EventModule,
-    EventModuleDefs, InputCommand, InputEvent
+    EventModuleDefs,
+    InputCommand,
+    InputEvent,
 } from '../types/module';
 import { Container, createContainer } from 'iti';
 import type { Dependencies, OptionalDependencies } from '../types/handler';

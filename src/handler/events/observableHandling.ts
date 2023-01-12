@@ -1,14 +1,5 @@
 import type { Awaitable, Message } from 'discord.js';
-import {
-    concatMap,
-    EMPTY,
-    from,
-    Observable,
-    of,
-    pipe,
-    tap,
-    throwError,
-} from 'rxjs';
+import { concatMap, EMPTY, from, Observable, of, pipe, tap, throwError } from 'rxjs';
 import type { SernError } from '../structures/errors';
 import { Result } from 'ts-results-es';
 import type { AnyModule, CommandModule, EventModule, Module } from '../../types/module';

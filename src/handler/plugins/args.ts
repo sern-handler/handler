@@ -5,15 +5,18 @@ import type {
     BothCommand,
     ButtonCommand,
     ChannelSelectCommand,
-    ContextMenuUser, DiscordEventCommand, ExternalEventCommand,
+    ContextMenuUser,
+    DiscordEventCommand,
+    ExternalEventCommand,
     MentionableSelectCommand,
     ModalSubmitCommand,
-    RoleSelectCommand, SernEventCommand,
+    RoleSelectCommand,
+    SernEventCommand,
     SlashCommand,
     StringSelectCommand,
     TextCommand,
     UserSelectCommand,
-    ContextMenuMsg
+    ContextMenuMsg,
 } from '../../types/module';
 import type { AnyDefinedModule, Args, Payload, Processed, SlashOptions } from '../../types/handler';
 import type Context from '../structures/context';
