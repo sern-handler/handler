@@ -28,9 +28,10 @@ import type {
 import { CommandType } from '../handler/structures/enums';
 import type { Args, SlashOptions } from './handler';
 import type Context from '../handler/structures/context';
-import type { InitPlugin, ControlPlugin } from '../handler/plugins';
+import type { InitPlugin, ControlPlugin } from './plugin';
 import { EventType } from '../handler/structures/enums';
 import type { UserSelectMenuInteraction } from 'discord.js';
+import type { AnyCommandPlugin, AnyEventPlugin } from './plugin';
 
 export interface Module {
     type: CommandType | EventType;
@@ -49,7 +50,7 @@ export interface TextCommand extends Module {
 
 export interface SlashCommand extends Module {
     type: CommandType.Slash;
-    description: string,
+    description: string;
     options?: SernOptionsData[];
     execute: (ctx: Context, args: ['slash', SlashOptions]) => Awaitable<unknown>;
 }
@@ -57,7 +58,7 @@ export interface SlashCommand extends Module {
 export interface BothCommand extends Module {
     type: CommandType.Both;
     alias?: string[];
-    description: string,
+    description: string;
     options?: SernOptionsData[];
     execute: (ctx: Context, args: Args) => Awaitable<unknown>;
 }
@@ -107,7 +108,8 @@ export interface ModalSubmitCommand extends Module {
     execute: (ctx: ModalSubmitInteraction) => Awaitable<unknown>;
 }
 
-export interface AutocompleteCommand extends Omit<Module, 'name' | 'type' | 'plugins' | 'description'> {
+export interface AutocompleteCommand
+    extends Omit<Module, 'name' | 'type' | 'plugins' | 'description'> {
     onEvent: ControlPlugin[];
     execute: (ctx: AutocompleteInteraction) => Awaitable<unknown>;
 }
@@ -161,6 +163,21 @@ export interface SernAutocompleteData
         | ApplicationCommandOptionType.Integer;
     command: AutocompleteCommand;
 }
+
+export type CommandModuleNoPlugins = {
+    [T in CommandType]: Omit<CommandModuleDefs[T], 'plugins' | 'onEvent'>;
+};
+export type EventModulesNoPlugins = {
+    [T in EventType]: Omit<EventModuleDefs[T], 'plugins' | 'onEvent'>;
+};
+
+export type InputEvent = {
+    [T in EventType]: EventModulesNoPlugins[T] & { plugins?: AnyEventPlugin[] };
+}[EventType];
+
+export type InputCommand = {
+    [T in CommandType]: CommandModuleNoPlugins[T] & { plugins?: AnyCommandPlugin[] };
+}[CommandType];
 
 /**
  * Type that replaces autocomplete with {@link SernAutocompleteData}

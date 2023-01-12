@@ -1,11 +1,23 @@
 import type Wrapper from './structures/wrapper';
 import { processEvents } from './events/userDefinedEventsHandling';
 import { CommandType, EventType, PluginType } from './structures/enums';
-import type { AnyEventPlugin, ControlPlugin, InitPlugin, InputCommand, InputEvent, Plugin } from './plugins/plugin';
+import type {
+    AnyEventPlugin,
+    ControlPlugin,
+    InitPlugin,
+    InputCommand,
+    InputEvent,
+    Plugin,
+} from './plugins/plugin';
 import InteractionHandler from './events/interactionHandler';
 import ReadyHandler from './events/readyHandler';
 import MessageHandler from './events/messageHandler';
-import type { CommandModule, CommandModuleDefs, EventModule, EventModuleDefs } from '../types/module';
+import type {
+    CommandModule,
+    CommandModuleDefs,
+    EventModule,
+    EventModuleDefs,
+} from '../types/module';
 import { Container, createContainer } from 'iti';
 import type { Dependencies, OptionalDependencies } from '../types/handler';
 import { composeRoot, containerSubject, useContainer } from './dependencies/provider';
@@ -90,8 +102,8 @@ export function eventModule(mod: InputEvent): EventModule {
  */
 export function discordEvent<T extends keyof ClientEvents>(mod: {
     name: T;
-    plugins?: AnyEventPlugin[],
-    execute: (...args: ClientEvents[T]) => Awaitable<unknown>
+    plugins?: AnyEventPlugin[];
+    execute: (...args: ClientEvents[T]) => Awaitable<unknown>;
 }) {
     return eventModule({ type: EventType.Discord, ...mod });
 }

@@ -12,7 +12,9 @@ export interface ModuleManager {
 
 export class DefaultModuleManager implements ModuleManager {
     constructor(private moduleStore: ModuleStore) {}
-    get<T extends CommandType>(strat: (ms: ModuleStore) => Processed<CommandModuleDefs[T]> | undefined) {
+    get<T extends CommandType>(
+        strat: (ms: ModuleStore) => Processed<CommandModuleDefs[T]> | undefined,
+    ) {
         return strat(this.moduleStore);
     }
 

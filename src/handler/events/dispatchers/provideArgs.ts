@@ -7,8 +7,11 @@ import type { Args, SlashOptions } from '../../../types/handler';
  * @param wrap
  * @param messageArgs
  */
-export function contextArgs(wrap: Message, messageArgs?: string[]) : () => [Context, ['text', string[]]];
-export function contextArgs(wrap: Interaction) : () => [Context, ['slash', SlashOptions]];
+export function contextArgs(
+    wrap: Message,
+    messageArgs?: string[],
+): () => [Context, ['text', string[]]];
+export function contextArgs(wrap: Interaction): () => [Context, ['slash', SlashOptions]];
 export function contextArgs(wrap: Interaction | Message, messageArgs?: string[]) {
     const ctx = Context.wrap(wrap as ChatInputCommandInteraction | Message);
     const args = ctx.isMessage() ? ['text', messageArgs!] : ['slash', ctx.interaction.options];

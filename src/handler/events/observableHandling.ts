@@ -1,5 +1,14 @@
 import type { Awaitable, Message } from 'discord.js';
-import { concatMap, EMPTY, from, Observable, of, tap, throwError } from 'rxjs';
+import {
+    concatMap,
+    EMPTY,
+    from,
+    Observable,
+    of,
+    pipe,
+    tap,
+    throwError,
+} from 'rxjs';
 import type { SernError } from '../structures/errors';
 import { Result } from 'ts-results-es';
 import type { AnyModule, CommandModule, EventModule, Module } from '../../types/module';
@@ -7,26 +16,28 @@ import { _const as i } from '../utilities/functions';
 import SernEmitter from '../sernEmitter';
 import { callPlugin, everyPluginOk, filterMapTo } from './operators';
 import type { Processed } from '../../types/handler';
+import type { VoidResult } from '../../types/plugin';
 
 /**
  * Ignores messages from any person / bot except itself
  * @param prefix
  */
 export function ignoreNonBot<T extends Message>(prefix: string) {
-    return (src: Observable<T>) => new Observable<T>(subscriber => {
-          return src.subscribe({
-              next(m) {
-                  const messageFromHumanAndHasPrefix =
-                      !m.author.bot &&
-                      m.content
-                          .slice(0, prefix.length)
-                          .localeCompare(prefix, undefined, { sensitivity: 'accent' }) === 0;
-                  if (messageFromHumanAndHasPrefix) {
-                      subscriber.next(m);
-                  }
-              },
-         });
-    });
+    return (src: Observable<T>) =>
+        new Observable<T>(subscriber => {
+            return src.subscribe({
+                next(m) {
+                    const messageFromHumanAndHasPrefix =
+                        !m.author.bot &&
+                        m.content
+                            .slice(0, prefix.length)
+                            .localeCompare(prefix, undefined, { sensitivity: 'accent' }) === 0;
+                    if (messageFromHumanAndHasPrefix) {
+                        subscriber.next(m);
+                    }
+                },
+            });
+        });
 }
 
 /**
@@ -60,7 +71,10 @@ export function errTap<T extends AnyModule>(cb: (err: SernError) => void) {
  */
 export function executeModule(
     emitter: SernEmitter,
-    { module, task }: {
+    {
+        module,
+        task,
+    }: {
         module: Processed<Module>;
         task: () => Awaitable<unknown>;
     },
@@ -81,7 +95,7 @@ export function executeModule(
 
 /**
  * A higher order function that
- * - creates a stream of Result<void,void> { config.createStream }
+ * - creates a stream of {@link VoidResult} { config.createStream }
  * - any failures results to { config.onFailure } being called
  * - if all results are ok, the stream is converted to { config.onSuccess }
  * emit config.onSuccess Observable
@@ -91,12 +105,12 @@ export function executeModule(
 export function createResultResolver<
     T extends Processed<Module>,
     Args extends { module: T; [key: string]: unknown },
-    Output>(
-    config: {
-        onFailure?: (module: T) => unknown;
-        onSuccess: (args: Args) => Output,
-        createStream: (args: Args) => Observable<Result<void, void>>;
-    }) {
+    Output,
+>(config: {
+    onFailure?: (module: T) => unknown;
+    onSuccess: (args: Args) => Output;
+    createStream: (args: Args) => Observable<VoidResult>;
+}) {
     return (args: Args) => {
         const task = config.createStream(args);
         return task.pipe(
@@ -115,28 +129,36 @@ export function createResultResolver<
  * Calls a module's init plugins and checks for Err. If so, call { onFailure } and
  * ignore the module
  */
-export function scanModule<T extends Processed<CommandModule | EventModule>, Args extends { module: T, absPath: string }>(
-    config : {
-        onFailure?: (module: T) => unknown,
-        onSuccess :(module: Args) => T
-}) {
-    return createResultResolver({
-        createStream: (args) => from(args.module.plugins).pipe(callPlugin(args)),
-        ...config
-    });
+export function scanModule<
+    T extends Processed<CommandModule | EventModule>,
+    Args extends { module: T; absPath: string },
+>(config: { onFailure?: (module: T) => unknown; onSuccess: (module: Args) => T }) {
+    return pipe(
+        concatMap(
+            createResultResolver({
+                createStream: args => from(args.module.plugins).pipe(callPlugin(args)),
+                ...config,
+            }),
+        ),
+    );
 }
 
 /**
  * Creates an executable task ( execute the command ) if  all control plugins are successful
  * @param onFailure emits a failure response to the SernEmitter
  */
-export function makeModuleExecutor<M extends Processed<Module>, Args extends { module: M; args: unknown[] }>(
-    onFailure: (m: M) => unknown,
-) {
+export function makeModuleExecutor<
+    M extends Processed<Module>,
+    Args extends { module: M; args: unknown[] },
+>(onFailure: (m: M) => unknown) {
     const onSuccess = ({ args, module }: Args) => ({ task: () => module.execute(...args), module });
-    return createResultResolver({
-        onFailure,
-        createStream: ({ args, module }) => from(module.onEvent).pipe(callPlugin(args)),
-        onSuccess,
-    });
+    return pipe(
+        concatMap(
+            createResultResolver({
+                onFailure,
+                createStream: ({ args, module }) => from(module.onEvent).pipe(callPlugin(args)),
+                onSuccess,
+            }),
+        ),
+    );
 }

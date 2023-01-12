@@ -14,7 +14,7 @@ import type { Processed } from '../../types/handler';
 
 export default class MessageHandler extends EventsHandler<{
     module: Processed<Module>;
-    args: unknown[]
+    args: unknown[];
 }> {
     protected discordEvent: Observable<Message>;
 
@@ -24,9 +24,12 @@ export default class MessageHandler extends EventsHandler<{
         this.init();
         this.payloadSubject
             .pipe(
-                concatMap( makeModuleExecutor(module => {
-                    this.emitter.emit('module.activate', SernEmitter.failure(module, SernError.PluginFailure));
-                })),
+                makeModuleExecutor(module => {
+                    this.emitter.emit(
+                        'module.activate',
+                        SernEmitter.failure(module, SernError.PluginFailure),
+                    );
+                }),
                 concatMap(payload => executeModule(this.emitter, payload)),
                 catchError(handleError(this.crashHandler, this.logger)),
             )
@@ -46,8 +49,10 @@ export default class MessageHandler extends EventsHandler<{
                 // Synonymous to filterMap, but I haven't thought of a generic implementation for filterMap yet
                 concatMap(message => {
                     const [prefix, ...rest] = fmt(message, defaultPrefix);
-                    const module = get(ms => ms.TextCommands.get(prefix) ?? ms.BothCommands.get(prefix));
-                    if(module === undefined) {
+                    const module = get(
+                        ms => ms.TextCommands.get(prefix) ?? ms.BothCommands.get(prefix),
+                    );
+                    if (module === undefined) {
                         return EMPTY;
                     }
                     const payload = {
@@ -64,7 +69,7 @@ export default class MessageHandler extends EventsHandler<{
             });
     }
 
-    protected setState(state: { module: Processed<Module>, args: unknown[] }) {
+    protected setState(state: { module: Processed<Module>; args: unknown[] }) {
         this.payloadSubject.next(state);
     }
 }

@@ -1,7 +1,5 @@
 import type { Processed } from '../../../types/handler';
-import type {
-    AutocompleteInteraction,
-} from 'discord.js';
+import type { AutocompleteInteraction } from 'discord.js';
 import { SernError } from '../../structures/errors';
 import treeSearch from '../../utilities/treeSearch';
 import type { BothCommand, CommandModule, Module, SlashCommand } from '../../../types/module';
@@ -11,10 +9,7 @@ import { concatMap, from, fromEvent, map, OperatorFunction, pipe } from 'rxjs';
 import { callPlugin } from '../operators';
 import { createResultResolver } from '../observableHandling';
 
-export function dispatchCommand(
-    module: Processed<CommandModule>,
-    createArgs: () => unknown[],
-) {
+export function dispatchCommand(module: Processed<CommandModule>, createArgs: () => unknown[]) {
     const args = createArgs();
     return {
         module,
@@ -27,10 +22,7 @@ export function dispatchCommand(
  * @param module
  * @param source
  */
-export function eventDispatcher(
-    module: Processed<Module>,
-    source: unknown,
-) {
+export function eventDispatcher(module: Processed<Module>, source: unknown) {
     assert.ok(source instanceof EventEmitter, `${source} is not an EventEmitter`);
     /**
      * Sometimes fromEvent emits a single parameter, which is not an Array. This
@@ -38,25 +30,27 @@ export function eventDispatcher(
      * @param src
      */
     const arrayify = pipe(
-        map(event => Array.isArray(event) ? event as unknown[] : [event]),
-        map( args => ({ module, args }))
+        map(event => (Array.isArray(event) ? (event as unknown[]) : [event])),
+        map(args => ({ module, args })),
     );
-    const createResult = createResultResolver<Processed<Module>, { module: Processed<Module>; args: unknown[] }, unknown[]>({
-        createStream: ({ module, args } ) => from(module.onEvent).pipe(callPlugin(args)),
-        onSuccess: ({ args } ) => args
+    const createResult = createResultResolver<
+        Processed<Module>,
+        { module: Processed<Module>; args: unknown[] },
+        unknown[]
+    >({
+        createStream: ({ module, args }) => from(module.onEvent).pipe(callPlugin(args)),
+        onSuccess: ({ args }) => args,
     });
     const execute: OperatorFunction<unknown[], unknown> = pipe(
-        concatMap(async args => module.execute(...args))
+        concatMap(async args => module.execute(...args)),
     );
-    return fromEvent(source, module.name)
-        .pipe(
-            arrayify,
-            concatMap(createResult),
-            execute
-        );
+    return fromEvent(source, module.name).pipe(arrayify, concatMap(createResult), execute);
 }
 
-export function dispatchAutocomplete(module: Processed<BothCommand | SlashCommand>, interaction: AutocompleteInteraction) {
+export function dispatchAutocomplete(
+    module: Processed<BothCommand | SlashCommand>,
+    interaction: AutocompleteInteraction,
+) {
     const option = treeSearch(interaction, module.options);
     if (option !== undefined) {
         return {

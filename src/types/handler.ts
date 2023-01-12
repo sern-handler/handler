@@ -48,7 +48,7 @@ export type ReplyOptions =
     | string
     | Omit<InteractionReplyOptions, 'fetchReply'>
     | MessageReplyOptions;
-
+//prettier-ignore
 export type MapDeps<Deps extends Dependencies, T extends readonly unknown[]> = T extends [
     infer First extends keyof Deps,
     ...infer Rest extends readonly unknown[],

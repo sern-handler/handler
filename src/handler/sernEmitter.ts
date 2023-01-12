@@ -37,19 +37,34 @@ class SernEmitter extends EventEmitter {
     ): boolean {
         return super.emit(eventName, ...args);
     }
-    private static payload<T extends Payload>(type: PayloadType, module?: Module, reason?: unknown) {
+    private static payload<T extends Payload>(
+        type: PayloadType,
+        module?: Module,
+        reason?: unknown,
+    ) {
         return { type, module, reason } as T;
     }
     static failure(module?: Module, reason?: unknown) {
         //The generic cast Payload & { type : PayloadType.* } coerces the type to be a failure payload
         // same goes to the other methods below
-        return SernEmitter.payload<Payload & { type: PayloadType.Failure }>(PayloadType.Failure, module, reason);
+        return SernEmitter.payload<Payload & { type: PayloadType.Failure }>(
+            PayloadType.Failure,
+            module,
+            reason,
+        );
     }
     static success(module: Module) {
-        return SernEmitter.payload<Payload & { type: PayloadType.Success }>(PayloadType.Success, module);
+        return SernEmitter.payload<Payload & { type: PayloadType.Success }>(
+            PayloadType.Success,
+            module,
+        );
     }
     static warning(reason: unknown) {
-        return SernEmitter.payload<Payload & { type: PayloadType.Warning }>(PayloadType.Warning, undefined, reason);
+        return SernEmitter.payload<Payload & { type: PayloadType.Warning }>(
+            PayloadType.Warning,
+            undefined,
+            reason,
+        );
     }
 }
 

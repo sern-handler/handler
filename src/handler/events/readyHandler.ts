@@ -28,23 +28,29 @@ export default class ReadyHandler extends EventsHandler<{
             concatMap(() =>
                 Files.buildData<CommandModule>(wrapper.commands).pipe(
                     errTap(reason => {
-                      this.emitter.emit('module.register', SernEmitter.failure(undefined, reason));
-                    }))
+                        this.emitter.emit(
+                            'module.register',
+                            SernEmitter.failure(undefined, reason),
+                        );
+                    }),
+                ),
             ),
         );
         this.init();
         this.payloadSubject
             .pipe(
-                concatMap(
-                    scanModule({
+                scanModule({
                     onFailure: module => {
-                        this.emitter.emit('module.register', SernEmitter.failure(module, SernError.PluginFailure));
+                        this.emitter.emit(
+                            'module.register',
+                            SernEmitter.failure(module, SernError.PluginFailure),
+                        );
                     },
-                    onSuccess: ( {module} ) => {
+                    onSuccess: ({ module }) => {
                         this.emitter.emit('module.register', SernEmitter.success(module));
                         return module;
-                    }
-                })),
+                    },
+                }),
             )
             .subscribe(module => {
                 const res = registerModule(this.modules, module as Processed<CommandModule>);
@@ -55,9 +61,7 @@ export default class ReadyHandler extends EventsHandler<{
     }
 
     protected init() {
-        this.discordEvent.pipe(
-            defineAllFields(),
-        ).subscribe({
+        this.discordEvent.pipe(defineAllFields()).subscribe({
             next: value => this.setState(value),
             complete: () => this.payloadSubject.unsubscribe(),
         });

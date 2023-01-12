@@ -14,7 +14,6 @@ import { eventDispatcher } from './dispatchers';
 import { handleError } from '../contracts/errorHandling';
 import { defineAllFields } from './operators';
 
-
 export function processEvents({ containerConfig, events }: Wrapper) {
     const [client, errorHandling, sernEmitter, logging] = containerConfig.get(
         '@sern/client',
@@ -27,28 +26,34 @@ export function processEvents({ containerConfig, events }: Wrapper) {
 
     const eventCreation$ = eventStream$.pipe(
         defineAllFields(),
-        concatMap( scanModule({
-            onFailure: module => sernEmitter.emit('module.register',SernEmitter.success(module)),
-            onSuccess: ( { module }) => {
-                sernEmitter.emit('module.register', SernEmitter.failure(module, SernError.PluginFailure));
+        scanModule({
+            onFailure: module => sernEmitter.emit('module.register', SernEmitter.success(module)),
+            onSuccess: ({ module }) => {
+                sernEmitter.emit(
+                    'module.register',
+                    SernEmitter.failure(module, SernError.PluginFailure),
+                );
                 return module;
-            }
-        })),
+            },
+        }),
     );
-    const intoDispatcher = (e: Processed<EventModule | CommandModule>) => match(e)
-        .with({ type: EventType.Sern }, m => eventDispatcher(m, sernEmitter))
-        .with({ type: EventType.Discord }, m => eventDispatcher(m, client))
-        .with({ type: EventType.External }, m => eventDispatcher(m, lazy(m.emitter)))
-        .otherwise(() => errorHandling.crash(Error(SernError.InvalidModuleType)));
+    const intoDispatcher = (e: Processed<EventModule | CommandModule>) =>
+        match(e)
+            .with({ type: EventType.Sern }, m => eventDispatcher(m, sernEmitter))
+            .with({ type: EventType.Discord }, m => eventDispatcher(m, client))
+            .with({ type: EventType.External }, m => eventDispatcher(m, lazy(m.emitter)))
+            .otherwise(() => errorHandling.crash(Error(SernError.InvalidModuleType)));
 
-    eventCreation$.pipe(
-        map(intoDispatcher),
-        /**
-         * Where all events are turned on
-         */
-        tap(dispatcher => dispatcher.subscribe()),
-        catchError(handleError(errorHandling, logging)),
-    ).subscribe();
+    eventCreation$
+        .pipe(
+            map(intoDispatcher),
+            /**
+             * Where all events are turned on
+             */
+            tap(dispatcher => dispatcher.subscribe()),
+            catchError(handleError(errorHandling, logging)),
+        )
+        .subscribe();
 }
 
 function eventObservable$(events: string, emitter: SernEmitter) {
