@@ -1,3 +1,9 @@
+/**
+ * This file holds sern's rxjs operators used for processing data.
+ * Each function should be modular and testable, not bound to discord / sern
+ * and independent of each other
+ */
+
 import { concatMap, defaultIfEmpty, EMPTY, every, map, of, OperatorFunction, pipe } from 'rxjs';
 import type { AnyModule } from '../../../types/module';
 import { nameOrFilename } from '../../utilities/functions';

@@ -103,8 +103,8 @@ export function createResultResolver<
     createStream: (args: Args) => Observable<VoidResult>;
 }) {
     return (args: Args) => {
-        const task = config.createStream(args);
-        return task.pipe(
+        const task$ = config.createStream(args);
+        return task$.pipe(
             tap(result => {
                 if (result.err) {
                     config.onFailure?.(args.module);
