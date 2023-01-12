@@ -1,4 +1,4 @@
-import type { CommandInteractionOptionResolver } from 'discord.js';
+import type { Awaitable, CommandInteractionOptionResolver } from 'discord.js';
 import type { PayloadType } from '../handler/structures/enums';
 import type { InteractionReplyOptions, MessageReplyOptions } from 'discord.js';
 import type { EventEmitter } from 'events';

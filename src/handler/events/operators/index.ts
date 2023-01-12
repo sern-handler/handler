@@ -1,4 +1,13 @@
-import { concatMap, defaultIfEmpty, EMPTY, every, map, Observable, of } from 'rxjs';
+import {
+    concatMap,
+    defaultIfEmpty,
+    EMPTY,
+    every,
+    map,
+    Observable,
+    of, OperatorFunction,
+    pipe,
+} from 'rxjs';
 import type { AnyModule } from '../../../types/module';
 import { nameOrFilename } from '../../utilities/functions';
 import type { Result } from 'ts-results-es';
@@ -8,26 +17,23 @@ import type { Awaitable } from 'discord.js';
  * if {src} is true, mapTo V, else ignore
  * @param item
  */
-export function filterMapTo$<V>(item: () => V) {
-    return (src: Observable<boolean>) => src.pipe(
-        concatMap( shouldKeep =>
+export function filterMapTo$<V>(item: () => V): OperatorFunction<boolean, V> {
+    return pipe(concatMap( shouldKeep =>
             shouldKeep ? of(item()) : EMPTY
-        )
-    );
+        ));
 }
 
 /**
  * Calls any plugin with {args}.
  * @param args if an array, its spread and plugin called.
  */
-export function callPlugin$<V>(args: V) {
-    return (src: Observable<{ execute: (...args: any[]) => Awaitable<any>}>) =>
-        src.pipe(concatMap(async plugin => {
-            if (Array.isArray(args)) {
-                return plugin.execute(...args);
-            }
-            return plugin.execute(args);
-        }));
+export function callPlugin$<V>(args: V): OperatorFunction<{ execute : (...args: any[]) => Awaitable<any>}, any> {
+    return pipe(concatMap(async plugin => {
+          if (Array.isArray(args)) {
+              return plugin.execute(...args);
+          }
+          return plugin.execute(args);
+    }));
 }
 
 /**
@@ -53,8 +59,8 @@ export function defineAllFields$<T extends AnyModule>(
  * Checks if the stream of results is all ok.
  * @param src
  */
-export function everyPluginOk$(src: Observable<Result<void, void>>) {
-    return src.pipe(
+export function everyPluginOk$() : OperatorFunction<Result<void, void>, boolean> {
+    return pipe(
         every(result => result.ok),
         defaultIfEmpty(true),
     );
