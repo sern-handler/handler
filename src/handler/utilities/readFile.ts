@@ -22,7 +22,8 @@ function readPath(dir: string, arrayOfFiles: string[] = []): string[] {
 export const fmtFileName = (n: string) => n.substring(0, n.length - 3);
 
 /**
- *
+ *  a directory string is converted into a stream of modules.
+ *  starts the stream of modules that sern needs to process on init
  * @returns {Observable<{ mod: Module; absPath: string; }[]>} data from command files
  * @param commandDir
  */

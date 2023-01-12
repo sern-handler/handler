@@ -1,6 +1,11 @@
 import { ApplicationCommandOptionType, AutocompleteInteraction } from 'discord.js';
 import type { SernAutocompleteData, SernOptionsData } from '../../types/module';
 
+/**
+ * Uses an iterative DFS to check if an autocomplete node exists
+ * @param iAutocomplete
+ * @param options
+ */
 export default function treeSearch(
     iAutocomplete: AutocompleteInteraction,
     options: SernOptionsData[] | undefined,

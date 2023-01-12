@@ -20,11 +20,6 @@ import type {
     RoleSelectMenuInteraction,
     StringSelectMenuInteraction,
 } from 'discord.js';
-import type {
-    DiscordEventCommand,
-    ExternalEventCommand,
-    SernEventCommand,
-} from '../handler/structures/events';
 import { CommandType } from '../handler/structures/enums';
 import type { Args, SlashOptions } from './handler';
 import type Context from '../handler/structures/context';
@@ -32,6 +27,8 @@ import type { InitPlugin, ControlPlugin } from './plugin';
 import { EventType } from '../handler/structures/enums';
 import type { UserSelectMenuInteraction } from 'discord.js';
 import type { AnyCommandPlugin, AnyEventPlugin } from './plugin';
+import type { SernEventsMapping } from './handler';
+import type { ClientEvents } from 'discord.js';
 
 export interface Module {
     type: CommandType | EventType;
@@ -112,6 +109,27 @@ export interface AutocompleteCommand
     extends Omit<Module, 'name' | 'type' | 'plugins' | 'description'> {
     onEvent: ControlPlugin[];
     execute: (ctx: AutocompleteInteraction) => Awaitable<unknown>;
+}
+
+export interface SernEventCommand<T extends keyof SernEventsMapping = keyof SernEventsMapping>
+    extends Module {
+    name?: T;
+    type: EventType.Sern;
+    execute(...args: SernEventsMapping[T]): Awaitable<unknown>;
+}
+
+export interface DiscordEventCommand<T extends keyof ClientEvents = keyof ClientEvents>
+    extends Module {
+    name?: T;
+    type: EventType.Discord;
+    execute(...args: ClientEvents[T]): Awaitable<unknown>;
+}
+
+export interface ExternalEventCommand extends Module {
+    name?: string;
+    emitter: string;
+    type: EventType.External;
+    execute(...args: unknown[]): Awaitable<unknown>;
 }
 
 export type EventModule = DiscordEventCommand | SernEventCommand | ExternalEventCommand;

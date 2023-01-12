@@ -5,19 +5,19 @@ import type {
     BothCommand,
     ButtonCommand,
     ChannelSelectCommand,
-    ContextMenuUser,
+    ContextMenuUser, DiscordEventCommand, ExternalEventCommand,
     MentionableSelectCommand,
     ModalSubmitCommand,
-    RoleSelectCommand,
+    RoleSelectCommand, SernEventCommand,
     SlashCommand,
     StringSelectCommand,
     TextCommand,
     UserSelectCommand,
+    ContextMenuMsg
 } from '../../types/module';
 import type { AnyDefinedModule, Args, Payload, Processed, SlashOptions } from '../../types/handler';
 import type Context from '../structures/context';
 import type { MessageContextMenuCommandInteraction } from 'discord.js';
-import type { ContextMenuMsg } from '../../types/module';
 import type {
     ButtonInteraction,
     RoleSelectMenuInteraction,
@@ -31,11 +31,6 @@ import type {
     UserSelectMenuInteraction,
 } from 'discord.js';
 import { EventType } from '../structures/enums';
-import type {
-    DiscordEventCommand,
-    ExternalEventCommand,
-    SernEventCommand,
-} from '../structures/events';
 
 type CommandArgsMatrix = {
     [CommandType.Text]: {
