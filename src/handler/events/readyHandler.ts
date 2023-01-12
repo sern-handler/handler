@@ -13,7 +13,7 @@ import type { DefinedCommandModule, DefinedEventModule } from '../../types/handl
 import type { ModuleManager } from '../contracts';
 import type { ModuleStore } from '../structures/moduleStore';
 import { _const, err, ok } from '../utilities/functions';
-import { defineAllFields$ } from './operators';
+import { defineAllFields } from './operators';
 import SernEmitter from '../sernEmitter';
 
 export default class ReadyHandler extends EventsHandler<{
@@ -56,7 +56,7 @@ export default class ReadyHandler extends EventsHandler<{
 
     protected init() {
         this.discordEvent.pipe(
-            defineAllFields$,
+            defineAllFields,
         ).subscribe({
             next: value => this.setState(value),
             complete: () => this.payloadSubject.unsubscribe(),

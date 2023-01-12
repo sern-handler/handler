@@ -7,8 +7,8 @@ import treeSearch from '../../utilities/treeSearch';
 import type { BothCommand, Module, SlashCommand } from '../../../types/module';
 import { EventEmitter } from 'events';
 import * as assert from 'assert';
-import { concatMap, from, fromEvent, map, Observable } from 'rxjs';
-import { callPlugin$ } from '../operators';
+import { concatMap, from, fromEvent, map, Observable, OperatorFunction, pipe } from 'rxjs';
+import { callPlugin } from '../operators';
 import { createResultResolver } from '../observableHandling';
 
 export function dispatchCommand(
@@ -37,22 +37,22 @@ export function eventDispatcher(
      * operator function flattens events into an array
      * @param src
      */
-    const arrayifySource$ = (src: Observable<unknown>) => src.pipe(
+    const arrayify = pipe(
         map(event => Array.isArray(event) ? event : [event]),
         map( args => ({ module, args }))
     );
-    const createResult$ = createResultResolver<DefinedEventModule, { module: DefinedEventModule; args: any[] }, any[]>({
+    const createResult = createResultResolver<DefinedEventModule, { module: DefinedEventModule; args: any[] }, any[]>({
         onSuccess: ({ args } ) => args,
-        createStream: ({ module, args } ) => from(module.onEvent).pipe(callPlugin$(args)),
+        createStream: ({ module, args } ) => from(module.onEvent).pipe(callPlugin(args)),
     });
-    const execute$ = (src: Observable<any[]>) => src.pipe(
+    const execute: OperatorFunction<any[], any> = pipe(
         concatMap(async args => module.execute(...args))
     );
     return fromEvent(source, module.name)
         .pipe(
-            arrayifySource$,
-            concatMap(createResult$),
-            execute$
+            arrayify,
+            concatMap(createResult),
+            execute
         );
 }
 

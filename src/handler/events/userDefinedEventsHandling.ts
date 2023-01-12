@@ -12,7 +12,7 @@ import type { ErrorHandling, Logging } from '../contracts';
 import { SernError } from '../structures/errors';
 import { eventDispatcher } from './dispatchers';
 import { handleError } from '../contracts/errorHandling';
-import { defineAllFields$ } from './operators';
+import { defineAllFields } from './operators';
 
 
 export function processEvents({ containerConfig, events }: Wrapper) {
@@ -26,7 +26,7 @@ export function processEvents({ containerConfig, events }: Wrapper) {
     const eventStream$ = eventObservable$(events!, sernEmitter);
 
     const eventCreation$ = eventStream$.pipe(
-        defineAllFields$,
+        defineAllFields,
         concatMap( scanModule({
             onFailure: module => sernEmitter.emit('module.register',SernEmitter.success(module)),
             onSuccess: ( { module }) => {

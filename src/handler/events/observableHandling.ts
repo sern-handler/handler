@@ -6,7 +6,7 @@ import type { AnyModule, Module } from '../../types/module';
 import { _const as i } from '../utilities/functions';
 import SernEmitter from '../sernEmitter';
 import type { AnyDefinedModule } from '../../types/handler';
-import { callPlugin$, everyPluginOk$, filterMapTo$ } from './operators';
+import { callPlugin, everyPluginOk, filterMapTo } from './operators';
 
 /**
  * Ignores messages from any person / bot except itself
@@ -105,8 +105,8 @@ export function createResultResolver<
                     config.onFailure?.(args.module);
                 }
             }),
-            everyPluginOk$(),
-            filterMapTo$(() => config.onSuccess(args)),
+            everyPluginOk(),
+            filterMapTo(() => config.onSuccess(args)),
         );
     };
 }
@@ -121,7 +121,7 @@ export function scanModule<T extends AnyDefinedModule, Args extends { module: T,
         onSuccess :(module: Args) => T
 }) {
     return createResultResolver({
-        createStream: (args) => from(args.module.plugins).pipe(callPlugin$(args)),
+        createStream: (args) => from(args.module.plugins).pipe(callPlugin(args)),
         ...config
     });
 }
@@ -136,7 +136,7 @@ export function makeModuleExecutor<M extends Module, Args extends { module: M; a
     const onSuccess = ({ args, module }: Args) => ({ task: () => module.execute(...args), module });
     return createResultResolver({
         onFailure,
-        createStream: ({ args, module }) => from(module.onEvent).pipe(callPlugin$(args)),
+        createStream: ({ args, module }) => from(module.onEvent).pipe(callPlugin(args)),
         onSuccess,
     });
 }
