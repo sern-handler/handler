@@ -1,4 +1,4 @@
-import { catchError, concatMap, map, tap } from 'rxjs';
+import { catchError, map, tap } from 'rxjs';
 import { buildData } from '../utilities/readFile';
 import type { Dependencies, Processed } from '../../types/handler';
 import { EventType } from '../structures/enums';
