@@ -4,15 +4,16 @@ import type Wrapper from '../structures/wrapper';
 import type { Message } from 'discord.js';
 import { executeModule, ignoreNonBot, makeModuleExecutor } from './observableHandling';
 import { fmt } from '../utilities/messageHelpers';
-import type { CommandModule, Module } from '../../types/module';
+import type { CommandModule, Module, TextCommand } from '../../types/module';
 import { handleError } from '../contracts/errorHandling';
 import type { ModuleStore } from '../structures/moduleStore';
 import { contextArgs, dispatchCommand } from './dispatchers';
 import { SernError } from '../structures/errors';
 import SernEmitter from '../sernEmitter';
+import type { Processed } from '../../types/handler';
 
 export default class MessageHandler extends EventsHandler<{
-    module: Module;
+    module: Processed<Module>;
     args: unknown[]
 }> {
     protected discordEvent: Observable<Message>;
@@ -35,7 +36,7 @@ export default class MessageHandler extends EventsHandler<{
     protected init(): void {
         if (this.wrapper.defaultPrefix === undefined) return; //for now, just ignore if prefix doesn't exist
         const { defaultPrefix } = this.wrapper;
-        const get = (cb: (ms: ModuleStore) => CommandModule | undefined) => {
+        const get = (cb: (ms: ModuleStore) => Processed<CommandModule> | undefined) => {
             return this.modules.get(cb);
         };
         this.discordEvent
@@ -55,7 +56,7 @@ export default class MessageHandler extends EventsHandler<{
                     };
                     return of(payload);
                 }),
-                map(({ args, module }) => dispatchCommand(module, args)),
+                map(({ args, module }) => dispatchCommand(module as Processed<TextCommand>, args)),
             )
             .subscribe({
                 next: value => this.setState(value),
@@ -63,7 +64,7 @@ export default class MessageHandler extends EventsHandler<{
             });
     }
 
-    protected setState(state: { module: Module, args: unknown[] }) {
+    protected setState(state: { module: Processed<Module>, args: unknown[] }) {
         this.payloadSubject.next(state);
     }
 }

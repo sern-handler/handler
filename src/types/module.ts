@@ -33,7 +33,7 @@ import { EventType } from '../handler/structures/enums';
 import type { UserSelectMenuInteraction } from 'discord.js';
 
 export interface Module {
-    type?: CommandType | EventType;
+    type: CommandType | EventType;
     name?: string;
     onEvent: ControlPlugin[];
     plugins: InitPlugin[];
@@ -107,11 +107,7 @@ export interface ModalSubmitCommand extends Module {
     execute: (ctx: ModalSubmitInteraction) => Awaitable<unknown>;
 }
 
-export interface AutocompleteCommand extends Module {
-    name?: never;
-    description?: never;
-    type?: never;
-    plugins: never;
+export interface AutocompleteCommand extends Omit<Module, 'name' | 'type' | 'plugins' | 'description'> {
     onEvent: ControlPlugin[];
     execute: (ctx: AutocompleteInteraction) => Awaitable<unknown>;
 }

@@ -14,10 +14,11 @@ import type { CommandModule } from '../../types/module';
 import { handleError } from '../contracts/errorHandling';
 import type { ModuleStore } from '../structures/moduleStore';
 import SernEmitter from '../sernEmitter';
+import type { Processed } from '../../types/handler';
 
 export default class InteractionHandler extends EventsHandler<{
     event: Interaction;
-    module: CommandModule;
+    module: Processed<CommandModule>;
 }> {
     protected override discordEvent: Observable<Interaction>;
     constructor(wrapper: Wrapper) {
@@ -40,7 +41,7 @@ export default class InteractionHandler extends EventsHandler<{
     }
 
     override init() {
-        const get = (cb: (ms: ModuleStore) => CommandModule | undefined) => {
+        const get = (cb: (ms: ModuleStore) => Processed<CommandModule> | undefined) => {
             return this.modules.get(cb);
         };
         /**
@@ -84,11 +85,11 @@ export default class InteractionHandler extends EventsHandler<{
             this.emitter.emit('warning', SernEmitter.warning('Found no module for this interaction'));
         } else {
             //if statement above checks already, safe cast
-            this.payloadSubject.next(state as { event: Interaction; module: CommandModule });
+            this.payloadSubject.next(state as { event: Interaction; module: Processed<CommandModule> });
         }
     }
 
-    protected createDispatcher({ module, event }: { event: Interaction; module: CommandModule }) {
+    protected createDispatcher({ module, event }: { event: Interaction; module: Processed<CommandModule> }) {
         return match(module)
             .with({ type: CommandType.Text }, () => this.crashHandler.crash(Error(SernError.MismatchEvent)))
             //P.union = either CommandType.Slash or CommandType.Both

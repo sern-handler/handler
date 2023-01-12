@@ -1,4 +1,4 @@
-import type { Awaitable, CommandInteractionOptionResolver } from 'discord.js';
+import type { CommandInteractionOptionResolver } from 'discord.js';
 import type { PayloadType } from '../handler/structures/enums';
 import type { InteractionReplyOptions, MessageReplyOptions } from 'discord.js';
 import type { EventEmitter } from 'events';
@@ -20,9 +20,7 @@ export type SlashOptions = Omit<CommandInteractionOptionResolver, 'getMessage' |
  * After modules are transformed, name and description are given default values if none
  * are provided to Module. This type represents that transformation
  */
-export type DefinedCommandModule = CommandModule & { name: string; description: string };
-export type DefinedEventModule = EventModule & { name: string };
-export type AnyDefinedModule = DefinedCommandModule | DefinedEventModule;
+export type AnyDefinedModule = Processed<CommandModule | EventModule>;
 export type Payload =
     | { type: PayloadType.Success; module: AnyModule }
     | { type: PayloadType.Failure; module?: AnyModule; reason: string | Error }

@@ -9,7 +9,7 @@ import { match } from 'ts-pattern';
 import { Result } from 'ts-results-es';
 import { ApplicationCommandType, ComponentType } from 'discord.js';
 import type { CommandModule } from '../../types/module';
-import type { DefinedCommandModule, DefinedEventModule } from '../../types/handler';
+import type { Processed } from '../../types/handler';
 import type { ModuleManager } from '../contracts';
 import type { ModuleStore } from '../structures/moduleStore';
 import { _const, err, ok } from '../utilities/functions';
@@ -17,7 +17,7 @@ import { defineAllFields } from './operators';
 import SernEmitter from '../sernEmitter';
 
 export default class ReadyHandler extends EventsHandler<{
-    module: DefinedCommandModule;
+    module: Processed<CommandModule>;
     absPath: string;
 }> {
     protected discordEvent!: Observable<{ module: CommandModule; absPath: string }>;
@@ -47,7 +47,7 @@ export default class ReadyHandler extends EventsHandler<{
                 })),
             )
             .subscribe(module => {
-                const res = registerModule(this.modules, module);
+                const res = registerModule(this.modules, module as Processed<CommandModule>);
                 if (res.err) {
                     this.crashHandler.crash(Error(SernError.InvalidModuleType));
                 }
@@ -56,27 +56,27 @@ export default class ReadyHandler extends EventsHandler<{
 
     protected init() {
         this.discordEvent.pipe(
-            defineAllFields,
+            defineAllFields(),
         ).subscribe({
             next: value => this.setState(value),
             complete: () => this.payloadSubject.unsubscribe(),
         });
     }
-    protected setState(state: { absPath: string; module: DefinedCommandModule }): void {
+    protected setState(state: { absPath: string; module: Processed<CommandModule> }): void {
         this.payloadSubject.next(state);
     }
 }
 
-function registerModule(
+function registerModule<T extends Processed<CommandModule>>(
     manager: ModuleManager,
-    mod: DefinedCommandModule | DefinedEventModule,
+    mod: T,
 ): Result<void, void> {
     const name = mod.name;
     const insert = (cb: (ms: ModuleStore) => void) => {
         const set = Result.wrap(_const(manager.set(cb)));
         return set.ok ? ok() : err();
     };
-    return match(mod)
+    return match(mod as Processed<CommandModule>)
         .with({ type: CommandType.Text }, mod => {
             mod.alias?.forEach(a => insert(ms => ms.TextCommands.set(a, mod)));
             return insert(ms => ms.TextCommands.set(name, mod));

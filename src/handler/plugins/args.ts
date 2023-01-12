@@ -82,7 +82,7 @@ type CommandArgsMatrix = {
 
 type EventArgsMatrix = {
     [EventType.Discord] : {
-       [PluginType.Control] : [/* library coupled */ClientEvents[keyof ClientEvents]]
+       [PluginType.Control] : /* library coupled */ClientEvents[keyof ClientEvents]
        [PluginType.Init] : [InitArgs<Processed<DiscordEventCommand>>]
     };
     [EventType.Sern] : {
@@ -90,7 +90,7 @@ type EventArgsMatrix = {
         [PluginType.Init] : [InitArgs<Processed<SernEventCommand>>]
     };
     [EventType.External] : {
-        [PluginType.Control] : [unknown[]]
+        [PluginType.Control] : unknown[]
         [PluginType.Init] : [InitArgs<Processed<ExternalEventCommand>>]
     }
 }
@@ -101,4 +101,4 @@ export interface InitArgs<T extends AnyDefinedModule> {
 }
 
 export type CommandArgs<I extends CommandType = CommandType, J extends PluginType = PluginType> = CommandArgsMatrix[I][J]
-export type EventArgs<I extends EventType, J extends PluginType> = EventArgsMatrix[I][J]
+export type EventArgs<I extends EventType = EventType, J extends PluginType = PluginType> = EventArgsMatrix[I][J]

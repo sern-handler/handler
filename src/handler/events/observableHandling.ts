@@ -2,11 +2,11 @@ import type { Awaitable, Message } from 'discord.js';
 import { concatMap, EMPTY, from, Observable, of, tap, throwError } from 'rxjs';
 import type { SernError } from '../structures/errors';
 import { Result } from 'ts-results-es';
-import type { AnyModule, Module } from '../../types/module';
+import type { AnyModule, CommandModule, EventModule, Module } from '../../types/module';
 import { _const as i } from '../utilities/functions';
 import SernEmitter from '../sernEmitter';
-import type { AnyDefinedModule } from '../../types/handler';
 import { callPlugin, everyPluginOk, filterMapTo } from './operators';
+import type { Processed } from '../../types/handler';
 
 /**
  * Ignores messages from any person / bot except itself
@@ -61,7 +61,7 @@ export function errTap<T extends AnyModule>(cb: (err: SernError) => void) {
 export function executeModule(
     emitter: SernEmitter,
     { module, task }: {
-        module: Module;
+        module: Processed<Module>;
         task: () => Awaitable<unknown>;
     },
 ) {
@@ -89,7 +89,7 @@ export function executeModule(
  * @returns receiver function for flattening a stream of data
  */
 export function createResultResolver<
-    T extends Module,
+    T extends Processed<Module>,
     Args extends { module: T; [key: string]: unknown },
     Output>(
     config: {
@@ -115,7 +115,7 @@ export function createResultResolver<
  * Calls a module's init plugins and checks for Err. If so, call { onFailure } and
  * ignore the module
  */
-export function scanModule<T extends AnyDefinedModule, Args extends { module: T, absPath: string }>(
+export function scanModule<T extends Processed<CommandModule | EventModule>, Args extends { module: T, absPath: string }>(
     config : {
         onFailure?: (module: T) => unknown,
         onSuccess :(module: Args) => T
@@ -130,7 +130,7 @@ export function scanModule<T extends AnyDefinedModule, Args extends { module: T,
  * Creates an executable task ( execute the command ) if  all control plugins are successful
  * @param onFailure emits a failure response to the SernEmitter
  */
-export function makeModuleExecutor<M extends Module, Args extends { module: M; args: any[] }>(
+export function makeModuleExecutor<M extends Processed<Module>, Args extends { module: M; args: unknown[] }>(
     onFailure: (m: M) => unknown,
 ) {
     const onSuccess = ({ args, module }: Args) => ({ task: () => module.execute(...args), module });

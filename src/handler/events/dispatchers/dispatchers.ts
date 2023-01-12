@@ -1,18 +1,18 @@
-import type { DefinedEventModule } from '../../../types/handler';
+import type { Processed } from '../../../types/handler';
 import type {
     AutocompleteInteraction,
 } from 'discord.js';
 import { SernError } from '../../structures/errors';
 import treeSearch from '../../utilities/treeSearch';
-import type { BothCommand, Module, SlashCommand } from '../../../types/module';
+import type { BothCommand, CommandModule, Module, SlashCommand } from '../../../types/module';
 import { EventEmitter } from 'events';
 import * as assert from 'assert';
-import { concatMap, from, fromEvent, map, Observable, OperatorFunction, pipe } from 'rxjs';
+import { concatMap, from, fromEvent, map, OperatorFunction, pipe } from 'rxjs';
 import { callPlugin } from '../operators';
 import { createResultResolver } from '../observableHandling';
 
 export function dispatchCommand(
-    module: Module,
+    module: Processed<CommandModule>,
     createArgs: () => unknown[],
 ) {
     const args = createArgs();
@@ -28,7 +28,7 @@ export function dispatchCommand(
  * @param source
  */
 export function eventDispatcher(
-    module: DefinedEventModule,
+    module: Processed<Module>,
     source: unknown,
 ) {
     assert.ok(source instanceof EventEmitter, `${source} is not an EventEmitter`);
@@ -38,14 +38,14 @@ export function eventDispatcher(
      * @param src
      */
     const arrayify = pipe(
-        map(event => Array.isArray(event) ? event : [event]),
+        map(event => Array.isArray(event) ? event as unknown[] : [event]),
         map( args => ({ module, args }))
     );
-    const createResult = createResultResolver<DefinedEventModule, { module: DefinedEventModule; args: any[] }, any[]>({
-        onSuccess: ({ args } ) => args,
+    const createResult = createResultResolver<Processed<Module>, { module: Processed<Module>; args: unknown[] }, unknown[]>({
         createStream: ({ module, args } ) => from(module.onEvent).pipe(callPlugin(args)),
+        onSuccess: ({ args } ) => args
     });
-    const execute: OperatorFunction<any[], any> = pipe(
+    const execute: OperatorFunction<unknown[], unknown> = pipe(
         concatMap(async args => module.execute(...args))
     );
     return fromEvent(source, module.name)
@@ -56,7 +56,7 @@ export function eventDispatcher(
         );
 }
 
-export function dispatchAutocomplete(module: BothCommand | SlashCommand, interaction: AutocompleteInteraction) {
+export function dispatchAutocomplete(module: Processed<BothCommand | SlashCommand>, interaction: AutocompleteInteraction) {
     const option = treeSearch(interaction, module.options);
     if (option !== undefined) {
         return {

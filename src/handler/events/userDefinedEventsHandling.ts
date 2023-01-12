@@ -1,10 +1,10 @@
 import { catchError, concatMap, map, tap } from 'rxjs';
 import { buildData } from '../utilities/readFile';
-import type { AnyDefinedModule,  Dependencies } from '../../types/handler';
+import type { Dependencies, Processed } from '../../types/handler';
 import { EventType } from '../structures/enums';
 import type Wrapper from '../structures/wrapper';
 import { errTap, scanModule } from './observableHandling';
-import type { EventModule } from '../../types/module';
+import type { CommandModule, EventModule } from '../../types/module';
 import type { EventEmitter } from 'events';
 import SernEmitter from '../sernEmitter';
 import { match } from 'ts-pattern';
@@ -26,7 +26,7 @@ export function processEvents({ containerConfig, events }: Wrapper) {
     const eventStream$ = eventObservable$(events!, sernEmitter);
 
     const eventCreation$ = eventStream$.pipe(
-        defineAllFields,
+        defineAllFields(),
         concatMap( scanModule({
             onFailure: module => sernEmitter.emit('module.register',SernEmitter.success(module)),
             onSuccess: ( { module }) => {
@@ -35,7 +35,7 @@ export function processEvents({ containerConfig, events }: Wrapper) {
             }
         })),
     );
-    const intoDispatcher = (e: AnyDefinedModule) => match(e)
+    const intoDispatcher = (e: Processed<EventModule | CommandModule>) => match(e)
         .with({ type: EventType.Sern }, m => eventDispatcher(m, sernEmitter))
         .with({ type: EventType.Discord }, m => eventDispatcher(m, client))
         .with({ type: EventType.External }, m => eventDispatcher(m, lazy(m.emitter)))

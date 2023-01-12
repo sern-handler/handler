@@ -4,14 +4,13 @@ import {
     EMPTY,
     every,
     map,
-    Observable,
     of, OperatorFunction,
     pipe,
 } from 'rxjs';
 import type { AnyModule } from '../../../types/module';
 import { nameOrFilename } from '../../utilities/functions';
 import type { Result } from 'ts-results-es';
-import type { Awaitable } from 'discord.js';
+import type { PluginResult } from '../../plugins';
 
 /**
  * if {src} is true, mapTo V, else ignore
@@ -27,7 +26,10 @@ export function filterMapTo<V>(item: () => V): OperatorFunction<boolean, V> {
  * Calls any plugin with {args}.
  * @param args if an array, its spread and plugin called.
  */
-export function callPlugin<V>(args: V): OperatorFunction<{ execute : (...args: any[]) => Awaitable<any>}, any> {
+export function callPlugin<V>(args: V): OperatorFunction<{
+    execute : (...args: unknown[]) => PluginResult },
+    Result<void, void>
+    > {
     return pipe(concatMap(async plugin => {
           if (Array.isArray(args)) {
               return plugin.execute(...args);
@@ -37,11 +39,9 @@ export function callPlugin<V>(args: V): OperatorFunction<{ execute : (...args: a
 }
 
 /**
- * operator function that fill the defaults for a module,
+ * operator function that fill the defaults for a module
  */
-export function defineAllFields<T extends AnyModule>(
-    src: Observable<{ absPath: string; module: T }>,
-) {
+export function defineAllFields<T extends AnyModule>() {
     const fillFields = ({ absPath, module }: { absPath: string; module: T }) => ({
         absPath,
         module: {
@@ -50,14 +50,13 @@ export function defineAllFields<T extends AnyModule>(
             ...module,
         }
     });
-    return src.pipe(
+    return pipe(
         map(fillFields),
     );
 }
 
 /**
  * Checks if the stream of results is all ok.
- * @param src
  */
 export function everyPluginOk() : OperatorFunction<Result<void, void>, boolean> {
     return pipe(

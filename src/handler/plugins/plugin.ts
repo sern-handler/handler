@@ -14,24 +14,24 @@
 import type {  Awaitable } from 'discord.js';
 import type { Result} from 'ts-results-es';
 import type { CommandType } from '../structures/enums';
-import type { CommandModuleDefs, EventModuleDefs } from '../../types/module';
+import type { CommandModule, CommandModuleDefs, EventModule, EventModuleDefs } from '../../types/module';
 
 import type { EventType, PluginType } from '../structures/enums';
-import type { DefinedCommandModule, DefinedEventModule } from '../../types/handler';
 import type { InitArgs } from './args';
+import type { Processed } from '../../types/handler';
 export type PluginResult = Awaitable<Result<void, void>>;
 
-export interface Plugin<Args extends any[] = unknown[]> {
+export interface Plugin<Args extends any[] = any[]> {
     type: PluginType;
     execute: (...args: Args) => PluginResult
 }
 
-export interface InitPlugin<Args extends unknown[] = unknown[]> extends Plugin<Args> {
+export interface InitPlugin<Args extends any[] = any[]>  {
     type: PluginType.Init;
     execute: (...args: Args) => PluginResult
 }
 
-export interface ControlPlugin<Args extends unknown[] = unknown[]> extends Plugin<Args> {
+export interface ControlPlugin<Args extends any[] = any[]>  {
     type: PluginType.Control;
     execute: (...args: Args) => PluginResult
 }
@@ -43,8 +43,8 @@ export type EventModulesNoPlugins = {
     [T in EventType]: Omit<EventModuleDefs[T], 'plugins' | 'onEvent'>;
 };
 
-export type AnyCommandPlugin = ControlPlugin | InitPlugin<[InitArgs<DefinedCommandModule>]>;
-export type AnyEventPlugin = ControlPlugin | InitPlugin<[InitArgs<DefinedEventModule>]>;
+export type AnyCommandPlugin = ControlPlugin | InitPlugin<[InitArgs<Processed<CommandModule>>]>;
+export type AnyEventPlugin = ControlPlugin | InitPlugin<[InitArgs<Processed<EventModule>>]>;
 
 export type InputEvent = {
     [T in EventType]: EventModulesNoPlugins[T] & { plugins?: AnyEventPlugin[] };
