@@ -1,5 +1,5 @@
 import { EventsHandler } from './eventsHandler';
-import { catchError, concatMap, EMPTY, fromEvent, map, Observable, of } from 'rxjs';
+import { catchError, concatMap, EMPTY, finalize, fromEvent, map, Observable, of } from 'rxjs';
 import type Wrapper from '../structures/wrapper';
 import type { Message } from 'discord.js';
 import { executeModule, ignoreNonBot, makeModuleExecutor } from './observableHandling';
@@ -11,6 +11,7 @@ import { contextArgs, dispatchCommand } from './dispatchers';
 import { SernError } from '../structures/errors';
 import SernEmitter from '../sernEmitter';
 import type { Processed } from '../../types/handler';
+import { useContainerRaw } from '../dependencies/provider';
 
 export default class MessageHandler extends EventsHandler<{
     module: Processed<Module>;
@@ -31,7 +32,15 @@ export default class MessageHandler extends EventsHandler<{
                     );
                 }),
                 concatMap(payload => executeModule(this.emitter, payload)),
-                catchError(handleError(this.crashHandler, this.logger)),
+                catchError(handleError(this.crashHandler)),
+                finalize(() => {
+                    this.logger?.info({ message: 'messageCreate stream closed or reached end of lifetime'});
+                    useContainerRaw()
+                        ?.disposeAll()
+                        .then(() => {
+                            this.logger?.info({ message: 'Cleaning container and crashing' });
+                        });
+                })
             )
             .subscribe();
     }

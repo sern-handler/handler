@@ -1,4 +1,4 @@
-import { catchError, map, tap } from 'rxjs';
+import { catchError, finalize, map, tap } from 'rxjs';
 import { buildData } from '../utilities/readFile';
 import type { Dependencies, Processed } from '../../types/handler';
 import { EventType } from '../structures/enums';
@@ -13,9 +13,10 @@ import { SernError } from '../structures/errors';
 import { eventDispatcher } from './dispatchers';
 import { handleError } from '../contracts/errorHandling';
 import { defineAllFields } from './operators';
+import { useContainerRaw } from '../dependencies/provider';
 
 export function processEvents({ containerConfig, events }: Wrapper) {
-    const [client, errorHandling, sernEmitter, logging] = containerConfig.get(
+    const [client, errorHandling, sernEmitter, logger] = containerConfig.get(
         '@sern/client',
         '@sern/errors',
         '@sern/emitter',
@@ -51,7 +52,15 @@ export function processEvents({ containerConfig, events }: Wrapper) {
              * Where all events are turned on
              */
             tap(dispatcher => dispatcher.subscribe()),
-            catchError(handleError(errorHandling, logging)),
+            catchError(handleError(errorHandling, logger)),
+            finalize(() => {
+                logger?.info({ message: 'an event module reached end of lifetime'});
+                useContainerRaw()
+                    ?.disposeAll()
+                    .then(() => {
+                        logger?.info({ message: 'Cleaning container and crashing' });
+                    });
+            })
         )
         .subscribe();
 }

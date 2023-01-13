@@ -1,6 +1,5 @@
 import type { Observable } from 'rxjs';
 import type { Logging } from './logging';
-import { useContainerRaw } from '../dependencies/provider';
 import util from 'util';
 export interface ErrorHandling {
     /**
@@ -36,11 +35,6 @@ export function handleError<C>(crashHandler: ErrorHandling, logging?: Logging) {
         // This is done to fit the ErrorHandling contract
         const err = pload instanceof Error ? pload : Error(util.format(pload));
         if (crashHandler.keepAlive == 0) {
-            useContainerRaw()
-                ?.disposeAll()
-                .then(() => {
-                    logging?.info({ message: 'Cleaning container and crashing' });
-                });
             crashHandler.crash(err);
         }
         //formatted payload

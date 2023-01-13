@@ -1,5 +1,5 @@
 import type { Interaction } from 'discord.js';
-import { catchError, concatMap, fromEvent, map, Observable } from 'rxjs';
+import { catchError, concatMap, finalize, fromEvent, map, Observable } from 'rxjs';
 import type Wrapper from '../structures/wrapper';
 import { EventsHandler } from './eventsHandler';
 import { SernError } from '../structures/errors';
@@ -12,6 +12,7 @@ import { handleError } from '../contracts/errorHandling';
 import type { ModuleStore } from '../structures/moduleStore';
 import SernEmitter from '../sernEmitter';
 import type { Processed } from '../../types/handler';
+import { useContainerRaw } from '../dependencies/provider';
 
 export default class InteractionHandler extends EventsHandler<{
     event: Interaction;
@@ -33,7 +34,15 @@ export default class InteractionHandler extends EventsHandler<{
                     );
                 }),
                 concatMap(payload => executeModule(this.emitter, payload)),
-                catchError(handleError(this.crashHandler, this.logger)),
+                catchError(handleError(this.crashHandler)),
+                finalize(() => {
+                    this.logger?.info({ message: 'interactionCreate stream closed or reached end of lifetime'});
+                    useContainerRaw()
+                        ?.disposeAll()
+                        .then(() => {
+                            this.logger?.info({ message: 'Cleaning container and crashing' });
+                        });
+                })
             )
             .subscribe();
     }

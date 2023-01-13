@@ -21,7 +21,7 @@ export function filterMapTo<V>(item: () => V): OperatorFunction<boolean, V> {
  * Calls any plugin with {args}.
  * @param args if an array, its spread and plugin called.
  */
-export function callPlugin<V>(args: V): OperatorFunction<
+export function callPlugin(args: unknown): OperatorFunction<
     {
         execute: (...args: unknown[]) => PluginResult;
     },
