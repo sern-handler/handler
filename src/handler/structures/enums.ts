@@ -106,6 +106,16 @@ export enum PluginType {
      */
     Init = 1,
     /**
+     * @deprecated
+     * Use PluginType.Init instead
+     */
+    Command = 1,
+    /**
+     * @deprecated
+     * Use PluginType.Control instead
+     */
+    Event = 2,
+    /**
      * The PluginType for EventPlugins
      */
     Control = 2,
