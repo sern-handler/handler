@@ -16,4 +16,4 @@ export * from './handler/plugins';
 export * from './handler/contracts';
 export { SernEmitter };
 export { useContainerRaw } from './handler/dependencies/provider';
-export { single, transient } from './handler/dependencies/lifetimeFunctions';
+export { single, transient, many } from './handler/dependencies/lifetimeFunctions';

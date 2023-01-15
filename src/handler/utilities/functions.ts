@@ -13,8 +13,7 @@ export const _const = <T>(value: T) => () => value;
  * Used for transient in iti
  * @param value
  */
-// prettier-ignore
-export const transient = <T>(value: T) => () => _const(value);
+
 
 export function nameOrFilename(modName: string | undefined, absPath: string) {
     return modName ?? Files.fmtFileName(basename(absPath));

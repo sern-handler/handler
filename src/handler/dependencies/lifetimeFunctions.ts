@@ -1,3 +1,5 @@
+import { _const } from '../utilities/functions';
+
 type NotFunction = string | number | boolean | null | undefined | bigint |
     readonly any[] | { apply?: never, [k: string]: any } |
     { call?: never, [k: string]: any };
@@ -38,3 +40,10 @@ export function transient<T>(cb: (() => () => T) | T) {
     if(typeof cb !== 'function') return () => () => cb;
     return cb;
 }
+
+/**
+ * @deprecated
+ * @param value
+ */
+// prettier-ignore
+export const many = <T>(value: T) => () => _const(value);
