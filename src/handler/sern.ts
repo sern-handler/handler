@@ -13,9 +13,8 @@ import type {
     InputCommand,
     InputEvent,
 } from '../types/module';
-import { Container, createContainer } from 'iti';
-import type { Dependencies, OptionalDependencies } from '../types/handler';
-import { composeRoot, containerSubject, useContainer } from './dependencies/provider';
+import type { Dependencies, DependencyConfiguration } from '../types/handler';
+import { composeRoot, useContainer } from './dependencies/provider';
 import type { Logging } from './contracts';
 import { err, ok, partition } from './utilities/functions';
 import type { Awaitable, ClientEvents } from 'discord.js';
@@ -105,13 +104,9 @@ export function discordEvent<T extends keyof ClientEvents>(mod: {
 /**
  * @param conf a configuration for creating your project dependencies
  */
-export function makeDependencies<T extends Dependencies>(conf: {
-    exclude?: Set<OptionalDependencies>;
-    build: (root: Container<Record<string, any>, {}>) => Container<Partial<T>, T>;
-}) {
-    const container = conf.build(createContainer());
-    composeRoot(container, conf.exclude ?? new Set());
-    containerSubject.next(container as unknown as Container<Dependencies, {}>);
+export function makeDependencies<T extends Dependencies>(conf: DependencyConfiguration<T>) {
+    //Until there are more optional dependencies, just check if the logger exists
+    composeRoot(conf);
     return useContainer<T>();
 }
 

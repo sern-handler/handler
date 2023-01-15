@@ -7,6 +7,7 @@ import type { UnpackFunction } from 'iti';
 import type { ErrorHandling, Logging, ModuleManager } from '../handler/contracts';
 import type { ModuleStore } from '../handler/structures/moduleStore';
 import type SernEmitter from '../handler/sernEmitter';
+import type { Container } from 'iti';
 // Thanks to @kelsny
 export type ParseType<T> = {
     [K in keyof T]: T[K] extends unknown ? [k: K, args: T[K]] : never;
@@ -62,3 +63,7 @@ export type MapDeps<Deps extends Dependencies, T extends readonly unknown[]> = T
 export type OptionalDependencies = '@sern/logger';
 export type Processed<T extends Module> = T & { name: string; description: string };
 export type Deprecated<Message extends string> = [never, Message]
+export interface DependencyConfiguration<T extends Dependencies> {
+ exclude?: Set<OptionalDependencies>;
+ build: (root: Container<Omit<Dependencies, '@sern/client'>, {}>) => Container<T, {}>
+}

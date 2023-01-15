@@ -15,5 +15,5 @@ export * from './handler/structures/structxports';
 export * from './handler/plugins';
 export * from './handler/contracts';
 export { SernEmitter };
-export { _const as single, transient as many } from './handler/utilities/functions';
 export { useContainerRaw } from './handler/dependencies/provider';
+export { single, transient } from './handler/dependencies/lifetimeFunctions';
