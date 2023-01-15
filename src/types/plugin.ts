@@ -14,9 +14,9 @@
 import type { Awaitable } from 'discord.js';
 import type { Result } from 'ts-results-es';
 import type { PluginType } from '../handler/structures/enums';
-import type { CommandModule, EventModule } from './module';
+import type { CommandModule, CommandModuleDefs, EventModule } from './module';
 
-import type { InitArgs } from '../handler/plugins';
+import type { CommandArgs, InitArgs } from '../handler/plugins';
 import type { Deprecated, Processed } from './handler';
 import type { CommandType } from '../handler/structures/enums';
 export type PluginResult = Awaitable<VoidResult>;
@@ -39,13 +39,42 @@ export interface ControlPlugin<Args extends any[] = any[]> {
 export type AnyCommandPlugin = ControlPlugin | InitPlugin<[InitArgs<Processed<CommandModule>>]>;
 export type AnyEventPlugin = ControlPlugin | InitPlugin<[InitArgs<Processed<EventModule>>]>;
 
-export type CommandPlugin<T extends CommandType = CommandType> =
-    Deprecated<'Please use InitPlugin instead: '>;
+/**
+ * @deprecated
+ * Use the newer helper functions
+ */
+export interface CommandPlugin<T extends CommandType = CommandType> {
+    /**
+     * @deprecated
+     */
+    name?: string
+    /**
+     * @deprecated
+     */
+    description?: string;
+    type: PluginType.Command,
+    execute: (args: { mod: Processed<CommandModuleDefs[T]>; absPath: string }, controller : Deprecated<'Import controller from @sern/handler instead'>) => Awaitable<any>
+}
+/**
+ * @deprecated
+ * Use the newer helper functions
+ */
+export interface EventPlugin<T extends CommandType> {
+    /**
+     * @deprecated
+     */
+    name?: string;
+    /**
+     * @deprecated
+     */
+    description?: string;
+    type: PluginType.Event,
+    execute: (args: CommandArgs<T, PluginType.Control>, controller : Deprecated<'Import controller from @sern/handler instead'>) => Awaitable<any>
+}
 export type DiscordEmitterPlugin = Deprecated<'Please view alternatives: '>;
 export type ExternalEmitterPlugin = Deprecated<'Please view alternatives: '>;
 export type SernEmitterPlugin = Deprecated<'Please view alternatives: '>;
 export type AutocompletePlugin = Deprecated<'Please view alternatives: '>;
-export type EventPlugin<T extends CommandType> = Deprecated<'Please view alternatives: '>;
 export type SernEventPlugin = Deprecated<'Please view alternatives: '>;
 export type ExternalEventPlugin = Deprecated<'Please view alternatives: '>;
 export type DiscordEventPlugin = Deprecated<'Please view alternatives: '>;
