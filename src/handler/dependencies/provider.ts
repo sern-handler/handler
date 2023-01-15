@@ -10,6 +10,12 @@ import { createContainer } from 'iti';
 
 export const containerSubject = new BehaviorSubject(defaultContainer());
 
+/**
+ * Given the user's conf, check for any excluded dependency keys.
+ * Then, call conf.build to get the rest of the users' dependencies.
+ * Finally, update the containerSubject with the new container state
+ * @param conf
+ */
 export function composeRoot<T extends Dependencies>(conf: DependencyConfiguration<T>) {
     //Get the current container. This should have no client or logger yet.
     const currentContainer = containerSubject.getValue();
@@ -21,7 +27,6 @@ export function composeRoot<T extends Dependencies>(conf: DependencyConfiguratio
     }
     //Build the container based on the callback provided by the user
     const container = conf.build(currentContainer);
-    console.log(container);
     //Check if the built container contains @sern/client or throw
     // a runtime exception
     const shouldHaveClient = Result
