@@ -3,18 +3,16 @@ import { basename } from 'path';
 import { Err, Ok } from 'ts-results-es';
 /**
  * A function that returns whatever value is provided.
- * Used for singleton in iti
+ * Warning: this evaluates { @param value }. It does not defer a value.
  * @param value
  */
 // prettier-ignore
 export const _const = <T>(value: T) => () => value;
 /**
- * A function that returns another function
- * Used for transient in iti
- * @param value
+ *
+ * @param modName
+ * @param absPath
  */
-
-
 export function nameOrFilename(modName: string | undefined, absPath: string) {
     return modName ?? Files.fmtFileName(basename(absPath));
 }
