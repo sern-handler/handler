@@ -32,7 +32,7 @@ export default class MessageHandler extends EventsHandler<{
                     );
                 }),
                 concatMap(payload => executeModule(this.emitter, payload)),
-                catchError(handleError(this.crashHandler)),
+                catchError(handleError(this.crashHandler, this.logger)),
                 finalize(() => {
                     this.logger?.info({ message: 'messageCreate stream closed or reached end of lifetime'});
                     useContainerRaw()

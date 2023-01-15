@@ -34,7 +34,7 @@ export default class InteractionHandler extends EventsHandler<{
                     );
                 }),
                 concatMap(payload => executeModule(this.emitter, payload)),
-                catchError(handleError(this.crashHandler)),
+                catchError(handleError(this.crashHandler, this.logger)),
                 finalize(() => {
                     this.logger?.info({ message: 'interactionCreate stream closed or reached end of lifetime'});
                     useContainerRaw()
