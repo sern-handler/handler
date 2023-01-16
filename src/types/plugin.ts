@@ -12,16 +12,19 @@
  */
 
 import type { Awaitable } from 'discord.js';
-import type { Result } from 'ts-results-es';
+import type { Err, Ok, Result } from 'ts-results-es';
 import type { PluginType } from '../handler/structures/enums';
 import type { CommandModule, EventModule } from './module';
-
-import type { InitArgs } from '../handler/plugins';
+import type { CommandArgs, InitArgs } from '../handler/plugins';
 import type { Deprecated, Processed } from './handler';
 import type { CommandType } from '../handler/structures/enums';
 export type PluginResult = Awaitable<VoidResult>;
 export type VoidResult = Result<void, void>;
 
+export interface Controller {
+    next: () => Ok<void>
+    stop: () => Err<void>
+}
 export interface Plugin<Args extends any[] = any[]> {
     type: PluginType;
     execute: (...args: Args) => PluginResult;
@@ -41,14 +44,24 @@ export type AnyEventPlugin = ControlPlugin | InitPlugin<[InitArgs<Processed<Even
 
 /**
  * @deprecated
- * Use the newer helper functions
+ * Use the newer helper functions and import { controller } from '@sern/handler'
  */
-export interface CommandPlugin<T extends CommandType = CommandType> {}
+export interface CommandPlugin<T extends CommandType = CommandType> {
+    name?: string;
+    description?: string;
+    type: PluginType.Command;
+    execute: (m: InitArgs<Processed<CommandModule>>, controller?: Deprecated<'Please import controller instead'>) => PluginResult;
+}
 /**
  * @deprecated
  * Use the newer helper functions
  */
-export interface EventPlugin<T extends CommandType> {}
+export interface EventPlugin<T extends CommandType> {
+    name?: string;
+    description?: string;
+    type: PluginType.Event;
+    execute: (args : CommandArgs<T, PluginType.Event>, controller?: Controller) => PluginResult
+}
 export type DiscordEmitterPlugin = Deprecated<'Please view alternatives: '>;
 export type ExternalEmitterPlugin = Deprecated<'Please view alternatives: '>;
 export type SernEmitterPlugin = Deprecated<'Please view alternatives: '>;

@@ -16,9 +16,9 @@ import type {
     StringSelectCommand,
     TextCommand,
     UserSelectCommand,
-    ContextMenuMsg,
+    ContextMenuMsg, Module,
 } from '../../types/module';
-import type { AnyDefinedModule, Args, Payload, Processed, SlashOptions } from '../../types/handler';
+import type { Args, Payload, Processed, SlashOptions } from '../../types/handler';
 import type Context from '../structures/context';
 import type { MessageContextMenuCommandInteraction } from 'discord.js';
 import type {
@@ -101,7 +101,7 @@ type EventArgsMatrix = {
     };
 };
 
-export interface InitArgs<T extends AnyDefinedModule> {
+export interface InitArgs<T extends Processed<Module>> {
     module: T;
     absPath: string;
 }

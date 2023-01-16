@@ -8,6 +8,8 @@ import { concatMap, defaultIfEmpty, EMPTY, every, map, of, OperatorFunction, pip
 import type { AnyModule } from '../../../types/module';
 import { nameOrFilename } from '../../utilities/functions';
 import type { PluginResult, VoidResult } from '../../../types/plugin';
+import { guayin } from '../../plugins';
+import { controller } from '../../sern';
 
 /**
  * if {src} is true, mapTo V, else ignore
@@ -29,10 +31,15 @@ export function callPlugin(args: unknown): OperatorFunction<
 > {
     return pipe(
         concatMap(async plugin => {
-            if (Array.isArray(args)) {
-                return plugin.execute(...args);
+            const isNewPlugin = Reflect.has(plugin, guayin);
+            if(isNewPlugin) {
+                if (Array.isArray(args)) {
+                    return plugin.execute(...args);
+                }
+                return plugin.execute(args);
+            } else {
+                return plugin.execute(args, controller);
             }
-            return plugin.execute(args);
         }),
     );
 }
