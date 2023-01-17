@@ -39,11 +39,11 @@ export default class Context {
     }
 
     public get id(): Snowflake {
-        return safeUnwrap(this.ctx.map(m => m.id).mapErr(i => i.id));
+        return this.ctx.val.id;
     }
 
     public get channel() {
-        return safeUnwrap(this.ctx.map(m => m.channel).mapErr(i => i.channel));
+        return this.ctx.val.channel;
     }
     /**
      * If context is holding a message, message.author
@@ -54,30 +54,30 @@ export default class Context {
     }
 
     public get createdTimestamp(): number {
-        return safeUnwrap(this.ctx.map(m => m.createdTimestamp).mapErr(i => i.createdTimestamp));
+        return this.ctx.val.createdTimestamp;
     }
 
     public get guild() {
-        return safeUnwrap(this.ctx.map(m => m.guild).mapErr(i => i.guild));
+        return this.ctx.val.guild;
     }
 
     public get guildId() {
-        return safeUnwrap(this.ctx.map(m => m.guildId).mapErr(i => i.guildId));
+        return this.ctx.val.guildId;
     }
 
     /*
      * interactions can return APIGuildMember if the guild it is emitted from is not cached
      */
     public get member() {
-        return safeUnwrap(this.ctx.map(m => m.member).mapErr(i => i.member));
+        return this.ctx.val.member;
     }
 
     public get client(): Client {
-        return safeUnwrap(this.ctx.map(m => m.client).mapErr(i => i.client));
+        return this.ctx.val.client;
     }
 
     public get inGuild(): boolean {
-        return safeUnwrap(this.ctx.map(m => m.inGuild()).mapErr(i => i.inGuild()));
+        return this.ctx.val.inGuild();
     }
     public isMessage() {
         return this.ctx.map(() => true).unwrapOr(false);
