@@ -17,7 +17,7 @@ export const containerSubject = new BehaviorSubject(defaultContainer());
  * @param conf
  */
 export function composeRoot<T extends Dependencies>(conf: DependencyConfiguration<T>) {
-    //Get the current container. This should have no client or logger yet.
+    //Get the current container. This should have no client or possible logger yet.
     const currentContainer = containerSubject.getValue();
     const excludeLogger = conf.exclude?.has('@sern/logger');
     if(!excludeLogger) {
@@ -29,9 +29,9 @@ export function composeRoot<T extends Dependencies>(conf: DependencyConfiguratio
     const container = conf.build(currentContainer);
     //Check if the built container contains @sern/client or throw
     // a runtime exception
-    const shouldHaveClient = Result
-        .wrap(() => container.get('@sern/client'));
-    shouldHaveClient.expect(SernError.MissingRequired);
+    Result
+        .wrap(() => container.get('@sern/client'))
+        .expect(SernError.MissingRequired);
 
     if(!excludeLogger) {
         container.get('@sern/logger')?.info({ message: 'All dependencies loaded successfully.' });

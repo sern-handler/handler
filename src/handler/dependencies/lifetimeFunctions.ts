@@ -44,6 +44,7 @@ export function transient<T>(cb: (() => () => T) | T) {
 /**
  * @deprecated
  * @param value
+ * Please use the transient function instead
  */
 // prettier-ignore
 export const many = <T>(value: T) => () => _const(value);
