@@ -1,6 +1,5 @@
 import type { CommandModuleDefs } from '../../types/module';
-import type { CommandType } from '../structures/enums';
-import type { ModuleStore } from '../structures/moduleStore';
+import type { CommandType, ModuleStore } from '../structures';
 import type { Processed } from '../../types/handler';
 
 export interface ModuleManager {

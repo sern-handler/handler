@@ -1,19 +1,17 @@
 import { catchError, finalize, map, tap } from 'rxjs';
 import { buildData } from '../utilities/readFile';
 import type { Dependencies, Processed } from '../../types/handler';
-import { EventType } from '../structures/enums';
-import type Wrapper from '../structures/wrapper';
 import { errTap, scanModule } from './observableHandling';
 import type { CommandModule, EventModule } from '../../types/module';
 import type { EventEmitter } from 'events';
 import SernEmitter from '../sernEmitter';
 import { match } from 'ts-pattern';
 import type { ErrorHandling, Logging } from '../contracts';
-import { SernError } from '../structures/errors';
+import { SernError, EventType, type Wrapper } from '../structures';
 import { eventDispatcher } from './dispatchers';
 import { handleError } from '../contracts/errorHandling';
 import { defineAllFields } from './operators';
-import { useContainerRaw } from '../dependencies/provider';
+import { useContainerRaw } from '../dependencies';
 
 export function processEvents({ containerConfig, events }: Wrapper) {
     const [client, errorHandling, sernEmitter, logger] = containerConfig.get(

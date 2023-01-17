@@ -1,17 +1,15 @@
 import { EventsHandler } from './eventsHandler';
 import { catchError, concatMap, EMPTY, finalize, fromEvent, map, Observable, of } from 'rxjs';
-import type Wrapper from '../structures/wrapper';
+import { type Wrapper, type ModuleStore, SernError } from '../structures';
 import type { Message } from 'discord.js';
 import { executeModule, ignoreNonBot, makeModuleExecutor } from './observableHandling';
 import { fmt } from '../utilities/messageHelpers';
 import type { CommandModule, Module, TextCommand } from '../../types/module';
 import { handleError } from '../contracts/errorHandling';
-import type { ModuleStore } from '../structures/moduleStore';
 import { contextArgs, dispatchCommand } from './dispatchers';
-import { SernError } from '../structures/errors';
 import SernEmitter from '../sernEmitter';
 import type { Processed } from '../../types/handler';
-import { useContainerRaw } from '../dependencies/provider';
+import { useContainerRaw } from '../dependencies';
 
 export default class MessageHandler extends EventsHandler<{
     module: Processed<Module>;

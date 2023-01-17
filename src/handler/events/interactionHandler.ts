@@ -2,17 +2,15 @@ import type { Interaction } from 'discord.js';
 import { catchError, concatMap, finalize, fromEvent, map, Observable } from 'rxjs';
 import type Wrapper from '../structures/wrapper';
 import { EventsHandler } from './eventsHandler';
-import { SernError } from '../structures/errors';
-import { CommandType } from '../structures/enums';
+import { CommandType, SernError, type ModuleStore } from '../structures';
 import { match, P } from 'ts-pattern';
 import { contextArgs, interactionArg, dispatchAutocomplete, dispatchCommand } from './dispatchers';
 import { executeModule, makeModuleExecutor } from './observableHandling';
 import type { CommandModule } from '../../types/module';
 import { handleError } from '../contracts/errorHandling';
-import type { ModuleStore } from '../structures/moduleStore';
 import SernEmitter from '../sernEmitter';
 import type { Processed } from '../../types/handler';
-import { useContainerRaw } from '../dependencies/provider';
+import { useContainerRaw } from '../dependencies';
 
 export default class InteractionHandler extends EventsHandler<{
     event: Interaction;

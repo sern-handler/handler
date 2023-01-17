@@ -1,5 +1,5 @@
 import type { ChatInputCommandInteraction, Interaction, Message } from 'discord.js';
-import Context from '../../structures/context';
+import { Context } from '../../structures';
 import type { Args, SlashOptions } from '../../../types/handler';
 
 /**
