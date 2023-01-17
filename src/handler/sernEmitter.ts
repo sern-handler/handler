@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events';
 import type { Payload, SernEventsMapping } from '../types/handler';
-import { PayloadType } from './structures/enums';
+import { PayloadType } from './structures';
 import type { Module } from '../types/module';
 
 class SernEmitter extends EventEmitter {
@@ -44,6 +44,12 @@ class SernEmitter extends EventEmitter {
     ) {
         return { type, module, reason } as T;
     }
+
+    /**
+     * Creates a compliant SernEmitter failure payload
+     * @param module
+     * @param reason
+     */
     static failure(module?: Module, reason?: unknown) {
         //The generic cast Payload & { type : PayloadType.* } coerces the type to be a failure payload
         // same goes to the other methods below
@@ -53,12 +59,20 @@ class SernEmitter extends EventEmitter {
             reason,
         );
     }
+    /**
+     * Creates a compliant SernEmitter module success payload
+     * @param module
+     */
     static success(module: Module) {
         return SernEmitter.payload<Payload & { type: PayloadType.Success }>(
             PayloadType.Success,
             module,
         );
     }
+    /**
+     * Creates a compliant SernEmitter module warning payload
+     * @param reason
+     */
     static warning(reason: unknown) {
         return SernEmitter.payload<Payload & { type: PayloadType.Warning }>(
             PayloadType.Warning,
