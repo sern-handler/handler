@@ -28,7 +28,13 @@ yarn add @sern/handler
 ```sh
 pnpm add @sern/handler
 ```
-
+## Why?
+- Most handlers don't support discord.js 14.7+
+- Customizable commands
+- Plug and play or customize to your liking
+- Embraces reactive programming for consistent and reliable backend
+- Customizable logger, error handling, and more
+- Active development and growing [community](https://sern.dev/discord)
 ## 👀 Quick Look
 
 * Support for discord.js v14 and all interactions
@@ -105,7 +111,7 @@ It is **highly encouraged** to use the [command line interface](https://github.c
 
 ## 👋 Contribute
 
-- Read our contribution [guidelines](./.github/CONTRIBUTING.md) carefully
+- Read our contribution [guidelines](https://github.com/sern-handler/handler/blob/main/.github/CONTRIBUTING.md) carefully
 - Pull up on [issues](https://github.com/sern-handler/handler/issues) and report bugs
 - All kinds of contributions are welcomed.
 

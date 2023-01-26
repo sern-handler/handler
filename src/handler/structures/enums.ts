@@ -102,13 +102,23 @@ export enum EventType {
  */
 export enum PluginType {
     /**
-     * The PluginType for CommandPlugins
+     * The PluginType for InitPlugins
+     */
+    Init = 1,
+    /**
+     * @deprecated
+     * Use PluginType.Init instead
      */
     Command = 1,
     /**
-     * The PluginType for EventPlugins
+     * @deprecated
+     * Use PluginType.Control instead
      */
     Event = 2,
+    /**
+     * The PluginType for EventPlugins
+     */
+    Control = 2,
 }
 /**
  * @enum { string }

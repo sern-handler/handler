@@ -1,1 +1,2 @@
-export { useContainer } from './provider';
+export { single, transient, many } from './lifetimeFunctions';
+export { useContainerRaw } from './provider';

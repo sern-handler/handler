@@ -7,6 +7,7 @@ import type { UnpackFunction } from 'iti';
 import type { ErrorHandling, Logging, ModuleManager } from '../handler/contracts';
 import type { ModuleStore } from '../handler/structures/moduleStore';
 import type SernEmitter from '../handler/sernEmitter';
+import type { Container } from 'iti';
 // Thanks to @kelsny
 export type ParseType<T> = {
     [K in keyof T]: T[K] extends unknown ? [k: K, args: T[K]] : never;
@@ -20,9 +21,7 @@ export type SlashOptions = Omit<CommandInteractionOptionResolver, 'getMessage' |
  * After modules are transformed, name and description are given default values if none
  * are provided to Module. This type represents that transformation
  */
-export type DefinedCommandModule = CommandModule & { name: string; description: string };
-export type DefinedEventModule = EventModule & { name: string };
-export type AnyDefinedModule = DefinedCommandModule | DefinedEventModule;
+export type AnyDefinedModule = Processed<CommandModule | EventModule>;
 export type Payload =
     | { type: PayloadType.Success; module: AnyModule }
     | { type: PayloadType.Failure; module?: AnyModule; reason: string | Error }
@@ -50,7 +49,7 @@ export type ReplyOptions =
     | string
     | Omit<InteractionReplyOptions, 'fetchReply'>
     | MessageReplyOptions;
-
+//prettier-ignore
 export type MapDeps<Deps extends Dependencies, T extends readonly unknown[]> = T extends [
     infer First extends keyof Deps,
     ...infer Rest extends readonly unknown[],
@@ -62,3 +61,9 @@ export type MapDeps<Deps extends Dependencies, T extends readonly unknown[]> = T
     : [never];
 //Basically, '@sern/client' | '@sern/store' | '@sern/modules' | '@sern/error' | '@sern/emitter' will be provided defaults, and you can exclude the rest
 export type OptionalDependencies = '@sern/logger';
+export type Processed<T> = T & { name: string; description: string };
+export type Deprecated<Message extends string> = [never, Message]
+export interface DependencyConfiguration<T extends Dependencies> {
+ exclude?: Set<OptionalDependencies>;
+ build: (root: Container<Omit<Dependencies, '@sern/client'>, {}>) => Container<T, {}>
+}

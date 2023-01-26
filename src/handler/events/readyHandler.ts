@@ -1,98 +1,84 @@
 import { EventsHandler } from './eventsHandler';
 import type Wrapper from '../structures/wrapper';
-import { concatMap, fromEvent, Observable, map, take } from 'rxjs';
+import { concatMap, fromEvent, type Observable, take } from 'rxjs';
 import * as Files from '../utilities/readFile';
-import { errTap, processPlugins, resolvePlugins } from './observableHandling';
-import { CommandType, PayloadType } from '../structures/enums';
-import { SernError } from '../structures/errors';
+import { errTap, scanModule } from './observableHandling';
+import { CommandType, SernError, type ModuleStore } from '../structures';
 import { match } from 'ts-pattern';
 import { Result } from 'ts-results-es';
 import { ApplicationCommandType, ComponentType } from 'discord.js';
 import type { CommandModule } from '../../types/module';
-import type { DefinedCommandModule, DefinedEventModule } from '../../types/handler';
+import type { Processed } from '../../types/handler';
 import type { ModuleManager } from '../contracts';
-import type { ModuleStore } from '../structures/moduleStore';
-import { _const, err, nameOrFilename, ok } from '../utilities/functions';
+import { _const, err, ok } from '../utilities/functions';
+import { defineAllFields } from './operators';
+import SernEmitter from '../sernEmitter';
 
 export default class ReadyHandler extends EventsHandler<{
-    mod: DefinedCommandModule;
+    module: Processed<CommandModule>;
     absPath: string;
 }> {
-    protected discordEvent!: Observable<{ mod: CommandModule; absPath: string }>;
+    protected discordEvent!: Observable<{ module: CommandModule; absPath: string }>;
     constructor(wrapper: Wrapper) {
         super(wrapper);
         const ready$ = fromEvent(this.client, 'ready').pipe(take(1));
         this.discordEvent = ready$.pipe(
             concatMap(() =>
                 Files.buildData<CommandModule>(wrapper.commands).pipe(
-                    errTap(reason =>
-                        this.emitter.emit('module.register', {
-                            type: PayloadType.Failure,
-                            module: undefined,
-                            reason,
-                        }),
-                    ),
+                    errTap(reason => {
+                        this.emitter.emit(
+                            'module.register',
+                            SernEmitter.failure(undefined, reason),
+                        );
+                    }),
                 ),
             ),
         );
         this.init();
         this.payloadSubject
-            .pipe(concatMap(processPlugins), concatMap(resolvePlugins))
-            .subscribe(payload => {
-                const allPluginsSuccessful = payload.pluginRes.every(({ execute }) => execute.ok);
-                if (allPluginsSuccessful) {
-                    const res = registerModule(this.modules, payload.mod);
-                    if (res.err) {
-                        this.crashHandler.crash(Error(SernError.InvalidModuleType));
-                    }
-                    this.emitter.emit('module.register', {
-                        type: PayloadType.Success,
-                        module: payload.mod,
-                    });
-                } else {
-                    this.emitter.emit('module.register', {
-                        type: PayloadType.Failure,
-                        module: payload.mod,
-                        reason: SernError.PluginFailure,
-                    });
+            .pipe(
+                scanModule({
+                    onFailure: module => {
+                        this.emitter.emit(
+                            'module.register',
+                            SernEmitter.failure(module, SernError.PluginFailure),
+                        );
+                    },
+                    onSuccess: ({ module }) => {
+                        this.emitter.emit('module.register', SernEmitter.success(module));
+                        return module;
+                    },
+                }),
+            )
+            .subscribe(module => {
+                const res = registerModule(this.modules, module as Processed<CommandModule>);
+                if (res.err) {
+                    this.crashHandler.crash(Error(SernError.InvalidModuleType));
                 }
             });
     }
-    private static intoDefinedModule({ absPath, mod }: { absPath: string; mod: CommandModule }): {
-        absPath: string;
-        mod: DefinedCommandModule;
-    } {
-        return {
-            absPath,
-            mod: {
-                name: nameOrFilename(mod.name, absPath),
-                description: mod?.description ?? '...',
-                ...mod,
-            },
-        };
-    }
 
     protected init() {
-        this.discordEvent.pipe(map(ReadyHandler.intoDefinedModule)).subscribe({
+        this.discordEvent.pipe(defineAllFields()).subscribe({
             next: value => this.setState(value),
             complete: () => this.payloadSubject.unsubscribe(),
         });
     }
-    protected setState(state: { absPath: string; mod: DefinedCommandModule }): void {
+    protected setState(state: { absPath: string; module: Processed<CommandModule> }): void {
         this.payloadSubject.next(state);
     }
 }
 
-function registerModule(
+function registerModule<T extends Processed<CommandModule>>(
     manager: ModuleManager,
-    mod: DefinedCommandModule | DefinedEventModule,
+    mod: T,
 ): Result<void, void> {
     const name = mod.name;
     const insert = (cb: (ms: ModuleStore) => void) => {
         const set = Result.wrap(_const(manager.set(cb)));
         return set.ok ? ok() : err();
     };
-    return match<DefinedCommandModule | DefinedEventModule>(mod)
+    return match(mod as Processed<CommandModule>)
         .with({ type: CommandType.Text }, mod => {
             mod.alias?.forEach(a => insert(ms => ms.TextCommands.set(a, mod)));
             return insert(ms => ms.TextCommands.set(name, mod));

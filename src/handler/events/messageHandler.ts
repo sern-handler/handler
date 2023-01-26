@@ -1,39 +1,44 @@
 import { EventsHandler } from './eventsHandler';
-import { catchError, concatMap, from, fromEvent, map, Observable, of, switchMap } from 'rxjs';
-import type Wrapper from '../structures/wrapper';
+import { catchError, concatMap, EMPTY, finalize, fromEvent, map, Observable, of } from 'rxjs';
+import { type Wrapper, type ModuleStore, SernError } from '../structures';
 import type { Message } from 'discord.js';
-import { executeModule, ignoreNonBot, isOneOfCorrectModules } from './observableHandling';
+import { executeModule, ignoreNonBot, makeModuleExecutor } from './observableHandling';
 import { fmt } from '../utilities/messageHelpers';
-import Context from '../structures/context';
-import { CommandType, PayloadType } from '../structures/enums';
-import { arrAsync } from '../utilities/arrAsync';
-import { controller } from '../sern';
-import type { CommandModule, TextCommand } from '../../types/module';
+import type { CommandModule, Module, TextCommand } from '../../types/module';
 import { handleError } from '../contracts/errorHandling';
-import type { ModuleStore } from '../structures/moduleStore';
+import { contextArgs, dispatchCommand } from './dispatchers';
+import SernEmitter from '../sernEmitter';
+import type { Processed } from '../../types/handler';
+import { useContainerRaw } from '../dependencies';
 
 export default class MessageHandler extends EventsHandler<{
-    ctx: Context;
-    args: ['text', string[]];
-    mod: TextCommand;
+    module: Processed<Module>;
+    args: unknown[];
 }> {
     protected discordEvent: Observable<Message>;
+
     public constructor(protected wrapper: Wrapper) {
         super(wrapper);
         this.discordEvent = <Observable<Message>>fromEvent(this.client, 'messageCreate');
         this.init();
         this.payloadSubject
             .pipe(
-                switchMap(({ mod, ctx, args }) => {
-                    const res = arrAsync(
-                        mod.onEvent.map(ep => ep.execute([ctx, args], controller)),
+                makeModuleExecutor(module => {
+                    this.emitter.emit(
+                        'module.activate',
+                        SernEmitter.failure(module, SernError.PluginFailure),
                     );
-                    const execute = () => mod.execute(ctx, args);
-                    //resolves the promise and re-emits it back into source
-                    return from(res).pipe(map(res => ({ mod, execute, res })));
                 }),
-                concatMap(payload => executeModule(wrapper, payload)),
+                concatMap(payload => executeModule(this.emitter, payload)),
                 catchError(handleError(this.crashHandler, this.logger)),
+                finalize(() => {
+                    this.logger?.info({ message: 'messageCreate stream closed or reached end of lifetime'});
+                    useContainerRaw()
+                        ?.disposeAll()
+                        .then(() => {
+                            this.logger?.info({ message: 'Cleaning container and crashing' });
+                        });
+                })
             )
             .subscribe();
     }
@@ -41,34 +46,37 @@ export default class MessageHandler extends EventsHandler<{
     protected init(): void {
         if (this.wrapper.defaultPrefix === undefined) return; //for now, just ignore if prefix doesn't exist
         const { defaultPrefix } = this.wrapper;
-        const get = (cb: (ms: ModuleStore) => CommandModule | undefined) => {
+        const get = (cb: (ms: ModuleStore) => Processed<CommandModule> | undefined) => {
             return this.modules.get(cb);
         };
         this.discordEvent
             .pipe(
                 ignoreNonBot(this.wrapper.defaultPrefix),
-                map(message => {
+                //This concatMap checks if module is undefined, and if it is, do not continue.
+                // Synonymous to filterMap, but I haven't thought of a generic implementation for filterMap yet
+                concatMap(message => {
                     const [prefix, ...rest] = fmt(message, defaultPrefix);
-                    return {
-                        ctx: Context.wrap(message),
-                        args: <['text', string[]]>['text', rest],
-                        mod: get(ms => ms.TextCommands.get(prefix) ?? ms.BothCommands.get(prefix)),
+                    const module = get(
+                        ms => ms.TextCommands.get(prefix) ?? ms.BothCommands.get(prefix),
+                    );
+                    if (module === undefined) {
+                        return EMPTY;
+                    }
+                    const payload = {
+                        args: contextArgs(message, rest),
+                        module,
                     };
+                    return of(payload);
                 }),
-                concatMap(element =>
-                    of(element.mod).pipe(
-                        isOneOfCorrectModules(CommandType.Text),
-                        map(mod => ({ ...element, mod })),
-                    ),
-                ),
+                map(({ args, module }) => dispatchCommand(module as Processed<TextCommand>, args)),
             )
             .subscribe({
                 next: value => this.setState(value),
-                error: reason => this.emitter.emit('error', { type: PayloadType.Failure, reason }),
+                error: reason => this.emitter.emit('error', SernEmitter.failure(reason)),
             });
     }
 
-    protected setState(state: { ctx: Context; args: ['text', string[]]; mod: TextCommand }) {
+    protected setState(state: { module: Processed<Module>; args: unknown[] }) {
         this.payloadSubject.next(state);
     }
 }

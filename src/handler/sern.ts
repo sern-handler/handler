@@ -1,15 +1,7 @@
 import type Wrapper from './structures/wrapper';
 import { processEvents } from './events/userDefinedEventsHandling';
 import { CommandType, EventType, PluginType } from './structures/enums';
-import type {
-    Plugin,
-    CommandPlugin,
-    EventModuleCommandPluginDefs,
-    EventModuleEventPluginDefs,
-    EventPlugin,
-    InputCommandModule,
-    InputEventModule,
-} from './plugins/plugin';
+import type { AnyEventPlugin, ControlPlugin, InitPlugin, Plugin } from '../types/plugin';
 import InteractionHandler from './events/interactionHandler';
 import ReadyHandler from './events/readyHandler';
 import MessageHandler from './events/messageHandler';
@@ -18,12 +10,15 @@ import type {
     CommandModuleDefs,
     EventModule,
     EventModuleDefs,
+    InputCommand,
+    InputEvent,
 } from '../types/module';
-import { Container, createContainer } from 'iti';
-import type { Dependencies, OptionalDependencies } from '../types/handler';
-import { composeRoot, containerSubject, useContainer } from './dependencies/provider';
+import type { Dependencies, DependencyConfiguration } from '../types/handler';
+import { composeRoot, useContainer } from './dependencies/provider';
 import type { Logging } from './contracts';
 import { err, ok, partition } from './utilities/functions';
+import type { Awaitable, ClientEvents } from 'discord.js';
+
 /**
  *
  * @param wrapper Options to pass into sern.
@@ -66,10 +61,10 @@ export const controller = {
  * The wrapper function to define command modules for sern
  * @param mod
  */
-export function commandModule(mod: InputCommandModule): CommandModule {
+export function commandModule(mod: InputCommand): CommandModule {
     const [onEvent, plugins] = partition(
         mod.plugins ?? [],
-        el => (el as Plugin).type === PluginType.Event,
+        el => (el as Plugin).type === PluginType.Control,
     );
     return {
         ...mod,
@@ -81,10 +76,10 @@ export function commandModule(mod: InputCommandModule): CommandModule {
  * The wrapper function to define event modules for sern
  * @param mod
  */
-export function eventModule(mod: InputEventModule): EventModule {
+export function eventModule(mod: InputEvent): EventModule {
     const [onEvent, plugins] = partition(
         mod.plugins ?? [],
-        el => (el as Plugin).type === PluginType.Event,
+        el => (el as Plugin).type === PluginType.Control,
     );
     return {
         ...mod,
@@ -92,29 +87,45 @@ export function eventModule(mod: InputEventModule): EventModule {
         plugins,
     } as EventModule;
 }
+
+/**
+ * Create event modules from discord.js client events,
+ * This is an {@link eventModule} for discord events,
+ * where typings can be very bad.
+ * @param mod
+ */
+export function discordEvent<T extends keyof ClientEvents>(mod: {
+    name: T;
+    plugins?: AnyEventPlugin[];
+    execute: (...args: ClientEvents[T]) => Awaitable<unknown>;
+}) {
+    return eventModule({ type: EventType.Discord, ...mod });
+}
 /**
  * @param conf a configuration for creating your project dependencies
  */
-export function makeDependencies<T extends Dependencies>(conf: {
-    exclude?: Set<OptionalDependencies>;
-    build: (root: Container<Record<string, any>, {}>) => Container<Partial<T>, T>;
-}) {
-    const container = conf.build(createContainer());
-    composeRoot(container, conf.exclude ?? new Set());
-    containerSubject.next(container as unknown as Container<Dependencies, {}>);
+export function makeDependencies<T extends Dependencies>(conf: DependencyConfiguration<T>) {
+    //Until there are more optional dependencies, just check if the logger exists
+    composeRoot(conf);
     return useContainer<T>();
 }
 
+/**
+ * @Experimental
+ * Will be refactored / changed in future
+ */
 export abstract class CommandExecutable<Type extends CommandType> {
     abstract type: Type;
-    plugins: CommandPlugin<Type>[] = [];
-    onEvent: EventPlugin<Type>[] = [];
+    plugins: InitPlugin[] = [];
+    onEvent: ControlPlugin[] = [];
     abstract execute: CommandModuleDefs[Type]['execute'];
 }
-
+/**@Experimental
+ * Will be refactored in future
+ */
 export abstract class EventExecutable<Type extends EventType> {
     abstract type: Type;
-    plugins: EventModuleCommandPluginDefs[Type][] = [];
-    onEvent: EventModuleEventPluginDefs[Type][] = [];
+    plugins: InitPlugin[] = [];
+    onEvent: ControlPlugin[] = [];
     abstract execute: EventModuleDefs[Type]['execute'];
 }

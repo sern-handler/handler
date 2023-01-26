@@ -1,26 +1,18 @@
 import * as Files from './readFile';
 import { basename } from 'path';
-import { Err, Ok, Result } from 'ts-results-es';
-import { Observable, of, switchMap } from 'rxjs';
+import { Err, Ok } from 'ts-results-es';
 /**
  * A function that returns whatever value is provided.
- * Used for singleton in iti
+ * Warning: this evaluates { @param value }. It does not defer a value.
  * @param value
  */
-export const _const =
-    <T>(value: T) =>
-    () =>
-        value;
+// prettier-ignore
+export const _const = <T>(value: T) => () => value;
 /**
- * A function that returns another function
- * Used for transient in iti
- * @param value
+ *
+ * @param modName
+ * @param absPath
  */
-export const transient =
-    <T>(value: T) =>
-    () =>
-        _const(value);
-
 export function nameOrFilename(modName: string | undefined, absPath: string) {
     return modName ?? Files.fmtFileName(basename(absPath));
 }
@@ -40,8 +32,4 @@ export function partition<T, V>(arr: (T & V)[], condition: (e: T & V) => boolean
         }
     }
     return [t, v];
-}
-
-export function reducePlugins(src: Observable<Result<void, void>[]>): Observable<boolean> {
-    return src.pipe(switchMap(s => of(s.every(a => a.ok))));
 }
