@@ -32,7 +32,7 @@ export function callPlugin(args: unknown): OperatorFunction<
     return pipe(
         concatMap(async plugin => {
             const isNewPlugin = Reflect.has(plugin, guayin);
-            if(isNewPlugin) {
+            if (isNewPlugin) {
                 if (Array.isArray(args)) {
                     return plugin.execute(...args);
                 }
