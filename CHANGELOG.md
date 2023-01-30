@@ -1,5 +1,21 @@
 # Changelog
 
+## [2.5.0](https://github.com/sern-handler/handler/compare/v2.1.1...v2.5.0) (2023-01-30)
+
+
+### ⚠ BREAKING CHANGES
+
+* simpler plugins ([#193](https://github.com/sern-handler/handler/issues/193))
+
+### Features
+
+* simpler plugins ([#193](https://github.com/sern-handler/handler/issues/193)) ([33f1446](https://github.com/sern-handler/handler/commit/33f14467ec413e003a82503c8a77cb42a6194281))
+
+
+### Miscellaneous Chores
+
+* release 2.5.0 ([b4b195d](https://github.com/sern-handler/handler/commit/b4b195dc9586736760d0b78caa8589f3d6131f8a))
+
 ## [2.1.1](https://github.com/sern-handler/handler/compare/v2.1.0...v2.1.1) (2022-12-31)
 
 
