@@ -62,8 +62,8 @@ export type MapDeps<Deps extends Dependencies, T extends readonly unknown[]> = T
 //Basically, '@sern/client' | '@sern/store' | '@sern/modules' | '@sern/error' | '@sern/emitter' will be provided defaults, and you can exclude the rest
 export type OptionalDependencies = '@sern/logger';
 export type Processed<T> = T & { name: string; description: string };
-export type Deprecated<Message extends string> = [never, Message]
+export type Deprecated<Message extends string> = [never, Message];
 export interface DependencyConfiguration<T extends Dependencies> {
- exclude?: Set<OptionalDependencies>;
- build: (root: Container<Omit<Dependencies, '@sern/client'>, {}>) => Container<T, {}>
+    exclude?: Set<OptionalDependencies>;
+    build: (root: Container<Omit<Dependencies, '@sern/client'>, {}>) => Container<T, {}>;
 }

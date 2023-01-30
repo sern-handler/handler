@@ -22,8 +22,8 @@ export type PluginResult = Awaitable<VoidResult>;
 export type VoidResult = Result<void, void>;
 
 export interface Controller {
-    next: () => Ok<void>
-    stop: () => Err<void>
+    next: () => Ok<void>;
+    stop: () => Err<void>;
 }
 export interface Plugin<Args extends any[] = any[]> {
     type: PluginType;
@@ -50,7 +50,10 @@ export interface CommandPlugin<T extends CommandType = CommandType> {
     name?: string;
     description?: string;
     type: PluginType.Command;
-    execute: (m: InitArgs<Processed<CommandModule>>, controller?: Deprecated<'Please import controller instead'>) => PluginResult;
+    execute: (
+        m: InitArgs<Processed<CommandModule>>,
+        controller?: Deprecated<'Please import controller instead'>,
+    ) => PluginResult;
 }
 /**
  * @deprecated
@@ -60,7 +63,7 @@ export interface EventPlugin<T extends CommandType> {
     name?: string;
     description?: string;
     type: PluginType.Event;
-    execute: (args : CommandArgs<T, PluginType.Event>, controller?: Controller) => PluginResult
+    execute: (args: CommandArgs<T, PluginType.Event>, controller?: Controller) => PluginResult;
 }
 export type DiscordEmitterPlugin = Deprecated<'Please view alternatives: '>;
 export type ExternalEmitterPlugin = Deprecated<'Please view alternatives: '>;
