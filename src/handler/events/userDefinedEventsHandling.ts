@@ -52,13 +52,13 @@ export function processEvents({ containerConfig, events }: Wrapper) {
             tap(dispatcher => dispatcher.subscribe()),
             catchError(handleError(errorHandling, logger)),
             finalize(() => {
-                logger?.info({ message: 'an event module reached end of lifetime'});
+                logger?.info({ message: 'an event module reached end of lifetime' });
                 useContainerRaw()
                     ?.disposeAll()
                     .then(() => {
                         logger?.info({ message: 'Cleaning container and crashing' });
                     });
-            })
+            }),
         )
         .subscribe();
 }

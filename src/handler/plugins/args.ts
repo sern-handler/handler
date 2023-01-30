@@ -16,7 +16,8 @@ import type {
     StringSelectCommand,
     TextCommand,
     UserSelectCommand,
-    ContextMenuMsg, Module,
+    ContextMenuMsg,
+    Module,
 } from '../../types/module';
 import type { Args, Payload, Processed, SlashOptions } from '../../types/handler';
 import type Context from '../structures/context';
