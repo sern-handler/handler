@@ -10,7 +10,7 @@ export function makePlugin<V extends unknown[]>(
     return {
         type,
         execute,
-        [guayin]: undefined
+        [guayin]: undefined,
     } as Plugin<V>;
 }
 

@@ -20,20 +20,18 @@ export function composeRoot<T extends Dependencies>(conf: DependencyConfiguratio
     //Get the current container. This should have no client or possible logger yet.
     const currentContainer = containerSubject.getValue();
     const excludeLogger = conf.exclude?.has('@sern/logger');
-    if(!excludeLogger) {
+    if (!excludeLogger) {
         currentContainer.add({
-            '@sern/logger' : () => new DefaultLogging()
+            '@sern/logger': () => new DefaultLogging(),
         });
     }
     //Build the container based on the callback provided by the user
     const container = conf.build(currentContainer);
     //Check if the built container contains @sern/client or throw
     // a runtime exception
-    Result
-        .wrap(() => container.get('@sern/client'))
-        .expect(SernError.MissingRequired);
+    Result.wrap(() => container.get('@sern/client')).expect(SernError.MissingRequired);
 
-    if(!excludeLogger) {
+    if (!excludeLogger) {
         container.get('@sern/logger')?.info({ message: 'All dependencies loaded successfully.' });
     }
     //I'm sorry little one
@@ -61,12 +59,15 @@ export function useContainerRaw<T extends Dependencies>() {
  */
 function defaultContainer() {
     return createContainer()
-        .add({ '@sern/errors': () => new DefaultErrorHandling()})
-        .add({ '@sern/store' : () => new ModuleStore()})
-        .add(ctx  => {
-           return {
-              '@sern/modules': () => new DefaultModuleManager(ctx['@sern/store'])
-           };
+        .add({ '@sern/errors': () => new DefaultErrorHandling() })
+        .add({ '@sern/store': () => new ModuleStore() })
+        .add(ctx => {
+            return {
+                '@sern/modules': () => new DefaultModuleManager(ctx['@sern/store']),
+            };
         })
-        .add({ '@sern/emitter': () => new SernEmitter()}) as Container<Omit<Dependencies, '@sern/client' | '@sern/logger'>, {}>;
+        .add({ '@sern/emitter': () => new SernEmitter() }) as Container<
+        Omit<Dependencies, '@sern/client' | '@sern/logger'>,
+        {}
+    >;
 }
