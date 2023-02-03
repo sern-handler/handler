@@ -1,4 +1,4 @@
-import { CommandType, EventType, PluginType } from '../structures/enums';
+import { CommandType, EventType, PluginType } from '../structures';
 import type { Plugin, PluginResult } from '../../types/plugin';
 import type { CommandArgs, EventArgs } from './args';
 import type { ClientEvents } from 'discord.js';
