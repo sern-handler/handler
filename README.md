@@ -100,7 +100,7 @@ exports.default = commandModule({
 - [Vinci](https://github.com/SrIzan10/vinci), the bot for Mara Turing.
 - [Bask](https://github.com/baskbotml/bask), Listen your favorite artists on Discord.
 - [ava](https://github.com/SrIzan10/ava), A discord bot that plays KNGI and Gensokyo Radio.
-- [Siamese](https://github.com/Benzo-Fury/Siamese-Bot), Using AI to unleash the power in your server.
+- [Siamese (WIP)](https://github.com/Benzo-Fury/Siamese-Bot), Using AI to unleash the power in your server.
 
 ## 💻 CLI
 
