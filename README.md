@@ -54,9 +54,6 @@ const { Client, GatewayIntentBits } = require('discord.js');
 // Import Sern namespace
 const { Sern } = require('@sern/handler');
 
-// Our configuration file
-const { defaultPrefix, token } = require('./config.json');
-
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
@@ -80,7 +77,7 @@ Sern.init({
 	}
 });
 
-client.login(token);
+client.login("YOUR_BOT_TOKEN_HERE");
 ```
 
 #### ` ping.js (CommonJS)`
