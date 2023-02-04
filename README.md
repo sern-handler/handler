@@ -67,7 +67,7 @@ const client = new Client({
 export const useContainer = Sern.makeDependencies({
     build: root => root
         .add({ '@sern/client': single(client)  })
-        .add({ '@sern/logger': single(new DefaultLogging()) })
+        .upsert({ '@sern/logger': single(new DefaultLogging()) })
 });
 
 //View docs for all options
@@ -98,7 +98,11 @@ exports.default = commandModule({
 });
 ```
 
-See our [templates](https://github.com/sern-handler/templates) for TypeScript examples and more.
+## 🤖 Bots Using sern 
+- [Vinci](https://github.com/SrIzan10/vinci), the bot for Mara Turing
+- [Community Bot](https://github.com/sern-handler/sern-community), the community bot for our [discord server](https://sern.dev/discord)
+- [Bask](https://github.com/baskbotml/bask), Listen your favorite artists on Discord 
+- [ava](https://github.com/SrIzan10/ava), A discord bot that plays KNGI and Gensokyo Radio.
 
 ## 💻 CLI
 
@@ -115,6 +119,4 @@ It is **highly encouraged** to use the [command line interface](https://github.c
 - Pull up on [issues](https://github.com/sern-handler/handler/issues) and report bugs
 - All kinds of contributions are welcomed.
 
-## 🚈 Roadmap
 
-You can check our [roadmap](https://github.com/sern-handler/roadmap) to see what's going to be added or patched in the future.
