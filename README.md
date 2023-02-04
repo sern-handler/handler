@@ -101,6 +101,7 @@ exports.default = commandModule({
 - [Bask](https://github.com/baskbotml/bask), Listen your favorite artists on Discord.
 - [ava](https://github.com/SrIzan10/ava), A discord bot that plays KNGI and Gensokyo Radio.
 - [Siamese](https://github.com/Benzo-Fury/Siamese-Bot), Using AI to unleash the power in your server.
+- [Protector](https://github.com/needhamgary/Protector), Just a simple bot to help enhance my minecraft server. **WIP**
 
 ## 💻 CLI
 
