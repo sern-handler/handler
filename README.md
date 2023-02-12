@@ -3,7 +3,7 @@
 </div>
 
 <h1 align="center">Handlers. Redefined.</h1>
-<h4 align="center">A customizable, batteries-included, powerful discord.js framework to streamline bot development.</h4>
+<h4 align="center">A complete, customizable, typesafe, & reactive framework for discord bots</h4>
 
 <div align="center" styles="margin-top: 10px">
   <img src="https://img.shields.io/badge/open-source-brightgreen" />
