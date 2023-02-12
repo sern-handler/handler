@@ -94,7 +94,7 @@ export function executeModule(
  * @returns receiver function for flattening a stream of data
  */
 export function createResultResolver<
-    T extends { execute: (...args: any[]) => any; onEvent : ControlPlugin[] },
+    T extends { execute: (...args: any[]) => any; onEvent: ControlPlugin[] },
     Args extends { module: T; [key: string]: unknown },
     Output,
 >(config: {
