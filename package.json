@@ -1,7 +1,7 @@
 {
     "name": "@sern/handler",
     "packageManager": "pnpm@7.27.0",
-    "version": "2.5.0",
+    "version": "2.5.1",
     "description": "A customizable, batteries-included, powerful discord.js framework to automate and streamline bot development.",
     "main": "dist/cjs/index.cjs",
     "module": "dist/esm/index.mjs",

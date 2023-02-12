@@ -7,7 +7,7 @@ import { _const as i } from '../utilities/functions';
 import SernEmitter from '../sernEmitter';
 import { callPlugin, everyPluginOk, filterMapTo } from './operators';
 import type { Processed } from '../../types/handler';
-import type { VoidResult } from '../../types/plugin';
+import type { ControlPlugin, VoidResult } from '../../types/plugin';
 
 /**
  * Ignores messages from any person / bot except itself
@@ -94,7 +94,7 @@ export function executeModule(
  * @returns receiver function for flattening a stream of data
  */
 export function createResultResolver<
-    T extends Processed<Module>,
+    T extends { execute: (...args: any[]) => any; onEvent : ControlPlugin[] },
     Args extends { module: T; [key: string]: unknown },
     Output,
 >(config: {
