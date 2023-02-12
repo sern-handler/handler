@@ -14,7 +14,7 @@ import type {
     InputEvent,
 } from '../types/module';
 import type { Dependencies, DependencyConfiguration } from '../types/handler';
-import { composeRoot, useContainer } from './dependencies/provider';
+import { composeRoot, makeFetcher, useContainer } from './dependencies/provider';
 import type { Logging } from './contracts';
 import { err, ok, partition } from './utilities/functions';
 import type { Awaitable, ClientEvents } from 'discord.js';

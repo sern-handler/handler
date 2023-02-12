@@ -1,12 +1,11 @@
 import type { Container } from 'iti';
-import { SernError } from '../structures/errors';
 import type { Dependencies, DependencyConfiguration, MapDeps } from '../../types/handler';
 import SernEmitter from '../sernEmitter';
 import { DefaultErrorHandling, DefaultLogging, DefaultModuleManager } from '../contracts';
-import { ModuleStore } from '../structures/moduleStore';
 import { Result } from 'ts-results-es';
 import { BehaviorSubject } from 'rxjs';
 import { createContainer } from 'iti';
+import { type Wrapper, ModuleStore, SernError} from '../structures';
 
 export const containerSubject = new BehaviorSubject(defaultContainer());
 
@@ -70,3 +69,21 @@ function defaultContainer() {
         })
         .add({ '@sern/emitter': () => new SernEmitter()}) as Container<Omit<Dependencies, '@sern/client' | '@sern/logger'>, {}>;
 }
+
+
+export function makeFetcher<Keys extends ['@sern/emitter', '@sern/client', '@sern/errors', '@sern/logger', ...(keyof Dependencies)[]]>(
+    wrapper: Wrapper
+) {
+   const requiredDependencyKeys = [
+       '@sern/emitter',
+       '@sern/client', 
+       '@sern/errors',
+       '@sern/logger'
+   ] as ['@sern/emitter', '@sern/client', '@sern/errors', '@sern/logger'];  
+   return (...keys : [...Keys]) => {
+       return wrapper.containerConfig.get(...requiredDependencyKeys,...keys) as MapDeps<Dependencies,Keys>;           
+   };
+
+}
+
+
