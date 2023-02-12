@@ -1,5 +1,23 @@
 # Changelog
 
+## [2.5.1](https://github.com/sern-handler/handler/compare/v2.5.0...v2.5.1) (2023-02-12)
+
+
+### Features
+
+* Adding my bot to readme ([#210](https://github.com/sern-handler/handler/issues/210)) ([96f4281](https://github.com/sern-handler/handler/commit/96f42811218e4898a47e75a8138ccd452ae2c5c2))
+* Adding the WIP to my bot ([86fa531](https://github.com/sern-handler/handler/commit/86fa531eb620d2ac649bad6decb29d5c55a25445))
+
+
+### Bug Fixes
+
+* autocomplete ([1860b89](https://github.com/sern-handler/handler/commit/1860b898f3a231840e2a8b781e007ef9d6f587a4))
+
+
+### Miscellaneous Chores
+
+* release 2.5.1 ([c78936a](https://github.com/sern-handler/handler/commit/c78936a22574da4af71826f5b5f72f354a4eb06a))
+
 ## [2.5.0](https://github.com/sern-handler/handler/compare/v2.1.1...v2.5.0) (2023-01-30)
 
 
