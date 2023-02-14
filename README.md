@@ -3,7 +3,7 @@
 </div>
 
 <h1 align="center">Handlers. Redefined.</h1>
-<h4 align="center">A customizable, batteries-included, powerful discord.js framework to streamline bot development.</h4>
+<h4 align="center">A complete, customizable, typesafe, & reactive framework for discord bots</h4>
 
 <div align="center" styles="margin-top: 10px">
   <img src="https://img.shields.io/badge/open-source-brightgreen" />
@@ -100,7 +100,7 @@ exports.default = commandModule({
 - [Vinci](https://github.com/SrIzan10/vinci), the bot for Mara Turing.
 - [Bask](https://github.com/baskbotml/bask), Listen your favorite artists on Discord.
 - [ava](https://github.com/SrIzan10/ava), A discord bot that plays KNGI and Gensokyo Radio.
-- [Siamese (WIP)](https://github.com/Benzo-Fury/Siamese-Bot), Using AI to unleash the power in your server.
+- [ALMA (WIP)](https://github.com/Benzo-Fury/ALMA), Using AI to unleash the power in your server.
 - [Protector (WIP)](https://github.com/needhamgary/Protector), Just a simple bot to help enhance a private minecraft server.
 
 ## 💻 CLI
