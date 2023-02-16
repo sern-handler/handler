@@ -14,20 +14,6 @@
   <img alt="Lines of code" src="https://img.shields.io/badge/total%20lines-2k-blue" />
 </div>
 
-
-## 📜 Installation
-
-```sh
-npm install @sern/handler
-```
-
-```sh
-yarn add @sern/handler
-```
-
-```sh
-pnpm add @sern/handler
-```
 ## Why?
 - Most handlers don't support discord.js 14.7+
 - Customizable commands
@@ -42,6 +28,20 @@ pnpm add @sern/handler
 * Lightweight and customizable
 * ESM, CommonJS and TypeScript support
 * A powerful CLI and awesome community-made plugins
+
+## 📜 Installation
+
+```sh
+npm install @sern/handler
+```
+
+```sh
+yarn add @sern/handler
+```
+
+```sh
+pnpm add @sern/handler
+```
 
 ## 👶 Basic Usage
 
