@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.5.3](https://github.com/sern-handler/handler/compare/v2.5.2...v2.5.3) (2023-02-16)
+
+
+### Miscellaneous Chores
+
+* release 2.5.3 ([ce9a083](https://github.com/sern-handler/handler/commit/ce9a0831a6e47dd38648f34653f0bd89b1d2e48e))
+
 ## [2.5.2](https://github.com/sern-handler/handler/compare/v2.5.1...v2.5.2) (2023-02-16)
 
 
