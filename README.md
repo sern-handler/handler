@@ -52,7 +52,7 @@ pnpm add @sern/handler
 const { Client, GatewayIntentBits } = require('discord.js');
 
 // Import Sern namespace
-const { Sern } = require('@sern/handler');
+const { Sern, single } = require('@sern/handler');
 
 const client = new Client({
   intents: [
