@@ -63,8 +63,8 @@ const client = new Client({
 });
 export const useContainer = Sern.makeDependencies({
     build: root => root
-        .add({ '@sern/client': single(client)  })
-        .upsert({ '@sern/logger': single(new DefaultLogging()) })
+        .add({ '@sern/client': single(() => client)  })
+        .upsert({ '@sern/logger': single(() => new DefaultLogging()) })
 });
 
 //View docs for all options
@@ -86,9 +86,8 @@ client.login("YOUR_BOT_TOKEN_HERE");
 const { CommandType, commandModule } = require('@sern/handler');
 
 exports.default = commandModule({
-  name: 'ping',
-  description: 'A ping pong command',
   type: CommandType.Slash,
+  description: 'A ping pong command',
   execute(ctx) {
     ctx.reply('pong!');
   }
