@@ -1,7 +1,7 @@
 {
     "name": "@sern/handler",
     "packageManager": "pnpm@7.27.0",
-    "version": "2.5.1",
+    "version": "2.5.3",
     "description": "A customizable, batteries-included, powerful discord.js framework to automate and streamline bot development.",
     "main": "dist/cjs/index.cjs",
     "module": "dist/esm/index.mjs",
@@ -13,7 +13,7 @@
         }
     },
     "scripts": {
-        "watch": "tsup --watch --dts",
+        "watch": "tsup --dts --watch",
         "clean-modules": "rimraf node_modules/ && npm install",
         "lint": "eslint src/**/*.ts",
         "format": "eslint src/**/*.ts --fix",
