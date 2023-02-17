@@ -22,6 +22,7 @@ export function single<T extends NotFunction>(cb: T): () => T;
  */
 export function single<T extends () => unknown>(cb: T): T;
 /**
+ * @__PURE__
  * Please note that on intellij, the deprecation is for all signatures, which is unintended behavior (and
  * very annoying).
  * For future versions, ensure that single is being passed as a **callback!!**
@@ -39,6 +40,7 @@ export function single<T>(cb: T) {
 export function transient<T extends NotFunction>(cb: T): () => () => T;
 export function transient<T extends () => () => unknown>(cb: T): T;
 /**
+ * @__PURE__
  * Following iti's singleton and transient implementation,
  * use transient if you want a new dependency every time your container getter is called
  * @param cb
@@ -49,6 +51,7 @@ export function transient<T>(cb: (() => () => T) | T) {
 }
 
 /**
+ * @__PURE__
  * @deprecated
  * @param value
  * Please use the transient function instead

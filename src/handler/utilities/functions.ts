@@ -5,6 +5,7 @@ import { Err, Ok } from 'ts-results-es';
  * A function that returns whatever value is provided.
  * Warning: this evaluates { @param value }. It does not defer a value.
  * @param value
+ * @__PURE__
  */
 // prettier-ignore
 export const _const = <T>(value: T) => () => value;
