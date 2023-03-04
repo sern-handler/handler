@@ -2,9 +2,9 @@ import type Wrapper from './structures/wrapper';
 import { processEvents } from './events/userDefinedEventsHandling';
 import { CommandType, EventType, PluginType } from './structures/enums';
 import type { AnyEventPlugin, ControlPlugin, InitPlugin, Plugin } from '../types/plugin';
-import InteractionHandler from './events/interactionHandler';
-import ReadyHandler from './events/readyHandler';
-import MessageHandler from './events/messageHandler';
+import InteractionHandler, { makeInteractionCreate } from './events/interactionHandler';
+import { makeReadyEvent } from './events/readyHandler';
+import { makeMessageCreate } from './events/messageHandler';
 import type {
     CommandModule,
     CommandModuleDefs,
@@ -37,13 +37,23 @@ import type { Awaitable, ClientEvents } from 'discord.js';
  */
 export function init(wrapper: Wrapper) {
     const logger = wrapper.containerConfig.get('@sern/logger')[0] as Logging | undefined;
+    const requiredDependenciesAnd = makeFetcher(wrapper);
     const startTime = performance.now();
     const { events } = wrapper;
     if (events !== undefined) {
         processEvents(wrapper);
     }
-    new ReadyHandler(wrapper);
-    new MessageHandler(wrapper);
+    const readySubscription = makeReadyEvent(
+        requiredDependenciesAnd(['@sern/modules']),
+        wrapper.commands
+    );
+    const messageSubscription = makeMessageCreate(
+        requiredDependenciesAnd(['@sern/modules']),
+        wrapper.defaultPrefix
+    );
+    const interactionSubscription = makeInteractionCreate(
+        requiredDependenciesAnd(['@sern/modules'])
+    );
     new InteractionHandler(wrapper);
     const endTime = performance.now();
     logger?.info({ message: `sern : ${(endTime - startTime).toFixed(2)} ms` });

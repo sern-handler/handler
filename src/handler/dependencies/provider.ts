@@ -71,7 +71,7 @@ function defaultContainer() {
 }
 
 
-export function makeFetcher<Keys extends ['@sern/emitter', '@sern/client', '@sern/errors', '@sern/logger', ...(keyof Dependencies)[]]>(
+export function makeFetcher(
     wrapper: Wrapper
 ) {
    const requiredDependencyKeys = [
@@ -80,10 +80,9 @@ export function makeFetcher<Keys extends ['@sern/emitter', '@sern/client', '@ser
        '@sern/errors',
        '@sern/logger'
    ] as ['@sern/emitter', '@sern/client', '@sern/errors', '@sern/logger'];  
-   return (...keys : [...Keys]) => {
-       return wrapper.containerConfig.get(...requiredDependencyKeys,...keys) as MapDeps<Dependencies,Keys>;           
-   };
-
-}
+   return <Keys extends (keyof Dependencies)[]>(otherKeys: [...Keys]) =>
+    wrapper
+    .containerConfig
+    .get(...requiredDependencyKeys, ...otherKeys) as MapDeps<Dependencies, [...typeof requiredDependencyKeys, ...Keys]>; }
 
 

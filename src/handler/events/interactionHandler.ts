@@ -1,22 +1,81 @@
 import type { Interaction } from 'discord.js';
-import { catchError, concatMap, finalize, fromEvent, map, Observable } from 'rxjs';
+import { catchError, concatMap, EMPTY, filter, finalize, fromEvent, map, Observable, of, OperatorFunction, pipe } from 'rxjs';
 import type Wrapper from '../structures/wrapper';
 import { EventsHandler } from './eventsHandler';
-import { CommandType, SernError, type ModuleStore } from '../structures';
+import { CommandType, type ModuleStore, SernError } from '../structures';
 import { match, P } from 'ts-pattern';
-import { contextArgs, interactionArg, dispatchAutocomplete, dispatchCommand } from './dispatchers';
+import { contextArgs, dispatchAutocomplete, dispatchCommand, interactionArg } from './dispatchers';
 import { executeModule, makeModuleExecutor } from './observableHandling';
 import type { CommandModule } from '../../types/module';
-import { handleError } from '../contracts/errorHandling';
+import { ErrorHandling, handleError } from '../contracts/errorHandling';
 import SernEmitter from '../sernEmitter';
 import type { Processed } from '../../types/handler';
 import { useContainerRaw } from '../dependencies';
+import type { Logging, ModuleManager } from '../contracts';
+import type { EventEmitter } from 'node:events';
 
+
+function makeInteractionProcessor(modules: ModuleManager): OperatorFunction<Interaction, { module: Processed<CommandModule>; event: Interaction }>  {
+    const get = (cb: (ms: ModuleStore) => Processed<CommandModule> | undefined) => {
+          return modules.get(cb);
+    };
+    return pipe(
+        concatMap(event => {
+         if (event.isMessageComponent()) {
+             const module = get(ms =>
+               ms.InteractionHandlers[event.componentType].get(event.customId),
+             );
+           return of({module, event})
+         } else if (event.isCommand() || event.isAutocomplete()) {
+           const module = get(ms =>
+              /**
+                * try to fetch from ApplicationCommands, if nothing, try BothCommands
+                * exists on the API but not sern
+                */
+                ms.ApplicationCommands[event.commandType].get(event.commandName) ??
+                ms.BothCommands.get(event.commandName),
+         );
+          return of({ module, event })
+       } else if (event.isModalSubmit()) {
+          const module = get(ms => ms.ModalSubmit.get(event.customId));
+          return of({ module, event })
+       }
+         else return EMPTY
+    }),
+    filter(m => m.module !== undefined)
+    );
+}
+
+export function makeInteractionCreate(
+    [s, client, err, log, modules]: [SernEmitter, EventEmitter, ErrorHandling, Logging | undefined, ModuleManager]
+) {
+
+    map. If nothing again,this means a slash command
+    const interactionStream$ = fromEvent(client, 'interactionCreate');
+    const interactionProcessor = makeInteractionProcessor(modules);
+    return interactionStream$.pipe(
+        interactionProcessor,
+        map(createDispatcher),
+        makeModuleExecutor(module => {
+            s.emit('module.activate', SernEmitter.failure(module, SernError.PluginFailure))
+        }),
+        concatMap(module => executeModule(s, module)),
+        catchError(handleError(err, log)),
+        finalize(() => {
+            this.logger?.info({ message: 'interactionCreate stream closed or reached end of lifetime' });
+            useContainerRaw()
+                ?.disposeAll()
+               .then(() => log?.info({ message: 'Cleaning container and crashing' }));
+        })
+    ).subscribe();
+
+}
 export default class InteractionHandler extends EventsHandler<{
     event: Interaction;
     module: Processed<CommandModule>;
 }> {
     protected override discordEvent: Observable<Interaction>;
+
     constructor(wrapper: Wrapper) {
         super(wrapper);
         this.discordEvent = <Observable<Interaction>>fromEvent(this.client, 'interactionCreate');
@@ -24,7 +83,7 @@ export default class InteractionHandler extends EventsHandler<{
 
         this.payloadSubject
             .pipe(
-                map(this.createDispatcher),
+                map(createDispatcher),
                 makeModuleExecutor(module => {
                     this.emitter.emit(
                         'module.activate',
@@ -34,13 +93,13 @@ export default class InteractionHandler extends EventsHandler<{
                 concatMap(payload => executeModule(this.emitter, payload)),
                 catchError(handleError(this.crashHandler, this.logger)),
                 finalize(() => {
-                    this.logger?.info({ message: 'interactionCreate stream closed or reached end of lifetime'});
+                    this.logger?.info({ message: 'interactionCreate stream closed or reached end of lifetime' });
                     useContainerRaw()
                         ?.disposeAll()
                         .then(() => {
                             this.logger?.info({ message: 'Cleaning container and crashing' });
                         });
-                })
+                }),
             )
             .subscribe();
     }
@@ -99,8 +158,9 @@ export default class InteractionHandler extends EventsHandler<{
             );
         }
     }
+}
 
-    protected createDispatcher({
+function createDispatcher({
         module,
         event,
     }: {
@@ -132,4 +192,4 @@ export default class InteractionHandler extends EventsHandler<{
                 .otherwise(mod => dispatchCommand(mod, interactionArg(event)))
         );
     }
-}
+
