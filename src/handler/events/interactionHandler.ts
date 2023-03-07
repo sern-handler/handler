@@ -25,7 +25,7 @@ function makeInteractionProcessor(
              const module = get(ms =>
                ms.InteractionHandlers[event.componentType].get(event.customId),
              );
-           return of({module, event})
+           return of({module, event});
          } else if (event.isCommand() || event.isAutocomplete()) {
            const module = get(ms =>
               /**
@@ -35,12 +35,12 @@ function makeInteractionProcessor(
                 ms.ApplicationCommands[event.commandType].get(event.commandName) ??
                 ms.BothCommands.get(event.commandName),
          );
-          return of({ module, event })
+          return of({ module, event });
        } else if (event.isModalSubmit()) {
           const module = get(ms => ms.ModalSubmit.get(event.customId));
-          return of({ module, event })
+          return of({ module, event });
        }
-         else return EMPTY
+         else return EMPTY;
     }),
     filter(m => m.module !== undefined)
     ) as OperatorFunction<Interaction, { module: Processed<CommandModule>; event: Interaction }>;
@@ -57,12 +57,12 @@ export function makeInteractionCreate(
         interactionProcessor,
         map(createDispatcher),
         makeModuleExecutor(module => {
-            s.emit('module.activate', SernEmitter.failure(module, SernError.PluginFailure))
+            s.emit('module.activate', SernEmitter.failure(module, SernError.PluginFailure));
         }),
         concatMap(module => executeModule(s, module)),
         catchError(handleError(err, log)),
         finalize(() => {
-            this.logger?.info({ message: 'interactionCreate stream closed or reached end of lifetime' });
+            log?.info({ message: 'interactionCreate stream closed or reached end of lifetime' });
             useContainerRaw()
                 ?.disposeAll()
                .then(() => log?.info({ message: 'Cleaning container and crashing' }));
@@ -79,9 +79,9 @@ function createDispatcher({
     }) {
         return (
             match(module)
-                .with({ type: CommandType.Text }, () =>
-                    this.crashHandler.crash(Error(SernError.MismatchEvent)),
-                )
+                .with({ type: CommandType.Text }, () => {
+                    throw Error(SernError.MismatchEvent);
+                })
                 //P.union = either CommandType.Slash or CommandType.Both
                 .with({ type: P.union(CommandType.Slash, CommandType.Both) }, module => {
                     if (event.isAutocomplete()) {
