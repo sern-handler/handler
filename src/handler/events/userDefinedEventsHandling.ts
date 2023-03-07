@@ -1,4 +1,4 @@
-import { catchError, finalize, map, tap } from 'rxjs';
+import { catchError, finalize, map, tap, mergeAll } from 'rxjs';
 import { buildData } from '../utilities/readFile';
 import type { Dependencies, Processed } from '../../types/handler';
 import { errTap, scanModule } from './observableHandling';
@@ -47,7 +47,7 @@ export function makeEventsHandler(
             /**
              * Where all events are turned on
              */
-            tap(dispatcher => dispatcher.subscribe()),
+            mergeAll(),
             catchError(handleError(err, log)),
             finalize(() => {
                 log?.info({ message: 'an event module reached end of lifetime'});
@@ -59,7 +59,6 @@ export function makeEventsHandler(
             })
         )
         .subscribe();
-
 }
 
 
