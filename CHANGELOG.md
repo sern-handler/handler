@@ -1,5 +1,53 @@
 # Changelog
 
+## [2.5.3](https://github.com/sern-handler/handler/compare/v2.5.2...v2.5.3) (2023-02-16)
+
+
+### Miscellaneous Chores
+
+* release 2.5.3 ([ce9a083](https://github.com/sern-handler/handler/commit/ce9a0831a6e47dd38648f34653f0bd89b1d2e48e))
+
+## [2.5.2](https://github.com/sern-handler/handler/compare/v2.5.1...v2.5.2) (2023-02-16)
+
+
+### Reverts
+
+* version ([facee79](https://github.com/sern-handler/handler/commit/facee79c904ad663d3c57ce56fb825419fcc12f9))
+
+## [2.5.1](https://github.com/sern-handler/handler/compare/v2.5.0...v2.5.1) (2023-02-12)
+
+
+### Features
+
+* Adding my bot to readme ([#210](https://github.com/sern-handler/handler/issues/210)) ([96f4281](https://github.com/sern-handler/handler/commit/96f42811218e4898a47e75a8138ccd452ae2c5c2))
+* Adding the WIP to my bot ([86fa531](https://github.com/sern-handler/handler/commit/86fa531eb620d2ac649bad6decb29d5c55a25445))
+
+
+### Bug Fixes
+
+* autocomplete ([1860b89](https://github.com/sern-handler/handler/commit/1860b898f3a231840e2a8b781e007ef9d6f587a4))
+
+
+### Miscellaneous Chores
+
+* release 2.5.1 ([c78936a](https://github.com/sern-handler/handler/commit/c78936a22574da4af71826f5b5f72f354a4eb06a))
+
+## [2.5.0](https://github.com/sern-handler/handler/compare/v2.1.1...v2.5.0) (2023-01-30)
+
+
+### ⚠ BREAKING CHANGES
+
+* simpler plugins ([#193](https://github.com/sern-handler/handler/issues/193))
+
+### Features
+
+* simpler plugins ([#193](https://github.com/sern-handler/handler/issues/193)) ([33f1446](https://github.com/sern-handler/handler/commit/33f14467ec413e003a82503c8a77cb42a6194281))
+
+
+### Miscellaneous Chores
+
+* release 2.5.0 ([b4b195d](https://github.com/sern-handler/handler/commit/b4b195dc9586736760d0b78caa8589f3d6131f8a))
+
 ## [2.1.1](https://github.com/sern-handler/handler/compare/v2.1.0...v2.1.1) (2022-12-31)
 
 

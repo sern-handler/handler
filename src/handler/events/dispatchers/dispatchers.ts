@@ -54,7 +54,7 @@ export function dispatchAutocomplete(
     const option = treeSearch(interaction, module.options);
     if (option !== undefined) {
         return {
-            module,
+            module: option.command as Processed<Module>, //autocomplete is not a true "module" warning cast!
             args: [interaction],
         };
     }

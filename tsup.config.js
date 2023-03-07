@@ -6,6 +6,7 @@ const shared = {
     minify: true,
     clean: true,
     sourcemap: false,
+    minify: true,
 };
 export default defineConfig([
     {
@@ -13,7 +14,6 @@ export default defineConfig([
         target: 'node16',
         tsconfig: './tsconfig-esm.json',
         outDir: './dist/esm',
-        external: ['discord.js'],
         treeshake: true,
         outExtension() {
             return {
@@ -25,7 +25,6 @@ export default defineConfig([
     {
         format: 'cjs',
         splitting: false,
-        external: ['discord.js'],
         target: 'node16',
         tsconfig: './tsconfig-cjs.json',
         outDir: './dist/cjs',
