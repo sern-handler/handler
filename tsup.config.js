@@ -3,7 +3,6 @@ const shared = {
     entry: ['src/index.ts'],
     external: ['discord.js'],
     platform: 'node',
-    minify: true,
     clean: true,
     sourcemap: false,
     minify: true,
