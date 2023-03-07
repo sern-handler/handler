@@ -13,36 +13,34 @@ import { handleError } from '../contracts/errorHandling';
 import { defineAllFields } from './operators';
 import { useContainerRaw } from '../dependencies';
 
-export function processEvents({ containerConfig, events }: Wrapper) {
-    const [client, errorHandling, sernEmitter, logger] = containerConfig.get(
-        '@sern/client',
-        '@sern/errors',
-        '@sern/emitter',
-        '@sern/logger',
-    ) as [EventEmitter, ErrorHandling, SernEmitter, Logging?];
-    const lazy = (k: string) => containerConfig.get(k as keyof Dependencies)[0];
-    const eventStream$ = eventObservable$(events!, sernEmitter);
+
+export function makeEventsHandler(
+    [s, client, err, log]: [SernEmitter, EventEmitter, ErrorHandling, Logging | undefined],
+    eventsPath: string,
+    containerGetter: Wrapper['containerConfig']
+) {
+    const lazy = (k: string) => containerGetter.get(k as keyof Dependencies)[0];
+    const eventStream$ = eventObservable(eventsPath, s);
 
     const eventCreation$ = eventStream$.pipe(
         defineAllFields(),
         scanModule({
-            onFailure: module => sernEmitter.emit('module.register', SernEmitter.success(module)),
+            onFailure: module => s.emit('module.register', SernEmitter.success(module)),
             onSuccess: ({ module }) => {
-                sernEmitter.emit(
+                s.emit(
                     'module.register',
                     SernEmitter.failure(module, SernError.PluginFailure),
                 );
                 return module;
             },
         }),
-    );
+    ); 
     const intoDispatcher = (e: Processed<EventModule | CommandModule>) =>
         match(e)
-            .with({ type: EventType.Sern }, m => eventDispatcher(m, sernEmitter))
+            .with({ type: EventType.Sern }, m => eventDispatcher(m, s))
             .with({ type: EventType.Discord }, m => eventDispatcher(m, client))
             .with({ type: EventType.External }, m => eventDispatcher(m, lazy(m.emitter)))
-            .otherwise(() => errorHandling.crash(Error(SernError.InvalidModuleType)));
-
+            .otherwise(() => err.crash(Error(SernError.InvalidModuleType)));
     eventCreation$
         .pipe(
             map(intoDispatcher),
@@ -50,20 +48,22 @@ export function processEvents({ containerConfig, events }: Wrapper) {
              * Where all events are turned on
              */
             tap(dispatcher => dispatcher.subscribe()),
-            catchError(handleError(errorHandling, logger)),
+            catchError(handleError(err, log)),
             finalize(() => {
-                logger?.info({ message: 'an event module reached end of lifetime'});
+                log?.info({ message: 'an event module reached end of lifetime'});
                 useContainerRaw()
                     ?.disposeAll()
                     .then(() => {
-                        logger?.info({ message: 'Cleaning container and crashing' });
+                        log?.info({ message: 'Cleaning container and crashing' });
                     });
             })
         )
         .subscribe();
+
 }
 
-function eventObservable$(events: string, emitter: SernEmitter) {
+
+function eventObservable(events: string, emitter: SernEmitter) {
     return buildData<EventModule>(events).pipe(
         errTap(reason => {
             emitter.emit('module.register', SernEmitter.failure(undefined, reason));

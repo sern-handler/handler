@@ -20,7 +20,6 @@ import type { EventEmitter } from 'node:events';
  */
 const createMessageProcessor = (
     defaultPrefix: string,
-    s: SernEmitter,
     get: (cb: (ms: ModuleStore) => Processed<CommandModule> | undefined) => CommandModule|undefined,
 ) => pipe(
     ignoreNonBot(defaultPrefix),
@@ -54,7 +53,7 @@ export function makeMessageCreate(
         return modules.get(cb);
     };
     const messageStream$ = fromEvent<Message>(client, 'messageCreate');
-    const messageProcessor = createMessageProcessor(defaultPrefix, s, get);
+    const messageProcessor = createMessageProcessor(defaultPrefix, get);
     return messageStream$
         .pipe(
             messageProcessor,

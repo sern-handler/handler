@@ -1,8 +1,8 @@
 import type Wrapper from './structures/wrapper';
-import { processEvents } from './events/userDefinedEventsHandling';
+import { makeEventsHandler } from './events/userDefinedEventsHandling';
 import { CommandType, EventType, PluginType } from './structures/enums';
 import type { AnyEventPlugin, ControlPlugin, InitPlugin, Plugin } from '../types/plugin';
-import InteractionHandler, { makeInteractionCreate } from './events/interactionHandler';
+import { makeInteractionCreate } from './events/interactionHandler';
 import { makeReadyEvent } from './events/readyHandler';
 import { makeMessageCreate } from './events/messageHandler';
 import type {
@@ -41,20 +41,23 @@ export function init(wrapper: Wrapper) {
     const startTime = performance.now();
     const { events } = wrapper;
     if (events !== undefined) {
-        processEvents(wrapper);
+        makeEventsHandler(
+            requiredDependenciesAnd([]),
+            events,
+            wrapper.containerConfig
+        );
     }
-    const readySubscription = makeReadyEvent(
+    makeReadyEvent(
         requiredDependenciesAnd(['@sern/modules']),
         wrapper.commands
     );
-    const messageSubscription = makeMessageCreate(
+    makeMessageCreate(
         requiredDependenciesAnd(['@sern/modules']),
         wrapper.defaultPrefix
     );
-    const interactionSubscription = makeInteractionCreate(
+    makeInteractionCreate(
         requiredDependenciesAnd(['@sern/modules'])
     );
-    new InteractionHandler(wrapper);
     const endTime = performance.now();
     logger?.info({ message: `sern : ${(endTime - startTime).toFixed(2)} ms` });
 }

@@ -1,4 +1,4 @@
-import { fromEvent, pipe, switchMap, take, tap } from 'rxjs';
+import { fromEvent, pipe, switchMap, take } from 'rxjs';
 import * as Files from '../utilities/readFile';
 import { errTap, scanModule } from './observableHandling';
 import { CommandType, type ModuleStore, SernError } from '../structures';
