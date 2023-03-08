@@ -15,7 +15,6 @@ import type { EventEmitter } from 'node:events';
 /**
  * An operator function that processes a message to fetch a command module and prepares context payload.
  * @param defaultPrefix
- * @param s
  * @param get
  */
 const createMessageProcessor = (
