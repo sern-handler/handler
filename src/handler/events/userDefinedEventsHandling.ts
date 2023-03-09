@@ -13,11 +13,10 @@ import { handleError } from '../contracts/errorHandling';
 import { defineAllFields } from './operators';
 import { useContainerRaw } from '../dependencies';
 
-
 export function makeEventsHandler(
     [s, client, err, log]: [SernEmitter, EventEmitter, ErrorHandling, Logging | undefined],
     eventsPath: string,
-    containerGetter: Wrapper['containerConfig']
+    containerGetter: Wrapper['containerConfig'],
 ) {
     const lazy = (k: string) => containerGetter.get(k as keyof Dependencies)[0];
     const eventStream$ = eventObservable(eventsPath, s);
@@ -27,14 +26,11 @@ export function makeEventsHandler(
         scanModule({
             onFailure: module => s.emit('module.register', SernEmitter.success(module)),
             onSuccess: ({ module }) => {
-                s.emit(
-                    'module.register',
-                    SernEmitter.failure(module, SernError.PluginFailure),
-                );
+                s.emit('module.register', SernEmitter.failure(module, SernError.PluginFailure));
                 return module;
             },
         }),
-    ); 
+    );
     const intoDispatcher = (e: Processed<EventModule | CommandModule>) =>
         match(e)
             .with({ type: EventType.Sern }, m => eventDispatcher(m, s))
@@ -50,17 +46,16 @@ export function makeEventsHandler(
             mergeAll(),
             catchError(handleError(err, log)),
             finalize(() => {
-                log?.info({ message: 'an event module reached end of lifetime'});
+                log?.info({ message: 'an event module reached end of lifetime' });
                 useContainerRaw()
                     ?.disposeAll()
                     .then(() => {
                         log?.info({ message: 'Cleaning container and crashing' });
                     });
-            })
+            }),
         )
         .subscribe();
 }
-
 
 function eventObservable(events: string, emitter: SernEmitter) {
     return buildData<EventModule>(events).pipe(

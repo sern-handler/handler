@@ -19,32 +19,39 @@ import type { EventEmitter } from 'node:events';
  */
 const createMessageProcessor = (
     defaultPrefix: string,
-    get: (cb: (ms: ModuleStore) => Processed<CommandModule> | undefined) => CommandModule|undefined,
-) => pipe(
-    ignoreNonBot(defaultPrefix),
-    //This concatMap checks if module is undefined, and if it is, do not continue.
-    // Synonymous to filterMap, but I haven't thought of a generic implementation for filterMap yet
-    concatMap(message => {
-        const [prefix, ...rest] = fmt(message, defaultPrefix);
-        const module = get(
-            ms => ms.TextCommands.get(prefix) ?? ms.BothCommands.get(prefix),
-        );
-        if (module === undefined) {
-            return EMPTY;
-        }
-        const payload = {
-            args: contextArgs(message, rest),
-            module,
-        };
-        return of(payload);
-    }),
-    map(({ args, module }) => dispatchCommand(module as Processed<TextCommand>, args)),
-);
+    get: (
+        cb: (ms: ModuleStore) => Processed<CommandModule> | undefined,
+    ) => CommandModule | undefined,
+) =>
+    pipe(
+        ignoreNonBot(defaultPrefix),
+        //This concatMap checks if module is undefined, and if it is, do not continue.
+        // Synonymous to filterMap, but I haven't thought of a generic implementation for filterMap yet
+        concatMap(message => {
+            const [prefix, ...rest] = fmt(message, defaultPrefix);
+            const module = get(ms => ms.TextCommands.get(prefix) ?? ms.BothCommands.get(prefix));
+            if (module === undefined) {
+                return EMPTY;
+            }
+            const payload = {
+                args: contextArgs(message, rest),
+                module,
+            };
+            return of(payload);
+        }),
+        map(({ args, module }) => dispatchCommand(module as Processed<TextCommand>, args)),
+    );
 
 export function makeMessageCreate(
-    [s, client, err, log, modules]: [SernEmitter, EventEmitter, ErrorHandling, Logging | undefined, ModuleManager],
-    defaultPrefix?: string) {
-
+    [s, client, err, log, modules]: [
+        SernEmitter,
+        EventEmitter,
+        ErrorHandling,
+        Logging | undefined,
+        ModuleManager,
+    ],
+    defaultPrefix?: string,
+) {
     if (!defaultPrefix) {
         return EMPTY.subscribe();
     }
@@ -57,10 +64,7 @@ export function makeMessageCreate(
         .pipe(
             messageProcessor,
             makeModuleExecutor(module => {
-                s.emit(
-                    'module.activate',
-                    SernEmitter.failure(module, SernError.PluginFailure),
-                );
+                s.emit('module.activate', SernEmitter.failure(module, SernError.PluginFailure));
             }),
             concatMap(payload => executeModule(s, payload)),
             catchError(handleError(err, log)),
@@ -70,5 +74,6 @@ export function makeMessageCreate(
                     ?.disposeAll()
                     .then(() => log?.info({ message: 'Cleaning container and crashing' }));
             }),
-        ).subscribe();
+        )
+        .subscribe();
 }

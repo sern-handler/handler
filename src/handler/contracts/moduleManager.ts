@@ -21,4 +21,3 @@ export class DefaultModuleManager implements ModuleManager {
         strat(this.moduleStore);
     }
 }
-

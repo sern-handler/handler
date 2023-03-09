@@ -14,7 +14,13 @@ import SernEmitter from '../sernEmitter';
 import type { EventEmitter } from 'node:events';
 
 export function makeReadyEvent(
-    [sEmitter,client, errorHandler,, moduleManager]: [SernEmitter, EventEmitter, ErrorHandling, Logging | undefined, ModuleManager],
+    [sEmitter, client, errorHandler, , moduleManager]: [
+        SernEmitter,
+        EventEmitter,
+        ErrorHandling,
+        Logging | undefined,
+        ModuleManager,
+    ],
     commandDir: string,
 ) {
     const readyOnce$ = fromEvent(client, 'ready').pipe(take(1));
@@ -25,23 +31,28 @@ export function makeReadyEvent(
         }),
         defineAllFields(),
     );
-    return readyOnce$.pipe(
-        parseCommandModules,
-        scanModule({
-            onFailure: module => {
-                sEmitter.emit('module.register', SernEmitter.failure(module, SernError.PluginFailure));
-            },
-            onSuccess: ({ module }) => {
-                sEmitter.emit('module.register', SernEmitter.success(module));
-                return module;
-            },
-        }),
-    ).subscribe(module => {
-        const result = registerModule(moduleManager, module as Processed<CommandModule>);
-        if (result.err) {
-            errorHandler.crash(Error(SernError.InvalidModuleType));
-        }
-    });
+    return readyOnce$
+        .pipe(
+            parseCommandModules,
+            scanModule({
+                onFailure: module => {
+                    sEmitter.emit(
+                        'module.register',
+                        SernEmitter.failure(module, SernError.PluginFailure),
+                    );
+                },
+                onSuccess: ({ module }) => {
+                    sEmitter.emit('module.register', SernEmitter.success(module));
+                    return module;
+                },
+            }),
+        )
+        .subscribe(module => {
+            const result = registerModule(moduleManager, module as Processed<CommandModule>);
+            if (result.err) {
+                errorHandler.crash(Error(SernError.InvalidModuleType));
+            }
+        });
 }
 
 function registerModule<T extends Processed<CommandModule>>(

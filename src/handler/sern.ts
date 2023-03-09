@@ -41,23 +41,11 @@ export function init(wrapper: Wrapper) {
     const startTime = performance.now();
     const { events } = wrapper;
     if (events !== undefined) {
-        makeEventsHandler(
-            requiredDependenciesAnd([]),
-            events,
-            wrapper.containerConfig
-        );
+        makeEventsHandler(requiredDependenciesAnd([]), events, wrapper.containerConfig);
     }
-    makeReadyEvent(
-        requiredDependenciesAnd(['@sern/modules']),
-        wrapper.commands
-    );
-    makeMessageCreate(
-        requiredDependenciesAnd(['@sern/modules']),
-        wrapper.defaultPrefix
-    );
-    makeInteractionCreate(
-        requiredDependenciesAnd(['@sern/modules'])
-    );
+    makeReadyEvent(requiredDependenciesAnd(['@sern/modules']), wrapper.commands);
+    makeMessageCreate(requiredDependenciesAnd(['@sern/modules']), wrapper.defaultPrefix);
+    makeInteractionCreate(requiredDependenciesAnd(['@sern/modules']));
     const endTime = performance.now();
     logger?.info({ message: `sern : ${(endTime - startTime).toFixed(2)} ms` });
 }
