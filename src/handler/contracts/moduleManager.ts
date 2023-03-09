@@ -5,7 +5,7 @@ import type { Processed } from '../../types/handler';
 export interface ModuleManager {
     get<T extends CommandType>(
         strat: (ms: ModuleStore) => Processed<CommandModuleDefs[T]> | undefined,
-    ): CommandModuleDefs[T] | undefined;
+    ): Processed<CommandModuleDefs[T]> | undefined;
     set(strat: (ms: ModuleStore) => void): void;
 }
 
@@ -21,3 +21,4 @@ export class DefaultModuleManager implements ModuleManager {
         strat(this.moduleStore);
     }
 }
+

@@ -1,10 +1,10 @@
 import type Wrapper from './structures/wrapper';
-import { processEvents } from './events/userDefinedEventsHandling';
+import { makeEventsHandler } from './events/userDefinedEventsHandling';
 import { CommandType, EventType, PluginType } from './structures/enums';
 import type { AnyEventPlugin, ControlPlugin, InitPlugin, Plugin } from '../types/plugin';
-import InteractionHandler from './events/interactionHandler';
-import ReadyHandler from './events/readyHandler';
-import MessageHandler from './events/messageHandler';
+import { makeInteractionCreate } from './events/interactionHandler';
+import { makeReadyEvent } from './events/readyHandler';
+import { makeMessageCreate } from './events/messageHandler';
 import type {
     CommandModule,
     CommandModuleDefs,
@@ -14,7 +14,7 @@ import type {
     InputEvent,
 } from '../types/module';
 import type { Dependencies, DependencyConfiguration } from '../types/handler';
-import { composeRoot, useContainer } from './dependencies/provider';
+import { composeRoot, makeFetcher, useContainer } from './dependencies/provider';
 import type { Logging } from './contracts';
 import { err, ok, partition } from './utilities/functions';
 import type { Awaitable, ClientEvents } from 'discord.js';
@@ -37,14 +37,27 @@ import type { Awaitable, ClientEvents } from 'discord.js';
  */
 export function init(wrapper: Wrapper) {
     const logger = wrapper.containerConfig.get('@sern/logger')[0] as Logging | undefined;
+    const requiredDependenciesAnd = makeFetcher(wrapper);
     const startTime = performance.now();
     const { events } = wrapper;
     if (events !== undefined) {
-        processEvents(wrapper);
+        makeEventsHandler(
+            requiredDependenciesAnd([]),
+            events,
+            wrapper.containerConfig
+        );
     }
-    new ReadyHandler(wrapper);
-    new MessageHandler(wrapper);
-    new InteractionHandler(wrapper);
+    makeReadyEvent(
+        requiredDependenciesAnd(['@sern/modules']),
+        wrapper.commands
+    );
+    makeMessageCreate(
+        requiredDependenciesAnd(['@sern/modules']),
+        wrapper.defaultPrefix
+    );
+    makeInteractionCreate(
+        requiredDependenciesAnd(['@sern/modules'])
+    );
     const endTime = performance.now();
     logger?.info({ message: `sern : ${(endTime - startTime).toFixed(2)} ms` });
 }
