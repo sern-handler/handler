@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.6.0](https://github.com/sern-handler/handler/compare/v2.5.3...v2.6.0) (2023-03-09)
+
+
+### Features
+
+* adding pure annotation for better tree shaking ([d20d015](https://github.com/sern-handler/handler/commit/d20d01524b872549da501e21feec147ab204f397))
+
 ## [2.5.3](https://github.com/sern-handler/handler/compare/v2.5.2...v2.5.3) (2023-02-16)
 
 
