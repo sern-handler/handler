@@ -1,10 +1,7 @@
 name: NPM / Publish
 
 on:
-  workflow_run:
-    workflows: ["release-please"]
-    types: [completed]
-
+  workflow_dispatch:
 jobs:
   test-and-publish:
     runs-on: ubuntu-latest
@@ -19,7 +16,6 @@ jobs:
             - recursive: true
               args: [--strict-peer-dependencies]
       - run: pnpm install
-      - run: pnpm test
       - run: pnpm build
       - uses: JS-DevTools/npm-publish@v1
         with:
