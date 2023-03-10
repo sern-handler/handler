@@ -1,6 +1,6 @@
 import { readdirSync, statSync } from 'fs';
 import { join } from 'path';
-import { type Observable, from, concatAll } from 'rxjs';
+import { type Observable, from,  mergeAll } from 'rxjs';
 import { SernError } from '../structures/errors';
 import { type Result, Err, Ok } from 'ts-results-es';
 
@@ -18,9 +18,7 @@ function readPath(dir: string, arrayOfFiles: string[] = []): string[] {
 
     return arrayOfFiles;
 }
-
 export const fmtFileName = (n: string) => n.substring(0, n.length - 3);
-
 /**
  *  a directory string is converted into a stream of modules.
  *  starts the stream of modules that sern needs to process on init
@@ -42,12 +40,13 @@ export function buildData<T>(commandDir: string): Observable<
         Promise.all(
             commands.map(async absPath => {
                 let module: T | undefined;
-                try {
-                    // eslint-disable-next-line @typescript-eslint/no-var-requires
-                    module = require(absPath).default;
-                } catch {
-                    module = (await import(`file:///` + absPath)).default;
-                }
+
+                /// #if MODE === 'esm'
+                module = (await import(`file:///` + absPath)).default;
+                /// #elif MODE === 'cjs'
+                module = require(absPath).default;
+                /// #endif
+                
                 if (module === undefined) {
                     return Err(SernError.UndefinedModule);
                 }
@@ -57,7 +56,7 @@ export function buildData<T>(commandDir: string): Observable<
                 return Ok({ module, absPath });
             }),
         ),
-    ).pipe(concatAll());
+    ).pipe(mergeAll());
 }
 
 export function getCommands(dir: string): string[] {

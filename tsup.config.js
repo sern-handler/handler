@@ -1,11 +1,12 @@
 import { defineConfig } from 'tsup';
+import  ifdefPlugin  from 'esbuild-ifdef'
 const shared = {
     entry: ['src/index.ts'],
     external: ['discord.js'],
     platform: 'node',
     clean: true,
     sourcemap: false,
-    minify: true,
+    minify: false,
 };
 export default defineConfig([
     {
@@ -14,6 +15,9 @@ export default defineConfig([
         tsconfig: './tsconfig-esm.json',
         outDir: './dist/esm',
         treeshake: true,
+        esbuildPlugins: [
+            ifdefPlugin({ variables: { MODE: 'esm' }, verbose: true })
+        ],
         outExtension() {
             return {
                 js: '.mjs',
@@ -23,6 +27,7 @@ export default defineConfig([
     },
     {
         format: 'cjs',
+        esbuildPlugins: [ifdefPlugin({ variables: { MODE: 'cjs' }, verbose: true })],
         splitting: false,
         target: 'node16',
         tsconfig: './tsconfig-cjs.json',
