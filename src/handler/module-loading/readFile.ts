@@ -19,7 +19,6 @@ function readPath(dir: string, arrayOfFiles: string[] = []): string[] {
     return arrayOfFiles;
 }
 export const fmtFileName = (n: string) => n.substring(0, n.length - 3);
-export const isLazyModule = (n: string) => n.indexOf('.lazy.', n.length - 9) !== -1;
 /**
  *  a directory string is converted into a stream of modules.
  *  starts the stream of modules that sern needs to process on init
