@@ -1,5 +1,5 @@
 import { fromEvent, pipe, switchMap, take } from 'rxjs';
-import * as Files from '../utilities/readFile';
+import * as Files from '../module-loading/readFile';
 import { errTap, scanModule } from './observableHandling';
 import { CommandType, type ModuleStore, SernError } from '../structures';
 import { match } from 'ts-pattern';

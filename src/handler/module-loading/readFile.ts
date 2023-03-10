@@ -1,6 +1,6 @@
 import { readdirSync, statSync } from 'fs';
 import { join } from 'path';
-import { type Observable, from,  mergeAll } from 'rxjs';
+import { type Observable, from,  mergeAll, map } from 'rxjs';
 import { SernError } from '../structures/errors';
 import { type Result, Err, Ok } from 'ts-results-es';
 
@@ -19,13 +19,13 @@ function readPath(dir: string, arrayOfFiles: string[] = []): string[] {
     return arrayOfFiles;
 }
 export const fmtFileName = (n: string) => n.substring(0, n.length - 3);
+
 /**
  *  a directory string is converted into a stream of modules.
  *  starts the stream of modules that sern needs to process on init
  * @returns {Observable<{ mod: Module; absPath: string; }[]>} data from command files
  * @param commandDir
  */
-
 export function buildData<T>(commandDir: string): Observable<
     Result<
         {
