@@ -75,7 +75,7 @@ client.login("YOUR_BOT_TOKEN_HERE");
 #### ` ping.js (ESM)`
 
 ```js
-const { CommandType, commandModule } = require('@sern/handler');
+import { CommandType, commandModule } from '@sern/handler';
 
 exports.default = commandModule({
   type: CommandType.Slash,
@@ -109,4 +109,17 @@ It is **highly encouraged** to use the [command line interface](https://github.c
 - Pull up on [issues](https://github.com/sern-handler/handler/issues) and report bugs
 - All kinds of contributions are welcomed.
 
+## Build
 
+- Install pnpm
+```sh
+npm install -g pnpm
+```
+- Copy
+```sh
+git clone https://github.com/sern-handler/handler.git
+```
+- Create bundle
+```sh
+pnpm run build
+```

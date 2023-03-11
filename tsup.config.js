@@ -13,7 +13,6 @@ export default defineConfig([
     {
         format: 'esm',
         target: 'node16',
-        splitting: true,
         tsconfig: './tsconfig-esm.json',
         outDir: './dist/esm',
         treeshake: true,
