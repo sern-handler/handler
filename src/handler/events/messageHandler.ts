@@ -29,7 +29,7 @@ const createMessageProcessor = (
         // Synonymous to filterMap, but I haven't thought of a generic implementation for filterMap yet
         concatMap(message => {
             const [prefix, ...rest] = fmt(message.content, defaultPrefix);
-            const moule = get(ms => ms.TextCommands.get(prefix) ?? ms.BothCommands.get(prefix));
+            const module = get(ms => ms.TextCommands.get(prefix) ?? ms.BothCommands.get(prefix));
             if (module === undefined) {
                 return EMPTY;
             }

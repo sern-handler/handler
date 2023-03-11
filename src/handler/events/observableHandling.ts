@@ -3,7 +3,6 @@ import { concatMap, EMPTY, from, Observable, of, pipe, tap, throwError } from 'r
 import type { SernError } from '../structures';
 import { Result } from 'ts-results-es';
 import type { AnyModule, CommandModule, EventModule, Module } from '../../types/module';
-import { _const as i } from '../utilities/functions';
 import SernEmitter from '../sernEmitter';
 import { callPlugin, everyPluginOk, filterMapTo } from './operators';
 import type { Processed } from '../../types/handler';
@@ -78,7 +77,7 @@ export function executeModule(
                 emitter.emit('module.activate', SernEmitter.success(module));
                 return EMPTY;
             } else {
-                return throwError(i(SernEmitter.failure(module, result.val)));
+                return throwError(() => SernEmitter.failure(module, result.val));
             }
         }),
     );

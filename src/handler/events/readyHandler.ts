@@ -8,7 +8,7 @@ import { ApplicationCommandType, ComponentType } from 'discord.js';
 import type { CommandModule } from '../../types/module';
 import type { Processed } from '../../types/handler';
 import type { ErrorHandling, Logging, ModuleManager } from '../contracts';
-import { _const, err, ok } from '../utilities/functions';
+import { err, ok } from '../utilities/functions';
 import { defineAllFields } from './operators';
 import SernEmitter from '../sernEmitter';
 import type { EventEmitter } from 'node:events';
@@ -61,7 +61,7 @@ function registerModule<T extends Processed<CommandModule>>(
 ): Result<void, void> {
     const name = mod.name;
     const insert = (cb: (ms: ModuleStore) => void) => {
-        const set = Result.wrap(_const(manager.set(cb)));
+        const set = Result.wrap(() => manager.set(cb));
         return set.ok ? ok() : err();
     };
     return match(mod as Processed<CommandModule>)
