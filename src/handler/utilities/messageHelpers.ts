@@ -1,4 +1,3 @@
-import type { Message } from 'discord.js';
 
 /**
  * Removes the first character(s) _[depending on prefix length]_ of the message
@@ -10,6 +9,6 @@ import type { Message } from 'discord.js';
  * console.log(fmt(message, '!'));
  * // [ 'ping' ]
  */
-export function fmt(msg: Message, prefix: string): string[] {
-    return msg.content.slice(prefix.length).trim().split(/\s+/g);
+export function fmt(msg: string, prefix: string): string[] {
+    return msg.slice(prefix.length).trim().split(/\s+/g);
 }

@@ -7,12 +7,13 @@ const shared = {
     platform: 'node',
     clean: true,
     sourcemap: false,
-    minify: false,
+    //minify: true,
 };
 export default defineConfig([
     {
         format: 'esm',
         target: 'node16',
+        splitting: true,
         tsconfig: './tsconfig-esm.json',
         outDir: './dist/esm',
         treeshake: true,
