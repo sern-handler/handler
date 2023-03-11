@@ -1,4 +1,5 @@
 import { defineConfig } from 'tsup';
+import { writeFile } from 'fs/promises';
 import  ifdefPlugin  from 'esbuild-ifdef'
 const shared = {
     entry: ['src/index.ts'],
@@ -23,6 +24,10 @@ export default defineConfig([
                 js: '.mjs',
             };
         },
+        async onSuccess() {
+            console.log('writing json esm')
+            await writeFile('./dist/esm/package.json', JSON.stringify({ type: 'module' }))       
+        },
         ...shared,
     },
     {
@@ -36,6 +41,10 @@ export default defineConfig([
             return {
                 js: '.cjs',
             };
+        },
+        async onSuccess() {
+            console.log('writing json commonjs')
+            await writeFile('./dist/cjs/package.json', JSON.stringify({ type: 'commonjs' }));
         },
         ...shared,
     },

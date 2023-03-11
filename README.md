@@ -45,22 +45,14 @@ pnpm add @sern/handler
 
 ## 👶 Basic Usage
 
-#### ` index.js (CommonJS)`
+#### ` index.js (ESM)`
 
 ```js
-// Import the discord.js Client and GatewayIntentBits
-const { Client, GatewayIntentBits } = require('discord.js');
+import { Client, GatewayIntentBits } from 'discord.js';
+import { Sern, single } from '@sern/handler';
 
-// Import Sern namespace
-const { Sern, single } = require('@sern/handler');
+//client has been declared previously
 
-const client = new Client({
-  intents: [
-    GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMembers,
-    GatewayIntentBits.GuildMessages
-  ]
-});
 export const useContainer = Sern.makeDependencies({
     build: root => root
         .add({ '@sern/client': single(() => client)  })
@@ -73,14 +65,14 @@ Sern.init({
 	commands: 'src/commands',
 	// events: 'src/events' (optional),
 	containerConfig : {
-		get: useContainer
+	    get: useContainer
 	}
 });
 
 client.login("YOUR_BOT_TOKEN_HERE");
 ```
 
-#### ` ping.js (CommonJS)`
+#### ` ping.js (ESM)`
 
 ```js
 const { CommandType, commandModule } = require('@sern/handler');
