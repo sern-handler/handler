@@ -16,7 +16,7 @@
 
 ## Why?
 - Most handlers don't support discord.js 14.7+
-- Customizable commands
+- Customizable, composable commands
 - Plug and play or customize to your liking
 - Embraces reactive programming for consistent and reliable backend
 - Customizable logger, error handling, and more
@@ -44,19 +44,54 @@ pnpm add @sern/handler
 ```
 
 ## 👶 Basic Usage
+<details open><summary>ping.ts</summary>
+#### ` ping.ts (ESM)`
 
-#### ` index.js (ESM)`
+```ts
+export default commandModule({
+  type: CommandType.Slash,
+  plugins: [publish(), ownerOnly()],
+  description: 'A ping pong command',
+  execute(ctx) {
+    ctx.reply('Hello owner of the bot');
+  }
+});
+```
+</details>
+<details open><summary>modal.ts></summary>
+#### ` modal.ts (ESM)`
+```ts
+export default commandModule({
+    type: CommandType.Modal,
+    plugins : [
+        assertFields({
+            fields: { 
+                name: /^([^0-9]*)$/ 
+            },
+            failure: (errors, modal) => modal.reply('your submission did not pass the validations')
+        })
+    ],
+    execute : (modal) => {
+        modal.reply('thanks for the submission!');
+    }
+})
+```
+</details>
+<details open><summary>index.ts</summary>
+#### ` index.ts (ESM)`
 
-```js
+```ts
 import { Client, GatewayIntentBits } from 'discord.js';
-import { Sern, single } from '@sern/handler';
+import { Sern, single, type Dependencies } from '@sern/handler';
 
 //client has been declared previously
 
-export const useContainer = Sern.makeDependencies({
+interface MyDependencies extends Dependencies {
+    '@sern/client': Singleton<Client>;
+}
+export const useContainer = Sern.makeDependencies<MyDependencies>({
     build: root => root
         .add({ '@sern/client': single(() => client)  })
-        .upsert({ '@sern/logger': single(() => new DefaultLogging()) })
 });
 
 //View docs for all options
@@ -71,20 +106,7 @@ Sern.init({
 
 client.login("YOUR_BOT_TOKEN_HERE");
 ```
-
-#### ` ping.js (ESM)`
-
-```js
-import { CommandType, commandModule } from '@sern/handler';
-
-exports.default = commandModule({
-  type: CommandType.Slash,
-  description: 'A ping pong command',
-  execute(ctx) {
-    ctx.reply('pong!');
-  }
-});
-```
+</details>
 
 ## 🤖 Bots Using sern 
 - [Community Bot](https://github.com/sern-handler/sern-community), the community bot for our [discord server](https://sern.dev/discord).
@@ -104,23 +126,7 @@ It is **highly encouraged** to use the [command line interface](https://github.c
 - [Support Server](https://sern.dev/discord)
 
 ## 👋 Contribute
-
 - Read our contribution [guidelines](https://github.com/sern-handler/handler/blob/main/.github/CONTRIBUTING.md) carefully
 - Pull up on [issues](https://github.com/sern-handler/handler/issues) and report bugs
 - All kinds of contributions are welcomed.
 
-## Build
-
-- Install pnpm
-```sh
-npm install -g pnpm
-```
-- Copy
-```sh
-git clone https://github.com/sern-handler/handler.git
-```
-- Create bundle
-```sh
-//prod for production, dev for dev build
-pnpm run build:(prod|dev)
-```
