@@ -7,7 +7,6 @@ const shared = {
     platform: 'node',
     clean: true,
     sourcemap: false,
-    //minify: true,
 };
 export default defineConfig([
     {
