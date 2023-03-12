@@ -49,6 +49,7 @@ pnpm add @sern/handler
 ```ts
 export default commandModule({
   type: CommandType.Slash,
+  //Installed plugin to publish to discord api and allow access to owners only.
   plugins: [publish(), ownerOnly()],
   description: 'A ping pong command',
   execute(ctx) {
@@ -62,6 +63,7 @@ export default commandModule({
 ```ts
 export default commandModule({
     type: CommandType.Modal,
+    //Installed a plugin to make sure modal fields pass a validation.
     plugins : [
         assertFields({
             fields: { 
