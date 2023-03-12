@@ -58,6 +58,7 @@ export default commandModule({
 ```
 </details>
 <details open><summary>modal.ts</summary>
+
 ```ts
 export default commandModule({
     type: CommandType.Modal,
@@ -76,6 +77,7 @@ export default commandModule({
 ```
 </details>
 <details open><summary>index.ts</summary>
+
 ```ts
 import { Client, GatewayIntentBits } from 'discord.js';
 import { Sern, single, type Dependencies } from '@sern/handler';
