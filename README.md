@@ -121,5 +121,6 @@ git clone https://github.com/sern-handler/handler.git
 ```
 - Create bundle
 ```sh
-pnpm run build
+//prod for production, dev for dev build
+pnpm run build:(prod|dev)
 ```
