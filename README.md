@@ -45,7 +45,6 @@ pnpm add @sern/handler
 
 ## 👶 Basic Usage
 <details open><summary>ping.ts</summary>
-#### ` ping.ts (ESM)`
 
 ```ts
 export default commandModule({
@@ -58,8 +57,7 @@ export default commandModule({
 });
 ```
 </details>
-<details open><summary>modal.ts></summary>
-#### ` modal.ts (ESM)`
+<details open><summary>modal.ts</summary>
 ```ts
 export default commandModule({
     type: CommandType.Modal,
@@ -78,8 +76,6 @@ export default commandModule({
 ```
 </details>
 <details open><summary>index.ts</summary>
-#### ` index.ts (ESM)`
-
 ```ts
 import { Client, GatewayIntentBits } from 'discord.js';
 import { Sern, single, type Dependencies } from '@sern/handler';
