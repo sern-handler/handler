@@ -1,4 +1,4 @@
-import * as Files from './readFile';
+import * as Files from '../module-loading/readFile';
 import { basename } from 'path';
 import { Err, Ok } from 'ts-results-es';
 /**

@@ -1,5 +1,5 @@
 import { fromEvent, pipe, switchMap, take } from 'rxjs';
-import * as Files from '../utilities/readFile';
+import * as Files from '../module-loading/readFile';
 import { errTap, scanModule } from './observableHandling';
 import { CommandType, type ModuleStore, SernError } from '../structures';
 import { match } from 'ts-pattern';
@@ -8,13 +8,13 @@ import { ApplicationCommandType, ComponentType } from 'discord.js';
 import type { CommandModule } from '../../types/module';
 import type { Processed } from '../../types/handler';
 import type { ErrorHandling, Logging, ModuleManager } from '../contracts';
-import { _const, err, ok } from '../utilities/functions';
+import { err, ok } from '../utilities/functions';
 import { defineAllFields } from './operators';
 import SernEmitter from '../sernEmitter';
 import type { EventEmitter } from 'node:events';
 
 export function makeReadyEvent(
-    [sEmitter, client, errorHandler, , moduleManager]: [
+    [sEmitter, client, errorHandler, ,moduleManager]: [
         SernEmitter,
         EventEmitter,
         ErrorHandling,
@@ -61,7 +61,7 @@ function registerModule<T extends Processed<CommandModule>>(
 ): Result<void, void> {
     const name = mod.name;
     const insert = (cb: (ms: ModuleStore) => void) => {
-        const set = Result.wrap(_const(manager.set(cb)));
+        const set = Result.wrap(() => manager.set(cb));
         return set.ok ? ok() : err();
     };
     return match(mod as Processed<CommandModule>)

@@ -1,5 +1,5 @@
-import { catchError, finalize, map, tap, mergeAll } from 'rxjs';
-import { buildData } from '../utilities/readFile';
+import { catchError, finalize, map, mergeAll } from 'rxjs';
+import { buildData } from '../module-loading/readFile';
 import type { Dependencies, Processed } from '../../types/handler';
 import { errTap, scanModule } from './observableHandling';
 import type { CommandModule, EventModule } from '../../types/module';

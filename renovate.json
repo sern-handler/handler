@@ -9,6 +9,6 @@
     "schedule": ["every weekend"],
     "lockFileMaintenance": {
         "enabled": true,
-        "automerge": false
+        "automerge": true
     }
 }

@@ -52,6 +52,7 @@ typings/
 .node_repl_history
 
 # Output of 'npm pack'
+
 *.tgz
 
 # Yarn Integrity file
@@ -108,6 +109,8 @@ tsup.config.js
 
 tsconfig-base.json
 
-tsconfig.cjs.json
+tsconfig-cjs.json
 
-tsconfig.esm.json
+tsconfig-esm.json
+
+renovate.json
