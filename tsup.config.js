@@ -1,6 +1,6 @@
 import { defineConfig } from 'tsup';
 import { writeFile } from 'fs/promises';
-import  ifdefPlugin  from 'esbuild-ifdef'
+import ifdefPlugin from 'esbuild-ifdef';
 const shared = {
     entry: ['src/index.ts'],
     external: ['discord.js'],
@@ -15,17 +15,15 @@ export default defineConfig([
         tsconfig: './tsconfig-esm.json',
         outDir: './dist/esm',
         treeshake: true,
-        esbuildPlugins: [
-            ifdefPlugin({ variables: { MODE: 'esm' }, verbose: true })
-        ],
+        esbuildPlugins: [ifdefPlugin({ variables: { MODE: 'esm' }, verbose: true })],
         outExtension() {
             return {
                 js: '.mjs',
             };
         },
         async onSuccess() {
-            console.log('writing json esm')
-            await writeFile('./dist/esm/package.json', JSON.stringify({ type: 'module' }))       
+            console.log('writing json esm');
+            await writeFile('./dist/esm/package.json', JSON.stringify({ type: 'module' }));
         },
         ...shared,
     },
@@ -42,7 +40,7 @@ export default defineConfig([
             };
         },
         async onSuccess() {
-            console.log('writing json commonjs')
+            console.log('writing json commonjs');
             await writeFile('./dist/cjs/package.json', JSON.stringify({ type: 'commonjs' }));
         },
         ...shared,

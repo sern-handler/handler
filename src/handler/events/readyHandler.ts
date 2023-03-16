@@ -14,7 +14,7 @@ import SernEmitter from '../sernEmitter';
 import type { EventEmitter } from 'node:events';
 
 export function makeReadyEvent(
-    [sEmitter, client, errorHandler, ,moduleManager]: [
+    [sEmitter, client, errorHandler, , moduleManager]: [
         SernEmitter,
         EventEmitter,
         ErrorHandling,

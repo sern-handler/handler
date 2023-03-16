@@ -1,6 +1,6 @@
 import { readdirSync, statSync } from 'fs';
 import { join } from 'path';
-import { type Observable, from,  mergeAll } from 'rxjs';
+import { type Observable, from, mergeAll } from 'rxjs';
 import { SernError } from '../structures/errors';
 import { type Result, Err, Ok } from 'ts-results-es';
 
@@ -38,14 +38,14 @@ export function buildData<T>(commandDir: string): Observable<
     return from(
         Promise.all(
             commands.map(async absPath => {
-                let module: T | undefined
-                // prettier-ignore
-                /// #if MODE === 'esm'
-                = (await import(`file:///` + absPath)).default
+                let module: T | undefined =
+                    // prettier-ignore
+                    /// #if MODE === 'esm'
+                    (await import(`file:///` + absPath)).default
                 /// #elif MODE === 'cjs'
                 = require(absPath).default;
                 /// #endif
-                
+
                 if (module === undefined) {
                     return Err(SernError.UndefinedModule);
                 }
