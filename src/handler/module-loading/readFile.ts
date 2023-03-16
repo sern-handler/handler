@@ -38,8 +38,8 @@ export function buildData<T>(commandDir: string): Observable<
     return from(
         Promise.all(
             commands.map(async absPath => {
-                let module: T | undefined
                 // prettier-ignore
+                let module: T | undefined
                 /// #if MODE === 'esm'
                 = (await import(`file:///` + absPath)).default
                 /// #elif MODE === 'cjs'
