@@ -1,4 +1,3 @@
-
 /**
  * Removes the first character(s) _[depending on prefix length]_ of the message
  * @param msg
