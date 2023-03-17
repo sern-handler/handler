@@ -10,6 +10,8 @@ import { nameOrFilename } from '../../utilities/functions';
 import type { PluginResult, VoidResult } from '../../../types/plugin';
 import { guayin } from '../../plugins';
 import { controller } from '../../sern';
+import { SernError } from '../../structures';
+import { Result } from 'ts-results-es';
 
 /**
  * if {src} is true, mapTo V, else ignore
@@ -48,7 +50,7 @@ export function callPlugin(args: unknown): OperatorFunction<
  * operator function that fill the defaults for a module
  */
 export function defineAllFields<T extends AnyModule>() {
-    const fillFields = ({ absPath, module }: { absPath: string; module: T }) => ({
+    const fillFields = ({ module, absPath }: { module: T; absPath: string }) => ({
         absPath,
         module: {
             name: nameOrFilename(module.name, absPath),
@@ -57,6 +59,27 @@ export function defineAllFields<T extends AnyModule>() {
         },
     });
     return pipe(map(fillFields));
+}
+
+/**
+ * If the current value in Result stream is an error, calls callback.
+ * This also extracts the Ok value from Result
+ * @param cb
+ * @returns Observable<{ module: T; absPath: string }>
+ */
+export function errTap<T extends AnyModule>(
+    cb: (err: SernError) => void
+): OperatorFunction<Result<{ module: T; absPath: string}, SernError>, { module: T; absPath: string }> {
+   return pipe(
+      concatMap(result => {
+         if(result.ok) {
+            return of(result.val);
+         } else {
+            cb(result.val)
+            return EMPTY; 
+         }
+      })
+    );
 }
 
 /**
