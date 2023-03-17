@@ -3,11 +3,6 @@
 ## [2.6.1](https://github.com/sern-handler/handler/compare/v2.6.0...v2.6.1) (2023-03-17)
 
 
-### Features
-
-* prettier ignore ([06a3e69](https://github.com/sern-handler/handler/commit/06a3e69210f022540c45c9c903a68c46f402f98b))
-
-
 ### Miscellaneous Chores
 
 * release 2.6.1 ([f9609ce](https://github.com/sern-handler/handler/commit/f9609ce6cd777fa0eb595d8c48d57905bbce5966))
