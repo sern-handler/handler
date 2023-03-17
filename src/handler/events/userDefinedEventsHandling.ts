@@ -32,12 +32,12 @@ export function makeEventsHandler(
     );
     const intoDispatcher = (e: Processed<EventModule | CommandModule>) => {
         switch(e.type) {
-            case EventType.Sern: return eventDispatcher(e, s)
-            case EventType.Discord: return eventDispatcher(e, client)
-            case EventType.External: return eventDispatcher(e, lazy(e.emitter))
-            default: err.crash(Error(SernError.InvalidModuleType + " while creating event handler"))
+            case EventType.Sern: return eventDispatcher(e, s);
+            case EventType.Discord: return eventDispatcher(e, client);
+            case EventType.External: return eventDispatcher(e, lazy(e.emitter));
+            default: err.crash(Error(SernError.InvalidModuleType + ' while creating event handler'));
         }
-    }
+    };
     eventCreation$
         .pipe(
             map(intoDispatcher),

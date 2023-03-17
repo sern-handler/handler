@@ -75,7 +75,7 @@ export function errTap<T extends AnyModule>(
          if(result.ok) {
             return of(result.val);
          } else {
-            cb(result.val)
+            cb(result.val);
             return EMPTY; 
          }
       })

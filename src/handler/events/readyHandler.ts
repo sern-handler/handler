@@ -73,7 +73,7 @@ function registerModule<T extends Processed<CommandModule>>(
         case CommandType.Text: {
            mod.alias?.forEach(a => insert(ms => ms.TextCommands.set(a, mod)));
            return insert(ms => ms.TextCommands.set(name, mod));
-        };
+        }
         case CommandType.Slash: 
            return insert(ms => ms.ApplicationCommands[ApplicationCommandType.ChatInput].set(name, mod));
         case CommandType.Both: {
@@ -97,7 +97,7 @@ function registerModule<T extends Processed<CommandModule>>(
         case CommandType.RoleSelect:
             return insert(ms => ms.InteractionHandlers[ComponentType.RoleSelect].set(name, mod));
         case CommandType.Modal:
-            return insert(ms => ms.ModalSubmit.set(name, mod))
-        default: return err()
+            return insert(ms => ms.ModalSubmit.set(name, mod));
+        default: return err();
     }
 }

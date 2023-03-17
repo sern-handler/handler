@@ -110,6 +110,6 @@ function createDispatcher({
                 return dispatchCommand(module, contextArgs(event));
             }
         }
-        default : return dispatchCommand(module, interactionArg(event))
+        default : return dispatchCommand(module, interactionArg(event));
     }
 }
