@@ -119,7 +119,7 @@ export function createResultResolver<
  * Calls a module's init plugins and checks for Err. If so, call { onFailure } and
  * ignore the module
  */
-export function scanModule<
+export function callInitPlugins<
     T extends Processed<CommandModule | EventModule>,
     Args extends { module: T; absPath: string },
 >(config: { onFailure?: (module: T) => unknown; onSuccess: (module: Args) => T }) {

@@ -37,14 +37,15 @@ function makeInteractionProcessor(
                 );
                 return of({ module, event });
             } else if (event.isCommand() || event.isAutocomplete()) {
+                const commandName = event.commandName;
                 const module = get(
                     ms =>
                         /**
                          * try to fetch from ApplicationCommands, if nothing, try BothCommands
                          * exists on the API but not sern
                          */
-                        ms.ApplicationCommands[event.commandType].get(event.commandName) ??
-                        ms.BothCommands.get(event.commandName),
+                        ms.ApplicationCommands[event.commandType].get(commandName) ??
+                        ms.BothCommands.get(commandName),
                 );
                 return of({ module, event });
             } else if (event.isModalSubmit()) {

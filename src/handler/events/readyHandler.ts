@@ -1,6 +1,6 @@
 import { fromEvent, pipe, switchMap, take } from 'rxjs';
 import * as Files from '../module-loading/readFile';
-import { errTap, scanModule } from './observableHandling';
+import { errTap, callInitPlugins } from './observableHandling';
 import { CommandType, type ModuleStore, SernError } from '../structures';
 import { Result } from 'ts-results-es';
 import { ApplicationCommandType, ComponentType } from 'discord.js';
@@ -33,14 +33,14 @@ export function makeReadyEvent(
     return readyOnce$
         .pipe(
             parseCommandModules,
-            scanModule({
+            callInitPlugins({
                 onFailure: module => {
                     sEmitter.emit(
                         'module.register',
                         SernEmitter.failure(module, SernError.PluginFailure),
                     );
                 },
-                onSuccess: ({ module }) => {
+                onSuccess: ({ module  }) => {
                     sEmitter.emit('module.register', SernEmitter.success(module));
                     return module;
                 },
@@ -92,7 +92,6 @@ function registerModule<T extends Processed<CommandModule>>(
             return insert(ms => ms.InteractionHandlers[ComponentType.RoleSelect].set(name, mod));
         case CommandType.Modal:
             return insert(ms => ms.ModalSubmit.set(name, mod))
-        default:
-            return err()
+        default: return err()
     }
 }
