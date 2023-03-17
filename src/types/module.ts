@@ -19,7 +19,7 @@ import type {
     MentionableSelectMenuInteraction,
     RoleSelectMenuInteraction,
     StringSelectMenuInteraction,
-    UserSelectMenuInteraction
+    UserSelectMenuInteraction,
 } from 'discord.js';
 import { CommandType } from '../handler/structures/enums';
 import type { Args, SlashOptions } from './handler';
