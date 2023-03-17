@@ -13,7 +13,6 @@ import {
     pipe,
 } from 'rxjs';
 import { CommandType, type ModuleStore, SernError } from '../structures';
-import { match, P } from 'ts-pattern';
 import { contextArgs, dispatchAutocomplete, dispatchCommand, interactionArg } from './dispatchers';
 import { executeModule, makeModuleExecutor } from './observableHandling';
 import type { CommandModule } from '../../types/module';
@@ -95,28 +94,21 @@ function createDispatcher({
     event: Interaction;
     module: Processed<CommandModule>;
 }) {
-    return (
-        match(module)
-            .with({ type: CommandType.Text }, () => {
-                throw Error(SernError.MismatchEvent);
-            })
-            //P.union = either CommandType.Slash or CommandType.Both
-            .with({ type: P.union(CommandType.Slash, CommandType.Both) }, module => {
-                if (event.isAutocomplete()) {
-                    /**
-                     * Autocomplete is a special case that
-                     * must be handled separately, since it's
-                     * too different from regular command modules
-                     */
-                    return dispatchAutocomplete(module, event);
-                } else {
-                    return dispatchCommand(module, contextArgs(event));
-                }
-            })
-            /**
-             * Every other command module takes a one argument parameter, its corresponding interaction
-             * this makes this usage safe
-             */
-            .otherwise(mod => dispatchCommand(mod, interactionArg(event)))
-    );
+    switch(module.type) {
+        case CommandType.Text: 
+            throw Error(SernError.MismatchEvent);
+        case CommandType.Slash: case CommandType.Both : {
+            if(event.isAutocomplete()) {
+                /**
+                  * Autocomplete is a special case that
+                  * must be handled separately, since it's
+                  * too different from regular command modules
+                  */
+                return dispatchAutocomplete(module, event);
+            } else {
+                return dispatchCommand(module, contextArgs(event));
+            }
+        }
+        default : return dispatchCommand(module, interactionArg(event))
+    }
 }

@@ -2,7 +2,6 @@ import { fromEvent, pipe, switchMap, take } from 'rxjs';
 import * as Files from '../module-loading/readFile';
 import { errTap, scanModule } from './observableHandling';
 import { CommandType, type ModuleStore, SernError } from '../structures';
-import { match } from 'ts-pattern';
 import { Result } from 'ts-results-es';
 import { ApplicationCommandType, ComponentType } from 'discord.js';
 import type { CommandModule } from '../../types/module';
@@ -64,42 +63,36 @@ function registerModule<T extends Processed<CommandModule>>(
         const set = Result.wrap(() => manager.set(cb));
         return set.ok ? ok() : err();
     };
-    return match(mod as Processed<CommandModule>)
-        .with({ type: CommandType.Text }, mod => {
-            mod.alias?.forEach(a => insert(ms => ms.TextCommands.set(a, mod)));
-            return insert(ms => ms.TextCommands.set(name, mod));
-        })
-        .with({ type: CommandType.Slash }, mod =>
-            insert(ms => ms.ApplicationCommands[ApplicationCommandType.ChatInput].set(name, mod)),
-        )
-        .with({ type: CommandType.Both }, mod => {
+    switch(mod.type) {
+        case CommandType.Text: {
+           mod.alias?.forEach(a => insert(ms => ms.TextCommands.set(a, mod)));
+           return insert(ms => ms.TextCommands.set(name, mod));
+        };
+        case CommandType.Slash: 
+           return insert(ms => ms.ApplicationCommands[ApplicationCommandType.ChatInput].set(name, mod));
+        case CommandType.Both: {
             mod.alias?.forEach(a => insert(ms => ms.TextCommands.set(a, mod)));
             return insert(ms => ms.BothCommands.set(name, mod));
-        })
-        .with({ type: CommandType.CtxUser }, mod =>
-            insert(ms => ms.ApplicationCommands[ApplicationCommandType.User].set(name, mod)),
-        )
-        .with({ type: CommandType.CtxMsg }, mod =>
-            insert(ms => ms.ApplicationCommands[ApplicationCommandType.Message].set(name, mod)),
-        )
-        .with({ type: CommandType.Button }, mod =>
-            insert(ms => ms.InteractionHandlers[ComponentType.Button].set(name, mod)),
-        )
-        .with({ type: CommandType.StringSelect }, mod =>
-            insert(ms => ms.InteractionHandlers[ComponentType.StringSelect].set(name, mod)),
-        )
-        .with({ type: CommandType.MentionableSelect }, mod =>
-            insert(ms => ms.InteractionHandlers[ComponentType.MentionableSelect].set(name, mod)),
-        )
-        .with({ type: CommandType.ChannelSelect }, mod =>
-            insert(ms => ms.InteractionHandlers[ComponentType.ChannelSelect].set(name, mod)),
-        )
-        .with({ type: CommandType.UserSelect }, mod =>
-            insert(ms => ms.InteractionHandlers[ComponentType.UserSelect].set(name, mod)),
-        )
-        .with({ type: CommandType.RoleSelect }, mod =>
-            insert(ms => ms.InteractionHandlers[ComponentType.RoleSelect].set(name, mod)),
-        )
-        .with({ type: CommandType.Modal }, mod => insert(ms => ms.ModalSubmit.set(name, mod)))
-        .otherwise(err);
+        }
+        case CommandType.CtxUser: 
+           return insert(ms => ms.ApplicationCommands[ApplicationCommandType.User].set(name, mod)); 
+        case CommandType.CtxMsg:
+            return insert(ms => ms.ApplicationCommands[ApplicationCommandType.Message].set(name, mod));
+        case CommandType.Button:
+            return insert(ms => ms.InteractionHandlers[ComponentType.Button].set(name, mod));
+        case CommandType.StringSelect:
+            return insert(ms => ms.InteractionHandlers[ComponentType.StringSelect].set(name, mod)); 
+        case CommandType.MentionableSelect:
+            return insert(ms => ms.InteractionHandlers[ComponentType.MentionableSelect].set(name, mod));
+        case CommandType.UserSelect: 
+            return insert(ms => ms.InteractionHandlers[ComponentType.UserSelect].set(name, mod));
+        case CommandType.ChannelSelect:
+            return insert(ms => ms.InteractionHandlers[ComponentType.ChannelSelect].set(name, mod));
+        case CommandType.RoleSelect:
+            return insert(ms => ms.InteractionHandlers[ComponentType.RoleSelect].set(name, mod));
+        case CommandType.Modal:
+            return insert(ms => ms.ModalSubmit.set(name, mod))
+        default:
+            return err()
+    }
 }

@@ -36,9 +36,7 @@
     "dependencies": {
         "iti": "^0.6.0",
         "rxjs": "^7.8.0",
-        "ts-pattern": "^4.1.4",
-        "ts-results-es": "^3.5.0",
-        "tsup": "^6.6.3"
+        "ts-results-es": "^3.5.0"
     },
     "devDependencies": {
         "@typescript-eslint/eslint-plugin": "5.54.0",
@@ -47,7 +45,8 @@
         "esbuild-ifdef": "^0.2.0",
         "eslint": "8.30.0",
         "prettier": "2.8.4",
-        "typescript": "4.9.5"
+        "typescript": "4.9.5",
+        "tsup": "^6.6.3"
     },
     "repository": {
         "type": "git",
