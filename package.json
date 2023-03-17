@@ -1,7 +1,7 @@
 {
     "name": "@sern/handler",
     "packageManager": "pnpm@7.28.0",
-    "version": "2.6.0",
+    "version": "2.6.1",
     "description": "A complete, customizable, typesafe, & reactive framework for discord bots.",
     "main": "dist/cjs/index.cjs",
     "module": "dist/esm/index.mjs",
