@@ -19,7 +19,7 @@
         "format": "eslint src/**/*.ts --fix",
         "build:dev": "tsup && tsup --dts-only --outDir dist",
         "build:prod": "tsup --minify && tsup --dts-only --outDir dist",
-        "publish": "npm run build:prod && npm publish",
+        "publish": "npm run build:prod",
         "pretty": "prettier --write ."
     },
     "keywords": [
