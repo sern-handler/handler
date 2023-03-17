@@ -81,7 +81,7 @@ function registerModule<T extends Processed<CommandModule>>(
             return insert(ms => ms.BothCommands.set(name, mod));
         }
         case CommandType.CtxUser: 
-           return insert(ms => ms.ApplicationCommands[ApplicationCommandType.User].set(name, mod)); 
+            return insert(ms => ms.ApplicationCommands[ApplicationCommandType.User].set(name, mod)); 
         case CommandType.CtxMsg:
             return insert(ms => ms.ApplicationCommands[ApplicationCommandType.Message].set(name, mod));
         case CommandType.Button:
