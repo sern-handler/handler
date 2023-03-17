@@ -68,17 +68,20 @@ export function defineAllFields<T extends AnyModule>() {
  * @returns Observable<{ module: T; absPath: string }>
  */
 export function errTap<T extends AnyModule>(
-    cb: (err: SernError) => void
-): OperatorFunction<Result<{ module: T; absPath: string}, SernError>, { module: T; absPath: string }> {
-   return pipe(
-      concatMap(result => {
-         if(result.ok) {
-            return of(result.val);
-         } else {
-            cb(result.val);
-            return EMPTY; 
-         }
-      })
+    cb: (err: SernError) => void,
+): OperatorFunction<
+    Result<{ module: T; absPath: string }, SernError>,
+    { module: T; absPath: string }
+> {
+    return pipe(
+        concatMap(result => {
+            if (result.ok) {
+                return of(result.val);
+            } else {
+                cb(result.val);
+                return EMPTY;
+            }
+        }),
     );
 }
 
