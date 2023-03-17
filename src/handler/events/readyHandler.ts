@@ -1,6 +1,6 @@
 import { fromEvent, pipe, switchMap, take } from 'rxjs';
 import * as Files from '../module-loading/readFile';
-import { errTap, callInitPlugins } from './observableHandling';
+import { callInitPlugins } from './observableHandling';
 import { CommandType, type ModuleStore, SernError } from '../structures';
 import { Result } from 'ts-results-es';
 import { ApplicationCommandType, ComponentType } from 'discord.js';
@@ -8,10 +8,23 @@ import type { CommandModule } from '../../types/module';
 import type { Processed } from '../../types/handler';
 import type { ErrorHandling, Logging, ModuleManager } from '../contracts';
 import { err, ok } from '../utilities/functions';
-import { defineAllFields } from './operators';
+import { defineAllFields, errTap } from './operators';
 import SernEmitter from '../sernEmitter';
 import type { EventEmitter } from 'node:events';
 
+
+function buildCommandModules(
+    commandDir: string,
+    sernEmitter: SernEmitter
+) {
+    return pipe(
+        switchMap(() => Files.buildData<CommandModule>(commandDir)),
+        errTap(error => {
+            sernEmitter.emit('module.register', SernEmitter.failure(undefined, error));
+        }),
+        defineAllFields(),
+    );
+}
 export function makeReadyEvent(
     [sEmitter, client, errorHandler, , moduleManager]: [
         SernEmitter,
@@ -23,16 +36,9 @@ export function makeReadyEvent(
     commandDir: string,
 ) {
     const readyOnce$ = fromEvent(client, 'ready').pipe(take(1));
-    const parseCommandModules = pipe(
-        switchMap(() => Files.buildData<CommandModule>(commandDir)),
-        errTap(error => {
-            sEmitter.emit('module.register', SernEmitter.failure(undefined, error));
-        }),
-        defineAllFields(),
-    );
     return readyOnce$
         .pipe(
-            parseCommandModules,
+            buildCommandModules(commandDir, sEmitter),
             callInitPlugins({
                 onFailure: module => {
                     sEmitter.emit(
