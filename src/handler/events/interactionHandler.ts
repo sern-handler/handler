@@ -95,21 +95,23 @@ function createDispatcher({
     event: Interaction;
     module: Processed<CommandModule>;
 }) {
-    switch(module.type) {
-        case CommandType.Text: 
+    switch (module.type) {
+        case CommandType.Text:
             throw Error(SernError.MismatchEvent);
-        case CommandType.Slash: case CommandType.Both : {
-            if(event.isAutocomplete()) {
+        case CommandType.Slash:
+        case CommandType.Both: {
+            if (event.isAutocomplete()) {
                 /**
-                  * Autocomplete is a special case that
-                  * must be handled separately, since it's
-                  * too different from regular command modules
-                  */
+                 * Autocomplete is a special case that
+                 * must be handled separately, since it's
+                 * too different from regular command modules
+                 */
                 return dispatchAutocomplete(module, event);
             } else {
                 return dispatchCommand(module, contextArgs(event));
             }
         }
-        default : return dispatchCommand(module, interactionArg(event));
+        default:
+            return dispatchCommand(module, interactionArg(event));
     }
 }
