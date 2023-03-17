@@ -1,8 +1,7 @@
 import type { Awaitable, Message } from 'discord.js';
 import { concatMap, EMPTY, from, Observable, of, pipe, tap, throwError } from 'rxjs';
-import type { SernError } from '../structures';
 import { Result } from 'ts-results-es';
-import type { AnyModule, CommandModule, EventModule, Module } from '../../types/module';
+import type { CommandModule, EventModule, Module } from '../../types/module';
 import SernEmitter from '../sernEmitter';
 import { callPlugin, everyPluginOk, filterMapTo } from './operators';
 import type { Processed } from '../../types/handler';
@@ -24,27 +23,6 @@ export function ignoreNonBot<T extends Message>(prefix: string) {
                             .localeCompare(prefix, undefined, { sensitivity: 'accent' }) === 0;
                     if (messageFromHumanAndHasPrefix) {
                         subscriber.next(m);
-                    }
-                },
-            });
-        });
-}
-
-/**
- * If the current value in Result stream is an error, calls callback.
- * This also extracts the Ok value from Result
- * @param cb
- * @returns Observable<{ module: T; absPath: string }>
- */
-export function errTap<T extends AnyModule>(cb: (err: SernError) => void) {
-    return (src: Observable<Result<{ module: T; absPath: string }, SernError>>) =>
-        new Observable<{ module: T; absPath: string }>(subscriber => {
-            return src.subscribe({
-                next(value) {
-                    if (value.err) {
-                        cb(value.val);
-                    } else {
-                        subscriber.next(value.val);
                     }
                 },
             });
@@ -119,7 +97,7 @@ export function createResultResolver<
  * Calls a module's init plugins and checks for Err. If so, call { onFailure } and
  * ignore the module
  */
-export function scanModule<
+export function callInitPlugins<
     T extends Processed<CommandModule | EventModule>,
     Args extends { module: T; absPath: string },
 >(config: { onFailure?: (module: T) => unknown; onSuccess: (module: Args) => T }) {

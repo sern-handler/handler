@@ -16,7 +16,7 @@ jobs:
             - recursive: true
               args: [--strict-peer-dependencies]
       - run: pnpm install
-      - run: pnpm build
+      - run: pnpm build:prod
       - uses: JS-DevTools/npm-publish@v1
         with:
           token: ${{ secrets.NPM_TOKEN }}

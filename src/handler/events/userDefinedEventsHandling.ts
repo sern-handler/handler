@@ -1,16 +1,15 @@
 import { catchError, finalize, map, mergeAll } from 'rxjs';
 import { buildData } from '../module-loading/readFile';
 import type { Dependencies, Processed } from '../../types/handler';
-import { errTap, scanModule } from './observableHandling';
+import { callInitPlugins } from './observableHandling';
 import type { CommandModule, EventModule } from '../../types/module';
 import type { EventEmitter } from 'events';
 import SernEmitter from '../sernEmitter';
-import { match } from 'ts-pattern';
 import type { ErrorHandling, Logging } from '../contracts';
 import { SernError, EventType, type Wrapper } from '../structures';
 import { eventDispatcher } from './dispatchers';
 import { handleError } from '../contracts/errorHandling';
-import { defineAllFields } from './operators';
+import { defineAllFields, errTap } from './operators';
 import { useContainerRaw } from '../dependencies';
 
 export function makeEventsHandler(
@@ -23,20 +22,22 @@ export function makeEventsHandler(
 
     const eventCreation$ = eventStream$.pipe(
         defineAllFields(),
-        scanModule({
-            onFailure: module => s.emit('module.register', SernEmitter.success(module)),
+        callInitPlugins({
+            onFailure: module => s.emit('module.register', SernEmitter.failure(module, SernError.PluginFailure)),
             onSuccess: ({ module }) => {
-                s.emit('module.register', SernEmitter.failure(module, SernError.PluginFailure));
+                s.emit('module.register', SernEmitter.success(module));
                 return module;
             },
         }),
     );
-    const intoDispatcher = (e: Processed<EventModule | CommandModule>) =>
-        match(e)
-            .with({ type: EventType.Sern }, m => eventDispatcher(m, s))
-            .with({ type: EventType.Discord }, m => eventDispatcher(m, client))
-            .with({ type: EventType.External }, m => eventDispatcher(m, lazy(m.emitter)))
-            .otherwise(() => err.crash(Error(SernError.InvalidModuleType)));
+    const intoDispatcher = (e: Processed<EventModule | CommandModule>) => {
+        switch(e.type) {
+            case EventType.Sern: return eventDispatcher(e, s);
+            case EventType.Discord: return eventDispatcher(e, client);
+            case EventType.External: return eventDispatcher(e, lazy(e.emitter));
+            default: err.crash(Error(SernError.InvalidModuleType + ' while creating event handler'));
+        }
+    };
     eventCreation$
         .pipe(
             map(intoDispatcher),

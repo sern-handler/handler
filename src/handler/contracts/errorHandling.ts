@@ -1,6 +1,7 @@
 import type { Observable } from 'rxjs';
 import type { Logging } from './logging';
 import util from 'util';
+
 export interface ErrorHandling {
     /**
      * Number of times the process should throw an error until crashing and exiting

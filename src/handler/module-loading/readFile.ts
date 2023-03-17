@@ -43,7 +43,7 @@ export function buildData<T>(commandDir: string): Observable<
                 /// #if MODE === 'esm'
                 = (await import(`file:///` + absPath)).default
                 /// #elif MODE === 'cjs'
-                = require(absPath).default;
+                = require(absPath).default; // eslint-disable-line
                 /// #endif
 
                 if (module === undefined) {
