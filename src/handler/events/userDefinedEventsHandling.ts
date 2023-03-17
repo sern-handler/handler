@@ -5,7 +5,6 @@ import { errTap, scanModule } from './observableHandling';
 import type { CommandModule, EventModule } from '../../types/module';
 import type { EventEmitter } from 'events';
 import SernEmitter from '../sernEmitter';
-import { match } from 'ts-pattern';
 import type { ErrorHandling, Logging } from '../contracts';
 import { SernError, EventType, type Wrapper } from '../structures';
 import { eventDispatcher } from './dispatchers';
@@ -31,12 +30,14 @@ export function makeEventsHandler(
             },
         }),
     );
-    const intoDispatcher = (e: Processed<EventModule | CommandModule>) =>
-        match(e)
-            .with({ type: EventType.Sern }, m => eventDispatcher(m, s))
-            .with({ type: EventType.Discord }, m => eventDispatcher(m, client))
-            .with({ type: EventType.External }, m => eventDispatcher(m, lazy(m.emitter)))
-            .otherwise(() => err.crash(Error(SernError.InvalidModuleType)));
+    const intoDispatcher = (e: Processed<EventModule | CommandModule>) => {
+        switch(e.type) {
+            case EventType.Sern: return eventDispatcher(e, s)
+            case EventType.Discord: return eventDispatcher(e, client)
+            case EventType.External: return eventDispatcher(e, lazy(e.emitter))
+            default: err.crash(Error(SernError.InvalidModuleType + " while creating event handler"))
+        }
+    }
     eventCreation$
         .pipe(
             map(intoDispatcher),
