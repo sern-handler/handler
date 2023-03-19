@@ -1,6 +1,6 @@
 import { readdirSync, statSync } from 'fs';
 import { join } from 'path';
-import { type Observable, from, mergeAll } from 'rxjs';
+import { type Observable, from, mergeAll, mergeMap, filter} from 'rxjs';
 import { SernError } from '../structures/errors';
 import { type Result, Err, Ok } from 'ts-results-es';
 
@@ -19,9 +19,10 @@ function readPath(dir: string, arrayOfFiles: string[] = []): string[] {
     return arrayOfFiles;
 }
 export const fmtFileName = (n: string) => n.substring(0, n.length - 3);
+export const isStoreable = (n: string) => n.indexOf(".lazy.", n.length-9) === -1;
 /**
- *  a directory string is converted into a stream of modules.
- *  starts the stream of modules that sern needs to process on init
+ * a directory string is converted into a stream of modules.
+ * starts the stream of modules that sern needs to process on init
  * @returns {Observable<{ mod: Module; absPath: string; }[]>} data from command files
  * @param commandDir
  */
@@ -35,27 +36,25 @@ export function buildData<T>(commandDir: string): Observable<
     >
 > {
     const commands = getCommands(commandDir);
-    return from(
-        Promise.all(
-            commands.map(async absPath => {
-                // prettier-ignore
-                let module: T | undefined
-                /// #if MODE === 'esm'
-                = (await import(`file:///` + absPath)).default
-                /// #elif MODE === 'cjs'
-                = require(absPath).default; // eslint-disable-line
-                /// #endif
-
-                if (module === undefined) {
-                    return Err(SernError.UndefinedModule);
-                }
-                try {
-                    module = new (module as unknown as new () => T)();
-                } catch {}
-                return Ok({ module, absPath });
-            }),
-        ),
-    ).pipe(mergeAll());
+    return from(commands).pipe(
+        filter(isStoreable),
+        mergeMap(async absPath => {
+            // prettier-ignore
+            let module: T | undefined
+            /// #if MODE === 'esm'
+            = (await import(`file:///` + absPath)).default
+            /// #elif MODE === 'cjs'
+            = require(absPath).default; // eslint-disable-line
+            /// #endif
+            if (module === undefined) {
+                return Err(SernError.UndefinedModule);
+            }
+            try {
+                module = new (module as unknown as new () => T)();
+            } catch {}
+            return Ok({ module, absPath });
+        })
+    );
 }
 
 export function getCommands(dir: string): string[] {
