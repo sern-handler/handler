@@ -20,6 +20,27 @@ function readPath(dir: string, arrayOfFiles: string[] = []): string[] {
 }
 export const fmtFileName = (n: string) => n.substring(0, n.length - 3);
 export const isStoreable = (n: string) => n.indexOf(".lazy.", n.length-9) === -1;
+
+
+
+async function defaultModuleLoader<T>(absPath: string) {
+    // prettier-ignore
+    let module: T | undefined
+    /// #if MODE === 'esm'
+    = (await import(`file:///` + absPath)).default
+    /// #elif MODE === 'cjs'
+    = require(absPath).default; // eslint-disable-line
+    /// #endif
+    if (module === undefined) {
+        return Err(SernError.UndefinedModule);
+    }
+    try {
+        module = new (module as unknown as new () => T)();
+    } catch {}
+    return Ok({ module, absPath });
+
+}
+
 /**
  * a directory string is converted into a stream of modules.
  * starts the stream of modules that sern needs to process on init
@@ -38,22 +59,7 @@ export function buildData<T>(commandDir: string): Observable<
     const commands = getCommands(commandDir);
     return from(commands).pipe(
         filter(isStoreable),
-        mergeMap(async absPath => {
-            // prettier-ignore
-            let module: T | undefined
-            /// #if MODE === 'esm'
-            = (await import(`file:///` + absPath)).default
-            /// #elif MODE === 'cjs'
-            = require(absPath).default; // eslint-disable-line
-            /// #endif
-            if (module === undefined) {
-                return Err(SernError.UndefinedModule);
-            }
-            try {
-                module = new (module as unknown as new () => T)();
-            } catch {}
-            return Ok({ module, absPath });
-        })
+        mergeMap(defaultModuleLoader<T>)
     );
 }
 
