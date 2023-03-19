@@ -1,8 +1,7 @@
-import { catchError, concatMap, EMPTY, finalize, fromEvent, map, of, pipe } from 'rxjs';
+import { catchError, concatMap, EMPTY, finalize, fromEvent, map, Observable, of, pipe } from 'rxjs';
 import { type ModuleStore, SernError } from '../structures';
 import type { Message } from 'discord.js';
 import { executeModule, ignoreNonBot, makeModuleExecutor } from './observableHandling';
-import { fmt } from '../utilities/messageHelpers';
 import type { CommandModule, TextCommand } from '../../types/module';
 import { ErrorHandling, handleError } from '../contracts/errorHandling';
 import { contextArgs, dispatchCommand } from './dispatchers';
@@ -11,6 +10,20 @@ import type { Processed } from '../../types/handler';
 import { useContainerRaw } from '../dependencies';
 import type { Logging, ModuleManager } from '../contracts';
 import type { EventEmitter } from 'node:events';
+
+/**
+ * Removes the first character(s) _[depending on prefix length]_ of the message
+ * @param msg
+ * @param prefix The prefix to remove
+ * @returns The message without the prefix
+ * @example
+ * message.content = '!ping';
+ * console.log(fmt(message, '!'));
+ * // [ 'ping' ]
+ */
+export function fmt(msg: string, prefix: string): string[] {
+    return msg.slice(prefix.length).trim().split(/\s+/g);
+}
 
 /**
  * An operator function that processes a message to fetch a command module and prepares context payload.
@@ -58,7 +71,7 @@ export function makeMessageCreate(
     const get = (cb: (ms: ModuleStore) => Processed<CommandModule> | undefined) => {
         return modules.get(cb);
     };
-    const messageStream$ = fromEvent<Message>(client, 'messageCreate');
+    const messageStream$ = fromEvent(client, 'messageCreate') as Observable<Message>;
     const messageProcessor = createMessageProcessor(defaultPrefix, get);
     return messageStream$
         .pipe(
@@ -77,3 +90,5 @@ export function makeMessageCreate(
         )
         .subscribe();
 }
+
+

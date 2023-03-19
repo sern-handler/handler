@@ -22,7 +22,6 @@ export const fmtFileName = (n: string) => n.substring(0, n.length - 3);
 export const isStoreable = (n: string) => n.indexOf(".lazy.", n.length-9) === -1;
 
 
-
 async function defaultModuleLoader<T>(absPath: string) {
     // prettier-ignore
     let module: T | undefined
