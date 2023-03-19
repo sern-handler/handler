@@ -18,7 +18,7 @@ function buildCommandModules(
     sernEmitter: SernEmitter
 ) {
     return pipe(
-        switchMap(() => Files.buildData<CommandModule>(commandDir)),
+        switchMap(() => Files.buildModuleStream<CommandModule>(commandDir)),
         errTap(error => {
             sernEmitter.emit('module.register', SernEmitter.failure(undefined, error));
         }),

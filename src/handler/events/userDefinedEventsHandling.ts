@@ -1,5 +1,5 @@
 import { catchError, finalize, map, mergeAll } from 'rxjs';
-import { buildData } from '../module-loading/readFile';
+import * as Files from '../module-loading/readFile';
 import type { Dependencies, Processed } from '../../types/handler';
 import { callInitPlugins } from './observableHandling';
 import type { CommandModule, EventModule } from '../../types/module';
@@ -59,7 +59,7 @@ export function makeEventsHandler(
 }
 
 function eventObservable(events: string, emitter: SernEmitter) {
-    return buildData<EventModule>(events).pipe(
+    return Files.buildModuleStream<EventModule>(events).pipe(
         errTap(reason => {
             emitter.emit('module.register', SernEmitter.failure(undefined, reason));
         }),

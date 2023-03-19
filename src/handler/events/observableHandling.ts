@@ -87,7 +87,7 @@ export function createResultResolver<
                     config.onFailure?.(args.module);
                 }
             }),
-            everyPluginOk(),
+            everyPluginOk,
             filterMapTo(() => config.onSuccess(args)),
         );
     };

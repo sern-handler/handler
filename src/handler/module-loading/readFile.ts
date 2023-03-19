@@ -1,6 +1,6 @@
 import { readdirSync, statSync } from 'fs';
 import { join } from 'path';
-import { type Observable, from, mergeAll, mergeMap, filter} from 'rxjs';
+import { type Observable, from, mergeMap, filter} from 'rxjs';
 import { SernError } from '../structures/errors';
 import { type Result, Err, Ok } from 'ts-results-es';
 
@@ -38,7 +38,6 @@ async function defaultModuleLoader<T>(absPath: string) {
         module = new (module as unknown as new () => T)();
     } catch {}
     return Ok({ module, absPath });
-
 }
 
 /**
@@ -47,7 +46,7 @@ async function defaultModuleLoader<T>(absPath: string) {
  * @returns {Observable<{ mod: Module; absPath: string; }[]>} data from command files
  * @param commandDir
  */
-export function buildData<T>(commandDir: string): Observable<
+export function buildModuleStream<T>(commandDir: string): Observable<
     Result<
         {
             module: T;

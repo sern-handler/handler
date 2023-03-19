@@ -85,9 +85,9 @@ export function errTap<T extends AnyModule>(
 /**
  * Checks if the stream of results is all ok.
  */
-export function everyPluginOk(): OperatorFunction<VoidResult, boolean> {
-    return pipe(
+export const everyPluginOk: OperatorFunction<VoidResult, boolean> = 
+    pipe(
         every(result => result.ok),
         defaultIfEmpty(true),
     );
-}
+
