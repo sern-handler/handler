@@ -1,5 +1,5 @@
 import type { Awaitable, Message } from 'discord.js';
-import { concatMap, EMPTY, from, Observable, of, pipe, tap, throwError } from 'rxjs';
+import { concatMap, EMPTY, filter, from, Observable, of, pipe, tap, throwError } from 'rxjs';
 import { Result } from 'ts-results-es';
 import type { CommandModule, EventModule, Module } from '../../types/module';
 import SernEmitter from '../sernEmitter';
@@ -7,26 +7,21 @@ import { callPlugin, everyPluginOk, filterMapTo } from './operators';
 import type { Processed } from '../../types/handler';
 import type { ControlPlugin, VoidResult } from '../../types/plugin';
 
+
+function hasPrefix(prefix: string, content: string) {
+    const prefixInContent = content.slice(0, prefix.length);
+    return prefixInContent.localeCompare(prefix, undefined, { sensitivity: 'accent' }) === 0; 
+}
+
 /**
  * Ignores messages from any person / bot except itself
  * @param prefix
  */
-export function ignoreNonBot<T extends Message>(prefix: string) {
-    return (src: Observable<T>) =>
-        new Observable<T>(subscriber => {
-            return src.subscribe({
-                next(m) {
-                    const messageFromHumanAndHasPrefix =
-                        !m.author.bot &&
-                        m.content
-                            .slice(0, prefix.length)
-                            .localeCompare(prefix, undefined, { sensitivity: 'accent' }) === 0;
-                    if (messageFromHumanAndHasPrefix) {
-                        subscriber.next(m);
-                    }
-                },
-            });
-        });
+export function ignoreNonBot(prefix: string) {
+    const messageFromHumanAndHasPrefix = ({ author, content }: Message) => !author.bot && hasPrefix(prefix, content);
+    return pipe(
+       filter(messageFromHumanAndHasPrefix) 
+    );
 }
 
 /**
