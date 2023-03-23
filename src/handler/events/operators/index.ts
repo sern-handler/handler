@@ -20,13 +20,13 @@ import type { PluginResult, VoidResult } from '../../../types/plugin';
 import { guayin } from '../../plugins';
 import { controller } from '../../sern';
 import { Result } from 'ts-results-es';
-import { ImportPayload } from '../../../types/handler';
+import { ImportPayload, Processed } from '../../../types/handler';
 /**
  * if {src} is true, mapTo V, else ignore
  * @param item
  */
 export function filterMapTo<V>(item: () => V): OperatorFunction<boolean, V> {
-    return concatMap(shouldKeep => (shouldKeep ? of(item()) : EMPTY));
+    return concatMap(shouldKeep => shouldKeep ? of(item()) : EMPTY);
 }
 
 /**
@@ -52,28 +52,27 @@ export function callPlugin(args: unknown): OperatorFunction<
     });
 }
 
+export const arrayifySource = map(src => (Array.isArray(src) ? (src as unknown[]) : [src]))
+
 const fillDefaults = <T extends AnyModule>({ module, absPath }: ImportPayload<T>) => {
-    return {
+    return Result.wrap(() => ({
         absPath,
         module: {
             name: nameOrFilename(module.name, absPath),
             description: module.description ?? '...',
             ...module,
         },
-    };
+    }))
+    .mapErr(() => absPath);
 };
 
 /**
  * operator function that fill the defaults for a module
  */
-export function defineAllFields<T extends AnyModule>() {
+export function defineAllFields<T extends AnyModule>(): OperatorFunction<ImportPayload<T>, Result<ImportPayload<Processed<T>>, string>> {
     return map(fillDefaults<T>);
 }
 
-export function wrapResult<In, Out>(predicate: OperatorFunction<In, Out>) {
-    return pipe(
-    );
-}
 /**
  * If the current value in Result stream is an error, calls callback.
  * This also extracts the Ok value from Result
