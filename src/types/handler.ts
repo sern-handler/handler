@@ -69,8 +69,5 @@ export interface DependencyConfiguration<T extends Dependencies> {
 }
 
 export type ImportPayload<T> =
-    | { module: T; absPath: string;  }
-    | { module: undefined; absPath: string; }
-
-
-
+    | { module: T; absPath: string }
+    | { module: undefined; absPath: string };
