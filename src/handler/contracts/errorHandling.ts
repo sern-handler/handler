@@ -26,7 +26,7 @@ export class DefaultErrorHandling implements ErrorHandling {
     crash(error: Error): never {
         throw error;
     }
-    updateAlive(e: Error) {
+    updateAlive(_: Error) {
         this.keepAlive--;
     }
 }
