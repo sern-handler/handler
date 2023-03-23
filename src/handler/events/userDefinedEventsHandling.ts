@@ -23,19 +23,24 @@ export function makeEventsHandler(
     const eventCreation$ = eventStream$.pipe(
         defineAllFields(),
         callInitPlugins({
-            onFailure: module => s.emit('module.register', SernEmitter.failure(module, SernError.PluginFailure)),
-            onSuccess: ({ module }) => {
+            onStop: module =>
+                s.emit('module.register', SernEmitter.failure(module, SernError.PluginFailure)),
+            onNext: ({ module }) => {
                 s.emit('module.register', SernEmitter.success(module));
                 return module;
             },
         }),
     );
     const intoDispatcher = (e: Processed<EventModule | CommandModule>) => {
-        switch(e.type) {
-            case EventType.Sern: return eventDispatcher(e, s);
-            case EventType.Discord: return eventDispatcher(e, client);
-            case EventType.External: return eventDispatcher(e, lazy(e.emitter));
-            default: err.crash(Error(SernError.InvalidModuleType + ' while creating event handler'));
+        switch (e.type) {
+            case EventType.Sern:
+                return eventDispatcher(e, s);
+            case EventType.Discord:
+                return eventDispatcher(e, client);
+            case EventType.External:
+                return eventDispatcher(e, lazy(e.emitter));
+            default:
+                err.crash(Error(SernError.InvalidModuleType + ' while creating event handler'));
         }
     };
     eventCreation$

@@ -1,4 +1,4 @@
-import { fromEvent, pipe, switchMap, take } from 'rxjs';
+import { fromEvent, pipe, switchMap, take, map } from 'rxjs';
 import * as Files from '../module-loading/readFile';
 import { callInitPlugins } from './observableHandling';
 import { CommandType, type ModuleStore, SernError } from '../structures';
@@ -40,13 +40,13 @@ export function makeReadyEvent(
         .pipe(
             buildCommandModules(commandDir, sEmitter),
             callInitPlugins({
-                onFailure: module => {
+                onStop: module => {
                     sEmitter.emit(
                         'module.register',
                         SernEmitter.failure(module, SernError.PluginFailure),
                     );
                 },
-                onSuccess: ({ module  }) => {
+                onNext: ({ module }) => {
                     sEmitter.emit('module.register', SernEmitter.success(module));
                     return module;
                 },
@@ -59,6 +59,7 @@ export function makeReadyEvent(
             }
         });
 }
+
 
 function registerModule<T extends Processed<CommandModule>>(
     manager: ModuleManager,

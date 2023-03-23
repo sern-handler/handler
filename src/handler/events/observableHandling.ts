@@ -1,16 +1,15 @@
 import type { Awaitable, Message } from 'discord.js';
-import { concatMap, EMPTY, filter, from, Observable, of, pipe, tap, throwError } from 'rxjs';
+import { concatMap, EMPTY, filter, from, Observable, of, tap, throwError } from 'rxjs';
 import { Result } from 'ts-results-es';
 import type { CommandModule, EventModule, Module } from '../../types/module';
 import SernEmitter from '../sernEmitter';
 import { callPlugin, everyPluginOk, filterMapTo } from './operators';
-import type { Processed } from '../../types/handler';
+import type { ImportPayload, Processed } from '../../types/handler';
 import type { ControlPlugin, VoidResult } from '../../types/plugin';
-
 
 function hasPrefix(prefix: string, content: string) {
     const prefixInContent = content.slice(0, prefix.length);
-    return prefixInContent.localeCompare(prefix, undefined, { sensitivity: 'accent' }) === 0; 
+    return prefixInContent.localeCompare(prefix, undefined, { sensitivity: 'accent' }) === 0;
 }
 
 /**
@@ -18,10 +17,9 @@ function hasPrefix(prefix: string, content: string) {
  * @param prefix
  */
 export function ignoreNonBot(prefix: string) {
-    const messageFromHumanAndHasPrefix = ({ author, content }: Message) => !author.bot && hasPrefix(prefix, content);
-    return pipe(
-       filter(messageFromHumanAndHasPrefix) 
-    );
+    const messageFromHumanAndHasPrefix = ({ author, content }: Message) =>
+        !author.bot && hasPrefix(prefix, content);
+    return filter(messageFromHumanAndHasPrefix);
 }
 
 /**
@@ -70,8 +68,8 @@ export function createResultResolver<
     Args extends { module: T; [key: string]: unknown },
     Output,
 >(config: {
-    onFailure?: (module: T) => unknown;
-    onSuccess: (args: Args) => Output;
+    onStop?: (module: T) => unknown;
+    onNext: (args: Args) => Output;
     createStream: (args: Args) => Observable<VoidResult>;
 }) {
     return (args: Args) => {
@@ -79,49 +77,45 @@ export function createResultResolver<
         return task$.pipe(
             tap(result => {
                 if (result.err) {
-                    config.onFailure?.(args.module);
+                    config.onStop?.(args.module);
                 }
             }),
             everyPluginOk,
-            filterMapTo(() => config.onSuccess(args)),
+            filterMapTo(() => config.onNext(args)),
         );
     };
 }
 
 /**
- * Calls a module's init plugins and checks for Err. If so, call { onFailure } and
+ * Calls a module's init plugins and checks for Err. If so, call { onStop } and
  * ignore the module
  */
 export function callInitPlugins<
     T extends Processed<CommandModule | EventModule>,
-    Args extends { module: T; absPath: string },
->(config: { onFailure?: (module: T) => unknown; onSuccess: (module: Args) => T }) {
-    return pipe(
-        concatMap(
-            createResultResolver({
-                createStream: args => from(args.module.plugins).pipe(callPlugin(args)),
-                ...config,
-            }),
-        ),
+    Args extends ImportPayload<T>,
+>(config: { onStop?: (module: T) => unknown; onNext: (module: Args) => T }) {
+    return concatMap(
+        createResultResolver({
+            createStream: args => from(args.module.plugins).pipe(callPlugin(args)),
+            ...config,
+        }),
     );
 }
 
 /**
  * Creates an executable task ( execute the command ) if  all control plugins are successful
- * @param onFailure emits a failure response to the SernEmitter
+ * @param onStop emits a failure response to the SernEmitter
  */
 export function makeModuleExecutor<
     M extends Processed<Module>,
     Args extends { module: M; args: unknown[] },
->(onFailure: (m: M) => unknown) {
-    const onSuccess = ({ args, module }: Args) => ({ task: () => module.execute(...args), module });
-    return pipe(
-        concatMap(
-            createResultResolver({
-                onFailure,
-                createStream: ({ args, module }) => from(module.onEvent).pipe(callPlugin(args)),
-                onSuccess,
-            }),
-        ),
+>(onStop: (m: M) => unknown) {
+    const onNext = ({ args, module }: Args) => ({ task: () => module.execute(...args), module });
+    return concatMap(
+        createResultResolver({
+            onStop,
+            createStream: ({ args, module }) => from(module.onEvent).pipe(callPlugin(args)),
+            onNext,
+        }),
     );
 }
