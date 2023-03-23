@@ -1,8 +1,10 @@
 import { readdirSync, statSync } from 'fs';
 import { join } from 'path';
-import { type Observable, from, mergeMap, filter} from 'rxjs';
+import { type Observable, from, mergeMap } from 'rxjs';
 import { SernError } from '../structures/errors';
 import { type Result, Err, Ok } from 'ts-results-es';
+import { ImportPayload } from '../../types/handler';
+
 
 // Courtesy @Townsy45
 function readPath(dir: string, arrayOfFiles: string[] = []): string[] {
@@ -19,10 +21,14 @@ function readPath(dir: string, arrayOfFiles: string[] = []): string[] {
     return arrayOfFiles;
 }
 export const fmtFileName = (n: string) => n.substring(0, n.length - 3);
-export const isStoreable = (n: string) => n.indexOf(".lazy.", n.length-9) === -1;
+export const isLazy = (n: string) => n.indexOf(".lazy.", n.length-9) !== -1;
 
 
 async function defaultModuleLoader<T>(absPath: string) {
+    
+    if(isLazy(absPath)) {
+        return Ok({ module: undefined, absPath }) 
+    }
     // prettier-ignore
     let module: T | undefined
     /// #if MODE === 'esm'
@@ -46,17 +52,10 @@ async function defaultModuleLoader<T>(absPath: string) {
  * @param commandDir
  */
 export function buildModuleStream<T>(commandDir: string): Observable<
-    Result<
-        {
-            module: T;
-            absPath: string;
-        },
-        SernError
-    >
+    Result<ImportPayload<T>, SernError>
 > {
     const commands = getCommands(commandDir);
     return from(commands).pipe(
-        filter(isStoreable),
         mergeMap(defaultModuleLoader<T>)
     );
 }
