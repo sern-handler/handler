@@ -113,7 +113,6 @@ client.login("YOUR_BOT_TOKEN_HERE");
 - [Vinci](https://github.com/SrIzan10/vinci), the bot for Mara Turing.
 - [Bask](https://github.com/baskbotml/bask), Listen your favorite artists on Discord.
 - [ava](https://github.com/SrIzan10/ava), A discord bot that plays KNGI and Gensokyo Radio.
-- [ALMA (WIP)](https://github.com/Benzo-Fury/ALMA), Using AI to unleash the power in your server.
 - [Protector (WIP)](https://github.com/needhamgary/Protector), Just a simple bot to help enhance a private minecraft server.
 
 ## 💻 CLI
