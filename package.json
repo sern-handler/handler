@@ -36,7 +36,7 @@
     "dependencies": {
         "iti": "^0.6.0",
         "rxjs": "^7.8.0",
-        "ts-results-es": "^3.5.0"
+        "ts-results-es": "^3.6.0"
     },
     "devDependencies": {
         "@typescript-eslint/eslint-plugin": "5.54.0",

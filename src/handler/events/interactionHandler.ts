@@ -1,4 +1,4 @@
-import type { Interaction } from 'discord.js';
+import { Interaction } from 'discord.js';
 import {
     catchError,
     concatMap,
@@ -26,15 +26,16 @@ import type { EventEmitter } from 'node:events';
 function makeInteractionProcessor(
     modules: ModuleManager,
 ): OperatorFunction<Interaction, { module: Processed<CommandModule>; event: Interaction }> {
-    const get = (cb: (ms: ModuleStore) => Processed<CommandModule> | undefined) => {
+    const get = (cb: ((ms: ModuleStore) => Processed<CommandModule>)) => {
         return modules.get(cb);
     };
     return pipe(
         concatMap(event => {
             if (event.isMessageComponent()) {
-                const module = get(ms =>
-                    ms.InteractionHandlers[event.componentType].get(event.customId),
-                );
+                const customId = event.customId;
+                const module = get(ms => {
+                    return ms.InteractionHandlers[event.componentType].get(customId);
+                });
                 return of({ module, event });
             } else if (event.isCommand() || event.isAutocomplete()) {
                 const commandName = event.commandName;
@@ -95,21 +96,23 @@ function createDispatcher({
     event: Interaction;
     module: Processed<CommandModule>;
 }) {
-    switch(module.type) {
-        case CommandType.Text: 
+    switch (module.type) {
+        case CommandType.Text:
             throw Error(SernError.MismatchEvent);
-        case CommandType.Slash: case CommandType.Both : {
-            if(event.isAutocomplete()) {
+        case CommandType.Slash:
+        case CommandType.Both: {
+            if (event.isAutocomplete()) {
                 /**
-                  * Autocomplete is a special case that
-                  * must be handled separately, since it's
-                  * too different from regular command modules
-                  */
+                 * Autocomplete is a special case that
+                 * must be handled separately, since it's
+                 * too different from regular command modules
+                 */
                 return dispatchAutocomplete(module, event);
             } else {
                 return dispatchCommand(module, contextArgs(event));
             }
         }
-        default : return dispatchCommand(module, interactionArg(event));
+        default:
+            return dispatchCommand(module, interactionArg(event));
     }
 }

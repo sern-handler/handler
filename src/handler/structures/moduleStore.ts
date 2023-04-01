@@ -7,7 +7,6 @@ import type { Processed } from '../../types/handler';
  * This dependency is usually injected into ModuleManager
  */
 export class ModuleStore {
-    readonly LazyPaths = new Map<string,string>();
     readonly BothCommands = new Map<string, Processed<CommandModule>>();
     readonly ApplicationCommands = {
         [ApplicationCommandType.User]: new Map<string, Processed<CommandModule>>(),

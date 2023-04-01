@@ -1,4 +1,4 @@
-import { fromEvent, pipe, switchMap, take, map } from 'rxjs';
+import { fromEvent, pipe, switchMap, take } from 'rxjs';
 import * as Files from '../module-loading/readFile';
 import { callInitPlugins } from './observableHandling';
 import { CommandType, type ModuleStore, SernError } from '../structures';
@@ -11,7 +11,6 @@ import { err, ok } from '../utilities/functions';
 import { defineAllFields, errTap } from './operators';
 import SernEmitter from '../sernEmitter';
 import type { EventEmitter } from 'node:events';
-
 
 function buildCommandModules(
     commandDir: string,

@@ -55,21 +55,20 @@ export function callPlugin(args: unknown): OperatorFunction<
 export const arrayifySource = map(src => (Array.isArray(src) ? (src as unknown[]) : [src]))
 
 const fillDefaults = <T extends AnyModule>({ module, absPath }: ImportPayload<T>) => {
-    return Result.wrap(() => ({
+    return {
         absPath,
         module: {
             name: nameOrFilename(module.name, absPath),
             description: module.description ?? '...',
             ...module,
         },
-    }))
-    .mapErr(() => absPath);
+    }
 };
 
 /**
  * operator function that fill the defaults for a module
  */
-export function defineAllFields<T extends AnyModule>(): OperatorFunction<ImportPayload<T>, Result<ImportPayload<Processed<T>>, string>> {
+export function defineAllFields<T extends AnyModule>(): OperatorFunction<ImportPayload<T>, ImportPayload<Processed<T>>> {
     return map(fillDefaults<T>);
 }
 
@@ -84,7 +83,7 @@ export function errTap<Ok, Err>(cb: (err: Err) => void): OperatorFunction<Result
         if (result.ok) {
             return of(result.val);
         } else {
-            cb(result.val);
+            cb(result.val as Err);
             return EMPTY;
         }
     });
