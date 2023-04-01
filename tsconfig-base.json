@@ -6,10 +6,10 @@
         "noImplicitAny": true,
         "experimentalDecorators": true,
         "strictNullChecks": true,
-        "importsNotUsedAsValues": "error",
         "moduleResolution": "node",
         "skipLibCheck": true,
         "declaration": true,
+        "preserveSymlinks": true,
         "allowSyntheticDefaultImports": true,
         "forceConsistentCasingInFileNames": true
     },
