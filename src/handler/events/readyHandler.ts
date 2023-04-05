@@ -69,28 +69,34 @@ function registerModule<T extends Processed<CommandModule>>(
         const set = Result.wrap(() => manager.set(cb));
         return set.ok ? ok() : err();
     };
-    switch(mod.type) {
+    switch (mod.type) {
         case CommandType.Text: {
-           mod.alias?.forEach(a => insert(ms => ms.TextCommands.set(a, mod)));
-           return insert(ms => ms.TextCommands.set(name, mod));
+            mod.alias?.forEach(a => insert(ms => ms.TextCommands.set(a, mod)));
+            return insert(ms => ms.TextCommands.set(name, mod));
         }
-        case CommandType.Slash: 
-           return insert(ms => ms.ApplicationCommands[ApplicationCommandType.ChatInput].set(name, mod));
+        case CommandType.Slash:
+            return insert(ms =>
+                ms.ApplicationCommands[ApplicationCommandType.ChatInput].set(name, mod),
+            );
         case CommandType.Both: {
             mod.alias?.forEach(a => insert(ms => ms.TextCommands.set(a, mod)));
             return insert(ms => ms.BothCommands.set(name, mod));
         }
-        case CommandType.CtxUser: 
-            return insert(ms => ms.ApplicationCommands[ApplicationCommandType.User].set(name, mod)); 
+        case CommandType.CtxUser:
+            return insert(ms => ms.ApplicationCommands[ApplicationCommandType.User].set(name, mod));
         case CommandType.CtxMsg:
-            return insert(ms => ms.ApplicationCommands[ApplicationCommandType.Message].set(name, mod));
+            return insert(ms =>
+                ms.ApplicationCommands[ApplicationCommandType.Message].set(name, mod),
+            );
         case CommandType.Button:
             return insert(ms => ms.InteractionHandlers[ComponentType.Button].set(name, mod));
         case CommandType.StringSelect:
-            return insert(ms => ms.InteractionHandlers[ComponentType.StringSelect].set(name, mod)); 
+            return insert(ms => ms.InteractionHandlers[ComponentType.StringSelect].set(name, mod));
         case CommandType.MentionableSelect:
-            return insert(ms => ms.InteractionHandlers[ComponentType.MentionableSelect].set(name, mod));
-        case CommandType.UserSelect: 
+            return insert(ms =>
+                ms.InteractionHandlers[ComponentType.MentionableSelect].set(name, mod),
+            );
+        case CommandType.UserSelect:
             return insert(ms => ms.InteractionHandlers[ComponentType.UserSelect].set(name, mod));
         case CommandType.ChannelSelect:
             return insert(ms => ms.InteractionHandlers[ComponentType.ChannelSelect].set(name, mod));
@@ -98,6 +104,7 @@ function registerModule<T extends Processed<CommandModule>>(
             return insert(ms => ms.InteractionHandlers[ComponentType.RoleSelect].set(name, mod));
         case CommandType.Modal:
             return insert(ms => ms.ModalSubmit.set(name, mod));
-        default: return err();
+        default:
+            return err();
     }
 }

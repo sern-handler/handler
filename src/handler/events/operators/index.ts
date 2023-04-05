@@ -62,7 +62,7 @@ const fillDefaults = <T extends AnyModule>({ module, absPath }: ImportPayload<T>
             description: module.description ?? '...',
             ...module,
         },
-    }
+    };
 };
 
 /**
