@@ -1,4 +1,4 @@
-import { fromEvent, pipe, switchMap, take } from 'rxjs';
+import { fromEvent, map, pipe, switchMap, take } from 'rxjs';
 import * as Files from '../module-loading/readFile';
 import { callInitPlugins } from './observableHandling';
 import { CommandType, type ModuleStore, SernError } from '../structures';
@@ -8,7 +8,7 @@ import type { CommandModule } from '../../types/module';
 import type { Processed } from '../../types/handler';
 import type { ErrorHandling, Logging, ModuleManager } from '../contracts';
 import { err, ok } from '../utilities/functions';
-import { defineAllFields, errTap } from './operators';
+import { errTap, fillDefaults } from './operators';
 import SernEmitter from '../sernEmitter';
 import type { EventEmitter } from 'node:events';
 
@@ -21,7 +21,7 @@ function buildCommandModules(
         errTap(error => {
             sernEmitter.emit('module.register', SernEmitter.failure(undefined, error));
         }),
-        defineAllFields(),
+        map(fillDefaults),
     );
 }
 export function makeReadyEvent(

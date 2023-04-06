@@ -54,23 +54,16 @@ export function callPlugin(args: unknown): OperatorFunction<
 
 export const arrayifySource = map(src => (Array.isArray(src) ? (src as unknown[]) : [src]))
 
-const fillDefaults = <T extends AnyModule>({ module, absPath }: ImportPayload<T>) => {
+export const fillDefaults = <T extends AnyModule>({ module, absPath }: ImportPayload<T>) => {
     return {
         absPath,
         module: {
-            name: nameOrFilename(module.name, absPath),
-            description: module.description ?? '...',
+            name: nameOrFilename(module?.name, absPath),
+            description: module?.description ?? '...',
             ...module,
         },
     };
 };
-
-/**
- * operator function that fill the defaults for a module
- */
-export function defineAllFields<T extends AnyModule>(): OperatorFunction<ImportPayload<T>, ImportPayload<Processed<T>>> {
-    return map(fillDefaults<T>);
-}
 
 /**
  * If the current value in Result stream is an error, calls callback.
