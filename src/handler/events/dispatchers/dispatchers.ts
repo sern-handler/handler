@@ -20,11 +20,15 @@ export function dispatchCommand(module: Processed<CommandModule>, createArgs: ()
 function intoPayload(module: Processed<Module>) {
     return pipe(
         arrayifySource,
-        map(args => ({ module, args }))
+        map(args => ({ module, args })),
     );
 }
 
-const createResult = createResultResolver<Processed<Module>, { module: Processed<Module>; args: unknown[] }, unknown[]>({
+const createResult = createResultResolver<
+    Processed<Module>,
+    { module: Processed<Module>; args: unknown[] },
+    unknown[]
+>({
     createStream: ({ module, args }) => from(module.onEvent).pipe(callPlugin(args)),
     onNext: ({ args }) => args,
 });
@@ -35,11 +39,15 @@ const createResult = createResultResolver<Processed<Module>, { module: Processed
  */
 export function eventDispatcher(module: Processed<Module>, source: unknown) {
     assert.ok(source instanceof EventEmitter, `${source} is not an EventEmitter`);
-    
-    const execute: OperatorFunction<unknown[], unknown> = concatMap(
-        async args => module.execute(...args)
+
+    const execute: OperatorFunction<unknown[], unknown> = concatMap(async args =>
+        module.execute(...args),
     );
-    return fromEvent(source, module.name).pipe(intoPayload(module), concatMap(createResult), execute);
+    return fromEvent(source, module.name).pipe(
+        intoPayload(module),
+        concatMap(createResult),
+        execute,
+    );
 }
 
 export function dispatchAutocomplete(

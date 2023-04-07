@@ -26,7 +26,7 @@ import type { EventEmitter } from 'node:events';
 function makeInteractionProcessor(
     modules: ModuleManager,
 ): OperatorFunction<Interaction, { module: Processed<CommandModule>; event: Interaction }> {
-    const get = (cb: ((ms: ModuleStore) => Processed<CommandModule> | undefined)) => {
+    const get = (cb: (ms: ModuleStore) => Processed<CommandModule> | undefined) => {
         return modules.get(cb);
     };
     return pipe(

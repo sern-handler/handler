@@ -12,10 +12,7 @@ import { errTap, fillDefaults } from './operators';
 import SernEmitter from '../sernEmitter';
 import type { EventEmitter } from 'node:events';
 
-function buildCommandModules(
-    commandDir: string,
-    sernEmitter: SernEmitter
-) {
+function buildCommandModules(commandDir: string, sernEmitter: SernEmitter) {
     return pipe(
         switchMap(() => Files.buildModuleStream<CommandModule>(commandDir)),
         errTap(error => {
@@ -58,7 +55,6 @@ export function makeReadyEvent(
             }
         });
 }
-
 
 function registerModule<T extends Processed<CommandModule>>(
     manager: ModuleManager,

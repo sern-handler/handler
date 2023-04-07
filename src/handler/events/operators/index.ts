@@ -4,16 +4,7 @@
  * and independent of each other
  */
 
-import {
-    concatMap,
-    defaultIfEmpty,
-    EMPTY,
-    every,
-    map,
-    of,
-    OperatorFunction,
-    pipe,
-} from 'rxjs';
+import { concatMap, defaultIfEmpty, EMPTY, every, map, of, OperatorFunction, pipe } from 'rxjs';
 import type { AnyModule } from '../../../types/module';
 import { nameOrFilename } from '../../utilities/functions';
 import type { PluginResult, VoidResult } from '../../../types/plugin';
@@ -26,7 +17,7 @@ import { ImportPayload, Processed } from '../../../types/handler';
  * @param item
  */
 export function filterMapTo<V>(item: () => V): OperatorFunction<boolean, V> {
-    return concatMap(shouldKeep => shouldKeep ? of(item()) : EMPTY);
+    return concatMap(shouldKeep => (shouldKeep ? of(item()) : EMPTY));
 }
 
 /**
@@ -52,7 +43,7 @@ export function callPlugin(args: unknown): OperatorFunction<
     });
 }
 
-export const arrayifySource = map(src => (Array.isArray(src) ? (src as unknown[]) : [src]))
+export const arrayifySource = map(src => (Array.isArray(src) ? (src as unknown[]) : [src]));
 
 export const fillDefaults = <T extends AnyModule>({ module, absPath }: ImportPayload<T>) => {
     return {

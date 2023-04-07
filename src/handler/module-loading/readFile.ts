@@ -4,8 +4,7 @@ import { type Observable, from, mergeMap } from 'rxjs';
 import { SernError } from '../structures/errors';
 import { type Result, Err, Ok } from 'ts-results-es';
 import { ImportPayload } from '../../types/handler';
-import { pathToFileURL } from 'node:url'
-
+import { pathToFileURL } from 'node:url';
 
 // Courtesy @Townsy45
 function readPath(dir: string, arrayOfFiles: string[] = []): string[] {
@@ -24,8 +23,9 @@ function readPath(dir: string, arrayOfFiles: string[] = []): string[] {
 export const fmtFileName = (n: string) => n.substring(0, n.length - 3);
 // export const isLazy = (n: string) => n.indexOf(".lazy.", n.length-9) !== -1;
 
-export async function defaultModuleLoader<T>(absPath: string): Promise<Result<ImportPayload<T>, SernError>> {
-    
+export async function defaultModuleLoader<T>(
+    absPath: string,
+): Promise<Result<ImportPayload<T>, SernError>> {
     // prettier-ignore
     let module: T | undefined
     /// #if MODE === 'esm'
@@ -48,21 +48,16 @@ export async function defaultModuleLoader<T>(absPath: string): Promise<Result<Im
  * @returns {Observable<{ mod: Module; absPath: string; }[]>} data from command files
  * @param commandDir
  */
-export function buildModuleStream<T>(commandDir: string): Observable<
-    Result<ImportPayload<T>, SernError>
-> {
+export function buildModuleStream<T>(
+    commandDir: string,
+): Observable<Result<ImportPayload<T>, SernError>> {
     const commands = getCommands(commandDir);
-    return from(commands).pipe(
-        mergeMap(defaultModuleLoader<T>)
-    );
+    return from(commands).pipe(mergeMap(defaultModuleLoader<T>));
 }
-
 
 export function fullPathFrom(dir: string) {
     return join(process.cwd(), dir);
 }
-
-
 
 export function getCommands(dir: string): string[] {
     return readPath(fullPathFrom(dir));
