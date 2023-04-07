@@ -1,4 +1,4 @@
-import { catchError, finalize, map, mergeAll } from 'rxjs';
+import { catchError, finalize, map, mergeAll, Observable } from 'rxjs';
 import * as Files from '../module-loading/readFile';
 import type { Dependencies, Processed } from '../../types/handler';
 import { callInitPlugins } from './observableHandling';
@@ -9,7 +9,7 @@ import type { ErrorHandling, Logging } from '../contracts';
 import { SernError, EventType, type Wrapper } from '../structures';
 import { eventDispatcher } from './dispatchers';
 import { handleError } from '../contracts/errorHandling';
-import { defineAllFields, errTap } from './operators';
+import { errTap, fillDefaults } from './operators';
 import { useContainerRaw } from '../dependencies';
 
 export function makeEventsHandler(
@@ -21,7 +21,7 @@ export function makeEventsHandler(
     const eventStream$ = eventObservable(eventsPath, s);
 
     const eventCreation$ = eventStream$.pipe(
-        defineAllFields(),
+        map(fillDefaults),
         callInitPlugins({
             onStop: module =>
                 s.emit('module.register', SernEmitter.failure(module, SernError.PluginFailure)),
@@ -40,7 +40,7 @@ export function makeEventsHandler(
             case EventType.External:
                 return eventDispatcher(e, lazy(e.emitter));
             default:
-                err.crash(Error(SernError.InvalidModuleType + ' while creating event handler'));
+                return err.crash(Error(SernError.InvalidModuleType + ' while creating event handler'));
         }
     };
     eventCreation$
