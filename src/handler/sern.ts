@@ -20,7 +20,7 @@ import { err, ok, partition } from './utilities/functions';
 import type { Awaitable, ClientEvents } from 'discord.js';
 
 /**
- *
+ * @since 1.0.0
  * @param wrapper Options to pass into sern.
  * Function to start the handler up
  * @example
@@ -51,6 +51,7 @@ export function init(wrapper: Wrapper) {
 }
 
 /**
+ * @since 1.0.0
  * The object passed into every plugin to control a command's behavior
  */
 export const controller = {
@@ -59,6 +60,7 @@ export const controller = {
 };
 
 /**
+ * @since 1.0.0
  * The wrapper function to define command modules for sern
  * @param mod
  */
@@ -74,6 +76,7 @@ export function commandModule(mod: InputCommand): CommandModule {
     } as CommandModule;
 }
 /**
+ * @since 1.0.0
  * The wrapper function to define event modules for sern
  * @param mod
  */
@@ -103,6 +106,7 @@ export function discordEvent<T extends keyof ClientEvents>(mod: {
     return eventModule({ type: EventType.Discord, ...mod });
 }
 /**
+ * @since 2.0.0
  * @param conf a configuration for creating your project dependencies
  */
 export function makeDependencies<T extends Dependencies>(conf: DependencyConfiguration<T>) {
@@ -121,7 +125,8 @@ export abstract class CommandExecutable<Type extends CommandType> {
     onEvent: ControlPlugin[] = [];
     abstract execute: CommandModuleDefs[Type]['execute'];
 }
-/**@Experimental
+/**
+ * @Experimental
  * Will be refactored in future
  */
 export abstract class EventExecutable<Type extends EventType> {

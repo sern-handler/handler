@@ -1,4 +1,5 @@
 /**
+ * @since 1.0.0
  * A bitfield that discriminates command modules
  * @enum { number }
  * @example

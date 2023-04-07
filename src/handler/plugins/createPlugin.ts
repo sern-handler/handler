@@ -13,25 +13,37 @@ export function makePlugin<V extends unknown[]>(
         [guayin]: undefined,
     } as Plugin<V>;
 }
-
+/**
+ * @since 2.5.0
+ *
+ */
 export function EventInitPlugin<I extends EventType>(
     execute: (...args: EventArgs<I, PluginType.Init>) => PluginResult,
 ) {
     return makePlugin(PluginType.Init, execute);
 }
-
+/**
+ * @since 2.5.0
+ *
+ */
 export function CommandInitPlugin<I extends CommandType>(
     execute: (...args: CommandArgs<I, PluginType.Init>) => PluginResult,
 ) {
     return makePlugin(PluginType.Init, execute);
 }
-
+/**
+ * @since 2.5.0
+ *
+ */
 export function CommandControlPlugin<I extends CommandType>(
     execute: (...args: CommandArgs<I, PluginType.Control>) => PluginResult,
 ) {
     return makePlugin(PluginType.Control, execute);
 }
-
+/**
+ * @since 2.5.0
+ *
+ */
 export function EventControlPlugin<I extends EventType>(
     execute: (...args: EventArgs<I, PluginType.Control>) => PluginResult,
 ) {
@@ -39,6 +51,7 @@ export function EventControlPlugin<I extends EventType>(
 }
 
 /**
+ * @since 2.5.0
  * @Experimental
  * A specialized function for creating control plugins with discord.js ClientEvents.
  * Will probably be moved one day!
