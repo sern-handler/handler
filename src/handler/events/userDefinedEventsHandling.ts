@@ -1,4 +1,4 @@
-import { catchError, finalize, map, mergeAll, Observable } from 'rxjs';
+import { catchError, finalize, map, mergeAll } from 'rxjs';
 import * as Files from '../module-loading/readFile';
 import type { Dependencies, Processed } from '../../types/handler';
 import { callInitPlugins } from './observableHandling';
