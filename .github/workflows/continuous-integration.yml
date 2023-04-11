@@ -3,8 +3,7 @@ name: Continuous Integration
 on:
   # Trigger the workflow on push or pull request or custom
   push:
-    branches:
-      main
+    branches: [main]
     paths:
       - '*.ts'
   pull_request_target:
@@ -29,14 +28,14 @@ jobs:
           node-version: 17
 
       - name: Install pnpm
-        run: npm i -g pnpm
+        run: npm i -g yarn
 
       # Prettier must be in `package.json`
       - name: Install Node.js dependencies
-        run:  pnpm i
+        run:  yarn --immutable
 
       - name: Run Prettier
-        run: pnpm run pretty
+        run: yarn pretty
 
       - name: Create Pull Request
         id: cpr
