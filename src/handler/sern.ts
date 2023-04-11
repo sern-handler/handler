@@ -43,9 +43,10 @@ export function init(wrapper: Wrapper) {
     if (events !== undefined) {
         makeEventsHandler(requiredDependenciesAnd([]), events, wrapper.containerConfig);
     }
-    makeReadyEvent(requiredDependenciesAnd(['@sern/modules']), wrapper.commands);
-    makeMessageCreate(requiredDependenciesAnd(['@sern/modules']), wrapper.defaultPrefix);
-    makeInteractionCreate(requiredDependenciesAnd(['@sern/modules']));
+    const dependencies = requiredDependenciesAnd(['@sern/modules']);
+    makeReadyEvent(dependencies, wrapper.commands);
+    makeMessageCreate(dependencies, wrapper.defaultPrefix);
+    makeInteractionCreate(dependencies);
     const endTime = performance.now();
     logger?.info({ message: `sern : ${(endTime - startTime).toFixed(2)} ms` });
 }
