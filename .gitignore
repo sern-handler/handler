@@ -87,3 +87,7 @@ dist
 
 # IntelliJ IDEA Config file
 .idea/
+
+# Yarn files
+.yarn/install-state.gz
+.yarn/build-state.yml

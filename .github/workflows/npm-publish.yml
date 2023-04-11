@@ -10,13 +10,8 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 17
-      - uses: pnpm/action-setup@v2
-        with:
-          run_install: |
-            - recursive: true
-              args: [--strict-peer-dependencies]
-      - run: pnpm install
-      - run: pnpm build:prod
+      - run: yarn --immutable
+      - run: yarn build:prod
       - uses: JS-DevTools/npm-publish@v1
         with:
           token: ${{ secrets.NPM_TOKEN }}
