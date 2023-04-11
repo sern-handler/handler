@@ -6,7 +6,7 @@ on:
     branches:
       main
     paths:
-      - '**.ts'
+      - '*.ts'
   pull_request_target:
     branches:
       main
