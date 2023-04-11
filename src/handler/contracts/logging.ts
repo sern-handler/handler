@@ -1,12 +1,16 @@
 import type { LogPayload } from '../../types/handler';
-
+/**
+ * @since 2.0.0
+ */
 export interface Logging<T = unknown> {
     error(payload: LogPayload<T>): void;
     warning(payload: LogPayload<T>): void;
     info(payload: LogPayload<T>): void;
     debug(payload: LogPayload<T>): void;
 }
-
+/**
+ * @since 2.0.0
+ */
 export class DefaultLogging implements Logging {
     private date = () => new Date();
     debug(payload: LogPayload): void {

@@ -1,5 +1,5 @@
 import { catchError, finalize, map, mergeAll } from 'rxjs';
-import { buildData } from '../module-loading/readFile';
+import * as Files from '../module-loading/readFile';
 import type { Dependencies, Processed } from '../../types/handler';
 import { callInitPlugins } from './observableHandling';
 import type { CommandModule, EventModule } from '../../types/module';
@@ -9,7 +9,7 @@ import type { ErrorHandling, Logging } from '../contracts';
 import { SernError, EventType, type Wrapper } from '../structures';
 import { eventDispatcher } from './dispatchers';
 import { handleError } from '../contracts/errorHandling';
-import { defineAllFields, errTap } from './operators';
+import { errTap, fillDefaults } from './operators';
 import { useContainerRaw } from '../dependencies';
 
 export function makeEventsHandler(
@@ -21,11 +21,11 @@ export function makeEventsHandler(
     const eventStream$ = eventObservable(eventsPath, s);
 
     const eventCreation$ = eventStream$.pipe(
-        defineAllFields(),
+        map(fillDefaults),
         callInitPlugins({
-            onFailure: module =>
+            onStop: module =>
                 s.emit('module.register', SernEmitter.failure(module, SernError.PluginFailure)),
-            onSuccess: ({ module }) => {
+            onNext: ({ module }) => {
                 s.emit('module.register', SernEmitter.success(module));
                 return module;
             },
@@ -40,7 +40,9 @@ export function makeEventsHandler(
             case EventType.External:
                 return eventDispatcher(e, lazy(e.emitter));
             default:
-                err.crash(Error(SernError.InvalidModuleType + ' while creating event handler'));
+                return err.crash(
+                    Error(SernError.InvalidModuleType + ' while creating event handler'),
+                );
         }
     };
     eventCreation$
@@ -64,7 +66,7 @@ export function makeEventsHandler(
 }
 
 function eventObservable(events: string, emitter: SernEmitter) {
-    return buildData<EventModule>(events).pipe(
+    return Files.buildModuleStream<EventModule>(events).pipe(
         errTap(reason => {
             emitter.emit('module.register', SernEmitter.failure(undefined, reason));
         }),

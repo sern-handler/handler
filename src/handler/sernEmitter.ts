@@ -3,6 +3,9 @@ import type { Payload, SernEventsMapping } from '../types/handler';
 import { PayloadType } from './structures';
 import type { Module } from '../types/module';
 
+/**
+ * @since 1.0.0
+ */
 class SernEmitter extends EventEmitter {
     /**
      * Listening to sern events with on. This event stays on until a crash or a normal exit

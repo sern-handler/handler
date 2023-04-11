@@ -1,4 +1,4 @@
-import type { Interaction } from 'discord.js';
+import { Interaction } from 'discord.js';
 import {
     catchError,
     concatMap,
@@ -32,9 +32,10 @@ function makeInteractionProcessor(
     return pipe(
         concatMap(event => {
             if (event.isMessageComponent()) {
-                const module = get(ms =>
-                    ms.InteractionHandlers[event.componentType].get(event.customId),
-                );
+                const customId = event.customId;
+                const module = get(ms => {
+                    return ms.InteractionHandlers[event.componentType].get(customId);
+                });
                 return of({ module, event });
             } else if (event.isCommand() || event.isAutocomplete()) {
                 const commandName = event.commandName;

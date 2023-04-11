@@ -67,3 +67,5 @@ export interface DependencyConfiguration<T extends Dependencies> {
     exclude?: Set<OptionalDependencies>;
     build: (root: Container<Omit<Dependencies, '@sern/client'>, {}>) => Container<T, {}>;
 }
+
+export type ImportPayload<T> = { module: T; absPath: string };
