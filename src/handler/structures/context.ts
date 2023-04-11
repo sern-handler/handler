@@ -15,6 +15,7 @@ function safeUnwrap<T>(res: Either<T, T>) {
     return res.val;
 }
 /**
+ * @since 1.0.0
  * Provides values shared between
  * Message and ChatInputCommandInteraction
  */

@@ -1,7 +1,9 @@
 import type { Observable } from 'rxjs';
 import type { Logging } from './logging';
 import util from 'util';
-
+/**
+ * @since 2.0.0
+ */
 export interface ErrorHandling {
     /**
      * Number of times the process should throw an error until crashing and exiting
@@ -20,13 +22,15 @@ export interface ErrorHandling {
      */
     updateAlive(error: Error): void;
 }
-
+/**
+ * @since 2.0.0
+ */
 export class DefaultErrorHandling implements ErrorHandling {
     keepAlive = 5;
     crash(error: Error): never {
         throw error;
     }
-    updateAlive(e: Error) {
+    updateAlive(_: Error) {
         this.keepAlive--;
     }
 }

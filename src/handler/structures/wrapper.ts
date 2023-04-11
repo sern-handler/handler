@@ -1,6 +1,7 @@
 import type { Dependencies } from '../../types/handler';
 
 /**
+ * @since 1.0.0
  * An object to be passed into Sern#init() function.
  * @typedef {object} Wrapper
  */
