@@ -6,6 +6,7 @@ on:
     paths: ["src/**/*"]
   pull_request:
     branches: [ main ]
+    paths: ["src/**/*"]
   schedule:
     - cron: '37 20 * * 4'
 
