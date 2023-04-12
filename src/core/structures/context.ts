@@ -6,7 +6,6 @@ export abstract class Context<Left, Right> {
 
     abstract get message(): Left; 
     abstract get interaction(): Right;
-    abstract get id(): string;
 
 }
 
