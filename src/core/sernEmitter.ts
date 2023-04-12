@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events';
 import type { Payload, SernEventsMapping } from '../types/handler';
-import { PayloadType } from './structures';
+import { PayloadType } from '../handler/structures';
 import type { Module } from '../types/module';
 
 /**
