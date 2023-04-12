@@ -15,15 +15,16 @@
 </div>
 
 ## Why?
-- Featherweight, lightning-fast. A framework that's tailored to your exact needs.
-- Support for discord.js v14 and all of it's interactions
+- For you. A framework that's tailored to your exact needs.
+- Lightweight. Does a lot while being small.
+- Latest features. Support for discord.js v14 and all of it's interactions
 - Hybrid, customizable, composable commands. Just how you like.
-- Plug and play or customize to your liking
-- Developed reactive. For consistent and reliable backend
-- Customizable logger, error handling, and more
+- Start quick. Plug and play or customize to your liking
+- Code Reactive. Embraces reactive programming for consistent and reliable backend
+- Logger. Customize, handle erros and do much more.
 - We're active and growing, always here to help. [Join the community](https://sern.dev/discord)
 - Use it with TypeScript, ESM, or CommonJS. All welcome.
-- Unleash the full potential with a poweful CLI and awesome plugins.
+- Unleash the full potential with a powerful CLI and awesome plugins.
 
 ## 📜 Installation
 
