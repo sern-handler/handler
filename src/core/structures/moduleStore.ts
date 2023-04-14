@@ -3,7 +3,6 @@ import type { Processed } from '../../types/handler';
 import { ApplicationCommandType, ComponentType } from './enums';
 
 
-
 /**
  * @since 2.0.0
  * Storing all command modules

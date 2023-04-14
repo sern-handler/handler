@@ -1,7 +1,7 @@
 import type { Processed } from '../../../types/handler';
 import type { AutocompleteInteraction } from 'discord.js';
-import { SernError } from '../../structures';
-import treeSearch from '../../utilities/treeSearch';
+import { SernError } from '../../../core/structures';
+import treeSearch from '../../../core/utilities/treeSearch';
 import type { BothCommand, CommandModule, Module, SlashCommand } from '../../../types/module';
 import { EventEmitter } from 'events';
 import * as assert from 'assert';

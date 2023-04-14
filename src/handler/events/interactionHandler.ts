@@ -12,15 +12,15 @@ import {
     OperatorFunction,
     pipe,
 } from 'rxjs';
-import { CommandType, type ModuleStore, SernError } from '../structures';
+import { CommandType, type ModuleStore, SernError } from '../../core/structures';
 import { contextArgs, dispatchAutocomplete, dispatchCommand, interactionArg } from './dispatchers';
 import { executeModule, makeModuleExecutor } from './observableHandling';
 import type { CommandModule } from '../../types/module';
-import { ErrorHandling, handleError } from '../contracts/errorHandling';
-import SernEmitter from '../sernEmitter';
+import { ErrorHandling, handleError } from '../../core/contracts/errorHandling';
+import { SernEmitter } from '../../core';
 import type { Processed } from '../../types/handler';
-import { useContainerRaw } from '../dependencies';
-import type { Logging, ModuleManager } from '../contracts';
+import { useContainerRaw } from '../../core/dependencies';
+import type { Logging, ModuleManager } from '../../core/contracts';
 import type { EventEmitter } from 'node:events';
 
 function makeInteractionProcessor(

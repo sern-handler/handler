@@ -5,13 +5,13 @@
  */
 
 import { concatMap, defaultIfEmpty, EMPTY, every, map, of, OperatorFunction, pipe } from 'rxjs';
-import type { AnyModule } from '../../../types/module';
-import { nameOrFilename } from '../../utilities/functions';
-import type { PluginResult, VoidResult } from '../../../types/plugin';
-import { guayin } from '../../plugins';
+import type { AnyModule } from '../types/module';
+import { nameOrFilename } from './utilities/functions';
+import type { PluginResult, VoidResult } from '../types/plugin';
+import { guayin } from './plugins';
 import { controller } from '../../sern';
 import { Result } from 'ts-results-es';
-import { ImportPayload, Processed } from '../../../types/handler';
+import { ImportPayload } from '../types/handler';
 /**
  * if {src} is true, mapTo V, else ignore
  * @param item
