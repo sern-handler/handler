@@ -20,7 +20,7 @@ import type {
     Module,
 } from '../../types/module';
 import type { Args, Payload, Processed, SlashOptions } from '../../types/handler';
-import type Context from '../structures/context';
+import type { Context } from '../structures/context';
 import type { MessageContextMenuCommandInteraction } from 'discord.js';
 import type {
     ButtonInteraction,

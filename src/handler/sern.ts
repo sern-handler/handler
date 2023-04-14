@@ -1,6 +1,5 @@
-import type Wrapper from './structures/wrapper';
+import type { Wrapper, CommandType, EventType, PluginType } from '../core/structures';
 import { makeEventsHandler } from './events/userDefinedEventsHandling';
-import { CommandType, EventType, PluginType } from './structures/enums';
 import type { AnyEventPlugin, ControlPlugin, InitPlugin, Plugin } from '../types/plugin';
 import { makeInteractionCreate } from './events/interactionHandler';
 import { makeReadyEvent } from './events/readyHandler';
@@ -14,9 +13,9 @@ import type {
     InputEvent,
 } from '../types/module';
 import type { Dependencies, DependencyConfiguration } from '../types/handler';
-import { composeRoot, makeFetcher, useContainer } from './dependencies/provider';
-import type { Logging } from './contracts';
-import { err, ok, partition } from './utilities/functions';
+import { composeRoot, makeFetcher, useContainer } from '../core/dependencies/provider';
+import type { Logging } from '../core/contracts';
+import { err, ok, partition } from '../core/utilities/functions';
 import type { Awaitable, ClientEvents } from 'discord.js';
 
 /**

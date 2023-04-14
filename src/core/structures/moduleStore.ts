@@ -1,22 +1,8 @@
 import type { CommandModule } from '../../types/module';
 import type { Processed } from '../../types/handler';
+import { ApplicationCommandType, ComponentType } from './enums';
 
-const enum ApplicationCommandType {
-    User,
-    Message,
-    ChatInput
-}
 
-const enum ComponentType {
-    ActionRow = 1,
-    Button = 2,
-    StringSelect = 3,
-    TextInput = 4,
-    UserSelect = 5,
-    RoleSelect = 6,
-    MentionableSelect = 7,
-    ChannelSelect = 8,
-}
 
 /**
  * @since 2.0.0
