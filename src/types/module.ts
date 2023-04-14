@@ -21,11 +21,11 @@ import type {
     StringSelectMenuInteraction,
     UserSelectMenuInteraction,
 } from 'discord.js';
-import { CommandType } from '../handler/structures/enums';
+import { CommandType } from '../core/structures/enums';
 import type { Args, SlashOptions } from './handler';
 import type Context from '../handler/structures/context';
 import type { InitPlugin, ControlPlugin } from './plugin';
-import { EventType } from '../handler/structures/enums';
+import { EventType } from '../core/structures/enums';
 import type { AnyCommandPlugin, AnyEventPlugin } from './plugin';
 import type { SernEventsMapping } from './handler';
 import type { ClientEvents } from 'discord.js';
