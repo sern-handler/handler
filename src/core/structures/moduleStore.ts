@@ -1,6 +1,22 @@
 import type { CommandModule } from '../../types/module';
-import { ApplicationCommandType, ComponentType } from 'discord.js';
 import type { Processed } from '../../types/handler';
+
+const enum ApplicationCommandType {
+    User,
+    Message,
+    ChatInput
+}
+
+const enum ComponentType {
+    ActionRow = 1,
+    Button = 2,
+    StringSelect = 3,
+    TextInput = 4,
+    UserSelect = 5,
+    RoleSelect = 6,
+    MentionableSelect = 7,
+    ChannelSelect = 8,
+}
 
 /**
  * @since 2.0.0

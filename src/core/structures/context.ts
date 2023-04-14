@@ -9,9 +9,13 @@ export abstract class Context<Left, Right> {
 
 }
 
+function safeUnwrap<T>(res: Either<T, T>) {
+    return res.val;
+}
+
 export function wrap<Left, Right>(
     val: Left|Right,
-    fa: (val: Left|Right
-) => Either<Left, Right>) {
+    fa: (val: Left|Right) => Either<Left, Right>
+) {
     return fa(val);
 }
