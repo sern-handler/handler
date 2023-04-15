@@ -13,11 +13,11 @@
 
 import type { Awaitable } from 'discord.js';
 import type { Err, Ok, Result } from 'ts-results-es';
-import type { PluginType } from '../handler/structures/enums';
+import type { PluginType } from '../core/structures/enums';
 import type { CommandModule, EventModule } from './module';
-import type { CommandArgs, InitArgs } from '../handler/plugins';
+import type { CommandArgs, InitArgs } from '../core/plugins';
 import type { Deprecated, Processed } from './handler';
-import type { CommandType } from '../handler/structures/enums';
+import type { CommandType } from '../core/structures/enums';
 export type PluginResult = Awaitable<VoidResult>;
 export type VoidResult = Result<void, void>;
 

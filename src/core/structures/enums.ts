@@ -139,10 +139,10 @@ export enum PayloadType {
     Warning = 'warning',
 }
 
-export const enum ApplicationCommandType {
-    User,
-    Message,
-    ChatInput
+export enum ApplicationCommandType {
+    ChatInput = 1,
+    User = 2,
+    Message = 3
 }
 
 

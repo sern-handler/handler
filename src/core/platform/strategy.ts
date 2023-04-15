@@ -18,4 +18,5 @@ interface WebsocketStrategy {
 
 interface ServerlessStrategy {
     type: DispatchType.Serverless;
+    endpoint: string;
 }

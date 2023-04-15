@@ -1,12 +1,9 @@
 import { Result as Either } from 'ts-results-es';
 
 
-export abstract class Context<Left, Right> {
-    private constructor(private _: Either<Left, Right>){}
-
-    abstract get message(): Left; 
-    abstract get interaction(): Right;
-
+export interface Context<Left, Right> {
+    get message(): Left; 
+    get interaction(): Right;
 }
 
 function safeUnwrap<T>(res: Either<T, T>) {

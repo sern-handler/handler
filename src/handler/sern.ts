@@ -1,6 +1,6 @@
-import type { Wrapper, CommandType, EventType, PluginType } from '../core/structures';
+import { Wrapper, CommandType, EventType, PluginType } from '../core/structures';
 import { makeEventsHandler } from './events/userDefinedEventsHandling';
-import type { AnyEventPlugin, ControlPlugin, InitPlugin, Plugin } from '../types/plugin';
+import { AnyEventPlugin, ControlPlugin, InitPlugin, type Plugin } from '../types/plugin';
 import { makeInteractionCreate } from './events/interactionHandler';
 import { makeReadyEvent } from './events/readyHandler';
 import { makeMessageCreate } from './events/messageHandler';
