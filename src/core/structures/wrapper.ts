@@ -8,6 +8,10 @@ import { PlatformStrategy } from '../platform/strategy';
  */
 interface Wrapper {
     readonly platform: PlatformStrategy;
+    /**
+     * @deprecated
+     * Add defaultprefix to platform field instead 
+     */
     readonly defaultPrefix?: string;
     readonly commands: string;
     readonly events?: string;

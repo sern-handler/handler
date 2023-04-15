@@ -1,4 +1,3 @@
-import { Context } from "../structures/context";
 
 enum DispatchType {
     Websocket,
@@ -14,6 +13,7 @@ interface WebsocketStrategy {
     interactionCreate: string;
     messageCreate: string;
     ready: string;
+    defaultPrefix: string;
 }
 
 interface ServerlessStrategy {
