@@ -1,10 +1,11 @@
+import { Context } from "../structures/context";
+
 enum DispatchType {
     Websocket,
     Serverless
 }
 
-
-type PlatformStrategy =
+export type PlatformStrategy =
     | WebsocketStrategy
     | ServerlessStrategy;
 
@@ -13,10 +14,8 @@ interface WebsocketStrategy {
     interactionCreate: string;
     messageCreate: string;
     ready: string;
-    
 }
 
 interface ServerlessStrategy {
     type: DispatchType.Serverless;
-
 }

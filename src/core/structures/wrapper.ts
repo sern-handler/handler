@@ -1,4 +1,5 @@
 import type { Dependencies } from '../../types/handler';
+import { PlatformStrategy } from '../platform/strategy';
 
 /**
  * @since 1.0.0
@@ -6,6 +7,7 @@ import type { Dependencies } from '../../types/handler';
  * @typedef {object} Wrapper
  */
 interface Wrapper {
+    readonly platform: PlatformStrategy;
     readonly defaultPrefix?: string;
     readonly commands: string;
     readonly events?: string;
