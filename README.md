@@ -22,7 +22,7 @@
 - Start quick. Plug and play or customize to your liking.
 - Embraces reactive programming. For consistent and reliable backend.
 - Switch and customize how errors are handled, logging, and more.
-- Use it with TypeScript or JavaScript. CommonJS and ESM are supported. All welcome.
+- Use it with TypeScript or JavaScript. CommonJS and ESM supported.
 - Active and growing community, always here to help. [Join us](https://sern.dev/discord)
 - Unleash its full potential with a powerful CLI and awesome plugins.
 
