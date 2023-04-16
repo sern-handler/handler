@@ -70,7 +70,10 @@ function defaultContainer() {
         {}
     >;
 }
-
+/**
+ * A way for sern to grab only the necessary dependencies. 
+ * Returns a function which allows for the user to call for more dependencies.
+ */
 export function makeFetcher(wrapper: Wrapper) {
     const requiredDependencyKeys = [
         '@sern/emitter',
