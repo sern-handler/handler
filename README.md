@@ -17,10 +17,10 @@
 ## Why?
 - For you. A framework that's tailored to your exact needs.
 - Lightweight. Does a lot while being small.
-- Latest features. Support for discord.js v14 and all of its interactions
+- Latest features. Support for discord.js v14 and all of its interactions.
 - Hybrid, customizable and composable commands. Just how you like.
-- Start quick. Plug and play or customize to your liking
-- Embraces Reactive Programming. For consistent and reliable backend
+- Start quick. Plug and play or customize to your liking.
+- Embraces Reactive Programming. For consistent and reliable backend.
 - Logger. Customize, handle errors and do much more.
 - Active and growing community, always here to help. [Join us](https://sern.dev/discord)
 - Use it with TypeScript, ESM, or CommonJS. All welcome.
