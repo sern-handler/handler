@@ -9,7 +9,6 @@ import type {
     ApplicationCommandSubCommandData,
     ApplicationCommandSubGroupData,
     AutocompleteInteraction,
-    Awaitable,
     BaseApplicationCommandOptionsData,
     ButtonInteraction,
     MessageContextMenuCommandInteraction,
@@ -22,7 +21,7 @@ import type {
     UserSelectMenuInteraction,
 } from 'discord.js';
 import { CommandType } from '../core/structures/enums';
-import type { Args, SlashOptions } from './handler';
+import type { Args, Awaitable, SlashOptions } from './handler';
 import type Context from '../handler/structures/context';
 import type { InitPlugin, ControlPlugin } from './plugin';
 import { EventType } from '../core/structures/enums';

@@ -8,6 +8,9 @@ import type { ErrorHandling, Logging, ModuleManager } from '../core/contracts';
 import type { ModuleStore } from '../core/structures/moduleStore';
 import type SernEmitter from '../core/sernEmitter';
 import type { Container } from 'iti';
+
+export type Awaitable<T> = PromiseLike<T> | T;
+
 // Thanks to @kelsny
 export type ParseType<T> = {
     [K in keyof T]: T[K] extends unknown ? [k: K, args: T[K]] : never;
