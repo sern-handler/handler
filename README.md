@@ -22,7 +22,7 @@
 - Start quick. Plug and play or customize to your liking
 - Embraces Reactive Programming. Reactive programming for consistent and reliable backend
 - Logger. Customize, handle errors and do much more.
-- We're active and growing, always here to help. [Join the community](https://sern.dev/discord)
+- Active and growing community, always here to help. [Join us](https://sern.dev/discord)
 - Use it with TypeScript, ESM, or CommonJS. All welcome.
 - Unleash the full potential with a powerful CLI and awesome plugins.
 
