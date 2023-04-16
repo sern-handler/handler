@@ -10,12 +10,11 @@ interface Wrapper {
     readonly platform: PlatformStrategy;
     /**
      * @deprecated
-     * Add defaultprefix to platform field instead 
+     * Add defaultPrefix to platform field instead 
      */
     readonly defaultPrefix?: string;
     readonly commands: string;
     readonly events?: string;
-    readonly strategy: PlatformStrategy;
     readonly containerConfig: {
         get: (...keys: (keyof Dependencies)[]) => unknown[];
     };

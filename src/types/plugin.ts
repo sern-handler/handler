@@ -15,9 +15,8 @@ import type { Awaitable } from 'discord.js';
 import type { Err, Ok, Result } from 'ts-results-es';
 import type { PluginType } from '../core/structures/enums';
 import type { CommandModule, EventModule } from './module';
-import type { CommandArgs, InitArgs } from '../core/plugins';
-import type { Deprecated, Processed } from './handler';
-import type { CommandType } from '../core/structures/enums';
+import type { InitArgs } from '../core/plugins';
+import type { Processed } from './handler';
 export type PluginResult = Awaitable<VoidResult>;
 export type VoidResult = Result<void, void>;
 
@@ -42,33 +41,3 @@ export interface ControlPlugin<Args extends any[] = any[]> {
 export type AnyCommandPlugin = ControlPlugin | InitPlugin<[InitArgs<Processed<CommandModule>>]>;
 export type AnyEventPlugin = ControlPlugin | InitPlugin<[InitArgs<Processed<EventModule>>]>;
 
-/**
- * @deprecated
- * Use the newer helper functions and import { controller } from '@sern/handler'
- */
-export interface CommandPlugin<T extends CommandType = CommandType> {
-    name?: string;
-    description?: string;
-    type: PluginType.Command;
-    execute: (
-        m: InitArgs<Processed<CommandModule>>,
-        controller?: Deprecated<'Please import controller instead'>,
-    ) => PluginResult;
-}
-/**
- * @deprecated
- * Use the newer helper functions
- */
-export interface EventPlugin<T extends CommandType> {
-    name?: string;
-    description?: string;
-    type: PluginType.Event;
-    execute: (args: CommandArgs<T, PluginType.Event>, controller?: Controller) => PluginResult;
-}
-export type DiscordEmitterPlugin = Deprecated<'Please view alternatives: '>;
-export type ExternalEmitterPlugin = Deprecated<'Please view alternatives: '>;
-export type SernEmitterPlugin = Deprecated<'Please view alternatives: '>;
-export type AutocompletePlugin = Deprecated<'Please view alternatives: '>;
-export type SernEventPlugin = Deprecated<'Please view alternatives: '>;
-export type ExternalEventPlugin = Deprecated<'Please view alternatives: '>;
-export type DiscordEventPlugin = Deprecated<'Please view alternatives: '>;
