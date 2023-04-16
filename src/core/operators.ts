@@ -8,8 +8,6 @@ import { concatMap, defaultIfEmpty, EMPTY, every, map, of, OperatorFunction, pip
 import type { AnyModule } from '../types/module';
 import { nameOrFilename } from './utilities/functions';
 import type { PluginResult, VoidResult } from '../types/plugin';
-import { guayin } from './plugins';
-import { controller } from '../../sern';
 import { Result } from 'ts-results-es';
 import { ImportPayload } from '../types/handler';
 /**
@@ -31,15 +29,10 @@ export function callPlugin(args: unknown): OperatorFunction<
     VoidResult
 > {
     return concatMap(async plugin => {
-        const isNewPlugin = Reflect.has(plugin, guayin);
-        if (isNewPlugin) {
-            if (Array.isArray(args)) {
-                return plugin.execute(...args);
-            }
-            return plugin.execute(args);
-        } else {
-            return plugin.execute(args, controller);
+        if (Array.isArray(args)) {
+            return plugin.execute(...args);
         }
+        return plugin.execute(args);
     });
 }
 
