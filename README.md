@@ -19,7 +19,7 @@
 - Lightweight. Does a lot while being small.
 - Latest features. Support for discord.js v14 and all of its interactions.
 - Hybrid, customizable and composable commands. Create them just how you like.
-- Start quick. Plug and play or customize to your liking.
+- Start quickly. Plug and play or customize to your liking.
 - Embraces reactive programming. For consistent and reliable backend.
 - Switch and customize how errors are handled, logging, and more.
 - Use it with TypeScript or JavaScript. CommonJS and ESM supported.
