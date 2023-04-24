@@ -15,19 +15,16 @@
 </div>
 
 ## Why?
-- Most handlers don't support discord.js 14.7+
-- Customizable, composable commands
-- Plug and play or customize to your liking
-- Embraces reactive programming for consistent and reliable backend
-- Customizable logger, error handling, and more
-- Active development and growing [community](https://sern.dev/discord)
-## 👀 Quick Look
-
-* Support for discord.js v14 and all interactions
-* Hybrid commands
-* Lightweight and customizable
-* ESM, CommonJS and TypeScript support
-* A powerful CLI and awesome community-made plugins
+- For you. A framework that's tailored to your exact needs.
+- Lightweight. Does a lot while being small.
+- Latest features. Support for discord.js v14 and all of its interactions.
+- Hybrid, customizable and composable commands. Create them just how you like.
+- Start quickly. Plug and play or customize to your liking.
+- Embraces reactive programming. For consistent and reliable backend.
+- Switch and customize how errors are handled, logging, and more.
+- Use it with TypeScript or JavaScript. CommonJS and ESM supported.
+- Active and growing community, always here to help. [Join us](https://sern.dev/discord)
+- Unleash its full potential with a powerful CLI and awesome plugins.
 
 ## 📜 Installation
 
