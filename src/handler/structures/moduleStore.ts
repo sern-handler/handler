@@ -24,4 +24,5 @@ export class ModuleStore {
         [ComponentType.RoleSelect]: new Map<string, Processed<CommandModule>>(),
         [ComponentType.UserSelect]: new Map<string, Processed<CommandModule>>(),
     };
+    readonly PatternCommands = new Map<string, Processed<CommandModule>>();
 }

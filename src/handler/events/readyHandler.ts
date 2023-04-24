@@ -60,7 +60,8 @@ function registerModule<T extends Processed<CommandModule>>(
     manager: ModuleManager,
     mod: T,
 ): Result<void, void> {
-    const name = mod.name;
+    const name = mod.name.toString();
+    console.log(typeof name);
     const insert = (cb: (ms: ModuleStore) => void) => {
         const set = Result.wrap(() => manager.set(cb));
         return set.ok ? ok() : err();
@@ -100,6 +101,8 @@ function registerModule<T extends Processed<CommandModule>>(
             return insert(ms => ms.InteractionHandlers[ComponentType.RoleSelect].set(name, mod));
         case CommandType.Modal:
             return insert(ms => ms.ModalSubmit.set(name, mod));
+        case CommandType.Pattern:
+            return insert(ms => ms.PatternCommands.set(name, mod));
         default:
             return err();
     }

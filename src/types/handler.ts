@@ -14,6 +14,7 @@ export type ParseType<T> = {
 }[keyof T];
 
 export type Args = ParseType<{ text: string[]; slash: SlashOptions }>;
+export type PatternArgs = ParseType<{ pattern: string[] }>;
 
 export type SlashOptions = Omit<CommandInteractionOptionResolver, 'getMessage' | 'getFocused'>;
 

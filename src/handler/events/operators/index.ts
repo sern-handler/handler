@@ -11,7 +11,7 @@ import type { PluginResult, VoidResult } from '../../../types/plugin';
 import { guayin } from '../../plugins';
 import { controller } from '../../sern';
 import { Result } from 'ts-results-es';
-import { ImportPayload, Processed } from '../../../types/handler';
+import { ImportPayload } from '../../../types/handler';
 /**
  * if {src} is true, mapTo V, else ignore
  * @param item
@@ -49,7 +49,7 @@ export const fillDefaults = <T extends AnyModule>({ module, absPath }: ImportPay
     return {
         absPath,
         module: {
-            name: nameOrFilename(module?.name, absPath),
+            name: nameOrFilename(module.name?.toString(), absPath),
             description: module?.description ?? '...',
             ...module,
         },

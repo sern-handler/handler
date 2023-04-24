@@ -16,9 +16,11 @@ function hasPrefix(prefix: string, content: string) {
  * Ignores messages from any person / bot except itself
  * @param prefix
  */
-export function ignoreNonBot(prefix: string) {
+export function ignoreNonBot(prefix: string | RegExp) {
     const messageFromHumanAndHasPrefix = ({ author, content }: Message) =>
-        !author.bot && hasPrefix(prefix, content);
+        typeof prefix === 'string'
+            ? !author.bot && hasPrefix(prefix, content)
+            : !author.bot && prefix.test(content);
     return filter(messageFromHumanAndHasPrefix);
 }
 

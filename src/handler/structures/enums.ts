@@ -54,6 +54,7 @@ export enum CommandType {
     MentionableSelect = 512,
     RoleSelect = 1024,
     UserSelect = 2048,
+    Pattern = 4096
 }
 
 /**

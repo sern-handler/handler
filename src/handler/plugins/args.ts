@@ -17,6 +17,7 @@ import type {
     TextCommand,
     UserSelectCommand,
     ContextMenuMsg,
+    PatternCommand,
     Module,
 } from '../../types/module';
 import type { Args, Payload, Processed, SlashOptions } from '../../types/handler';
@@ -85,6 +86,10 @@ type CommandArgsMatrix = {
         [PluginType.Control]: [/* library coupled */ ModalSubmitInteraction];
         [PluginType.Init]: [InitArgs<Processed<ModalSubmitCommand>>];
     };
+    [CommandType.Pattern]: {
+        [PluginType.Control]: [Context, ['pattern', string[]]];
+        [PluginType.Init]: [InitArgs<Processed<PatternCommand>>]
+    }
 };
 
 type EventArgsMatrix = {

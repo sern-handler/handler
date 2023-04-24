@@ -17,7 +17,7 @@
         "clean-modules": "rimraf node_modules/ && npm install",
         "lint": "eslint src/**/*.ts",
         "format": "eslint src/**/*.ts --fix",
-        "build:dev": "tsup && tsup --dts-only --outDir dist",
+        "dev": "tsup && tsup --dts-only --outDir dist",
         "build:prod": "tsup --minify && tsup --dts-only --outDir dist",
         "publish": "npm run build:prod",
         "pretty": "prettier --write ."
@@ -54,5 +54,8 @@
         "type": "git",
         "url": "git+https://github.com/sern-handler/handler.git"
     },
-    "homepage": "https://sern.dev"
+    "homepage": "https://sern.dev",
+    "resolutions": {
+        "plugtest": "portal:/D:/Projects/plugtest"
+    }
 }
