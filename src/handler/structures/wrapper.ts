@@ -6,6 +6,10 @@ import type { Dependencies } from '../../types/handler';
  * @typedef {object} Wrapper
  */
 interface Wrapper {
+    /**
+      * @deprecated
+      * This will be moved to a new field in 3.0.0
+      */
     readonly defaultPrefix?: string;
     readonly commands: string;
     readonly events?: string;
