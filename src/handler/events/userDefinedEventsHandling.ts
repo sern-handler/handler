@@ -1,23 +1,23 @@
 import { catchError, finalize, map, mergeAll } from 'rxjs';
-import * as Files from '../module-loading/readFile';
-import type { Dependencies, Processed } from '../../types/handler';
+import * as Files from '../../core/module-loading/readFile';
+import type { Processed, WebsocketDependencies } from '../../types/handler';
 import { callInitPlugins } from './observableHandling';
 import type { CommandModule, EventModule } from '../../types/module';
 import type { EventEmitter } from 'events';
-import SernEmitter from '../sernEmitter';
-import type { ErrorHandling, Logging } from '../contracts';
-import { SernError, EventType, type Wrapper } from '../structures';
+import SernEmitter from '../../core/sernEmitter';
+import type { ErrorHandling, Logging } from '../../core/contracts';
+import { SernError, EventType, type Wrapper } from '../../core/structures';
 import { eventDispatcher } from './dispatchers';
-import { handleError } from '../contracts/errorHandling';
-import { errTap, fillDefaults } from './operators';
-import { useContainerRaw } from '../dependencies';
+import { handleError } from '../../core/contracts/errorHandling';
+import { errTap, fillDefaults } from '../../core/operators';
+import { useContainerRaw } from '../../core/dependencies';
 
 export function makeEventsHandler(
     [s, client, err, log]: [SernEmitter, EventEmitter, ErrorHandling, Logging | undefined],
     eventsPath: string,
     containerGetter: Wrapper['containerConfig'],
 ) {
-    const lazy = (k: string) => containerGetter.get(k as keyof Dependencies)[0];
+    const lazy = (k: string) => containerGetter.get(k as keyof WebsocketDependencies)[0];
     const eventStream$ = eventObservable(eventsPath, s);
 
     const eventCreation$ = eventStream$.pipe(

@@ -1,10 +1,3 @@
-import { _const } from '../utilities/functions';
-/**
- * New signature
- * @since 2.0.0
- * @param cb
- */
-export function single<T extends () => unknown>(cb: T): T;
 /**
  * @__PURE__
  * @since 2.0.0.
@@ -13,8 +6,8 @@ export function single<T extends () => unknown>(cb: T): T;
  * For future versions, ensure that single is being passed as a **callback!!**
  * @param cb
  */
-export function single<T>(cb: T) {
-    return () => cb;
+export function single<T>(cb: () => T) {
+    return cb;
 }
 
 /**

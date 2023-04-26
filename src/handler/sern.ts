@@ -1,4 +1,5 @@
 import { Wrapper, CommandType, EventType, PluginType } from '../core/structures';
+import { DispatchType } from '../core/platform';
 import { makeEventsHandler } from './events/userDefinedEventsHandling';
 import { AnyEventPlugin, ControlPlugin, InitPlugin, type Plugin } from '../types/plugin';
 import { makeInteractionCreate } from './events/interactionHandler';
@@ -12,12 +13,12 @@ import type {
     InputCommand,
     InputEvent,
 } from '../types/module';
-import type { Dependencies, DependencyConfiguration } from '../types/handler';
+import type { AnyDependencies, Dependencies, DependencyConfiguration } from '../types/handler';
 import { composeRoot, makeFetcher, useContainer } from '../core/dependencies/provider';
 import type { Logging } from '../core/contracts';
 import { err, ok, partition } from '../core/utilities/functions';
 import type { Awaitable, ClientEvents } from 'discord.js';
-
+import { AnyWrapper, isServerless } from '../core/structures/wrapper';
 /**
  * @since 1.0.0
  * @param wrapper Options to pass into sern.
@@ -34,20 +35,25 @@ import type { Awaitable, ClientEvents } from 'discord.js';
  * })
  * ```
  */
-export function init(wrapper: Wrapper) {
+export function init(wrapper: AnyWrapper) {
     const logger = wrapper.containerConfig.get('@sern/logger')[0] as Logging | undefined;
     const requiredDependenciesAnd = makeFetcher(wrapper);
     const startTime = performance.now();
-    const { events } = wrapper;
-    if (events !== undefined) {
-        makeEventsHandler(requiredDependenciesAnd([]), events, wrapper.containerConfig);
+    if(isServerless(wrapper)) {
+                 
+
+    } else {
+        const dependencies = requiredDependenciesAnd(['@sern/modules']);
+        const { events } = wrapper;
+        if (events !== undefined) {
+            makeEventsHandler(requiredDependenciesAnd([]), events, wrapper.containerConfig);
+        }
+        makeReadyEvent(dependencies, wrapper.commands);
+        makeMessageCreate(dependencies, wrapper?.defaultPrefix ?? wrapper.platform.defaultPrefix);
+        makeInteractionCreate(dependencies);
+        const endTime = performance.now();
+        logger?.info({ message: `sern : ${(endTime - startTime).toFixed(2)} ms` });
     }
-    const dependencies = requiredDependenciesAnd(['@sern/modules']);
-    makeReadyEvent(dependencies, wrapper.commands);
-    makeMessageCreate(dependencies, wrapper.defaultPrefix);
-    makeInteractionCreate(dependencies);
-    const endTime = performance.now();
-    logger?.info({ message: `sern : ${(endTime - startTime).toFixed(2)} ms` });
 }
 
 /**
@@ -60,8 +66,7 @@ export const controller = {
 };
 
 /**
- * @since 1.0.0
- * The wrapper function to define command modules for sern
+ * @since 1.0.0 The wrapper function to define command modules for sern
  * @param mod
  */
 export function commandModule(mod: InputCommand): CommandModule {
@@ -109,7 +114,7 @@ export function discordEvent<T extends keyof ClientEvents>(mod: {
  * @since 2.0.0
  * @param conf a configuration for creating your project dependencies
  */
-export function makeDependencies<T extends Dependencies>(conf: DependencyConfiguration<T>) {
+export function makeDependencies<const T extends AnyDependencies>(conf: DependencyConfiguration<T>) {
     //Until there are more optional dependencies, just check if the logger exists
     composeRoot(conf);
     return useContainer<T>();

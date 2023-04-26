@@ -1,15 +1,15 @@
 import { fromEvent, map, pipe, switchMap, take } from 'rxjs';
-import * as Files from '../module-loading/readFile';
+import * as Files from '../../core/module-loading/readFile';
 import { callInitPlugins } from './observableHandling';
-import { CommandType, type ModuleStore, SernError } from '../structures';
+import { CommandType, type ModuleStore, SernError } from '../../core/structures';
 import { Result } from 'ts-results-es';
 import { ApplicationCommandType, ComponentType } from 'discord.js';
 import type { CommandModule } from '../../types/module';
 import type { Processed } from '../../types/handler';
-import type { ErrorHandling, Logging, ModuleManager } from '../contracts';
-import { err, ok } from '../utilities/functions';
-import { errTap, fillDefaults } from './operators';
-import SernEmitter from '../sernEmitter';
+import type { ErrorHandling, Logging, ModuleManager } from '../../core/contracts';
+import { err, ok } from '../../core/utilities/functions';
+import { errTap, fillDefaults } from '../../core/operators';
+import SernEmitter from '../../core/sernEmitter';
 import type { EventEmitter } from 'node:events';
 
 function buildCommandModules(commandDir: string, sernEmitter: SernEmitter) {

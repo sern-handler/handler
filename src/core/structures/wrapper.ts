@@ -1,22 +1,39 @@
-import type { Dependencies } from '../../types/handler';
-import { PlatformStrategy } from '../platform/strategy';
+import type { ServerlessDependencies, WebsocketDependencies } from '../../types/handler';
+import { DispatchType, ServerlessStrategy, WebsocketStrategy } from '../platform/strategy';
 
-/**
- * @since 1.0.0
- * An object to be passed into Sern#init() function.
- * @typedef {object} Wrapper
- */
-interface Wrapper {
-    readonly platform: PlatformStrategy;
+
+export interface WebsocketWrapper {
+    readonly platform: WebsocketStrategy;
+    commands: string;
     /**
-     * @deprecated
-     * Add defaultPrefix to platform field instead 
-     */
-    readonly defaultPrefix?: string;
-    readonly commands: string;
-    readonly events?: string;
-    readonly containerConfig: {
-        get: (...keys: (keyof Dependencies)[]) => unknown[];
-    };
+      * @deprecated
+      * Please specify this in platform specification
+      */
+    defaultPrefix?: string;
+    events?: string;
+    containerConfig: {
+        get: (...keys: (keyof WebsocketDependencies)[]) => unknown[];
+    }
 }
-export default Wrapper;
+/**
+  * @deprecated
+  * Type alias for WebsocketWrapper
+  */
+export type Wrapper = WebsocketWrapper
+
+export interface ServerlessWrapper {
+    readonly platform: ServerlessStrategy
+    containerConfig: {
+        get: (...keys: (keyof ServerlessDependencies)[]) => unknown[];
+    }
+
+}
+
+export type AnyWrapper = 
+    | WebsocketWrapper
+    | ServerlessWrapper
+
+
+export function isServerless(wrapper: AnyWrapper): wrapper is ServerlessWrapper {
+    return wrapper.platform.type === DispatchType.Serverless;
+}

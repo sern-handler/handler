@@ -1,11 +1,12 @@
 import type { Container } from 'iti';
-import type { Dependencies, DependencyConfiguration, MapDeps } from '../../types/handler';
+import type { AnyDependencies, Dependencies, DependencyConfiguration, MapDeps } from '../../types/handler';
 import SernEmitter from '../sernEmitter';
 import { DefaultErrorHandling, DefaultLogging, DefaultModuleManager } from '../contracts';
 import { Result } from 'ts-results-es';
 import { BehaviorSubject } from 'rxjs';
 import { createContainer } from 'iti';
 import { type Wrapper, ModuleStore, SernError } from '../structures';
+import { AnyWrapper } from '../structures/wrapper';
 
 export const containerSubject = new BehaviorSubject(defaultContainer());
 
@@ -15,7 +16,7 @@ export const containerSubject = new BehaviorSubject(defaultContainer());
  * Finally, update the containerSubject with the new container state
  * @param conf
  */
-export function composeRoot<T extends Dependencies>(conf: DependencyConfiguration<T>) {
+export function composeRoot<T extends AnyDependencies>(conf: DependencyConfiguration<T>) {
     //Get the current container. This should have no client or possible logger yet.
     const currentContainer = containerSubject.getValue();
     const excludeLogger = conf.exclude?.has('@sern/logger');
@@ -37,7 +38,7 @@ export function composeRoot<T extends Dependencies>(conf: DependencyConfiguratio
     containerSubject.next(container as any);
 }
 
-export function useContainer<T extends Dependencies>() {
+export function useContainer<const T extends AnyDependencies>() {
     const container = containerSubject.getValue() as Container<T, {}>;
     return <V extends (keyof T)[]>(...keys: [...V]) =>
         keys.map(key => Result.wrap(() => container.get(key)).unwrapOr(undefined)) as MapDeps<T, V>;
@@ -48,7 +49,7 @@ export function useContainer<T extends Dependencies>() {
  * Please be careful as this only gets the client's current state.
  * Exposes some methods from iti
  */
-export function useContainerRaw<T extends Dependencies>() {
+export function useContainerRaw<T extends AnyDependencies>() {
     return containerSubject.getValue() as Container<T, {}>;
 }
 
@@ -66,7 +67,7 @@ function defaultContainer() {
             };
         })
         .add({ '@sern/emitter': () => new SernEmitter() }) as Container<
-        Omit<Dependencies, '@sern/client' | '@sern/logger'>,
+        Omit<AnyDependencies, '@sern/client' | '@sern/logger'>,
         {}
     >;
 }
@@ -74,16 +75,16 @@ function defaultContainer() {
  * A way for sern to grab only the necessary dependencies. 
  * Returns a function which allows for the user to call for more dependencies.
  */
-export function makeFetcher(wrapper: Wrapper) {
+export function makeFetcher<const Dep extends AnyDependencies>(wrapper: AnyWrapper) {
     const requiredDependencyKeys = [
         '@sern/emitter',
         '@sern/client',
         '@sern/errors',
         '@sern/logger',
     ] as ['@sern/emitter', '@sern/client', '@sern/errors', '@sern/logger'];
-    return <Keys extends (keyof Dependencies)[]>(otherKeys: [...Keys]) =>
+    return <const Keys extends (keyof Dep)[]>(otherKeys: [...Keys]) =>
         wrapper.containerConfig.get(...requiredDependencyKeys, ...otherKeys) as MapDeps<
-            Dependencies,
+            AnyDependencies,
             [...typeof requiredDependencyKeys, ...Keys]
         >;
 }

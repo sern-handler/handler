@@ -39,21 +39,35 @@ export type LogPayload<T = unknown> = { message: T };
 export type Singleton<T> = () => T;
 export type Transient<T> = () => () => T;
 
-export interface Dependencies {
-    '@sern/client': Singleton<EventEmitter>;
+export interface CoreDependencies {
     '@sern/logger'?: Singleton<Logging>;
     '@sern/emitter': Singleton<SernEmitter>;
     '@sern/store': Singleton<ModuleStore>;
     '@sern/modules': Singleton<ModuleManager>;
     '@sern/errors': Singleton<ErrorHandling>;
 }
+/**
+  * To support older versions. Type alias for WebsocketDependencies
+  * @deprecated
+  */
+export type Dependencies = WebsocketDependencies
+export interface ServerlessDependencies extends CoreDependencies {
+    '@sern/client': never
+}
+
+export interface WebsocketDependencies extends CoreDependencies {
+    '@sern/client': Singleton<EventEmitter>;
+}
+export type AnyDependencies =
+    | ServerlessDependencies
+    | WebsocketDependencies;
 
 export type ReplyOptions =
     | string
     | Omit<InteractionReplyOptions, 'fetchReply'>
     | MessageReplyOptions;
 //prettier-ignore
-export type MapDeps<Deps extends Dependencies, T extends readonly unknown[]> = T extends [
+export type MapDeps<Deps extends AnyDependencies, T extends readonly unknown[]> = T extends [
     infer First extends keyof Deps,
     ...infer Rest extends readonly unknown[],
 ]
@@ -66,9 +80,9 @@ export type MapDeps<Deps extends Dependencies, T extends readonly unknown[]> = T
 export type OptionalDependencies = '@sern/logger';
 export type Processed<T> = T & { name: string; description: string };
 export type Deprecated<Message extends string> = [never, Message];
-export interface DependencyConfiguration<T extends Dependencies> {
+export interface DependencyConfiguration<T extends AnyDependencies> {
     exclude?: Set<OptionalDependencies>;
-    build: (root: Container<Omit<Dependencies, '@sern/client'>, {}>) => Container<T, {}>;
+    build: (root: Container<Omit<AnyDependencies, '@sern/client'>, {}>) => Container<T, {}>;
 }
 
 export type ImportPayload<T> = { module: T; absPath: string };
