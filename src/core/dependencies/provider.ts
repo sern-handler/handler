@@ -1,12 +1,12 @@
 import type { Container } from 'iti';
-import type { AnyDependencies, Dependencies, DependencyConfiguration, MapDeps } from '../../types/handler';
+import type { AnyDependencies, DependencyConfiguration, MapDeps, ServerlessDependencies, WebsocketDependencies } from '../../types/handler';
 import SernEmitter from '../sernEmitter';
 import { DefaultErrorHandling, DefaultLogging, DefaultModuleManager } from '../contracts';
 import { Result } from 'ts-results-es';
 import { BehaviorSubject } from 'rxjs';
 import { createContainer } from 'iti';
-import { type Wrapper, ModuleStore, SernError } from '../structures';
-import { AnyWrapper } from '../structures/wrapper';
+import { ModuleStore, SernError } from '../structures';
+import { AnyWrapper, ServerlessWrapper, WebsocketWrapper } from '../structures/wrapper';
 
 export const containerSubject = new BehaviorSubject(defaultContainer());
 
@@ -16,7 +16,9 @@ export const containerSubject = new BehaviorSubject(defaultContainer());
  * Finally, update the containerSubject with the new container state
  * @param conf
  */
-export function composeRoot<T extends AnyDependencies>(conf: DependencyConfiguration<T>) {
+export function composeRoot<T extends AnyDependencies>(
+    conf: DependencyConfiguration<T>
+) {
     //Get the current container. This should have no client or possible logger yet.
     const currentContainer = containerSubject.getValue();
     const excludeLogger = conf.exclude?.has('@sern/logger');
@@ -34,7 +36,6 @@ export function composeRoot<T extends AnyDependencies>(conf: DependencyConfigura
     if (!excludeLogger) {
         container.get('@sern/logger')?.info({ message: 'All dependencies loaded successfully.' });
     }
-    //I'm sorry little one
     containerSubject.next(container as any);
 }
 
@@ -71,20 +72,33 @@ function defaultContainer() {
         {}
     >;
 }
+
+const requiredDependencyKeys = [
+    '@sern/emitter',
+    '@sern/errors',
+    '@sern/logger',
+] as const;
+
+
+/**
+  * @overload
+ */
+export function makeFetcher<Dep extends WebsocketDependencies>({ containerConfig }: WebsocketWrapper)
+    : <const Keys extends (keyof Dep)[]>(ks: [...Keys]) => MapDeps<Dep, [...typeof requiredDependencyKeys, ...Keys]>;
+/**
+  * @overload
+ */
+export function makeFetcher<Dep extends ServerlessDependencies>(wrapper: ServerlessWrapper)
+    : <const Keys extends (keyof Dep)[]>(ks: [...Keys]) => MapDeps<Dep, [...typeof requiredDependencyKeys, ...Keys]>;
 /**
  * A way for sern to grab only the necessary dependencies. 
  * Returns a function which allows for the user to call for more dependencies.
  */
-export function makeFetcher<const Dep extends AnyDependencies>(wrapper: AnyWrapper) {
-    const requiredDependencyKeys = [
-        '@sern/emitter',
-        '@sern/client',
-        '@sern/errors',
-        '@sern/logger',
-    ] as ['@sern/emitter', '@sern/client', '@sern/errors', '@sern/logger'];
-    return <const Keys extends (keyof Dep)[]>(otherKeys: [...Keys]) =>
-        wrapper.containerConfig.get(...requiredDependencyKeys, ...otherKeys) as MapDeps<
-            AnyDependencies,
+export function makeFetcher<Dep extends AnyDependencies>({ containerConfig }: AnyWrapper) {
+        return <const Keys extends (keyof Dep)[]>(otherKeys: [...Keys]) =>
+        containerConfig.get(...requiredDependencyKeys, ...otherKeys as (keyof AnyDependencies)[]) as MapDeps<
+            Dep,
             [...typeof requiredDependencyKeys, ...Keys]
         >;
 }
+
