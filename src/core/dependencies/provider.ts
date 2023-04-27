@@ -83,18 +83,18 @@ const requiredDependencyKeys = [
 /**
   * @overload
  */
-export function makeFetcher<Dep extends WebsocketDependencies>({ containerConfig }: WebsocketWrapper)
+export function makeFetcher<Dep extends WebsocketDependencies>(containerConfig : WebsocketWrapper['containerConfig'])
     : <const Keys extends (keyof Dep)[]>(ks: [...Keys]) => MapDeps<Dep, [...typeof requiredDependencyKeys, ...Keys]>;
 /**
   * @overload
  */
-export function makeFetcher<Dep extends ServerlessDependencies>(wrapper: ServerlessWrapper)
+export function makeFetcher<Dep extends ServerlessDependencies>(containerConfig: ServerlessWrapper['containerConfig'])
     : <const Keys extends (keyof Dep)[]>(ks: [...Keys]) => MapDeps<Dep, [...typeof requiredDependencyKeys, ...Keys]>;
 /**
  * A way for sern to grab only the necessary dependencies. 
  * Returns a function which allows for the user to call for more dependencies.
  */
-export function makeFetcher<Dep extends AnyDependencies>({ containerConfig }: AnyWrapper) {
+export function makeFetcher<Dep extends AnyDependencies>(containerConfig : AnyWrapper['containerConfig']) {
         return <const Keys extends (keyof Dep)[]>(otherKeys: [...Keys]) =>
         containerConfig.get(...requiredDependencyKeys, ...otherKeys as (keyof AnyDependencies)[]) as MapDeps<
             Dep,
