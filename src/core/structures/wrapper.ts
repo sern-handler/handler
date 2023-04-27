@@ -1,5 +1,5 @@
 import type { ServerlessDependencies, WebsocketDependencies } from '../../types/handler';
-import { DispatchType, ServerlessStrategy, WebsocketStrategy } from '../platform/strategy';
+import { DispatchType, ServerlessStrategy, WebsocketStrategy } from '../platform';
 
 
 export interface WebsocketWrapper {
@@ -19,7 +19,7 @@ export interface WebsocketWrapper {
   * @deprecated
   * Type alias for WebsocketWrapper
   */
-export type Wrapper = WebsocketWrapper
+export type Wrapper = WebsocketWrapper | ServerlessWrapper
 
 export interface ServerlessWrapper {
     readonly platform: ServerlessStrategy

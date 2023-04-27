@@ -1,18 +1,31 @@
-import { Result as Either } from 'ts-results-es';
+import { Result as Either, Ok, Err } from 'ts-results-es';
 
-
-export interface Context<Left, Right> {
-    get message(): Left; 
-    get interaction(): Right;
+/**
+  *
+  * @since 3.0.0
+  *
+  */
+export interface CoreContext<M, I> {
+    get message(): M; 
+    get interaction(): I;
 }
 
-function safeUnwrap<T>(res: Either<T, T>) {
+export function safeUnwrap<T>(res: Either<T, T>) {
     return res.val;
 }
 
-export function wrap<Left, Right>(
-    val: Left|Right,
-    fa: (val: Left|Right) => Either<Left, Right>
-) {
-    return fa(val);
+export function wrap<A extends unknown, B extends unknown>(
+    val: B|A,
+): Either<A,B> {
+   if(typeof val !== 'object' || Array.isArray(val) || val == null) {
+       throw Error("Could not form correct Context." + "Recieved " + val) 
+   }
+   const msgInteractionObject = (val as unknown as { interaction: unknown }).interaction;
+   //falsy comparison: ==. Checks if its null OR undefined
+   if(msgInteractionObject == null) {
+    return Ok(val as A)
+   }
+   return Err(val as B);
 }
+
+
