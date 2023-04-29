@@ -11,6 +11,28 @@ import { AnyWrapper, ServerlessWrapper, WebsocketWrapper } from '../structures/w
 export const containerSubject = new BehaviorSubject(defaultContainer());
 
 /**
+ * @__PURE__
+ * @since 2.0.0.
+ * Please note that on intellij, the deprecation is for all signatures, which is unintended behavior (and
+ * very annoying).
+ * For future versions, ensure that single is being passed as a **callback!!**
+ * @param cb
+ */
+export function single<T>(cb: () => T) {
+    return cb;
+}
+
+/**
+ * @__PURE__
+ * @since 2.0.0
+ * Following iti's singleton and transient implementation,
+ * use transient if you want a new dependency every time your container getter is called
+ * @param cb
+ */
+export function transient<T>(cb: (() => () => T) ) {
+    return cb;
+}
+/**
  * Given the user's conf, check for any excluded dependency keys.
  * Then, call conf.build to get the rest of the users' dependencies.
  * Finally, update the containerSubject with the new container state
@@ -19,7 +41,7 @@ export const containerSubject = new BehaviorSubject(defaultContainer());
 export function composeRoot<T extends AnyDependencies>(
     conf: DependencyConfiguration<T>
 ) {
-    //Get the current container. This should have no client or possible logger yet.
+    //This should have no client or logger yet.
     const currentContainer = containerSubject.getValue();
     const excludeLogger = conf.exclude?.has('@sern/logger');
     if (!excludeLogger) {
