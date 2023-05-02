@@ -1,6 +1,15 @@
 import type { ServerlessDependencies, WebsocketDependencies } from '../../types/handler';
 import { DispatchType, ServerlessStrategy, WebsocketStrategy } from '../platform';
 
+export interface DefaultWrapper {
+    commands: string;
+    defaultPrefix?: string;
+    events?: string;
+    containerConfig: {
+        get: (...keys: (keyof WebsocketDependencies)[]) => unknown[];
+    }
+}
+
 
 export interface WebsocketWrapper {
     readonly platform: WebsocketStrategy;
