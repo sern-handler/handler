@@ -4,12 +4,13 @@
  * and independent of each other
  */
 
-import { concatMap, defaultIfEmpty, EMPTY, every, map, of, OperatorFunction, pipe } from 'rxjs';
+import { concatMap, defaultIfEmpty, EMPTY, every, fromEvent, map, Observable, of, OperatorFunction, pipe, share } from 'rxjs';
 import type { AnyModule } from '../types/module';
 import { nameOrFilename } from './utilities/functions';
 import type { PluginResult, VoidResult } from '../types/plugin';
 import { Result } from 'ts-results-es';
 import { ImportPayload } from '../types/handler';
+import { EventEmitter } from 'node:events';
 /**
  * if {src} is true, mapTo V, else ignore
  * @param item
@@ -73,3 +74,10 @@ export const everyPluginOk: OperatorFunction<VoidResult, boolean> = pipe(
     every(result => result.ok),
     defaultIfEmpty(true),
 );
+
+export const sharedObservable = <T>(e: EventEmitter, eventName: string) => {
+    return (fromEvent(e, eventName) as Observable<T>).pipe(share())
+};
+
+
+
