@@ -50,6 +50,14 @@
         "tsup": "^6.7.0",
         "typescript": "5.0.2"
     },
+    "prettier": {
+        "semi": true,
+        "trailingComma": "all",
+        "singleQuote": true,
+        "printWidth": 100,
+        "tabWidth": 4,
+        "arrowParens": "avoid"
+    },
     "repository": {
         "type": "git",
         "url": "git+https://github.com/sern-handler/handler.git"
