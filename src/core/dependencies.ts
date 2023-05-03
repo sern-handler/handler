@@ -1,12 +1,12 @@
 import type { Container } from 'iti';
-import type { AnyDependencies, DependencyConfiguration, MapDeps, ServerlessDependencies, WebsocketDependencies } from '../../types/handler';
-import SernEmitter from '../sernEmitter';
-import { DefaultErrorHandling, DefaultLogging, DefaultModuleManager } from '../contracts';
+import type { AnyDependencies, DependencyConfiguration, MapDeps, ServerlessDependencies, WebsocketDependencies } from '../types/handler';
+import SernEmitter from './sernEmitter';
+import { DefaultErrorHandling, DefaultLogging, DefaultModuleManager } from './contracts';
 import { Result } from 'ts-results-es';
 import { BehaviorSubject } from 'rxjs';
 import { createContainer } from 'iti';
-import { ModuleStore, SernError } from '../structures';
-import { AnyWrapper, ServerlessWrapper, WebsocketWrapper } from '../structures/wrapper';
+import { ModuleStore } from './structures';
+import { AnyWrapper, ServerlessWrapper, WebsocketWrapper } from './structures/wrapper';
 
 export const containerSubject = new BehaviorSubject(defaultContainer());
 
@@ -53,7 +53,7 @@ export function composeRoot<T extends AnyDependencies>(
     const container = conf.build(currentContainer);
     //Check if the built container contains @sern/client or throw
     // a runtime exception
-    Result.wrap(() => container.get('@sern/client')).expect(SernError.MissingRequired);
+    //Result.wrap(() => container.get('@sern/client')).expect(SernError.MissingRequired);
 
     if (!excludeLogger) {
         container.get('@sern/logger')?.info({ message: 'All dependencies loaded successfully.' });

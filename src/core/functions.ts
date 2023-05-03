@@ -1,6 +1,6 @@
 import { Err, Ok } from 'ts-results-es';
 import { ApplicationCommandOptionType, AutocompleteInteraction } from 'discord.js';
-import type { SernAutocompleteData, SernOptionsData } from '../../types/module';
+import type { SernAutocompleteData, SernOptionsData } from '../types/module';
 
 
 //function wrappers for empty ok / err
