@@ -42,7 +42,7 @@
         "@types/node": "^18.15.11",
         "@typescript-eslint/eslint-plugin": "5.58.0",
         "@typescript-eslint/parser": "5.58.0",
-        "discord.js": "^14.9.0",
+        "discord.js": "14.8.0",
         "esbuild": "^0.15.2",
         "esbuild-ifdef": "^0.2.0",
         "eslint": "8.38.0",
@@ -57,6 +57,19 @@
         "printWidth": 100,
         "tabWidth": 4,
         "arrowParens": "avoid"
+    },
+    "eslintConfig": {
+        "parser": "@typescript-eslint/parser",
+        "extends": ["plugin:@typescript-eslint/recommended"],
+        "parserOptions": { "ecmaVersion": "latest", "sourceType": "script" },
+        "rules": {
+            "@typescript-eslint/no-non-null-assertion": "off",
+            "quotes": [2, "single", { "avoidEscape": true, "allowTemplateLiterals": true }],
+            "semi": ["error", "always"],
+            "@typescript-eslint/no-empty-interface": 0,
+            "@typescript-eslint/ban-types": 0,
+            "@typescript-eslint/no-explicit-any": "off"
+        }
     },
     "repository": {
         "type": "git",
