@@ -1,21 +1,22 @@
 import { catchError, finalize, map, mergeAll } from 'rxjs';
-import * as Files from '../../core/module-loading/readFile';
+import * as Files from '../../core/module-loading';
 import type { Processed, WebsocketDependencies } from '../../types/handler';
 import { callInitPlugins } from './observableHandling';
 import type { CommandModule, EventModule } from '../../types/module';
 import type { EventEmitter } from 'events';
 import SernEmitter from '../../core/sernEmitter';
 import type { ErrorHandling, Logging } from '../../core/contracts';
-import { SernError, EventType, type Wrapper } from '../../core/structures';
+import { SernError, EventType } from '../../core/structures';
 import { eventDispatcher } from './dispatchers';
 import { handleError } from '../../core/contracts/errorHandling';
 import { errTap, fillDefaults } from '../../core/operators';
 import { useContainerRaw } from '../../core/dependencies';
+import { AnyWrapper } from '../../core/structures/wrapper';
 
 export function makeEventsHandler(
-    [s, client, err, log]: [SernEmitter, EventEmitter, ErrorHandling, Logging | undefined],
+    [s, err, log, client]: [SernEmitter, ErrorHandling, Logging | undefined, EventEmitter],
     eventsPath: string,
-    containerGetter: Wrapper['containerConfig'],
+    containerGetter: AnyWrapper['containerConfig'],
 ) {
     const lazy = (k: string) => containerGetter.get(k as keyof WebsocketDependencies)[0];
     const eventStream$ = eventObservable(eventsPath, s);

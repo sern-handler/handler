@@ -1,5 +1,5 @@
-import { fromEvent, map, pipe, switchMap, take } from 'rxjs';
-import * as Files from '../../core/module-loading/readFile';
+import { Subscription, fromEvent, map, of, pipe, switchMap, take } from 'rxjs';
+import * as Files from '../../core/module-loading';
 import { callInitPlugins } from './observableHandling';
 import { CommandType, type ModuleStore, SernError } from '../../core/structures';
 import { Result } from 'ts-results-es';
@@ -7,10 +7,11 @@ import { ApplicationCommandType, ComponentType } from 'discord.js';
 import type { CommandModule } from '../../types/module';
 import type { Processed } from '../../types/handler';
 import type { ErrorHandling, Logging, ModuleManager } from '../../core/contracts';
-import { err, ok } from '../../core/utilities/functions';
+import { err, ok } from '../../core/functions';
 import { errTap, fillDefaults } from '../../core/operators';
 import SernEmitter from '../../core/sernEmitter';
 import type { EventEmitter } from 'node:events';
+import { DispatchType, PlatformStrategy, ServerlessStrategy, WebsocketStrategy } from '../../core';
 
 function buildCommandModules(commandDir: string, sernEmitter: SernEmitter) {
     return pipe(
@@ -21,18 +22,49 @@ function buildCommandModules(commandDir: string, sernEmitter: SernEmitter) {
         map(fillDefaults),
     );
 }
+
+/**
+  * @overload
+  */
 export function makeReadyEvent(
-    [sEmitter, client, errorHandler, , moduleManager]: [
+     dependencies: [
         SernEmitter,
-        EventEmitter,
         ErrorHandling,
         Logging | undefined,
         ModuleManager,
     ],
     commandDir: string,
+    platform: ServerlessStrategy
+
+): Subscription
+export function makeReadyEvent(
+     dependencies: [
+        SernEmitter,
+        ErrorHandling,
+        Logging | undefined,
+        ModuleManager,
+        EventEmitter
+    ],
+    commandDir: string,
+    platform: WebsocketStrategy
+
+): Subscription
+
+export function makeReadyEvent(
+    [sEmitter, errorHandler, , moduleManager, client]: [
+        SernEmitter,
+        ErrorHandling,
+        Logging | undefined,
+        ModuleManager,
+        EventEmitter? 
+    ],
+    commandDir: string,
+    platform: PlatformStrategy
 ) {
-    const readyOnce$ = fromEvent(client, 'ready').pipe(take(1));
-    return readyOnce$
+    const ready$ = platform.type === DispatchType.Serverless 
+        ? of(null)
+        : fromEvent(client!, platform.eventNames[2]).pipe(take(1));
+    return ready$
         .pipe(
             buildCommandModules(commandDir, sEmitter),
             callInitPlugins({

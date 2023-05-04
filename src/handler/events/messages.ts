@@ -1,15 +1,17 @@
 import { catchError, concatMap, EMPTY, finalize, fromEvent, map, Observable, of, pipe } from 'rxjs';
-import { type ModuleStore, SernError } from '../structures';
+import { type ModuleStore, SernError } from '../../core/structures';
 import type { Message } from 'discord.js';
 import { executeModule, ignoreNonBot, makeModuleExecutor } from './observableHandling';
-import type { CommandModule, TextCommand } from '../../types/module';
-import { ErrorHandling, handleError } from '../contracts/errorHandling';
+import type { CommandModule } from '../../types/module';
+import { ErrorHandling, handleError } from '../../core/contracts/errorHandling';
 import { contextArgs, dispatchCommand } from './dispatchers';
-import SernEmitter from '../sernEmitter';
+import SernEmitter from '../../core/sernEmitter';
 import type { Processed } from '../../types/handler';
-import { useContainerRaw } from '../dependencies';
-import type { Logging, ModuleManager } from '../contracts';
+import { useContainerRaw } from '../../core/dependencies';
+import type { Logging, ModuleManager } from '../../core/contracts';
 import type { EventEmitter } from 'node:events';
+import { WebsocketStrategy } from '../../core';
+import { createModuleGetter } from '../../core/contracts/moduleManager';
 
 /**
  * Removes the first character(s) _[depending on prefix length]_ of the message
@@ -52,27 +54,25 @@ const createMessageProcessor = (
             };
             return of(payload);
         }),
-        map(({ args, module }) => dispatchCommand(module as Processed<TextCommand>, args)),
+        map(({ args, module }) => dispatchCommand(module as Processed<CommandModule>, args)),
     );
 
 export function makeMessageCreate(
-    [s, client, err, log, modules]: [
+    [s, err, log, modules, client]: [
         SernEmitter,
-        EventEmitter,
         ErrorHandling,
         Logging | undefined,
         ModuleManager,
+        EventEmitter,
     ],
-    defaultPrefix?: string,
+    platform: WebsocketStrategy
 ) {
-    if (!defaultPrefix) {
-        return EMPTY.subscribe();
+    if(!platform.defaultPrefix) {
+        return EMPTY.subscribe()
     }
-    const get = (cb: (ms: ModuleStore) => Processed<CommandModule> | undefined) => {
-        return modules.get(cb);
-    };
-    const messageStream$ = fromEvent(client, 'messageCreate') as Observable<Message>;
-    const messageProcessor = createMessageProcessor(defaultPrefix, get);
+    const get = createModuleGetter(modules); 
+    const messageStream$ = fromEvent(client, platform.eventNames[1]) as Observable<Message>;
+    const messageProcessor = createMessageProcessor(platform.defaultPrefix, get);
     return messageStream$
         .pipe(
             messageProcessor,

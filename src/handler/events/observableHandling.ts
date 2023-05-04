@@ -77,9 +77,7 @@ export function createResultResolver<
         const task$ = config.createStream(args);
         return task$.pipe(
             tap(result => {
-                if (result.err) {
-                    config.onStop?.(args.module);
-                }
+               result.err && config.onStop?.(args.module);
             }),
             everyPluginOk,
             filterMapTo(() => config.onNext(args)),

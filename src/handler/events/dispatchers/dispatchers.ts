@@ -1,12 +1,12 @@
 import type { Processed } from '../../../types/handler';
 import type { AutocompleteInteraction } from 'discord.js';
 import { SernError } from '../../../core/structures';
-import treeSearch from '../../../core/utilities/treeSearch';
-import type { BothCommand, CommandModule, Module, SlashCommand } from '../../../types/module';
+import { treeSearch } from '../../../core/functions';
+import type { CommandModule, Module } from '../../../types/module';
 import { EventEmitter } from 'events';
 import * as assert from 'assert';
 import { concatMap, from, fromEvent, map, OperatorFunction, pipe } from 'rxjs';
-import { arrayifySource, callPlugin } from '../operators';
+import { arrayifySource, callPlugin } from '../../../core/operators';
 import { createResultResolver } from '../observableHandling';
 
 export function dispatchCommand(module: Processed<CommandModule>, createArgs: () => unknown[]) {
@@ -51,7 +51,7 @@ export function eventDispatcher(module: Processed<Module>, source: unknown) {
 }
 
 export function dispatchAutocomplete(
-    module: Processed<BothCommand | SlashCommand>,
+    module: Processed<Module>,
     interaction: AutocompleteInteraction,
 ) {
     const option = treeSearch(interaction, module.options);

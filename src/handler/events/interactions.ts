@@ -1,4 +1,4 @@
-import { Interaction } from 'discord.js';
+import { ChatInputCommandInteraction, Interaction, InteractionType } from 'discord.js';
 import {
     catchError,
     concatMap,
@@ -12,25 +12,63 @@ import {
     OperatorFunction,
     pipe,
 } from 'rxjs';
-import { CommandType, type ModuleStore, SernError } from '../../core/structures';
+import { CommandType,SernError } from '../../core/structures';
 import { contextArgs, dispatchAutocomplete, dispatchCommand, interactionArg } from './dispatchers';
 import { executeModule, makeModuleExecutor } from './observableHandling';
 import type { CommandModule } from '../../types/module';
 import { ErrorHandling, handleError } from '../../core/contracts/errorHandling';
-import { SernEmitter } from '../../core';
+import { SernEmitter, WebsocketStrategy } from '../../core';
 import type { Processed } from '../../types/handler';
 import { useContainerRaw } from '../../core/dependencies';
 import type { Logging, ModuleManager } from '../../core/contracts';
 import type { EventEmitter } from 'node:events';
+import { ModuleGetter, createModuleGetter } from '../../core/contracts/moduleManager';
 
+
+function handleMessageComponents(i: Observable<Interaction>, mg: ModuleGetter) {
+    return i.pipe(
+        filter(e => e.isMessageComponent()),
+        map(event => ({ module: mg('' as any), event }) )
+    )
+}
+
+function handleAutocomplete(i: Observable<Interaction>, mg: ModuleGetter) {
+    return i.pipe(
+        filter(e => e.isAutocomplete()),
+        map(event => ({ module: mg('' as any), event }) )
+    )
+}
+
+function handleApplicationCommands(i: Observable<Interaction>, mg: ModuleGetter) {
+    return i.pipe(
+        filter(e => e.isCommand()),
+        map(event => ({ module: mg('' as any), event }) )
+    )
+}
+
+function handleModal(i: Observable<Interaction>, mg: ModuleGetter) {
+    return i.pipe(
+        filter(e => e.isModalSubmit()),
+        map(event => ({ module: mg('' as any), event }) )
+    )
+}
 function makeInteractionProcessor(
     modules: ModuleManager,
 ): OperatorFunction<Interaction, { module: Processed<CommandModule>; event: Interaction }> {
-    const get = (cb: (ms: ModuleStore) => Processed<CommandModule> | undefined) => {
-        return modules.get(cb);
-    };
+    const get = createModuleGetter(modules);
     return pipe(
         concatMap(event => {
+            switch(event.type) {
+                case InteractionType.MessageComponent:
+                case InteractionType.ModalSubmit: {
+                   const id = `${event.customId}__M${event.componentType}` 
+                } break;
+                case InteractionType.ApplicationCommand:
+                case InteractionType.ApplicationCommandAutocomplete: {
+
+                }
+
+            }
             if (event.isMessageComponent()) {
                 const customId = event.customId;
                 const module = get(ms => {
@@ -58,15 +96,17 @@ function makeInteractionProcessor(
     ) as OperatorFunction<Interaction, { module: Processed<CommandModule>; event: Interaction }>;
 }
 
-export function makeInteractionCreate([s, client, err, log, modules]: [
+export function makeInteractionCreate([s, err, log, modules, client]: [
     SernEmitter,
-    EventEmitter,
     ErrorHandling,
     Logging | undefined,
     ModuleManager,
-]) {
+    EventEmitter
+],
+    platform: WebsocketStrategy 
+) {
     //map. If nothing again,this means a slash command
-    const interactionStream$ = fromEvent(client, 'interactionCreate') as Observable<Interaction>;
+    const interactionStream$ = fromEvent(client, platform.eventNames[0]) as Observable<Interaction>;
     const interactionProcessor = makeInteractionProcessor(modules);
     return interactionStream$
         .pipe(
@@ -109,7 +149,7 @@ function createDispatcher({
                  */
                 return dispatchAutocomplete(module, event);
             } else {
-                return dispatchCommand(module, contextArgs(event));
+                return dispatchCommand(module, contextArgs(event as ChatInputCommandInteraction));
             }
         }
         default:
