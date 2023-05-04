@@ -58,6 +58,7 @@ export function buildModuleStream<T>(
 export function getCommands(dir: string): string[] {
     return readPath(join(process.cwd(), dir));
 }
+
 export function filename(path: string) {
     return fmtFileName(basename(path))
 }

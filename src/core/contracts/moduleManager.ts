@@ -1,4 +1,4 @@
-import type { CommandModuleDefs } from '../../types/module';
+import type { CommandModule, CommandModuleDefs } from '../../types/module';
 import type { CommandType, ModuleStore } from '../structures';
 import type { Processed } from '../../types/handler';
 /**
@@ -23,5 +23,18 @@ export class DefaultModuleManager implements ModuleManager {
 
     set(strat: (ms: ModuleStore) => void): void {
         strat(this.moduleStore);
+    }
+}
+
+export type ModuleGetter = (accessStrat: (ms: ModuleStore) => Processed<CommandModule>|undefined) => Processed<CommandModule>|undefined
+export function createModuleGetter(moduleManager: ModuleManager) {
+    return (accessStrat: (ms: ModuleStore) => Processed<CommandModule>|undefined) => { 
+       return moduleManager.get(accessStrat) 
+    }
+}
+
+export function createModuleInserter(moduleManager: ModuleManager) {
+    return (insertStrat: (ms: ModuleStore) => void) => { 
+       return moduleManager.set(insertStrat) 
     }
 }

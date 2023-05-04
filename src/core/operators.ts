@@ -6,10 +6,9 @@
 
 import { concatMap, defaultIfEmpty, EMPTY, every, fromEvent, map, Observable, of, OperatorFunction, pipe, share } from 'rxjs';
 import type { AnyModule } from '../types/module';
-import { nameOrFilename } from './utilities/functions';
 import type { PluginResult, VoidResult } from '../types/plugin';
 import { Result } from 'ts-results-es';
-import { ImportPayload } from '../types/handler';
+import { ImportPayload, Processed } from '../types/handler';
 import { EventEmitter } from 'node:events';
 /**
  * if {src} is true, mapTo V, else ignore
@@ -40,14 +39,11 @@ export function callPlugin(args: unknown): OperatorFunction<
 export const arrayifySource = map(src => (Array.isArray(src) ? (src as unknown[]) : [src]));
 
 export const fillDefaults = <T extends AnyModule>({ module, absPath }: ImportPayload<T>) => {
+    module.description ??= '...'
     return {
         absPath,
-        module: {
-            name: nameOrFilename(module?.name, absPath),
-            description: module?.description ?? '...',
-            ...module,
-        },
-    };
+        module 
+    } as ImportPayload<Processed<T>>;
 };
 
 /**

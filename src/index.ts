@@ -1,18 +1,9 @@
-import SernEmitter from './handler/sernEmitter';
-export {
-    eventModule,
-    commandModule,
-    EventExecutable,
-    CommandExecutable,
-    controller,
-    discordEvent,
-} from './handler/sern';
+export { default as SernEmitter } from './core/sernEmitter';
 export * as Sern from './handler/sern';
 export * from './types/handler';
 export * from './types/module';
 export * from './types/plugin';
-export * from './handler/structures';
-export * from './handler/plugins';
-export * from './handler/contracts';
-export { SernEmitter };
-export * from './handler/dependencies';
+export * from './core'
+export { controller } from './handler/sern'
+export { commandModule, eventModule, CommandExecutable, EventExecutable } from './commands'
+export { default as Context } from './classic/context'
