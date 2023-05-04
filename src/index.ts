@@ -5,5 +5,5 @@ export * from './types/module';
 export * from './types/plugin';
 export * from './core'
 export { controller } from './handler/sern'
-export { commandModule, eventModule, CommandExecutable, EventExecutable } from './commands'
+export { commandModule, eventModule, discordEvent } from './commands'
 export { default as Context } from './classic/context'
