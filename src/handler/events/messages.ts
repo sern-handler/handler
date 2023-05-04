@@ -1,5 +1,5 @@
-import { catchError, concatMap, EMPTY, finalize, fromEvent, map, Observable, of, pipe } from 'rxjs';
-import { type ModuleStore, SernError } from '../../core/structures';
+import { catchError, concatMap, EMPTY, finalize, map, of, pipe } from 'rxjs';
+import { SernError } from '../../core/structures';
 import type { Message } from 'discord.js';
 import { executeModule, ignoreNonBot, makeModuleExecutor } from './observableHandling';
 import type { CommandModule } from '../../types/module';
@@ -11,7 +11,9 @@ import { useContainerRaw } from '../../core/dependencies';
 import type { Logging, ModuleManager } from '../../core/contracts';
 import type { EventEmitter } from 'node:events';
 import { WebsocketStrategy } from '../../core';
-import { createModuleGetter } from '../../core/contracts/moduleManager';
+import { err } from '../../core/functions';
+import { defaultModuleLoader } from '../../core/module-loading';
+import { sharedObservable, filterMap } from '../../core/operators';
 
 /**
  * Removes the first character(s) _[depending on prefix length]_ of the message
@@ -34,25 +36,21 @@ export function fmt(msg: string, prefix: string): string[] {
  */
 const createMessageProcessor = (
     defaultPrefix: string,
-    get: (
-        cb: (ms: ModuleStore) => Processed<CommandModule> | undefined,
-    ) => CommandModule | undefined,
+    moduleManager: ModuleManager
 ) =>
     pipe(
         ignoreNonBot(defaultPrefix),
-        //This concatMap checks if module is undefined, and if it is, do not continue.
-        // Synonymous to filterMap, but I haven't thought of a generic implementation for filterMap yet
-        concatMap(message => {
+        filterMap(message => {
             const [prefix, ...rest] = fmt(message.content, defaultPrefix);
-            const module = get(ms => ms.TextCommands.get(prefix) ?? ms.BothCommands.get(prefix));
-            if (module === undefined) {
-                return EMPTY;
+            const fullPath = moduleManager.get(`${prefix}__A0`);
+            if (fullPath === undefined) {
+                return err();
             }
-            const payload = {
-                args: contextArgs(message, rest),
-                module,
-            };
-            return of(payload);
+            return defaultModuleLoader<CommandModule>(fullPath).then(
+                result => {
+                    const args = contextArgs(message, rest);
+                    return result.map(module => ({ module, args }))
+                })
         }),
         map(({ args, module }) => dispatchCommand(module as Processed<CommandModule>, args)),
     );
@@ -70,9 +68,8 @@ export function makeMessageCreate(
     if(!platform.defaultPrefix) {
         return EMPTY.subscribe()
     }
-    const get = createModuleGetter(modules); 
-    const messageStream$ = fromEvent(client, platform.eventNames[1]) as Observable<Message>;
-    const messageProcessor = createMessageProcessor(platform.defaultPrefix, get);
+    const messageStream$ = sharedObservable<Message>(client, platform.eventNames[1]);
+    const messageProcessor = createMessageProcessor(platform.defaultPrefix, modules);
     return messageStream$
         .pipe(
             messageProcessor,

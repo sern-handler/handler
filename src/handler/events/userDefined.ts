@@ -1,5 +1,4 @@
-import { catchError, finalize, map, mergeAll } from 'rxjs';
-import * as Files from '../../core/module-loading';
+import { catchError, finalize, map, mergeAll, of } from 'rxjs';
 import type { Processed, WebsocketDependencies } from '../../types/handler';
 import { callInitPlugins } from './observableHandling';
 import type { CommandModule, EventModule } from '../../types/module';
@@ -9,9 +8,9 @@ import type { ErrorHandling, Logging } from '../../core/contracts';
 import { SernError, EventType } from '../../core/structures';
 import { eventDispatcher } from './dispatchers';
 import { handleError } from '../../core/contracts/errorHandling';
-import { errTap, fillDefaults } from '../../core/operators';
 import { useContainerRaw } from '../../core/dependencies';
 import { AnyWrapper } from '../../core/structures/wrapper';
+import { buildModules } from './generic';
 
 export function makeEventsHandler(
     [s, err, log, client]: [SernEmitter, ErrorHandling, Logging | undefined, EventEmitter],
@@ -19,19 +18,6 @@ export function makeEventsHandler(
     containerGetter: AnyWrapper['containerConfig'],
 ) {
     const lazy = (k: string) => containerGetter.get(k as keyof WebsocketDependencies)[0];
-    const eventStream$ = eventObservable(eventsPath, s);
-
-    const eventCreation$ = eventStream$.pipe(
-        map(fillDefaults),
-        callInitPlugins({
-            onStop: module =>
-                s.emit('module.register', SernEmitter.failure(module, SernError.PluginFailure)),
-            onNext: ({ module }) => {
-                s.emit('module.register', SernEmitter.success(module));
-                return module;
-            },
-        }),
-    );
     const intoDispatcher = (e: Processed<EventModule | CommandModule>) => {
         switch (e.type) {
             case EventType.Sern:
@@ -46,30 +32,29 @@ export function makeEventsHandler(
                 );
         }
     };
-    eventCreation$
-        .pipe(
-            map(intoDispatcher),
-            /**
-             * Where all events are turned on
-             */
-            mergeAll(),
-            catchError(handleError(err, log)),
-            finalize(() => {
-                log?.info({ message: 'an event module reached end of lifetime' });
-                useContainerRaw()
-                    ?.disposeAll()
-                    .then(() => {
-                        log?.info({ message: 'Cleaning container and crashing' });
-                    });
-            }),
-        )
-        .subscribe();
-}
-
-function eventObservable(events: string, emitter: SernEmitter) {
-    return Files.buildModuleStream<EventModule>(events).pipe(
-        errTap(reason => {
-            emitter.emit('module.register', SernEmitter.failure(undefined, reason));
+    of(null).pipe(
+        buildModules(eventsPath, s),
+        callInitPlugins({
+            onStop: module =>
+                s.emit('module.register', SernEmitter.failure(module, SernError.PluginFailure)),
+            onNext: ({ module }) => {
+                s.emit('module.register', SernEmitter.success(module));
+                return module;
+            },
         }),
-    );
+        map(intoDispatcher),
+       /**
+        * Where all events are turned on
+        */
+        mergeAll(),
+        catchError(handleError(err, log)),
+        finalize(() => {
+            log?.info({ message: 'an event module reached end of lifetime' });
+            useContainerRaw()
+                ?.disposeAll()
+                .then(() => {
+                    log?.info({ message: 'Cleaning container and crashing' });
+                });
+        }),
+    ).subscribe();
 }

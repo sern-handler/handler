@@ -24,8 +24,8 @@ import { discordjs } from '../core';
  * ```
  */
 export function init(wrapper: DefaultWrapper) {
-    const dependenciesAnd = makeFetcher(wrapper.containerConfig);
     const startTime = performance.now();
+    const dependenciesAnd = makeFetcher(wrapper.containerConfig);
     const dependencies = dependenciesAnd(['@sern/modules', '@sern/client']);
     if (wrapper.events !== undefined) {
         makeEventsHandler(

@@ -2,7 +2,7 @@ import type { Processed } from '../../../types/handler';
 import type { AutocompleteInteraction } from 'discord.js';
 import { SernError } from '../../../core/structures';
 import { treeSearch } from '../../../core/functions';
-import type { CommandModule, Module } from '../../../types/module';
+import type { BothCommand, CommandModule, Module } from '../../../types/module';
 import { EventEmitter } from 'events';
 import * as assert from 'assert';
 import { concatMap, from, fromEvent, map, OperatorFunction, pipe } from 'rxjs';
@@ -51,7 +51,7 @@ export function eventDispatcher(module: Processed<Module>, source: unknown) {
 }
 
 export function dispatchAutocomplete(
-    module: Processed<Module>,
+    module: Processed<BothCommand>,
     interaction: AutocompleteInteraction,
 ) {
     const option = treeSearch(interaction, module.options);

@@ -1,35 +1,45 @@
 import { readdirSync, statSync } from 'fs';
-import { join, basename } from 'path';
+import { readdir, stat } from 'fs/promises';
+import { join, basename, resolve } from 'path';
 import { type Observable, from, mergeMap } from 'rxjs';
 import { SernError } from './structures/errors';
 import { type Result, Err, Ok } from 'ts-results-es';
-import { ImportPayload } from '../types/handler';
-import { pathToFileURL } from 'node:url';
+import { Processed } from '../types/handler';
+import { Module } from '../types/module';
+import * as assert from 'node:assert'
+import * as util from 'node:util'
 
-// Courtesy @Townsy45
-function readPath(dir: string, arrayOfFiles: string[] = []): string[] {
-    try {
-        const files = readdirSync(dir);
-        for (const file of files) {
-            if (statSync(dir + '/' + file).isDirectory()) readPath(dir + '/' + file, arrayOfFiles);
-            else arrayOfFiles.push(join(dir, '/', file));
-        }
-    } catch (err) {
-        throw err;
+async function* readPath(dir: string): AsyncGenerator<string> {
+  try {
+    const files = await readdir(dir);
+    for (const file of files) {
+      const fullPath = join(dir, file);
+      const fileStats = await stat(fullPath);
+      if (fileStats.isDirectory()) {
+        yield* readPath(fullPath);
+      } else {
+        /// #if MODE === 'esm'
+        yield 'file:///'+fullPath;
+        /// #elif MODE === 'cjs'
+        yield fullPath;
+        /// #endif
+      }
     }
-
-    return arrayOfFiles;
+  } catch (err) {
+    throw err;
+  }
 }
-export const fmtFileName = (n: string) => n.substring(0, n.length - 3);
-// export const isLazy = (n: string) => n.indexOf(".lazy.", n.length-9) !== -1;
 
-export async function defaultModuleLoader<T>(
+
+export const fmtFileName = (n: string) => n.substring(0, n.length - 3);
+
+export async function defaultModuleLoader<T extends Module>(
     absPath: string,
-): Promise<Result<ImportPayload<T>, SernError>> {
+): Promise<Result< Processed<T>, SernError>> {
     // prettier-ignore
     let module: T | undefined
     /// #if MODE === 'esm'
-    = (await import(pathToFileURL(absPath).toString())).default
+    = (await import(absPath)).default
     /// #elif MODE === 'cjs'
     = require(absPath).default; // eslint-disable-line
     /// #endif
@@ -39,7 +49,12 @@ export async function defaultModuleLoader<T>(
     try {
         module = new (module as unknown as new () => T)();
     } catch {}
-    return Ok({ module, absPath });
+    checkIsProcessed(module)
+    return Ok(module);
+}
+
+function checkIsProcessed<T extends Module>(m: T): asserts m is Processed<T> {
+    assert.ok(m.name !== undefined, `name is not defined for ${util.format(m)}`)
 }
 
 /**
@@ -48,15 +63,15 @@ export async function defaultModuleLoader<T>(
  * @returns {Observable<{ mod: Module; absPath: string; }[]>} data from command files
  * @param commandDir
  */
-export function buildModuleStream<T>(
+export function buildModuleStream<T extends Module >(
     commandDir: string,
-): Observable<Result<ImportPayload<T>, SernError>> {
+): Observable<Result<Processed<T>, SernError>> {
     const commands = getCommands(commandDir);
     return from(commands).pipe(mergeMap(defaultModuleLoader<T>));
 }
 
-export function getCommands(dir: string): string[] {
-    return readPath(join(process.cwd(), dir));
+export function getCommands(dir: string) {
+    return readPath(resolve(dir));
 }
 
 export function filename(path: string) {
