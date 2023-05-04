@@ -15,45 +15,18 @@
  * ```
  */
 export enum CommandType {
-    /**
-     * The CommandType for text commands
-     */
-    Text = 1,
-    /**
-     * The CommandType for slash commands
-     */
-    Slash = 2,
-    /**
-     * The CommandType for hybrid commands, text and slash
-     */
-    Both = 3,
-    /**
-     * The CommandType for UserContextMenuInteraction commands
-     */
-    CtxUser = 4,
-    /**
-     * The CommandType for MessageContextMenuInteraction commands
-     */
-    CtxMsg = 8,
-    /**
-     * The CommandType for ButtonInteraction commands
-     */
-    Button = 16,
-    /**
-     * The CommandType for StringSelectMenuInteraction commands
-     */
-    StringSelect = 32,
-    /**
-     * The CommandType for ModalSubmitInteraction commands
-     */
-    Modal = 64,
-    /**
-     * The CommandType for the other SelectMenuInteractions
-     */
-    ChannelSelect = 256,
-    MentionableSelect = 512,
-    RoleSelect = 1024,
-    UserSelect = 2048,
+    Text    = 1 << 0,
+    Slash   = 1 << 1,
+    Both    = 3,
+    CtxUser = 1 << 2,
+    CtxMsg  = 1 << 3,
+    Button  = 1 << 4,
+    StringSelect = 1 << 5,
+    Modal = 1 << 6,
+    ChannelSelect = 1 << 7,
+    MentionableSelect = 1 << 8,
+    RoleSelect = 1 << 9,
+    UserSelect = 1 << 10,
 }
 
 /**
@@ -106,16 +79,6 @@ export enum PluginType {
      * The PluginType for InitPlugins
      */
     Init = 1,
-    /**
-     * @deprecated
-     * Use PluginType.Init instead
-     */
-    Command = 1,
-    /**
-     * @deprecated
-     * Use PluginType.Control instead
-     */
-    Event = 2,
     /**
      * The PluginType for EventPlugins
      */

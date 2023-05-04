@@ -1,31 +1,36 @@
-import { Result as Either, Ok, Err } from 'ts-results-es';
+import { Result as Either } from 'ts-results-es';
+import { SernError } from './errors';
+import * as assert from 'node:assert'
+
+
 
 /**
-  *
   * @since 3.0.0
-  *
   */
-export interface CoreContext<M, I> {
-    get message(): M; 
-    get interaction(): I;
-}
+export abstract class CoreContext<M, I> {
+    protected constructor(protected ctx: Either<M, I>) {
+       assert.ok(typeof ctx.val === 'object' && ctx.val != null)
+    }
+    get message(): M {
+        return this.ctx.expect(SernError.MismatchEvent);
+    } 
+    get interaction(): I  {
+        return this.ctx.expectErr(SernError.MismatchEvent);
+    }
 
-export function safeUnwrap<T>(res: Either<T, T>) {
-    return res.val;
-}
+    public isMessage(): this is CoreContext<M, never> {
+        return this.ctx.map(() => true).unwrapOr(false);
+    }
 
-export function wrap<A extends unknown, B extends unknown>(
-    val: B|A,
-): Either<A,B> {
-   if(typeof val !== 'object' || Array.isArray(val) || val == null) {
-       throw Error("Could not form correct Context." + "Recieved " + val) 
-   }
-   const msgInteractionObject = (val as unknown as { interaction: unknown }).interaction;
-   //falsy comparison: ==. Checks if its null OR undefined
-   if(msgInteractionObject == null) {
-    return Ok(val as A)
-   }
-   return Err(val as B);
-}
+    public isSlash(): this is CoreContext<never, I> {
+        return !this.isMessage();
+    }
+    //todo: add agnostic options resolver for Context
+    abstract get options() : unknown
+    
+    abstract get id() : string
 
+    static wrap(_: unknown): unknown { throw Error("You need to override this method; cannot wrap an abstract class") }
+    
+}
 

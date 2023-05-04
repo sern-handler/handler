@@ -32,6 +32,8 @@ export type Wrapper = WebsocketWrapper | ServerlessWrapper
 
 export interface ServerlessWrapper {
     readonly platform: ServerlessStrategy
+    commands: string;
+    events?: string;
     containerConfig: {
         get: (...keys: (keyof ServerlessDependencies)[]) => unknown[];
     }
