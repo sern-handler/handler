@@ -3,7 +3,7 @@ import type { PluginType } from '../structures/enums';
 import type { Module } from '../../types/module';
 import type { Processed } from '../../types/handler';
 import { EventType } from '../structures/enums';
-import { CommandArgsMatrix, EventArgsMatrix } from '../../entrypoints/djs';
+import { CommandArgsMatrix, EventArgsMatrix } from '../../types/module';
 
 export interface InitArgs<T extends Processed<Module>> {
     module: T;

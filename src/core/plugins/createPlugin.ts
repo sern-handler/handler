@@ -2,7 +2,6 @@ import { CommandType, EventType, PluginType } from '../structures';
 import type { Plugin, PluginResult } from '../../types/plugin';
 import type { CommandArgs, EventArgs } from './args';
 import type { ClientEvents } from 'discord.js';
-export const guayin = Symbol('twice<3');
 
 export function makePlugin<V extends unknown[]>(
     type: PluginType,
@@ -10,8 +9,7 @@ export function makePlugin<V extends unknown[]>(
 ): Plugin<V> {
     return {
         type,
-        execute,
-        [guayin]: undefined,
+        execute
     } as Plugin<V>;
 }
 /**
