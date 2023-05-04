@@ -9,7 +9,6 @@ export type PlatformStrategy =
 
 export interface WebsocketStrategy {
     type: DispatchType.Websocket;
-    //icreate, messageCreate, ready
     eventNames: [interactioncreate: string, messagecreate: string, ready: string]
     defaultPrefix?: string;
 }
