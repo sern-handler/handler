@@ -5,6 +5,13 @@ __metadata:
   version: 6
   cacheKey: 8
 
+"@cloudflare/workers-types@npm:^4.20230419.0":
+  version: 4.20230419.0
+  resolution: "@cloudflare/workers-types@npm:4.20230419.0"
+  checksum: db1eb1e74029da8ee3eaed8c8b83e1bc3a10801d328ccfddf39258e5eb679ffb34776fab441f6ac66aa304bc3715dedce77083aed3d79b4825639fb24970c164
+  languageName: node
+  linkType: hard
+
 "@discordjs/builders@npm:^1.5.0":
   version: 1.6.3
   resolution: "@discordjs/builders@npm:1.6.3"
@@ -448,6 +455,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@sern/handler@workspace:."
   dependencies:
+    "@cloudflare/workers-types": ^4.20230419.0
     "@types/node": ^18.15.11
     "@typescript-eslint/eslint-plugin": 5.58.0
     "@typescript-eslint/parser": 5.58.0
@@ -460,6 +468,7 @@ __metadata:
     rxjs: ^7.8.0
     ts-results-es: ^3.6.0
     tsup: ^6.7.0
+    tweetnacl: ^1.0.3
     typescript: 5.0.2
   languageName: unknown
   linkType: soft
@@ -3016,6 +3025,13 @@ __metadata:
   peerDependencies:
     typescript: ">=2.8.0 || >= 3.2.0-dev || >= 3.3.0-dev || >= 3.4.0-dev || >= 3.5.0-dev || >= 3.6.0-dev || >= 3.6.0-beta || >= 3.7.0-dev || >= 3.7.0-beta"
   checksum: 1843f4c1b2e0f975e08c4c21caa4af4f7f65a12ac1b81b3b8489366826259323feb3fc7a243123453d2d1a02314205a7634e048d4a8009921da19f99755cdc48
+  languageName: node
+  linkType: hard
+
+"tweetnacl@npm:^1.0.3":
+  version: 1.0.3
+  resolution: "tweetnacl@npm:1.0.3"
+  checksum: e4a57cac188f0c53f24c7a33279e223618a2bfb5fea426231991652a13247bea06b081fd745d71291fcae0f4428d29beba1b984b1f1ce6f66b06a6d1ab90645c
   languageName: node
   linkType: hard
 

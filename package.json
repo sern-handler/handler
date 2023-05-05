@@ -5,11 +5,16 @@
     "description": "A complete, customizable, typesafe, & reactive framework for discord bots.",
     "main": "dist/cjs/index.cjs",
     "module": "dist/esm/index.mjs",
-    "types": "dist/index.d.ts",
     "exports": {
         ".": {
             "import": "./dist/esm/index.mjs",
-            "require": "./dist/cjs/index.cjs"
+            "require": "./dist/cjs/index.cjs",
+            "types": "dist/index.d.ts"
+        },
+        "./multiplatform": {
+            "import": "./dist/esm/multiplatform/index.mjs",
+            "require": "./dist/cjs/multiplatform/index.cjs",
+            "types": "./dist/multiplatform/index.d.ts"
         }
     },
     "scripts": {
@@ -36,9 +41,11 @@
     "dependencies": {
         "iti": "^0.6.0",
         "rxjs": "^7.8.0",
-        "ts-results-es": "^3.6.0"
+        "ts-results-es": "^3.6.0",
+        "tweetnacl": "^1.0.3"
     },
     "devDependencies": {
+        "@cloudflare/workers-types": "^4.20230419.0",
         "@types/node": "^18.15.11",
         "@typescript-eslint/eslint-plugin": "5.58.0",
         "@typescript-eslint/parser": "5.58.0",
@@ -60,12 +67,27 @@
     },
     "eslintConfig": {
         "parser": "@typescript-eslint/parser",
-        "extends": ["plugin:@typescript-eslint/recommended"],
-        "parserOptions": { "ecmaVersion": "latest", "sourceType": "script" },
+        "extends": [
+            "plugin:@typescript-eslint/recommended"
+        ],
+        "parserOptions": {
+            "ecmaVersion": "latest",
+            "sourceType": "script"
+        },
         "rules": {
             "@typescript-eslint/no-non-null-assertion": "off",
-            "quotes": [2, "single", { "avoidEscape": true, "allowTemplateLiterals": true }],
-            "semi": ["error", "always"],
+            "quotes": [
+                2,
+                "single",
+                {
+                    "avoidEscape": true,
+                    "allowTemplateLiterals": true
+                }
+            ],
+            "semi": [
+                "error",
+                "always"
+            ],
             "@typescript-eslint/no-empty-interface": 0,
             "@typescript-eslint/ban-types": 0,
             "@typescript-eslint/no-explicit-any": "off"
