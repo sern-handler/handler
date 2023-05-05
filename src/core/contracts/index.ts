@@ -1,3 +1,3 @@
-export { ErrorHandling, DefaultErrorHandling } from './errorHandling';
-export { Logging, DefaultLogging } from './logging';
-export { ModuleManager, DefaultModuleManager } from './moduleManager';
+export { type ErrorHandling, DefaultErrorHandling } from './errorHandling';
+export { type Logging, DefaultLogging } from './logging';
+export { type ModuleManager, DefaultModuleManager } from './moduleManager';

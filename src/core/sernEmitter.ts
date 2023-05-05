@@ -6,7 +6,7 @@ import type { Module } from '../types/module';
 /**
  * @since 1.0.0
  */
-class SernEmitter extends EventEmitter {
+export class SernEmitter extends EventEmitter {
     /**
      * Listening to sern events with on. This event stays on until a crash or a normal exit
      * @param eventName
@@ -85,4 +85,3 @@ class SernEmitter extends EventEmitter {
     }
 }
 
-export default SernEmitter;

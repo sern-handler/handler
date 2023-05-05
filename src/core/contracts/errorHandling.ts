@@ -1,6 +1,6 @@
 import type { Observable } from 'rxjs';
 import type { Logging } from './logging';
-import util from 'util';
+import util from 'node:util';
 /**
  * @since 2.0.0
  */

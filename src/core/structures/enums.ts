@@ -101,22 +101,3 @@ export enum PayloadType {
      */
     Warning = 'warning',
 }
-
-export enum ApplicationCommandType {
-    ChatInput = 1,
-    User = 2,
-    Message = 3
-}
-
-
-export const enum ComponentType {
-    ActionRow = 1,
-    Button = 2,
-    StringSelect = 3,
-    TextInput = 4,
-    UserSelect = 5,
-    RoleSelect = 6,
-    MentionableSelect = 7,
-    ChannelSelect = 8,
-}
-

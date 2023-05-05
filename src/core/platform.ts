@@ -15,7 +15,6 @@ export interface WebsocketStrategy {
 
 export interface ServerlessStrategy {
     type: DispatchType.Serverless;
-    endpoint: string;
 }
 
 export function makeWebsocketAdapter(

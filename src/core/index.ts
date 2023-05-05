@@ -1,5 +1,4 @@
-import SernEmitter from './sernEmitter';
-export { SernEmitter };
+export * from './sernEmitter'; 
 export * from './contracts';
 export * from './platform';
 export * from './plugins';

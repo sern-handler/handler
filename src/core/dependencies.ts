@@ -1,6 +1,6 @@
 import type { Container } from 'iti';
-import type { AnyDependencies, DependencyConfiguration, MapDeps, ServerlessDependencies, WebsocketDependencies } from '../types/handler';
-import SernEmitter from './sernEmitter';
+import type { AnyDependencies, DependencyConfiguration, MapDeps, ServerlessDependencies, WebsocketDependencies } from '../types/core';
+import { SernEmitter } from './sernEmitter';
 import { DefaultErrorHandling, DefaultLogging, DefaultModuleManager } from './contracts';
 import { Result } from 'ts-results-es';
 import { BehaviorSubject } from 'rxjs';

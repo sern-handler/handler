@@ -1,40 +1,22 @@
-import type { CommandModule, CommandModuleDefs } from '../../types/module';
-import type { CommandType, ModuleStore } from '../structures';
-import type { Processed } from '../../types/handler';
+import type { ModuleStore } from '../structures';
 /**
  * @since 2.0.0
  */
 export interface ModuleManager {
-    get<T extends CommandType>(
-        strat: (ms: ModuleStore) => Processed<CommandModuleDefs[T]> | undefined,
-    ): Processed<CommandModuleDefs[T]> | undefined;
-    set(strat: (ms: ModuleStore) => void): void;
+    get(id: string): string | undefined;
+    set(id: string, path: string): void;
 }
 /**
  * @since 2.0.0
  */
 export class DefaultModuleManager implements ModuleManager {
     constructor(private moduleStore: ModuleStore) {}
-    get<T extends CommandType>(
-        strat: (ms: ModuleStore) => Processed<CommandModuleDefs[T]> | undefined,
-    ) {
-        return strat(this.moduleStore);
+    get(id: string) {
+        return this.moduleStore.Commands.get(id);
+    }
+    set(id: string, path: string): void {
+        this.moduleStore.Commands.set(id, path)
     }
 
-    set(strat: (ms: ModuleStore) => void): void {
-        strat(this.moduleStore);
-    }
 }
 
-export type ModuleGetter = (accessStrat: (ms: ModuleStore) => Processed<CommandModule>|undefined) => Processed<CommandModule>|undefined
-export function createModuleGetter(moduleManager: ModuleManager) {
-    return (accessStrat: (ms: ModuleStore) => Processed<CommandModule>|undefined) => { 
-       return moduleManager.get(accessStrat) 
-    }
-}
-
-export function createModuleInserter(moduleManager: ModuleManager) {
-    return (insertStrat: (ms: ModuleStore) => void) => { 
-       return moduleManager.set(insertStrat) 
-    }
-}

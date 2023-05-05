@@ -1,4 +1,4 @@
-import type { ServerlessDependencies, WebsocketDependencies } from '../../types/handler';
+import type { ServerlessDependencies, WebsocketDependencies } from '../../types/core';
 import { DispatchType, ServerlessStrategy, WebsocketStrategy } from '../platform';
 
 export interface DefaultWrapper {

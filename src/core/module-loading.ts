@@ -1,10 +1,9 @@
-import { readdirSync, statSync } from 'fs';
 import { readdir, stat } from 'fs/promises';
 import { join, basename, resolve } from 'path';
 import { type Observable, from, mergeMap } from 'rxjs';
 import { SernError } from './structures/errors';
 import { type Result, Err, Ok } from 'ts-results-es';
-import { Processed } from '../types/handler';
+import { Processed } from '../types/core';
 import { Module } from '../types/module';
 import * as assert from 'node:assert'
 import * as util from 'node:util'

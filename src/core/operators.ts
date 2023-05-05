@@ -3,14 +3,13 @@
  * Each function should be modular and testable, not bound to discord / sern
  * and independent of each other
  */
-
 import { concatMap, defaultIfEmpty, EMPTY, every, fromEvent, map, Observable, of, OperatorFunction, pipe, share, switchMap } from 'rxjs';
 import type { AnyModule } from '../types/module';
 import type { PluginResult, VoidResult } from '../types/plugin';
 import { Result } from 'ts-results-es';
-import { Awaitable, ImportPayload, Processed } from '../types/handler';
+import { Awaitable } from '../types/handler';
+import { ImportPayload, Processed } from '../types/core';
 import { EventEmitter } from 'node:events';
-
 /**
  * if {src} is true, mapTo V, else ignore
  * @param item
@@ -87,4 +86,5 @@ export const everyPluginOk: OperatorFunction<VoidResult, boolean> = pipe(
 export const sharedObservable = <T>(e: EventEmitter, eventName: string) => {
     return (fromEvent(e, eventName) as Observable<T>).pipe(share())
 };
+
 

@@ -1,4 +1,4 @@
-import type { LogPayload } from '../../types/handler';
+import type { LogPayload } from '../../types/core';
 /**
  * @since 2.0.0
  */
