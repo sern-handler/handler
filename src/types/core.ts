@@ -1,7 +1,8 @@
 import { type EventEmitter } from "node:events";
-import { ErrorHandling, Logging, ModuleManager, ModuleStore, SernEmitter } from "../core";
+import { ErrorHandling, Logging, ModuleManager, SernEmitter } from "../core";
 import { Container, UnpackFunction } from "iti";
 
+export type ModuleStore = Map<string,string>
 export type ServerlessDependencyList = [ SernEmitter,ErrorHandling, Logging | undefined, ModuleManager];
 export type WebsocketDependencyList = [SernEmitter,ErrorHandling, Logging | undefined, ModuleManager, EventEmitter];
 /**

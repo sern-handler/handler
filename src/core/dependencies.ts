@@ -1,10 +1,10 @@
 import type { Container } from 'iti';
-import type { AnyDependencies, DependencyConfiguration, MapDeps, ServerlessDependencies, WebsocketDependencies, Wrapper } from '../types/core';
+import type { AnyDependencies, DependencyConfiguration, MapDeps, Wrapper } from '../types/core';
 import { DefaultErrorHandling, DefaultLogging, DefaultModuleManager } from './contracts';
 import { Result } from 'ts-results-es';
 import { BehaviorSubject } from 'rxjs';
 import { createContainer } from 'iti';
-import { ModuleStore, SernEmitter } from './structures';
+import { SernEmitter } from './structures';
 
 export const containerSubject = new BehaviorSubject(defaultContainer());
 
@@ -81,7 +81,7 @@ export function useContainerRaw<T extends AnyDependencies>() {
 function defaultContainer() {
     return createContainer()
         .add({ '@sern/errors': () => new DefaultErrorHandling() })
-        .add({ '@sern/store': () => new ModuleStore() })
+        .add({ '@sern/store': () => new Map() })
         .add(ctx => {
             return {
                 '@sern/modules': () => new DefaultModuleManager(ctx['@sern/store']),

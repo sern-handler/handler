@@ -1,6 +1,6 @@
+import { ModuleStore } from '../../types/core';
 import { CommandModule } from '../../types/module';
 import { importModule } from '../module-loading';
-import type { ModuleStore } from '../structures';
 /**
  * @since 2.0.0
  */
@@ -29,6 +29,5 @@ export class DefaultModuleManager implements ModuleManager {
         .filter(([id,]) => (Number.parseInt(id.at(-1)!) & publishable) !== 0)
         .map(([, path]) => importModule<CommandModule>(path)))
     }
-
 }
 

@@ -72,8 +72,6 @@ export function createMessageHandler(
                     const args = contextArgs(event, rest);
                     return result.map(module => dispatchCommand(module, args))
                 })
-
-
         }
     )
 }

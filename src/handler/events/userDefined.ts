@@ -1,5 +1,5 @@
 import { catchError, finalize, map, mergeAll, of } from 'rxjs';
-import type { Processed, WebsocketDependencies } from '../../types/core';
+import type { Processed, WebsocketDependencies, Wrapper } from '../../types/core';
 import { callInitPlugins } from './observableHandling';
 import type { CommandModule, EventModule } from '../../types/module';
 import type { EventEmitter } from 'node:events';
@@ -10,13 +10,12 @@ import { SernError } from '../../core/structures/errors';
 import { eventDispatcher } from './dispatchers';
 import { handleError } from '../../core/contracts/errorHandling';
 import { useContainerRaw } from '../../core/dependencies';
-import { AnyWrapper } from '../../core/structures/wrapper';
 import { buildModules } from './generic';
 
 export function makeEventsHandler(
     [s, err, log, client]: [SernEmitter, ErrorHandling, Logging | undefined, EventEmitter],
     eventsPath: string,
-    containerGetter: AnyWrapper['containerConfig'],
+    containerGetter: Wrapper['containerConfig'],
 ) {
     const lazy = (k: string) => containerGetter.get(k as keyof WebsocketDependencies)[0];
     const intoDispatcher = (e: Processed<EventModule | CommandModule>) => {
