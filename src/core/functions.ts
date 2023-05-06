@@ -4,8 +4,8 @@ import type { SernAutocompleteData, SernOptionsData } from '../types/module';
 
 
 //function wrappers for empty ok / err
-export const ok = () => Ok.EMPTY;
-export const err = () => Err.EMPTY;
+export const ok = /* @__PURE__*/ () => Ok.EMPTY;
+export const err =/* @__PURE__*/ () => Err.EMPTY;
 
 export function partition<T, V>(arr: (T & V)[], condition: (e: T & V) => boolean): [T[], V[]] {
     const t: T[] = [];

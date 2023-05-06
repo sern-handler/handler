@@ -8,19 +8,19 @@ import {
     User 
 } from "discord.js";
 import { CoreContext } from "../core/structures/context";
-import { Result as Either, Ok as Right, Err as Left } from 'ts-results-es';
+import { Result , Ok , Err } from 'ts-results-es';
 import { ReplyOptions } from "../types/handler";
 /**
  * @since 1.0.0
  * Provides values shared between
  * Message and ChatInputCommandInteraction
  */
-export default class Context extends CoreContext<Message, ChatInputCommandInteraction> {
+export class Context extends CoreContext<Message, ChatInputCommandInteraction> {
 
     get options()  {
         return this.interaction.options
     }
-    protected constructor(protected ctx: Either<Message, ChatInputCommandInteraction>) {
+    protected constructor(protected ctx: Result<Message, ChatInputCommandInteraction>) {
         super(ctx)
     }
 
@@ -77,14 +77,14 @@ export default class Context extends CoreContext<Message, ChatInputCommandIntera
 
     static override wrap(wrappable: ChatInputCommandInteraction | Message): Context {
         if ('interaction' in wrappable) {
-            return new Context(Right(wrappable));
+            return new Context(Ok(wrappable));
         }
-        return new Context(Left(wrappable));
+        return new Context(Err(wrappable));
     }
 }
 
 
-function safeUnwrap<T>(res: Either<T, T>) {
+function safeUnwrap<T>(res: Result<T, T>) {
     return res.val;
 }
 

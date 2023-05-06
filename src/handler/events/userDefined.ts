@@ -3,7 +3,7 @@ import type { Processed, WebsocketDependencies } from '../../types/core';
 import { callInitPlugins } from './observableHandling';
 import type { CommandModule, EventModule } from '../../types/module';
 import type { EventEmitter } from 'node:events';
-import { SernEmitter } from '../../core/sernEmitter';
+import { SernEmitter } from '../../core';
 import type { ErrorHandling, Logging } from '../../core/contracts';
 import { EventType } from '../../core/structures'
 import { SernError } from '../../core/structures/errors';

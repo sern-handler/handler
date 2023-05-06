@@ -6,7 +6,7 @@ import { makeFetcher, makeDependencies } from '../core/dependencies';
 import { err, ok } from '../core/functions';
 import { DefaultWrapper } from '../core/structures/wrapper';
 import { discordjs } from '../core';
-import { getCommands } from '../core/io';
+import { getCommands } from '../core/module-loading';
 /**
  * @since 1.0.0
  * @param wrapper Options to pass into sern.

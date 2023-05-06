@@ -1,7 +1,4 @@
 import type { InteractionReplyOptions, MessageReplyOptions, CommandInteractionOptionResolver } from 'discord.js';
-import type { EventEmitter } from 'node:events';
-import type { ErrorHandling, Logging, ModuleManager } from '../core/contracts';
-import type { SernEmitter } from '../core/sernEmitter';
 import { Processed } from './core';
 import { AnyModule, CommandModule, EventModule } from './module';
 import { PayloadType } from '../core';

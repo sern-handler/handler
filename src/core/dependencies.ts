@@ -1,11 +1,10 @@
 import type { Container } from 'iti';
 import type { AnyDependencies, DependencyConfiguration, MapDeps, ServerlessDependencies, WebsocketDependencies } from '../types/core';
-import { SernEmitter } from './sernEmitter';
 import { DefaultErrorHandling, DefaultLogging, DefaultModuleManager } from './contracts';
 import { Result } from 'ts-results-es';
 import { BehaviorSubject } from 'rxjs';
 import { createContainer } from 'iti';
-import { ModuleStore } from './structures';
+import { ModuleStore, SernEmitter } from './structures';
 import { AnyWrapper, ServerlessWrapper, WebsocketWrapper } from './structures/wrapper';
 
 export const containerSubject = new BehaviorSubject(defaultContainer());
@@ -124,3 +123,12 @@ export function makeFetcher<Dep extends AnyDependencies>(containerConfig : AnyWr
         >;
 }
 
+/**
+ * @since 2.0.0
+ * @param conf a configuration for creating your project dependencies
+ */
+export function makeDependencies<const T extends AnyDependencies>(conf: DependencyConfiguration<T>) {
+    //Until there are more optional dependencies, just check if the logger exists
+    composeRoot(conf);
+    return useContainer<T>();
+}

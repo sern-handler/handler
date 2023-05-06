@@ -28,10 +28,9 @@ export function makeWebsocketAdapter(
     };
 }
 
-export function makeServerlessAdapter(i : { endpoint: string }): ServerlessStrategy {
+export function makeServerlessAdapter(): ServerlessStrategy {
     return {
-        type: DispatchType.Serverless ,
-        ...i
+        type: DispatchType.Serverless,
     };
 }
 

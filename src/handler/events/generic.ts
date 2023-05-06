@@ -12,7 +12,7 @@ import { err } from "../../core/functions";
 import { ObservableInput, pipe, switchMap} from "rxjs";
 import { SernEmitter } from "../../core";
 import { errTap } from '../../core/operators';
-import * as Files from '../../core/io';
+import * as Files from '../../core/module-loading';
 import { sernMeta } from "../../commands";
 import { AnyModule } from "../../types/module";
 
