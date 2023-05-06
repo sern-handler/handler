@@ -11,7 +11,7 @@ import { SernError } from '../../core/structures/errors';
 import { filterMap } from '../../core/operators';
 import { defaultModuleLoader } from '../../core/module-loading';
 import { Processed } from '../../types/core';
-import { BothCommand, CommandModule, Module } from '../../types/module';
+import { BothCommand, CommandModule } from '../../types/module';
 import { contextArgs, dispatchAutocomplete, dispatchCommand, interactionArg } from './dispatchers';
 import { isAutocomplete } from '../../core/predicates';
 import { ObservableInput, pipe, switchMap } from 'rxjs';

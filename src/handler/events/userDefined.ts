@@ -1,5 +1,5 @@
 import { catchError, finalize, map, mergeAll, of } from 'rxjs';
-import type { Processed, WebsocketDependencies, Wrapper } from '../../types/core';
+import type { Dependencies, Processed, Wrapper } from '../../types/core';
 import { callInitPlugins } from './observableHandling';
 import type { CommandModule, EventModule } from '../../types/module';
 import type { EventEmitter } from 'node:events';
@@ -17,7 +17,7 @@ export function makeEventsHandler(
     eventsPath: string,
     containerGetter: Wrapper['containerConfig'],
 ) {
-    const lazy = (k: string) => containerGetter.get(k as keyof WebsocketDependencies)[0];
+    const lazy = (k: string) => containerGetter.get(k as keyof Dependencies)[0];
     const intoDispatcher = (e: Processed<EventModule | CommandModule>) => {
         switch (e.type) {
             case EventType.Sern:

@@ -1,10 +1,10 @@
-import { ObservableInput, fromEvent, of, take } from 'rxjs';
+import { ObservableInput, fromEvent, take } from 'rxjs';
 import { callInitPlugins } from './observableHandling';
 import { CommandType } from '../../core/structures';
 import { SernError } from '../../core/structures/errors';
 import { Result } from 'ts-results-es';
-import type { ModuleManager } from '../../core/contracts';
-import { SernEmitter, PlatformStrategy, DispatchType } from '../../core';
+import { ModuleManager } from '../../core/contracts';
+import { SernEmitter, } from '../../core';
 import { sernMeta } from '../../commands';
 import { Processed, ServerlessDependencyList, WebsocketDependencyList } from '../../types/core';
 import { Module } from '../../types/module';
@@ -17,7 +17,7 @@ export function startReadyEvent(
         | WebsocketDependencyList,
     input: ObservableInput<string>,
 ) {
-    const ready$ = fromEvent(client!, 'interactionCreate').pipe(take(1));
+    const ready$ = fromEvent(client!, 'ready').pipe(take(1));
     return ready$
         .pipe(
             buildModules(input, sEmitter),
@@ -54,3 +54,5 @@ function registerModule<T extends Processed<Module>>(
     }
     return Result.wrap(() => manager.set(id, fullPath));
 }
+
+

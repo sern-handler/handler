@@ -1,9 +1,9 @@
-import { BaseInteraction, Interaction } from 'discord.js';
+import { Interaction } from 'discord.js';
 import { catchError, concatMap, finalize, merge } from 'rxjs';
 import { SernError } from '../../core/structures/errors';
 import { executeModule, makeModuleExecutor } from './observableHandling';
 import { ErrorHandling, handleError } from '../../core/contracts/errorHandling';
-import { SernEmitter, WebsocketStrategy } from '../../core';
+import { SernEmitter } from '../../core';
 import { sharedObservable } from '../../core/operators';
 import { useContainerRaw } from '../../core/dependencies';
 import type { Logging, ModuleManager } from '../../core/contracts';
