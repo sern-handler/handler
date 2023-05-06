@@ -3,10 +3,15 @@ import { writeFile } from 'fs/promises';
 import ifdefPlugin from 'esbuild-ifdef';
 const shared = {
     entry: ['src/index.ts'],
-    external: ['discord.js'],
+    external: ['discord.js', 'iti'],
     platform: 'node',
     clean: true,
     sourcemap: false,
+    treeshake: {
+        moduleSideEffects: false,
+        correctVarValueBeforeDeclaration: true, //need this to treeshake esm discord.js empty import
+        annotations: true,
+    },
 };
 export default defineConfig([
     {
@@ -14,8 +19,10 @@ export default defineConfig([
         target: 'node16',
         tsconfig: './tsconfig-esm.json',
         outDir: './dist/esm',
-        treeshake: true,
-        esbuildPlugins: [ifdefPlugin({ variables: { MODE: 'esm' }, verbose: true })],
+        splitting: false, 
+        esbuildPlugins: [
+            ifdefPlugin({ variables: { MODE: 'esm' }, verbose: true }),
+        ],
         outExtension() {
             return {
                 js: '.mjs',
