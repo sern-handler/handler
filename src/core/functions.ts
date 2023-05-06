@@ -20,7 +20,7 @@ export function partition<T, V>(arr: (T & V)[], condition: (e: T & V) => boolean
 }
 
 /**
- * Uses an iterative DFS to check if an autocomplete node exists
+ * Uses an iterative DFS to check if an autocomplete node exists on the option tree
  * @param iAutocomplete
  * @param options
  */
