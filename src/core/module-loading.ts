@@ -10,23 +10,21 @@ import { basename, join, resolve } from 'path';
 
 export type ModuleResult<T> = Promise<Result<Processed<T>, SernError>> 
 export type Loader<T> = (absPath: string) => ModuleResult<T>
-
+export async function importModule<T>(absPath: string) {
+    /// #if MODE === 'esm'
+    return (await import(absPath)).default as T
+    /// #elif MODE === 'cjs'
+    return require(absPath).default as T; // eslint-disable-line
+    /// #endif
+}
 export async function defaultModuleLoader<T extends Module>(
     absPath: string,
 ): ModuleResult<T> {
     // prettier-ignore
-    let module: T | undefined
-    /// #if MODE === 'esm'
-    = (await import(absPath)).default
-    /// #elif MODE === 'cjs'
-    = require(absPath).default; // eslint-disable-line
-    /// #endif
+    const module = await importModule<T>(absPath);
     if (module === undefined) {
-        return Err(SernError.UndefinedModule);
+       return Err(SernError.UndefinedModule);
     }
-    try {
-        module = new (module as unknown as new () => T)();
-    } catch {}
     checkIsProcessed(module)
     return Ok(module);
 }

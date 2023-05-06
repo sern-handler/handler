@@ -4,8 +4,8 @@
  * Storing all command modules
  * This dependency is usually injected into ModuleManager
  */
-export class ModuleStore {
-    readonly Commands = new Map<string, string>();
+export class ModuleStore extends Map<string, string> {
+    
 }
 
 

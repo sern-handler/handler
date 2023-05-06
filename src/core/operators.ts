@@ -4,11 +4,9 @@
  * and independent of each other
  */
 import { concatMap, defaultIfEmpty, EMPTY, every, fromEvent, map, Observable, of, OperatorFunction, pipe, share, switchMap } from 'rxjs';
-import type { AnyModule } from '../types/module';
 import type { PluginResult, VoidResult } from '../types/plugin';
 import { Result } from 'ts-results-es';
 import { Awaitable } from '../types/handler';
-import { ImportPayload, Processed } from '../types/core';
 import { EventEmitter } from 'node:events';
 /**
  * if {src} is true, mapTo V, else ignore

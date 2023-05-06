@@ -13,7 +13,6 @@ import { getCommands } from '../core/module-loading';
  * @example
  * ```ts title="src/index.ts"
  * Sern.init({
- *     platform: djs('!'),
  *     commands: 'dist/commands',
  *     events: 'dist/events',
  *     containerConfig : {

@@ -10,7 +10,6 @@ type AnyCommandInteraction = ChatInputCommandInteraction | MessageContextMenuCom
 export function isMessageComponent(i: InteractionTypable): i is AnyMessageComponentInteraction {
     return i.type === InteractionType.MessageComponent;
 }
-
 export function isCommand(i: InteractionTypable): i is AnyCommandInteraction {
     return i.type === InteractionType.ApplicationCommand;
 }
