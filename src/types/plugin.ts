@@ -15,7 +15,8 @@ import type { Err, Ok, Result } from 'ts-results-es';
 import type { PluginType } from '../core/structures/enums';
 import type { CommandModule, EventModule } from './module';
 import type { InitArgs } from '../core/plugins';
-import type { Awaitable, Processed } from './handler';
+import type { Awaitable } from './handler';
+import { Processed } from './core';
 export type PluginResult = Awaitable<VoidResult>;
 export type VoidResult = Result<void, void>;
 
