@@ -5,7 +5,7 @@ import type { CommandModule, EventModule } from '../../types/module';
 import type { EventEmitter } from 'node:events';
 import { SernEmitter } from '../../core';
 import type { ErrorHandling, Logging } from '../../core/contracts';
-import { EventType } from '../../core/structures'
+import { EventType } from '../../core/structures';
 import { SernError } from '../../core/structures/errors';
 import { eventDispatcher } from './dispatchers';
 import { handleError } from '../../core/contracts/errorHandling';
@@ -32,29 +32,31 @@ export function makeEventsHandler(
                 );
         }
     };
-    of(null).pipe(
-        buildModules(eventsPath, s),
-        callInitPlugins({
-            onStop: module =>
-                s.emit('module.register', SernEmitter.failure(module, SernError.PluginFailure)),
-            onNext: ({ module }) => {
-                s.emit('module.register', SernEmitter.success(module));
-                return module;
-            },
-        }),
-        map(intoDispatcher),
-       /**
-        * Where all events are turned on
-        */
-        mergeAll(),
-        catchError(handleError(err, log)),
-        finalize(() => {
-            log?.info({ message: 'an event module reached end of lifetime' });
-            useContainerRaw()
-                ?.disposeAll()
-                .then(() => {
-                    log?.info({ message: 'Cleaning container and crashing' });
-                });
-        }),
-    ).subscribe();
+    of(null)
+        .pipe(
+            buildModules(eventsPath, s),
+            callInitPlugins({
+                onStop: module =>
+                    s.emit('module.register', SernEmitter.failure(module, SernError.PluginFailure)),
+                onNext: ({ module }) => {
+                    s.emit('module.register', SernEmitter.success(module));
+                    return module;
+                },
+            }),
+            map(intoDispatcher),
+            /**
+             * Where all events are turned on
+             */
+            mergeAll(),
+            catchError(handleError(err, log)),
+            finalize(() => {
+                log?.info({ message: 'an event module reached end of lifetime' });
+                useContainerRaw()
+                    ?.disposeAll()
+                    .then(() => {
+                        log?.info({ message: 'Cleaning container and crashing' });
+                    });
+            }),
+        )
+        .subscribe();
 }

@@ -1,27 +1,26 @@
-import { 
+import {
     ChatInputCommandInteraction,
     Client,
     InteractionReplyOptions,
     Message,
     MessageReplyOptions,
     Snowflake,
-    User 
-} from "discord.js";
-import { CoreContext } from "../core/structures/context";
-import { Result , Ok , Err } from 'ts-results-es';
-import { ReplyOptions } from "../types/handler";
+    User,
+} from 'discord.js';
+import { CoreContext } from '../core/structures/context';
+import { Result, Ok, Err } from 'ts-results-es';
+import { ReplyOptions } from '../types/handler';
 /**
  * @since 1.0.0
  * Provides values shared between
  * Message and ChatInputCommandInteraction
  */
 export class Context extends CoreContext<Message, ChatInputCommandInteraction> {
-
-    get options()  {
-        return this.interaction.options
+    get options() {
+        return this.interaction.options;
     }
     protected constructor(protected ctx: Result<Message, ChatInputCommandInteraction>) {
-        super(ctx)
+        super(ctx);
     }
 
     public get id(): Snowflake {
@@ -64,7 +63,7 @@ export class Context extends CoreContext<Message, ChatInputCommandInteraction> {
     public get inGuild(): boolean {
         return this.ctx.val.inGuild();
     }
-   
+
     public async reply(content: ReplyOptions) {
         return safeUnwrap(
             this.ctx
@@ -83,9 +82,6 @@ export class Context extends CoreContext<Message, ChatInputCommandInteraction> {
     }
 }
 
-
 function safeUnwrap<T>(res: Result<T, T>) {
     return res.val;
 }
-
-

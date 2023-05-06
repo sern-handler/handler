@@ -1,4 +1,8 @@
-import type { InteractionReplyOptions, MessageReplyOptions, CommandInteractionOptionResolver } from 'discord.js';
+import type {
+    InteractionReplyOptions,
+    MessageReplyOptions,
+    CommandInteractionOptionResolver,
+} from 'discord.js';
 import { Processed } from './core';
 import { AnyModule, CommandModule, EventModule } from './module';
 import { PayloadType } from '../core';
@@ -14,12 +18,10 @@ export type Args = ParseType<{ text: string[]; slash: SlashOptions }>;
 
 export type SlashOptions = Omit<CommandInteractionOptionResolver, 'getMessage' | 'getFocused'>;
 
-
 export type ReplyOptions =
     | string
     | Omit<InteractionReplyOptions, 'fetchReply'>
     | MessageReplyOptions;
-
 
 export type AnyDefinedModule = Processed<CommandModule | EventModule>;
 export type Payload =
@@ -32,4 +34,4 @@ export interface SernEventsMapping {
     'module.activate': [Payload];
     error: [Payload];
     warning: [Payload];
-};
+}

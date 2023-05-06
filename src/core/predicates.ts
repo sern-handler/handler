@@ -1,12 +1,23 @@
-import { AnySelectMenuInteraction, AutocompleteInteraction, ButtonInteraction, ChatInputCommandInteraction, MessageContextMenuCommandInteraction, ModalSubmitInteraction, UserContextMenuCommandInteraction } from "discord.js";
-import { InteractionType } from "discord.js";
+import {
+    AnySelectMenuInteraction,
+    AutocompleteInteraction,
+    ButtonInteraction,
+    ChatInputCommandInteraction,
+    MessageContextMenuCommandInteraction,
+    ModalSubmitInteraction,
+    UserContextMenuCommandInteraction,
+} from 'discord.js';
+import { InteractionType } from 'discord.js';
 
 interface InteractionTypable {
-    type: InteractionType
+    type: InteractionType;
 }
 //discord.js pls fix ur typings or i will >:(
 type AnyMessageComponentInteraction = AnySelectMenuInteraction | ButtonInteraction;
-type AnyCommandInteraction = ChatInputCommandInteraction | MessageContextMenuCommandInteraction | UserContextMenuCommandInteraction;
+type AnyCommandInteraction =
+    | ChatInputCommandInteraction
+    | MessageContextMenuCommandInteraction
+    | UserContextMenuCommandInteraction;
 export function isMessageComponent(i: InteractionTypable): i is AnyMessageComponentInteraction {
     return i.type === InteractionType.MessageComponent;
 }

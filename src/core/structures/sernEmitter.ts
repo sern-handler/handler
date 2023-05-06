@@ -84,4 +84,3 @@ export class SernEmitter extends EventEmitter {
         );
     }
 }
-

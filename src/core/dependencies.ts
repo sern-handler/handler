@@ -27,7 +27,7 @@ export function single<T>(cb: () => T) {
  * use transient if you want a new dependency every time your container getter is called
  * @param cb
  */
-export function transient<T>(cb: (() => () => T) ) {
+export function transient<T>(cb: () => () => T) {
     return cb;
 }
 /**
@@ -36,9 +36,7 @@ export function transient<T>(cb: (() => () => T) ) {
  * Finally, update the containerSubject with the new container state
  * @param conf
  */
-export function composeRoot<T extends AnyDependencies>(
-    conf: DependencyConfiguration<T>
-) {
+export function composeRoot<T extends AnyDependencies>(conf: DependencyConfiguration<T>) {
     //This should have no client or logger yet.
     const currentContainer = containerSubject.getValue();
     const excludeLogger = conf.exclude?.has('@sern/logger');
@@ -93,29 +91,29 @@ function defaultContainer() {
     >;
 }
 
-const requiredDependencyKeys = [
-    '@sern/emitter',
-    '@sern/errors',
-    '@sern/logger',
-] as const;
+const requiredDependencyKeys = ['@sern/emitter', '@sern/errors', '@sern/logger'] as const;
 
 /**
- * A way for sern to grab only the necessary dependencies. 
+ * A way for sern to grab only the necessary dependencies.
  * Returns a function which allows for the user to call for more dependencies.
  */
-export function makeFetcher<Dep extends AnyDependencies>(containerConfig : Wrapper['containerConfig']) {
-        return <const Keys extends (keyof Dep)[]>(otherKeys: [...Keys]) =>
-        containerConfig.get(...requiredDependencyKeys, ...otherKeys as (keyof AnyDependencies)[]) as MapDeps<
-            Dep,
-            [...typeof requiredDependencyKeys, ...Keys]
-        >;
+export function makeFetcher<Dep extends AnyDependencies>(
+    containerConfig: Wrapper['containerConfig'],
+) {
+    return <const Keys extends (keyof Dep)[]>(otherKeys: [...Keys]) =>
+        containerConfig.get(
+            ...requiredDependencyKeys,
+            ...(otherKeys as (keyof AnyDependencies)[]),
+        ) as MapDeps<Dep, [...typeof requiredDependencyKeys, ...Keys]>;
 }
 
 /**
  * @since 2.0.0
  * @param conf a configuration for creating your project dependencies
  */
-export function makeDependencies<const T extends AnyDependencies>(conf: DependencyConfiguration<T>) {
+export function makeDependencies<const T extends AnyDependencies>(
+    conf: DependencyConfiguration<T>,
+) {
     //Until there are more optional dependencies, just check if the logger exists
     composeRoot(conf);
     return useContainer<T>();

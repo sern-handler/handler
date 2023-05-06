@@ -37,29 +37,26 @@ export function makeMessageCreate(
         ModuleManager,
         EventEmitter,
     ],
-    defaultPrefix: string | undefined
+    defaultPrefix: string | undefined,
 ) {
-    if(!defaultPrefix) {
-        log?.debug({ message: 'No prefix found. message handler shut down' })
-        return EMPTY.subscribe()
+    if (!defaultPrefix) {
+        log?.debug({ message: 'No prefix found. message handler shut down' });
+        return EMPTY.subscribe();
     }
     const messageStream$ = sharedObservable<Message>(client, 'messageCreate');
     const handler = createMessageHandler(messageStream$, defaultPrefix, modules);
-    const messageHandler = handler(
-        ignoreNonBot(defaultPrefix) as (m: Message) => m is Message
-    )
-    return messageHandler 
-        .pipe(
-            makeModuleExecutor(module => {
-                s.emit('module.activate', SernEmitter.failure(module, SernError.PluginFailure));
-            }),
-            concatMap(payload => executeModule(s, payload)),
-            catchError(handleError(err, log)),
-            finalize(() => {
-                log?.info({ message: 'messageCreate stream closed or reached end of lifetime' });
-                useContainerRaw()
-                    ?.disposeAll()
-                    .then(() => log?.info({ message: 'Cleaning container and crashing' }));
-            }),
-        )
+    const messageHandler = handler(ignoreNonBot(defaultPrefix) as (m: Message) => m is Message);
+    return messageHandler.pipe(
+        makeModuleExecutor(module => {
+            s.emit('module.activate', SernEmitter.failure(module, SernError.PluginFailure));
+        }),
+        concatMap(payload => executeModule(s, payload)),
+        catchError(handleError(err, log)),
+        finalize(() => {
+            log?.info({ message: 'messageCreate stream closed or reached end of lifetime' });
+            useContainerRaw()
+                ?.disposeAll()
+                .then(() => log?.info({ message: 'Cleaning container and crashing' }));
+        }),
+    );
 }

@@ -12,13 +12,18 @@ export function contextArgs(
 /*
  * @overload
  */
-export function contextArgs(wrappable: ChatInputCommandInteraction): () => [Context, ['slash', SlashOptions]];
+export function contextArgs(
+    wrappable: ChatInputCommandInteraction,
+): () => [Context, ['slash', SlashOptions]];
 /**
  * function overloads to create an arguments list for Context
  * @param wrap
  * @param messageArgs
  */
-export function contextArgs(wrappable: Message | ChatInputCommandInteraction, messageArgs?: string[]) {
+export function contextArgs(
+    wrappable: Message | ChatInputCommandInteraction,
+    messageArgs?: string[],
+) {
     const ctx = Context.wrap(wrappable);
     const args = ctx.isMessage() ? ['text', messageArgs!] : ['slash', ctx.options];
     return () => [ctx, args] as [Context, Args];
@@ -27,4 +32,3 @@ export function contextArgs(wrappable: Message | ChatInputCommandInteraction, me
 export function interactionArg<T>(interaction: T) {
     return () => [interaction] as [T];
 }
-

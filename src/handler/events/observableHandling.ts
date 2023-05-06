@@ -6,20 +6,18 @@ import { callPlugin, everyPluginOk, filterMapTo } from '../../core/operators';
 import type { ImportPayload, Processed } from '../../types/core';
 import type { ControlPlugin, VoidResult } from '../../types/plugin';
 import { Awaitable } from '../../types/handler';
-import { Message } from 'discord.js'
+import { Message } from 'discord.js';
 function hasPrefix(prefix: string, content: string) {
     const prefixInContent = content.slice(0, prefix.length);
     return prefixInContent.localeCompare(prefix, undefined, { sensitivity: 'accent' }) === 0;
 }
-
 
 /**
  * Ignores messages from any person / bot except itself
  * @param prefix
  */
 export function ignoreNonBot(prefix: string) {
-    return ({ author, content }: Message) =>
-        !author.bot && hasPrefix(prefix, content);
+    return ({ author, content }: Message) => !author.bot && hasPrefix(prefix, content);
 }
 
 /**
@@ -76,7 +74,7 @@ export function createResultResolver<
         const task$ = config.createStream(args);
         return task$.pipe(
             tap(result => {
-               result.err && config.onStop?.(args.module);
+                result.err && config.onStop?.(args.module);
             }),
             everyPluginOk,
             filterMapTo(() => config.onNext(args)),

@@ -3,7 +3,20 @@
  * Each function should be modular and testable, not bound to discord / sern
  * and independent of each other
  */
-import { concatMap, defaultIfEmpty, EMPTY, every, fromEvent, map, Observable, of, OperatorFunction, pipe, share, switchMap } from 'rxjs';
+import {
+    concatMap,
+    defaultIfEmpty,
+    EMPTY,
+    every,
+    fromEvent,
+    map,
+    Observable,
+    of,
+    OperatorFunction,
+    pipe,
+    share,
+    switchMap,
+} from 'rxjs';
 import type { PluginResult, VoidResult } from '../types/plugin';
 import { Result } from 'ts-results-es';
 import { Awaitable } from '../types/handler';
@@ -16,16 +29,18 @@ export function filterMapTo<V>(item: () => V): OperatorFunction<boolean, V> {
     return concatMap(shouldKeep => (shouldKeep ? of(item()) : EMPTY));
 }
 
-export function filterMap<In, Out>(cb: (i: In) => Awaitable<Result<Out, unknown>>): OperatorFunction<In, Out> {
+export function filterMap<In, Out>(
+    cb: (i: In) => Awaitable<Result<Out, unknown>>,
+): OperatorFunction<In, Out> {
     return pipe(
         switchMap(async input => cb(input)),
         concatMap(s => {
-            if(s.ok) {
-                return of(s.val)
+            if (s.ok) {
+                return of(s.val);
             }
             return EMPTY;
-        })
-    )
+        }),
+    );
 }
 
 /**
@@ -47,7 +62,6 @@ export function callPlugin(args: unknown): OperatorFunction<
 }
 
 export const arrayifySource = map(src => (Array.isArray(src) ? (src as unknown[]) : [src]));
-
 
 /**
  * If the current value in Result stream is an error, calls callback.
@@ -75,7 +89,5 @@ export const everyPluginOk: OperatorFunction<VoidResult, boolean> = pipe(
 );
 
 export const sharedObservable = <T>(e: EventEmitter, eventName: string) => {
-    return (fromEvent(e, eventName) as Observable<T>).pipe(share())
+    return (fromEvent(e, eventName) as Observable<T>).pipe(share());
 };
-
-

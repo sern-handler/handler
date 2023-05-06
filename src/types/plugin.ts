@@ -40,4 +40,3 @@ export interface ControlPlugin<Args extends any[] = any[]> {
 
 export type AnyCommandPlugin = ControlPlugin | InitPlugin<[InitArgs<Processed<CommandModule>>]>;
 export type AnyEventPlugin = ControlPlugin | InitPlugin<[InitArgs<Processed<EventModule>>]>;
-

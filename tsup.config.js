@@ -19,10 +19,8 @@ export default defineConfig([
         target: 'node16',
         tsconfig: './tsconfig-esm.json',
         outDir: './dist/esm',
-        splitting: false, 
-        esbuildPlugins: [
-            ifdefPlugin({ variables: { MODE: 'esm' }, verbose: true }),
-        ],
+        splitting: false,
+        esbuildPlugins: [ifdefPlugin({ variables: { MODE: 'esm' }, verbose: true })],
         outExtension() {
             return {
                 js: '.mjs',

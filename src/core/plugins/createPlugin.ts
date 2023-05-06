@@ -9,7 +9,7 @@ export function makePlugin<V extends unknown[]>(
 ): Plugin<V> {
     return {
         type,
-        execute
+        execute,
     } as Plugin<V>;
 }
 /**

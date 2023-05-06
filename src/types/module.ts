@@ -10,7 +10,7 @@ import type {
     ApplicationCommandSubGroupData,
     BaseApplicationCommandOptionsData,
 } from 'discord.js';
-import { 
+import {
     AutocompleteInteraction,
     ButtonInteraction,
     ChannelSelectMenuInteraction,
@@ -21,13 +21,12 @@ import {
     RoleSelectMenuInteraction,
     StringSelectMenuInteraction,
     UserContextMenuCommandInteraction,
-    UserSelectMenuInteraction 
-
-} from "discord.js";
-import { InitArgs, } from "../core";
-import { Args,  Payload, SlashOptions } from "../types/handler";
-import { Context } from "../classic/context";
-import { Processed } from "../types/core";
+    UserSelectMenuInteraction,
+} from 'discord.js';
+import { InitArgs } from '../core';
+import { Args, Payload, SlashOptions } from '../types/handler';
+import { Context } from '../classic/context';
+import { Processed } from '../types/core';
 import { CommandType, PluginType } from '../core/structures/enums';
 import type { Awaitable, SernEventsMapping } from './handler';
 import type { InitPlugin, ControlPlugin } from './plugin';
@@ -36,8 +35,8 @@ import type { AnyCommandPlugin, AnyEventPlugin } from './plugin';
 import { sernMeta } from '../commands';
 
 interface CommandMeta {
-   fullPath: string;
-   id: string;
+    fullPath: string;
+    id: string;
 }
 
 export interface Module {
@@ -46,14 +45,14 @@ export interface Module {
     onEvent: ControlPlugin[];
     plugins: InitPlugin[];
     description?: string;
-    [sernMeta] : CommandMeta
+    [sernMeta]: CommandMeta;
     execute: (...args: any[]) => Awaitable<any>;
 }
 export interface CommandTypeModule extends Module {
-    type: CommandType
+    type: CommandType;
 }
 export interface EventTypeModule extends Module {
-    type: EventType
+    type: EventType;
 }
 export interface SernEventCommand<T extends keyof SernEventsMapping = keyof SernEventsMapping>
     extends Module {
@@ -67,7 +66,6 @@ export interface ExternalEventCommand extends Module {
     type: EventType.External;
     execute(...args: unknown[]): Awaitable<unknown>;
 }
-
 
 export interface ContextMenuUser extends Module {
     type: CommandType.CtxUser;
@@ -195,7 +193,7 @@ export interface CommandArgsMatrix {
         [PluginType.Control]: [/* library coupled */ ModalSubmitInteraction];
         [PluginType.Init]: [InitArgs<Processed<ModalSubmitCommand>>];
     };
-};
+}
 
 export interface EventArgsMatrix {
     [EventType.Discord]: {
@@ -210,7 +208,7 @@ export interface EventArgsMatrix {
         [PluginType.Control]: unknown[];
         [PluginType.Init]: [InitArgs<Processed<ExternalEventCommand>>];
     };
-};
+}
 export type EventModule = DiscordEventCommand | SernEventCommand | ExternalEventCommand;
 export type CommandModule =
     | TextCommand
@@ -243,13 +241,13 @@ export interface CommandModuleDefs {
     [CommandType.MentionableSelect]: MentionableSelectCommand;
     [CommandType.UserSelect]: UserSelectCommand;
     [CommandType.Modal]: ModalSubmitCommand;
-};
+}
 
 export interface EventModuleDefs {
     [EventType.Sern]: SernEventCommand;
     [EventType.Discord]: DiscordEventCommand;
     [EventType.External]: ExternalEventCommand;
-};
+}
 
 export interface SernAutocompleteData
     extends Omit<BaseApplicationCommandOptionsData, 'autocomplete'> {

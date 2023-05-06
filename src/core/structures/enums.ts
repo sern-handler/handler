@@ -15,12 +15,12 @@
  * ```
  */
 export enum CommandType {
-    Text    = 1 << 0,
-    Slash   = 1 << 1,
-    Both    = 3,
+    Text = 1 << 0,
+    Slash = 1 << 1,
+    Both = 3,
     CtxUser = 1 << 2,
-    CtxMsg  = 1 << 3,
-    Button  = 1 << 4,
+    CtxMsg = 1 << 3,
+    Button = 1 << 4,
     StringSelect = 1 << 5,
     Modal = 1 << 6,
     ChannelSelect = 1 << 7,
