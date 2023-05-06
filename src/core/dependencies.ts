@@ -1,11 +1,10 @@
 import type { Container } from 'iti';
-import type { AnyDependencies, DependencyConfiguration, MapDeps, ServerlessDependencies, WebsocketDependencies } from '../types/core';
+import type { AnyDependencies, DependencyConfiguration, MapDeps, ServerlessDependencies, WebsocketDependencies, Wrapper } from '../types/core';
 import { DefaultErrorHandling, DefaultLogging, DefaultModuleManager } from './contracts';
 import { Result } from 'ts-results-es';
 import { BehaviorSubject } from 'rxjs';
 import { createContainer } from 'iti';
 import { ModuleStore, SernEmitter } from './structures';
-import { AnyWrapper, ServerlessWrapper, WebsocketWrapper } from './structures/wrapper';
 
 export const containerSubject = new BehaviorSubject(defaultContainer());
 
@@ -100,22 +99,11 @@ const requiredDependencyKeys = [
     '@sern/logger',
 ] as const;
 
-
-/**
-  * @overload
- */
-export function makeFetcher<Dep extends WebsocketDependencies>(containerConfig : WebsocketWrapper['containerConfig'])
-    : <const Keys extends (keyof Dep)[]>(ks: [...Keys]) => MapDeps<Dep, [...typeof requiredDependencyKeys, ...Keys]>;
-/**
-  * @overload
- */
-export function makeFetcher<Dep extends ServerlessDependencies>(containerConfig: ServerlessWrapper['containerConfig'])
-    : <const Keys extends (keyof Dep)[]>(ks: [...Keys]) => MapDeps<Dep, [...typeof requiredDependencyKeys, ...Keys]>;
 /**
  * A way for sern to grab only the necessary dependencies. 
  * Returns a function which allows for the user to call for more dependencies.
  */
-export function makeFetcher<Dep extends AnyDependencies>(containerConfig : AnyWrapper['containerConfig']) {
+export function makeFetcher<Dep extends AnyDependencies>(containerConfig : Wrapper['containerConfig']) {
         return <const Keys extends (keyof Dep)[]>(otherKeys: [...Keys]) =>
         containerConfig.get(...requiredDependencyKeys, ...otherKeys as (keyof AnyDependencies)[]) as MapDeps<
             Dep,

@@ -37,15 +37,16 @@ export function makeMessageCreate(
         ModuleManager,
         EventEmitter,
     ],
-    platform: WebsocketStrategy
+    defaultPrefix: string | undefined
 ) {
-    if(!platform.defaultPrefix) {
+    if(!defaultPrefix) {
+        log?.debug({ message: 'No prefix found. message handler shut down' })
         return EMPTY.subscribe()
     }
-    const messageStream$ = sharedObservable<Message>(client, platform.eventNames[1]);
-    const handler = createMessageHandler(messageStream$, platform.defaultPrefix, modules);
+    const messageStream$ = sharedObservable<Message>(client, 'messageCreate');
+    const handler = createMessageHandler(messageStream$, defaultPrefix, modules);
     const messageHandler = handler(
-        ignoreNonBot(platform.defaultPrefix) as (m: Message) => m is Message
+        ignoreNonBot(defaultPrefix) as (m: Message) => m is Message
     )
     return messageHandler 
         .pipe(

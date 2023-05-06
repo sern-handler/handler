@@ -50,13 +50,6 @@ export function callPlugin(args: unknown): OperatorFunction<
 
 export const arrayifySource = map(src => (Array.isArray(src) ? (src as unknown[]) : [src]));
 
-export const fillDefaults = <T extends AnyModule>({ module, absPath }: ImportPayload<T>) => {
-    module.description ??= '...'
-    return {
-        absPath,
-        module 
-    } as ImportPayload<Processed<T>>;
-};
 
 /**
  * If the current value in Result stream is an error, calls callback.

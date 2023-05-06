@@ -14,11 +14,8 @@ import { buildModules } from './generic';
 export function startReadyEvent(
     [sEmitter, errorHandler, , moduleManager, client]: ServerlessDependencyList | WebsocketDependencyList,
     input: ObservableInput<string>,
-    platform: PlatformStrategy,
 ) {
-    const ready$ = platform.type === DispatchType.Serverless 
-        ? of(null)
-        : fromEvent(client!, platform.eventNames[2]).pipe(take(1));
+    const ready$ = fromEvent(client!, 'interactionCreate').pipe(take(1));
     return ready$
         .pipe(
             buildModules(input, sEmitter),
@@ -36,7 +33,6 @@ export function startReadyEvent(
             }),
         )
         .subscribe(module => {
-            console.log(module)
             const result = registerModule(moduleManager, module as Processed<Module>);
             if (result.err) {
                 errorHandler.crash(Error(SernError.InvalidModuleType));

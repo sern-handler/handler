@@ -3,12 +3,12 @@ import { type Result, Err, Ok } from 'ts-results-es';
 import { Processed } from '../types/core';
 import { Module } from '../types/module';
 import * as assert from 'node:assert'
-import * as util from 'node:util'
+import util from 'node:util'
 import { type Observable, from, mergeMap, ObservableInput } from 'rxjs';
 import { readdir, stat } from 'fs/promises';
 import { basename, join, resolve } from 'path';
 
-type ModuleResult<T> = Promise<Result<Processed<T>, SernError>> 
+export type ModuleResult<T> = Promise<Result<Processed<T>, SernError>> 
 export type Loader<T> = (absPath: string) => ModuleResult<T>
 
 export async function defaultModuleLoader<T extends Module>(

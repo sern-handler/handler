@@ -60,3 +60,11 @@ export interface ImportPayload<T> {
     absPath: string 
 };
 
+export interface Wrapper {
+    commands: string;
+    defaultPrefix?: string;
+    events?: string;
+    containerConfig: {
+        get: (...keys: (keyof WebsocketDependencies)[]) => unknown[];
+    }
+}

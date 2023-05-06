@@ -23,10 +23,9 @@ export function makeInteractionCreate([s, err, log, modules, client]: [
     Logging | undefined,
     ModuleManager,
     EventEmitter
-],
-    platform: WebsocketStrategy 
+]
 ) {
-    const interactionStream$ = sharedObservable<Interaction>(client, platform.eventNames[0]);
+    const interactionStream$ = sharedObservable<Interaction>(client, 'interactionCreate');
     const handle = createInteractionHandler<Interaction>(interactionStream$, modules);
     const interactionHandler$ = merge(
         handle(isMessageComponent),

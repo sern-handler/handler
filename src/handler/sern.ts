@@ -4,8 +4,7 @@ import { startReadyEvent } from './events/ready';
 import { makeMessageCreate } from './events/messages';
 import { makeFetcher, makeDependencies } from '../core/dependencies';
 import { err, ok } from '../core/functions';
-import { DefaultWrapper } from '../core/structures/wrapper';
-import { discordjs } from '../core';
+import { Wrapper } from '../types/core';
 import { getCommands } from '../core/module-loading';
 /**
  * @since 1.0.0
@@ -23,7 +22,7 @@ import { getCommands } from '../core/module-loading';
  * })
  * ```
  */
-export function init(wrapper: DefaultWrapper) {
+export function init(wrapper: Wrapper) {
     const startTime = performance.now();
     const dependenciesAnd = makeFetcher(wrapper.containerConfig);
     const dependencies = dependenciesAnd(['@sern/modules', '@sern/client']);
@@ -32,10 +31,9 @@ export function init(wrapper: DefaultWrapper) {
             dependenciesAnd(['@sern/client']), wrapper.events, wrapper.containerConfig
         );
     }
-    const platform = discordjs(wrapper.defaultPrefix);
-    startReadyEvent(dependencies, getCommands(wrapper.commands), platform);
-    makeMessageCreate(dependencies, platform);
-    makeInteractionCreate(dependencies, platform);
+    startReadyEvent(dependencies, getCommands(wrapper.commands));
+    makeMessageCreate(dependencies, wrapper.defaultPrefix);
+    makeInteractionCreate(dependencies);
     const endTime = performance.now();
     dependencies[2]?.info({ message: `sern : ${(endTime - startTime).toFixed(2)} ms` });
    

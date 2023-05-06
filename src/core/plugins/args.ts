@@ -1,8 +1,6 @@
-import type { CommandType } from '../structures/enums';
-import type { PluginType } from '../structures/enums';
+import type { CommandType, PluginType, EventType } from '../structures/enums';
 import type { Module } from '../../types/module';
 import type { Processed } from '../../types/core';
-import { EventType } from '../structures/enums';
 import { CommandArgsMatrix, EventArgsMatrix } from '../../types/module';
 
 export interface InitArgs<T extends Processed<Module>> {

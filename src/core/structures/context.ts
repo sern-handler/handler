@@ -3,7 +3,6 @@ import { SernError } from './errors';
 import * as assert from 'node:assert'
 
 
-
 /**
   * @since 3.0.0
   */

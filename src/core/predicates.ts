@@ -1,18 +1,23 @@
-import { AutocompleteInteraction, CommandInteraction, ModalSubmitInteraction } from "discord.js";
-import { BaseInteraction,  InteractionType, MessageComponentInteraction } from "discord.js";
+import { AnySelectMenuInteraction, AutocompleteInteraction, ButtonInteraction, ChatInputCommandInteraction, MessageContextMenuCommandInteraction, ModalSubmitInteraction, UserContextMenuCommandInteraction } from "discord.js";
+import { InteractionType } from "discord.js";
 
-
-export function isMessageComponent(i: BaseInteraction): i is MessageComponentInteraction {
+interface InteractionTypable {
+    type: InteractionType
+}
+//discord.js pls fix ur typings or i will >:(
+type AnyMessageComponentInteraction = AnySelectMenuInteraction | ButtonInteraction;
+type AnyCommandInteraction = ChatInputCommandInteraction | MessageContextMenuCommandInteraction | UserContextMenuCommandInteraction;
+export function isMessageComponent(i: InteractionTypable): i is AnyMessageComponentInteraction {
     return i.type === InteractionType.MessageComponent;
 }
 
-export function isCommand(i: BaseInteraction): i is CommandInteraction {
+export function isCommand(i: InteractionTypable): i is AnyCommandInteraction {
     return i.type === InteractionType.ApplicationCommand;
 }
-export function isAutocomplete(i: BaseInteraction): i is AutocompleteInteraction {
+export function isAutocomplete(i: InteractionTypable): i is AutocompleteInteraction {
     return i.type === InteractionType.ApplicationCommandAutocomplete;
 }
 
-export function isModal(i: BaseInteraction): i is ModalSubmitInteraction {
+export function isModal(i: InteractionTypable): i is ModalSubmitInteraction {
     return i.type === InteractionType.ModalSubmit;
 }

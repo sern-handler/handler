@@ -79,6 +79,7 @@ export function eventModule(mod: InputEvent): EventModule {
 /** Create event modules from discord.js client events,
  * This is an {@link eventModule} for discord events,
  * where typings can be very bad.
+ * @Experimental
  * @param mod
  */
 export function discordEvent<T extends keyof ClientEvents>(mod: {
