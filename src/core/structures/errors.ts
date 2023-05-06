@@ -1,7 +1,7 @@
 /**
  * @enum { string }
  */
-export enum SernError {
+export const enum SernError {
     /**
      * Throws when registering an invalid module.
      * This means it is undefined or an invalid command type was provided
