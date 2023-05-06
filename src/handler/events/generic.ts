@@ -1,21 +1,35 @@
-import { BaseInteraction, ChatInputCommandInteraction, Interaction, InteractionType } from "discord.js";
+import { BaseInteraction, ChatInputCommandInteraction, Interaction, InteractionType, Message } from "discord.js";
 import { Observable, filter, map } from "rxjs";
 import { CommandType, ModuleManager } from "../../core";
 import { SernError } from '../../core/structures/errors'
 import { filterMap } from '../../core/operators';
 import { defaultModuleLoader } from "../../core/module-loading";
 import { Processed } from "../../types/core";
-import { BothCommand, CommandModule } from "../../types/module";
+import { BothCommand, CommandModule, Module } from "../../types/module";
 import { contextArgs, dispatchAutocomplete, dispatchCommand, interactionArg } from "./dispatchers";
 import { isAutocomplete } from "../../core/predicates";
-import { err } from "../../core/functions";
 import { ObservableInput, pipe, switchMap} from "rxjs";
 import { SernEmitter } from "../../core";
 import { errTap } from '../../core/operators';
 import * as Files from '../../core/module-loading';
 import { sernMeta } from "../../commands";
 import { AnyModule } from "../../types/module";
+import { Err, Result } from "ts-results-es";
+import { Awaitable } from "../../types/handler";
+import { fmt } from "./messages";
 
+
+
+function createGenericHandler<Source, Narrowed extends Source, Output>(
+    source: Observable<Source>,
+    makeModule: (event: Narrowed) => Awaitable<Result<Output, unknown>>
+) {
+    return (pred: (i: Source) => i is Narrowed) =>
+       source.pipe(
+        filter(pred),
+        filterMap(makeModule)
+       )
+}
 /**
  *
  * Creates an RxJS observable that filters and maps incoming interactions to their respective modules.
@@ -23,21 +37,45 @@ import { AnyModule } from "../../types/module";
  * @param mg The module manager instance used to retrieve the module path for each interaction.
  * @returns A handler to create a RxJS observable of dispatchers that take incoming interactions and execute their corresponding modules.
  */
-export function createHandler<T extends BaseInteraction>(
-    i: Observable<Interaction>,
+export function createInteractionHandler<T extends Interaction>(
+    source: Observable<Interaction>,
     mg: ModuleManager,
 ) {
-    return (pred: (i: BaseInteraction) => i is T) =>
-        i.pipe(
-            filter(pred),
-            filterMap(event => {
-                const fullPath = mg.get(createId(event as unknown as Interaction))
-                if(!fullPath) return err();
-                return defaultModuleLoader<CommandModule>(fullPath)
-                    .then(res => res.map(module => ({ module, event }) ))
-            }),
-            map(createDispatcher)
-       ) 
+    return createGenericHandler<Interaction, T, ReturnType<typeof createDispatcher>>(
+        source,
+        ( event ) => {
+            const fullPath = mg.get(createId(event as unknown as Interaction))
+            if(!fullPath) return Err(SernError.UndefinedModule + " No full path found in module store");
+            return defaultModuleLoader<CommandModule>(fullPath)
+                .then(res => 
+                    res.map(module => createDispatcher({ module, event }))
+                )
+        }
+    )
+}
+
+export function createMessageHandler(
+    source: Observable<Message>,
+    defaultPrefix: string,
+    mg: ModuleManager
+) {
+    return createGenericHandler(
+        source,
+        ( event ) => {
+            const [prefix, ...rest] = fmt(event.content, defaultPrefix);
+            const fullPath = mg.get(`${prefix}__A0`);
+            if (fullPath === undefined) {
+                return Err(SernError.UndefinedModule + " No full path found in module store");
+            }
+            return defaultModuleLoader<CommandModule>(fullPath).then(
+                result => {
+                    const args = contextArgs(event, rest);
+                    return result.map(module => dispatchCommand(module, args))
+                })
+
+
+        }
+    )
 }
 /**
  * Creates a unique ID for a given interaction object.

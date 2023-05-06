@@ -1,4 +1,4 @@
-import { Interaction } from 'discord.js';
+import { BaseInteraction, Interaction } from 'discord.js';
 import {
     catchError,
     concatMap,
@@ -14,7 +14,7 @@ import { useContainerRaw } from '../../core/dependencies';
 import type { Logging, ModuleManager } from '../../core/contracts';
 import type { EventEmitter } from 'node:events';
 import { isAutocomplete, isCommand, isMessageComponent, isModal } from '../../core/predicates';
-import { createHandler } from './generic';
+import { createInteractionHandler } from './generic';
 
 
 export function makeInteractionCreate([s, err, log, modules, client]: [
@@ -27,7 +27,7 @@ export function makeInteractionCreate([s, err, log, modules, client]: [
     platform: WebsocketStrategy 
 ) {
     const interactionStream$ = sharedObservable<Interaction>(client, platform.eventNames[0]);
-    const handle = createHandler(interactionStream$, modules);
+    const handle = createInteractionHandler<Interaction>(interactionStream$, modules);
     const interactionHandler$ = merge(
         handle(isMessageComponent),
         handle(isAutocomplete),

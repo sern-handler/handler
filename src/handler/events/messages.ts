@@ -13,6 +13,7 @@ import { WebsocketStrategy, SernEmitter } from '../../core';
 import { err } from '../../core/functions';
 import { defaultModuleLoader } from '../../core/module-loading';
 import { sharedObservable, filterMap } from '../../core/operators';
+import { createMessageHandler } from './generic';
 
 /**
  * Removes the first character(s) _[depending on prefix length]_ of the message
@@ -28,32 +29,6 @@ export function fmt(msg: string, prefix: string): string[] {
     return msg.slice(prefix.length).trim().split(/\s+/g);
 }
 
-/**
- * An operator function that processes a message to fetch a command module and prepares context payload.
- * @param defaultPrefix
- * @param get
- */
-const createMessageProcessor = (
-    defaultPrefix: string,
-    moduleManager: ModuleManager
-) =>
-    pipe(
-        ignoreNonBot(defaultPrefix),
-        filterMap(message => {
-            const [prefix, ...rest] = fmt(message.content, defaultPrefix);
-            const fullPath = moduleManager.get(`${prefix}__A0`);
-            if (fullPath === undefined) {
-                return err();
-            }
-            return defaultModuleLoader<CommandModule>(fullPath).then(
-                result => {
-                    const args = contextArgs(message, rest);
-                    return result.map(module => ({ module, args }))
-                })
-        }),
-        map(({ args, module }) => dispatchCommand(module as Processed<CommandModule>, args)),
-    );
-
 export function makeMessageCreate(
     [s, err, log, modules, client]: [
         SernEmitter,
@@ -68,10 +43,12 @@ export function makeMessageCreate(
         return EMPTY.subscribe()
     }
     const messageStream$ = sharedObservable<Message>(client, platform.eventNames[1]);
-    const messageProcessor = createMessageProcessor(platform.defaultPrefix, modules);
-    return messageStream$
+    const handler = createMessageHandler(messageStream$, platform.defaultPrefix, modules);
+    const messageHandler = handler(
+        ignoreNonBot(platform.defaultPrefix) as (m: Message) => m is Message
+    )
+    return messageHandler 
         .pipe(
-            messageProcessor,
             makeModuleExecutor(module => {
                 s.emit('module.activate', SernEmitter.failure(module, SernError.PluginFailure));
             }),
@@ -84,5 +61,4 @@ export function makeMessageCreate(
                     .then(() => log?.info({ message: 'Cleaning container and crashing' }));
             }),
         )
-        .subscribe();
 }

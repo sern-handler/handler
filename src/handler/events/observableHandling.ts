@@ -1,4 +1,4 @@
-import { concatMap, EMPTY, filter, from, Observable, of, tap, throwError } from 'rxjs';
+import { concatMap, EMPTY, from, Observable, of, tap, throwError } from 'rxjs';
 import { Result } from 'ts-results-es';
 import type { CommandModule, EventModule, Module } from '../../types/module';
 import { SernEmitter } from '../../core';
@@ -18,9 +18,8 @@ function hasPrefix(prefix: string, content: string) {
  * @param prefix
  */
 export function ignoreNonBot(prefix: string) {
-    const messageFromHumanAndHasPrefix = ({ author, content }: Message) =>
+    return ({ author, content }: Message) =>
         !author.bot && hasPrefix(prefix, content);
-    return filter(messageFromHumanAndHasPrefix);
 }
 
 /**
