@@ -36,29 +36,23 @@ export function treeSearch(
         const cur = _options.pop()!;
         switch (cur.type) {
             case ApplicationCommandOptionType.Subcommand:
-                {
+            case ApplicationCommandOptionType.SubcommandGroup:
+            {
                     for (const option of cur.options ?? []) {
                         _options.push(option);
                     }
-                }
-                break;
-            case ApplicationCommandOptionType.SubcommandGroup:
-                {
-                    for (const command of cur.options ?? []) {
-                        _options.push(command);
-                    }
-                }
-                break;
+            }
+            break;
             default:
-                {
-                    if (cur.autocomplete) {
-                        const choice = iAutocomplete.options.getFocused(true);
-                        if (cur.name === choice.name && cur.autocomplete) {
-                            autocompleteData = cur;
-                        }
+            {
+                if (cur.autocomplete) {
+                    const choice = iAutocomplete.options.getFocused(true);
+                    if (cur.name === choice.name && cur.autocomplete) {
+                        autocompleteData = cur;
                     }
                 }
-                break;
+            }
+            break;
         }
     }
     return autocompleteData;
