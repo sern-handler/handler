@@ -3,18 +3,11 @@
     "packageManager": "yarn@3.5.0",
     "version": "2.6.1",
     "description": "A complete, customizable, typesafe, & reactive framework for discord bots.",
-    "main": "dist/cjs/index.cjs",
-    "module": "dist/esm/index.mjs",
     "exports": {
         ".": {
             "import": "./dist/esm/index.mjs",
             "require": "./dist/cjs/index.cjs",
             "types": "dist/index.d.ts"
-        },
-        "./multiplatform": {
-            "import": "./dist/esm/multiplatform/index.mjs",
-            "require": "./dist/cjs/multiplatform/index.cjs",
-            "types": "./dist/multiplatform/index.d.ts"
         }
     },
     "scripts": {
@@ -41,8 +34,7 @@
     "dependencies": {
         "iti": "^0.6.0",
         "rxjs": "^7.8.0",
-        "ts-results-es": "^3.6.0",
-        "tweetnacl": "^1.0.3"
+        "ts-results-es": "^3.6.0"
     },
     "devDependencies": {
         "@cloudflare/workers-types": "^4.20230419.0",

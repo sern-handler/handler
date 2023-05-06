@@ -11,7 +11,9 @@
         "declaration": true,
         "preserveSymlinks": true,
         "allowSyntheticDefaultImports": true,
-        "forceConsistentCasingInFileNames": true
+        "forceConsistentCasingInFileNames": true,
+        "types": ["@cloudflare/workers-types"],
+        "isolatedModules": true
     },
     "exclude": ["node_modules", "dist"],
     "include": ["src"]
