@@ -1,12 +1,12 @@
-import type { Awaitable, Message } from 'discord.js';
 import { concatMap, EMPTY, filter, from, Observable, of, tap, throwError } from 'rxjs';
 import { Result } from 'ts-results-es';
 import type { CommandModule, EventModule, Module } from '../../types/module';
 import { SernEmitter } from '../../core';
 import { callPlugin, everyPluginOk, filterMapTo } from '../../core/operators';
-import type { ImportPayload, Processed } from '../../types/handler';
+import type { ImportPayload, Processed } from '../../types/core';
 import type { ControlPlugin, VoidResult } from '../../types/plugin';
-
+import { Awaitable } from '../../types/handler';
+import { Message } from 'discord.js'
 function hasPrefix(prefix: string, content: string) {
     const prefixInContent = content.slice(0, prefix.length);
     return prefixInContent.localeCompare(prefix, undefined, { sensitivity: 'accent' }) === 0;

@@ -1,7 +1,6 @@
 import type { Message, ChatInputCommandInteraction } from 'discord.js';
-import { CoreContext } from '../../../core/structures'
 import type { Args, SlashOptions } from '../../../types/handler';
-import Context from '../../../classic/context';
+import { Context } from '../../../classic/context';
 
 /*
  * @overload
@@ -29,10 +28,3 @@ export function interactionArg<T>(interaction: T) {
     return () => [interaction] as [T];
 }
 
-
-export function multiplatformArgs<
-    M,
-    I,
-    Ctx extends typeof CoreContext<M, I>
->(c: Ctx) {
-}

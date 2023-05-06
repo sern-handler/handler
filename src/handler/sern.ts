@@ -1,12 +1,12 @@
 import { makeEventsHandler } from './events/userDefined';
 import { makeInteractionCreate } from './events/interactions';
-import { makeReadyEvent } from './events/ready';
+import { startReadyEvent } from './events/ready';
 import { makeMessageCreate } from './events/messages';
-import type { AnyDependencies, DependencyConfiguration } from '../types/handler';
-import { composeRoot, makeFetcher, useContainer } from '../core/dependencies';
+import { makeFetcher, makeDependencies } from '../core/dependencies';
 import { err, ok } from '../core/functions';
 import { DefaultWrapper } from '../core/structures/wrapper';
 import { discordjs } from '../core';
+import { getCommands } from '../core/io';
 /**
  * @since 1.0.0
  * @param wrapper Options to pass into sern.
@@ -33,14 +33,21 @@ export function init(wrapper: DefaultWrapper) {
         );
     }
     const platform = discordjs(wrapper.defaultPrefix);
-    makeReadyEvent(dependencies, wrapper.commands, platform);
+    startReadyEvent(dependencies, getCommands(wrapper.commands), platform);
     makeMessageCreate(dependencies, platform);
     makeInteractionCreate(dependencies, platform);
     const endTime = performance.now();
     dependencies[2]?.info({ message: `sern : ${(endTime - startTime).toFixed(2)} ms` });
    
 }
-
+/**
+  * @deprecated - Please import the function directly:
+  * ```ts
+  * import { makeDependencies } from '@sern/handler'
+  *
+  * ```
+  */
+export { makeDependencies }
 /**
  * @since 1.0.0
  * The object passed into every plugin to control a command's behavior
@@ -49,16 +56,4 @@ export const controller = {
     next: ok,
     stop: err,
 };
-
-
-/**
- * @since 2.0.0
- * @param conf a configuration for creating your project dependencies
- */
-export function makeDependencies<const T extends AnyDependencies>(conf: DependencyConfiguration<T>) {
-    //Until there are more optional dependencies, just check if the logger exists
-    composeRoot(conf);
-    return useContainer<T>();
-}
-
 

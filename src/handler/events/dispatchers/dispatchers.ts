@@ -1,10 +1,10 @@
-import type { Processed } from '../../../types/handler';
+import type { Processed } from '../../../types/core';
 import type { AutocompleteInteraction } from 'discord.js';
-import { SernError } from '../../../core/structures';
+import { SernError } from '../../../core/structures/errors';
 import { treeSearch } from '../../../core/functions';
 import type { BothCommand, CommandModule, Module } from '../../../types/module';
-import { EventEmitter } from 'events';
-import * as assert from 'assert';
+import { EventEmitter } from 'node:events';
+import * as assert from 'node:assert';
 import { concatMap, from, fromEvent, map, OperatorFunction, pipe } from 'rxjs';
 import { arrayifySource, callPlugin } from '../../../core/operators';
 import { createResultResolver } from '../observableHandling';

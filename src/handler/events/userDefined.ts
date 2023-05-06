@@ -1,11 +1,12 @@
 import { catchError, finalize, map, mergeAll, of } from 'rxjs';
-import type { Processed, WebsocketDependencies } from '../../types/handler';
+import type { Processed, WebsocketDependencies } from '../../types/core';
 import { callInitPlugins } from './observableHandling';
 import type { CommandModule, EventModule } from '../../types/module';
-import type { EventEmitter } from 'events';
-import SernEmitter from '../../core/sernEmitter';
+import type { EventEmitter } from 'node:events';
+import { SernEmitter } from '../../core/sernEmitter';
 import type { ErrorHandling, Logging } from '../../core/contracts';
-import { SernError, EventType } from '../../core/structures';
+import { EventType } from '../../core/structures'
+import { SernError } from '../../core/structures/errors';
 import { eventDispatcher } from './dispatchers';
 import { handleError } from '../../core/contracts/errorHandling';
 import { useContainerRaw } from '../../core/dependencies';

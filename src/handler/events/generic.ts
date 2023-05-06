@@ -1,17 +1,23 @@
 import { BaseInteraction, ChatInputCommandInteraction, Interaction, InteractionType } from "discord.js";
-import { Observable, filter, map, pipe, switchMap} from "rxjs";
-import { CommandType, ModuleManager, SernEmitter, SernError } from "../../core";
-import { filterMap, errTap } from '../../core/operators';
+import { Observable, filter, map } from "rxjs";
+import { CommandType, ModuleManager } from "../../core";
+import { SernError } from '../../core/structures/errors'
+import { filterMap } from '../../core/operators';
 import { defaultModuleLoader } from "../../core/module-loading";
-import { Processed } from "../../types/handler";
-import { AnyModule, BothCommand, CommandModule } from "../../types/module";
+import { Processed } from "../../types/core";
+import { BothCommand, CommandModule } from "../../types/module";
 import { contextArgs, dispatchAutocomplete, dispatchCommand, interactionArg } from "./dispatchers";
 import { isAutocomplete } from "../../core/predicates";
 import { err } from "../../core/functions";
-import * as Files from '../../core/module-loading';
+import { ObservableInput, pipe, switchMap} from "rxjs";
+import { SernEmitter } from "../../core";
+import { errTap } from '../../core/operators';
+import * as Files from '../../core/io';
 import { sernMeta } from "../../commands";
+import { AnyModule } from "../../types/module";
 
 /**
+ *
  * Creates an RxJS observable that filters and maps incoming interactions to their respective modules.
  * @param i An RxJS observable of interactions.
  * @param mg The module manager instance used to retrieve the module path for each interaction.
@@ -83,9 +89,12 @@ function createDispatcher({
     }
 }
 
-export function buildModules<T extends AnyModule>(path: string, sernEmitter: SernEmitter) {
+
+export function buildModules<T extends AnyModule>(
+    input: ObservableInput<string>, sernEmitter: SernEmitter
+) {
     return pipe(
-        switchMap(() => Files.buildModuleStream<T>(path)),
+        switchMap(() => Files.buildModuleStream<T>(input)),
         errTap(error => {
             sernEmitter.emit('module.register', SernEmitter.failure(undefined, error));
         }),
