@@ -23,7 +23,7 @@ import {
     UserContextMenuCommandInteraction,
     UserSelectMenuInteraction,
 } from 'discord.js';
-import { InitArgs } from '../core';
+import { InitArgs } from './core';
 import { Args, Payload, SlashOptions } from '../types/handler';
 import { Context } from '../classic/context';
 import { Processed } from '../types/core';

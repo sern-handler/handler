@@ -1,15 +1,16 @@
+/**
+ * Core typings.
+ * Includes iti, dependencies, and other commonly used types
+ * Should not have discord.js imports
+ */
 import { type EventEmitter } from 'node:events';
 import { ErrorHandling, Logging, ModuleManager, SernEmitter } from '../core';
 import { Container, UnpackFunction } from 'iti';
+import { Module } from './module';
+import { Awaitable } from './handler';
 
 export type ModuleStore = Map<string, string>;
-export type ServerlessDependencyList = [
-    SernEmitter,
-    ErrorHandling,
-    Logging | undefined,
-    ModuleManager,
-];
-export type WebsocketDependencyList = [
+export type DependencyList = [
     SernEmitter,
     ErrorHandling,
     Logging | undefined,
@@ -32,22 +33,13 @@ export interface CoreDependencies {
     '@sern/modules': Singleton<ModuleManager>;
     '@sern/errors': Singleton<ErrorHandling>;
 }
-/**
- * To support older versions. Type alias for WebsocketDependencies
- * @deprecated
- */
-export type Dependencies = WebsocketDependencies;
-export interface ServerlessDependencies extends CoreDependencies {
-    '@sern/client': never;
-}
 
-export interface WebsocketDependencies extends CoreDependencies {
+export interface Dependencies extends CoreDependencies {
     '@sern/client': Singleton<EventEmitter>;
 }
-export type AnyDependencies = ServerlessDependencies | WebsocketDependencies;
 
 //prettier-ignore
-export type MapDeps<Deps extends AnyDependencies, T extends readonly unknown[]> = T extends [
+export type MapDeps<Deps extends Dependencies, T extends readonly unknown[]> = T extends [
     infer First extends keyof Deps,
     ...infer Rest extends readonly unknown[],
 ]
@@ -56,13 +48,17 @@ export type MapDeps<Deps extends AnyDependencies, T extends readonly unknown[]> 
           ...(MapDeps<Deps, Rest> extends [never] ? [] : MapDeps<Deps, Rest>),
       ]
     : [never];
-//Basically, '@sern/client' | '@sern/store' | '@sern/modules' | '@sern/error' | '@sern/emitter' will be provided defaults, and you can exclude the rest
-export type OptionalDependencies = '@sern/logger';
+
+/*
+ * @deprecated  
+ * Will remove optional logger in the future
+ */export type OptionalDependencies = '@sern/logger';
 export type Processed<T> = T & { name: string; description: string };
 export type Deprecated<Message extends string> = [never, Message];
-export interface DependencyConfiguration<T extends AnyDependencies> {
+export interface DependencyConfiguration<T extends Dependencies> {
+    //@deprecated. Loggers will always be included in the future
     exclude?: Set<OptionalDependencies>;
-    build: (root: Container<Omit<AnyDependencies, '@sern/client'>, {}>) => Container<T, {}>;
+    build: (root: Container<CoreDependencies, {}>) => Awaitable<Container<T, {}>>;
 }
 
 export interface ImportPayload<T> {
@@ -75,6 +71,10 @@ export interface Wrapper {
     defaultPrefix?: string;
     events?: string;
     containerConfig: {
-        get: (...keys: (keyof WebsocketDependencies)[]) => unknown[];
+        get: (...keys: (keyof Dependencies)[]) => unknown[];
     };
+}
+export interface InitArgs<T extends Processed<Module>> {
+    module: T;
+    absPath: string;
 }
