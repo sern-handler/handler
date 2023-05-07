@@ -1,2 +1,2 @@
 export * from './args';
-export * from './createPlugin';
+export * from './create-plugin';

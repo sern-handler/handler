@@ -1,19 +1,16 @@
-import type { Container } from 'iti';
-import type { AnyDependencies, DependencyConfiguration, MapDeps, Wrapper } from '../types/core';
+import { Container } from 'iti';
+import type { Dependencies, DependencyConfiguration, MapDeps, Wrapper } from '../types/core';
 import { DefaultErrorHandling, DefaultLogging, DefaultModuleManager } from './contracts';
 import { Result } from 'ts-results-es';
-import { BehaviorSubject } from 'rxjs';
 import { createContainer } from 'iti';
 import { SernEmitter } from './structures';
-
-export const containerSubject = new BehaviorSubject(defaultContainer());
-
+import { SernError } from './structures/errors';
+export let containerSubject: Container<{}, {}> 
+const requiredDependencyKeys = ['@sern/emitter', '@sern/errors', '@sern/logger'] as const;
 /**
  * @__PURE__
  * @since 2.0.0.
- * Please note that on intellij, the deprecation is for all signatures, which is unintended behavior (and
- * very annoying).
- * For future versions, ensure that single is being passed as a **callback!!**
+ * use single if you want a singleton, or an object that is called once.
  * @param cb
  */
 export function single<T>(cb: () => T) {
@@ -36,31 +33,31 @@ export function transient<T>(cb: () => () => T) {
  * Finally, update the containerSubject with the new container state
  * @param conf
  */
-export function composeRoot<T extends AnyDependencies>(conf: DependencyConfiguration<T>) {
+export function composeRoot<T extends Dependencies>(conf: DependencyConfiguration<T>) {
     //This should have no client or logger yet.
-    const currentContainer = containerSubject.getValue();
     const excludeLogger = conf.exclude?.has('@sern/logger');
     if (!excludeLogger) {
-        currentContainer.add({
+        containerSubject.add({
             '@sern/logger': () => new DefaultLogging(),
         });
     }
     //Build the container based on the callback provided by the user
-    const container = conf.build(currentContainer);
-    //Check if the built container contains @sern/client or throw
-    // a runtime exception
-    //Result.wrap(() => container.get('@sern/client')).expect(SernError.MissingRequired);
+    const container = conf.build(containerSubject as Container<Omit<Dependencies, '@sern/client'>, {}>);
+    try {
+        container.get('@sern/client');
+    } catch {
+        throw new Error(SernError.MissingRequired + " No client was provided")
+    }
 
     if (!excludeLogger) {
         container.get('@sern/logger')?.info({ message: 'All dependencies loaded successfully.' });
     }
-    containerSubject.next(container as any);
 }
 
-export function useContainer<const T extends AnyDependencies>() {
-    const container = containerSubject.getValue() as Container<T, {}>;
+export function useContainer<const T extends Dependencies>() {
+    const container = containerSubject as Container<T, {}>;
     return <V extends (keyof T)[]>(...keys: [...V]) =>
-        keys.map(key => Result.wrap(() => container.get(key)).unwrapOr(undefined)) as MapDeps<T, V>;
+        keys.map(key => Result.wrap(() => container.get(key)).expect(`Unregistered dependency: ${String(key)}`)) as MapDeps<T, V>;
 }
 
 /**
@@ -68,8 +65,11 @@ export function useContainer<const T extends AnyDependencies>() {
  * Please be careful as this only gets the client's current state.
  * Exposes some methods from iti
  */
-export function useContainerRaw<T extends AnyDependencies>() {
-    return containerSubject.getValue() as Container<T, {}>;
+export function useContainerRaw<T extends Dependencies>() {
+    if(!containerSubject) {
+        throw Error("Could not find container. Did you call makeDependencies?")
+    }
+    return containerSubject as Container<T, {}>;
 }
 
 /**
@@ -78,32 +78,30 @@ export function useContainerRaw<T extends AnyDependencies>() {
  */
 function defaultContainer() {
     return createContainer()
-        .add({ '@sern/errors': () => new DefaultErrorHandling() })
-        .add({ '@sern/store': () => new Map() })
+        .add({
+            '@sern/errors': () => new DefaultErrorHandling(),
+            '@sern/store': () => new Map<string, string>(),
+            '@sern/emitter': () => new SernEmitter()
+        })
         .add(ctx => {
             return {
                 '@sern/modules': () => new DefaultModuleManager(ctx['@sern/store']),
             };
         })
-        .add({ '@sern/emitter': () => new SernEmitter() }) as Container<
-        Omit<AnyDependencies, '@sern/client' | '@sern/logger'>,
-        {}
-    >;
 }
 
-const requiredDependencyKeys = ['@sern/emitter', '@sern/errors', '@sern/logger'] as const;
 
 /**
  * A way for sern to grab only the necessary dependencies.
  * Returns a function which allows for the user to call for more dependencies.
  */
-export function makeFetcher<Dep extends AnyDependencies>(
+export function makeFetcher<Dep extends Dependencies>(
     containerConfig: Wrapper['containerConfig'],
 ) {
     return <const Keys extends (keyof Dep)[]>(otherKeys: [...Keys]) =>
         containerConfig.get(
             ...requiredDependencyKeys,
-            ...(otherKeys as (keyof AnyDependencies)[]),
+            ...(otherKeys as (keyof Dependencies)[]),
         ) as MapDeps<Dep, [...typeof requiredDependencyKeys, ...Keys]>;
 }
 
@@ -111,9 +109,10 @@ export function makeFetcher<Dep extends AnyDependencies>(
  * @since 2.0.0
  * @param conf a configuration for creating your project dependencies
  */
-export function makeDependencies<const T extends AnyDependencies>(
+export function makeDependencies<const T extends Dependencies>(
     conf: DependencyConfiguration<T>,
 ) {
+    containerSubject = defaultContainer()
     //Until there are more optional dependencies, just check if the logger exists
     composeRoot(conf);
     return useContainer<T>();

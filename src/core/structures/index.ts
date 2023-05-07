@@ -1,3 +1,3 @@
 export * from './enums';
 export * from './context';
-export * from './sernEmitter';
+export * from './sern-emitter';
