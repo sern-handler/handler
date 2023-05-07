@@ -12,8 +12,8 @@
  */
 
 import type { Err, Ok, Result } from 'ts-results-es';
-import type { PluginType } from '../core/structures/enums';
-import type { CommandModule, EventModule } from './module';
+import type { CommandType, EventType, PluginType } from '../core/structures';
+import type { CommandArgsMatrix, CommandModule, EventArgsMatrix, EventModule } from './module';
 import type { InitArgs } from './core';
 import type { Awaitable } from './handler';
 import { Processed } from './core';
@@ -40,3 +40,13 @@ export interface ControlPlugin<Args extends any[] = any[]> {
 
 export type AnyCommandPlugin = ControlPlugin | InitPlugin<[InitArgs<Processed<CommandModule>>]>;
 export type AnyEventPlugin = ControlPlugin | InitPlugin<[InitArgs<Processed<EventModule>>]>;
+
+export type CommandArgs<
+    I extends CommandType = CommandType,
+    J extends PluginType = PluginType,
+> = CommandArgsMatrix[I][J];
+
+export type EventArgs<
+    I extends EventType = EventType,
+    J extends PluginType = PluginType,
+> = EventArgsMatrix[I][J];
