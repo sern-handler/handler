@@ -1,4 +1,4 @@
-import { makeEventsHandler } from './events/userDefined';
+import { makeEventsHandler } from './events/user-defined';
 import { makeInteractionCreate } from './events/interactions';
 import { startReadyEvent } from './events/ready';
 import { makeMessageCreate } from './events/messages';

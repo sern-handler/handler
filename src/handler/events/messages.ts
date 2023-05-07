@@ -1,13 +1,13 @@
 import { catchError, concatMap, EMPTY, finalize } from 'rxjs';
 import { SernError } from '../../core/structures/errors';
 import type { Message } from 'discord.js';
-import { executeModule, ignoreNonBot, makeModuleExecutor } from './observableHandling';
-import { ErrorHandling, handleError } from '../../core/contracts/errorHandling';
+import { ErrorHandling, handleError } from '../../core/contracts/error-handling';
 import type { Logging, ModuleManager } from '../../core/contracts';
 import type { EventEmitter } from 'node:events';
 import { SernEmitter, useContainerRaw } from '../../core';
 import { sharedObservable } from '../../core/operators';
-import { createMessageHandler } from './generic';
+import { createMessageHandler, executeModule, isNonBot, makeModuleExecutor } from './generic';
+import { DependencyList } from '../../types/core';
 
 /**
  * Removes the first character(s) _[depending on prefix length]_ of the message
@@ -24,13 +24,7 @@ export function fmt(msg: string, prefix: string): string[] {
 }
 
 export function makeMessageCreate(
-    [s, err, log, modules, client]: [
-        SernEmitter,
-        ErrorHandling,
-        Logging | undefined,
-        ModuleManager,
-        EventEmitter,
-    ],
+    [s, err, log, modules, client]: DependencyList,
     defaultPrefix: string | undefined,
 ) {
     if (!defaultPrefix) {
@@ -39,7 +33,7 @@ export function makeMessageCreate(
     }
     const messageStream$ = sharedObservable<Message>(client, 'messageCreate');
     const handler = createMessageHandler(messageStream$, defaultPrefix, modules);
-    const messageHandler = handler(ignoreNonBot(defaultPrefix) as (m: Message) => m is Message);
+    const messageHandler = handler(isNonBot(defaultPrefix) as (m: Message) => m is Message);
     return messageHandler.pipe(
         makeModuleExecutor(module => {
             s.emit('module.activate', SernEmitter.failure(module, SernError.PluginFailure));

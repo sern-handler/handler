@@ -7,7 +7,7 @@ import { EventEmitter } from 'node:events';
 import * as assert from 'node:assert';
 import { concatMap, from, fromEvent, map, OperatorFunction, pipe } from 'rxjs';
 import { arrayifySource, callPlugin } from '../../../core/operators';
-import { createResultResolver } from '../observableHandling';
+import { createResultResolver } from '../generic';
 
 export function dispatchCommand(module: Processed<CommandModule>, createArgs: () => unknown[]) {
     const args = createArgs();

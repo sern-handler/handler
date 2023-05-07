@@ -1,6 +1,5 @@
 import { catchError, finalize, map, mergeAll, of } from 'rxjs';
 import type { Dependencies, Processed, Wrapper } from '../../types/core';
-import { callInitPlugins } from './observableHandling';
 import type { CommandModule, EventModule } from '../../types/module';
 import type { EventEmitter } from 'node:events';
 import { SernEmitter } from '../../core';
@@ -8,9 +7,9 @@ import type { ErrorHandling, Logging } from '../../core/contracts';
 import { EventType } from '../../core/structures';
 import { SernError } from '../../core/structures/errors';
 import { eventDispatcher } from './dispatchers';
-import { handleError } from '../../core/contracts/errorHandling';
+import { handleError } from '../../core/contracts/error-handling';
 import { useContainerRaw } from '../../core/dependencies';
-import { buildModules } from './generic';
+import { buildModules, callInitPlugins } from './generic';
 
 export function makeEventsHandler(
     [s, err, log, client]: [SernEmitter, ErrorHandling, Logging | undefined, EventEmitter],

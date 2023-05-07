@@ -1,20 +1,17 @@
 import { ObservableInput, fromEvent, take } from 'rxjs';
-import { callInitPlugins } from './observableHandling';
 import { CommandType } from '../../core/structures';
 import { SernError } from '../../core/structures/errors';
 import { Result } from 'ts-results-es';
 import { ModuleManager } from '../../core/contracts';
 import { SernEmitter, } from '../../core';
 import { sernMeta } from '../../commands';
-import { Processed, ServerlessDependencyList, WebsocketDependencyList } from '../../types/core';
+import { Processed, DependencyList } from '../../types/core';
 import { Module } from '../../types/module';
 import * as assert from 'node:assert';
-import { buildModules } from './generic';
+import { buildModules, callInitPlugins } from './generic';
 
 export function startReadyEvent(
-    [sEmitter, errorHandler, , moduleManager, client]:
-        | ServerlessDependencyList
-        | WebsocketDependencyList,
+    [sEmitter, errorHandler, , moduleManager, client]: DependencyList,
     input: ObservableInput<string>,
 ) {
     const ready$ = fromEvent(client!, 'ready').pipe(take(1));

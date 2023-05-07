@@ -29,6 +29,7 @@ export async function defaultModuleLoader<T extends Module>(absPath: string): Mo
 
 function checkIsProcessed<T extends Module>(m: T): asserts m is Processed<T> {
     assert.ok(m.name !== undefined, `name is not defined for ${util.format(m)}`);
+    assert.ok(m.description !== undefined, `description is not defined for ${util.format}`);
 }
 
 export const fmtFileName = (n: string) => n.substring(0, n.length - 3);

@@ -1,2 +1,2 @@
 export * from './dispatchers';
-export * from './provideArgs';
+export * from './provide-args';
