@@ -3,6 +3,9 @@
     "packageManager": "yarn@3.5.0",
     "version": "2.6.1",
     "description": "A complete, customizable, typesafe, & reactive framework for discord bots.",
+    "main": "./dist/esm/index.mjs",
+    "module": "./dist/cjs/index.cjs",
+    "types": "dist/index.d.ts",
     "exports": {
         ".": {
             "import": "./dist/esm/index.mjs",
