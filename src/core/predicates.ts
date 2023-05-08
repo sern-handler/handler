@@ -18,6 +18,7 @@ type AnyCommandInteraction =
     | ChatInputCommandInteraction
     | MessageContextMenuCommandInteraction
     | UserContextMenuCommandInteraction;
+
 export function isMessageComponent(i: InteractionTypable): i is AnyMessageComponentInteraction {
     return i.type === InteractionType.MessageComponent;
 }

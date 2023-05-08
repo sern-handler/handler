@@ -1,7 +1,7 @@
 /**
  * This file holds sern's rxjs operators used for processing data.
  * Each function should be modular and testable, not bound to discord / sern
- * and independent of each other
+ * and independent of each other.
  */
 import {
     concatMap,
@@ -21,6 +21,8 @@ import type { PluginResult, VoidResult } from '../types/plugin';
 import { Result } from 'ts-results-es';
 import { Awaitable } from '../types/handler';
 import { EventEmitter } from 'node:events';
+import { ErrorHandling, Logging } from './contracts';
+import util from 'node:util'
 /**
  * if {src} is true, mapTo V, else ignore
  * @param item
@@ -91,3 +93,19 @@ export const everyPluginOk: OperatorFunction<VoidResult, boolean> = pipe(
 export const sharedObservable = <T>(e: EventEmitter, eventName: string) => {
     return (fromEvent(e, eventName) as Observable<T>).pipe(share());
 };
+
+export function handleError<C>(crashHandler: ErrorHandling, logging?: Logging) {
+    return (pload: unknown, caught: Observable<C>) => {
+        // This is done to fit the ErrorHandling contract
+        const err = pload instanceof Error 
+            ? pload 
+            : Error(util.inspect(pload, { colors: true }));
+        if (crashHandler.keepAlive == 0) {
+            crashHandler.crash(err);
+        }
+        //formatted payload
+        logging?.error({ message: util.inspect(pload) });
+        crashHandler.updateAlive(err);
+        return caught;
+    };
+}

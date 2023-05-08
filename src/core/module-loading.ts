@@ -32,6 +32,7 @@ function checkIsProcessed<T extends Module>(m: T): asserts m is Processed<T> {
 }
 
 export const fmtFileName = (n: string) => n.substring(0, n.length - 3);
+
 /**
  * a directory string is converted into a stream of modules.
  * starts the stream of modules that sern needs to process on init

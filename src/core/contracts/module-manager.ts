@@ -8,12 +8,18 @@ export interface ModuleManager {
     get(id: string): string | undefined;
     set(id: string, path: string): void;
     getPublishableCommands(): Promise<CommandModule[]>;
+    remove(id: string) : boolean
 }
 /**
  * @since 2.0.0
  */
 export class DefaultModuleManager implements ModuleManager {
     constructor(private moduleStore: ModuleStore) {}
+
+    remove(id: string): boolean {
+        throw new Error('Method not implemented.');
+    }
+
     get(id: string) {
         return this.moduleStore.get(id);
     }
