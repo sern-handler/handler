@@ -9,7 +9,6 @@ import { readdir, stat } from 'fs/promises';
 import { basename, join, resolve } from 'path';
 
 export type ModuleResult<T> = Promise<Result<Processed<T>, SernError>>;
-export type Loader<T> = (absPath: string) => ModuleResult<T>;
 export async function importModule<T>(absPath: string) {
     /// #if MODE === 'esm'
     return import(absPath).then(i => i.default as T);
@@ -29,7 +28,7 @@ export async function defaultModuleLoader<T extends Module>(absPath: string): Mo
 
 function checkIsProcessed<T extends Module>(m: T): asserts m is Processed<T> {
     assert.ok(m.name !== undefined, `name is not defined for ${util.format(m)}`);
-    assert.ok(m.description !== undefined, `description is not defined for ${util.format}`);
+    assert.ok(m.description !== undefined, `description is not defined for ${util.format(m)}`);
 }
 
 export const fmtFileName = (n: string) => n.substring(0, n.length - 3);
@@ -45,7 +44,7 @@ export function buildModuleStream<T extends Module>(
     return from(input).pipe(mergeMap(defaultModuleLoader<T>));
 }
 
-export function getCommands(dir: string) {
+export function getFullPathTree(dir: string) {
     return readPath(resolve(dir));
 }
 
