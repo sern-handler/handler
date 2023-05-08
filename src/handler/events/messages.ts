@@ -1,10 +1,7 @@
-import { catchError, concatMap, EMPTY, finalize } from 'rxjs';
+import { concatMap, EMPTY } from 'rxjs';
 import { SernError } from '../../core/structures/errors';
 import type { Message } from 'discord.js';
-import { ErrorHandling, handleError } from '../../core/contracts/error-handling';
-import type { Logging, ModuleManager } from '../../core/contracts';
-import type { EventEmitter } from 'node:events';
-import { SernEmitter, useContainerRaw } from '../../core';
+import { SernEmitter } from '../../core';
 import { sharedObservable } from '../../core/operators';
 import { createMessageHandler, executeModule, isNonBot, makeModuleExecutor } from './generic';
 import { DependencyList } from '../../types/core';
@@ -23,28 +20,23 @@ export function fmt(msg: string, prefix: string): string[] {
     return msg.slice(prefix.length).trim().split(/\s+/g);
 }
 
-export function makeMessageCreate(
-    [s, err, log, modules, client]: DependencyList,
+export function makeMessageHandler(
+    [emitter, , log, modules, client]: DependencyList,
     defaultPrefix: string | undefined,
 ) {
     if (!defaultPrefix) {
         log?.debug({ message: 'No prefix found. message handler shut down' });
-        return EMPTY.subscribe();
+        return EMPTY;
     }
     const messageStream$ = sharedObservable<Message>(client, 'messageCreate');
     const handler = createMessageHandler(messageStream$, defaultPrefix, modules);
+
     const messageHandler = handler(isNonBot(defaultPrefix) as (m: Message) => m is Message);
     return messageHandler.pipe(
         makeModuleExecutor(module => {
-            s.emit('module.activate', SernEmitter.failure(module, SernError.PluginFailure));
+            emitter.emit('module.activate', SernEmitter.failure(module, SernError.PluginFailure));
         }),
-        concatMap(payload => executeModule(s, payload)),
-        catchError(handleError(err, log)),
-        finalize(() => {
-            log?.info({ message: 'messageCreate stream closed or reached end of lifetime' });
-            useContainerRaw()
-                ?.disposeAll()
-                .then(() => log?.info({ message: 'Cleaning container and crashing' }));
-        }),
+        concatMap(payload => executeModule(emitter, payload)),
+        
     );
 }

@@ -1,6 +1,5 @@
 import {
     BaseInteraction,
-    ChatInputCommandInteraction,
     Interaction,
     InteractionType,
     Message,
@@ -11,8 +10,8 @@ import { SernError } from '../../core/structures/errors';
 import { callPlugin, everyPluginOk, filterMap, filterMapTo } from '../../core/operators';
 import { defaultModuleLoader } from '../../core/module-loading';
 import { ImportPayload, Processed } from '../../types/core';
-import { BothCommand, CommandModule, EventModule, Module } from '../../types/module';
-import { contextArgs, dispatchAutocomplete, dispatchCommand, interactionArg } from './dispatchers';
+import { CommandModule, Module } from '../../types/module';
+import { contextArgs, createDispatcher, dispatchAutocomplete, dispatchInteraction, dispatchMessage, interactionArg } from './dispatchers';
 import { isAutocomplete } from '../../core/predicates';
 import { ObservableInput, pipe, switchMap } from 'rxjs';
 import { SernEmitter } from '../../core';
@@ -66,10 +65,11 @@ export function createMessageHandler(
         if (fullPath === undefined) {
             return Err(SernError.UndefinedModule + ' No full path found in module store');
         }
-        return defaultModuleLoader<CommandModule>(fullPath).then(result => {
-            const args = contextArgs(event, rest);
-            return result.map(module => dispatchCommand(module, args));
-        });
+        return defaultModuleLoader<CommandModule>(fullPath)
+            .then(result => {
+                const args = contextArgs(event, rest);
+                return result.map(module => dispatchMessage(module, args))
+            })
     });
 }
 /**
@@ -101,32 +101,7 @@ function createId<T extends Interaction>(event: T) {
     return id;
 }
 
-function createDispatcher({
-    module,
-    event,
-}: {
-    module: Processed<CommandModule>;
-    event: BaseInteraction;
-}) {
-    switch (module.type) {
-        case CommandType.Text:
-            throw Error(SernError.MismatchEvent + ' Found a text module in interaction stream.');
-        case CommandType.Slash:
-        case CommandType.Both: {
-            if (isAutocomplete(event)) {
-                /**
-                 * Autocomplete is a special case that
-                 * must be handled separately, since it's
-                 * too different from regular command modules
-                 */
-                return dispatchAutocomplete(module as Processed<BothCommand>, event);
-            }
-            return dispatchCommand(module, contextArgs(event as ChatInputCommandInteraction));
-        }
-        default:
-            return dispatchCommand(module, interactionArg(event));
-    }
-}
+
 
 export function buildModules<T extends AnyModule>(
     input: ObservableInput<string>,
@@ -221,7 +196,7 @@ export function createResultResolver<
  * ignore the module
  */
 export function callInitPlugins<
-    T extends Processed<CommandModule | EventModule>,
+    T extends Processed<Module>,
     Args extends ImportPayload<T>,
 >(config: { onStop?: (module: T) => unknown; onNext: (module: Args) => T }) {
     return concatMap(
@@ -249,3 +224,5 @@ export function makeModuleExecutor<
         }),
     );
 }
+
+
