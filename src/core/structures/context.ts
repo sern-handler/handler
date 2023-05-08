@@ -1,34 +1,92 @@
-import { Result as Either } from 'ts-results-es';
-import { SernError } from './errors';
-import * as assert from 'node:assert';
+import {
+    BaseInteraction,
+    ChatInputCommandInteraction,
+    Client,
+    InteractionReplyOptions,
+    Message,
+    MessageReplyOptions,
+    Snowflake,
+    User,
+} from 'discord.js';
+import { CoreContext } from './core-context';
+import { Result, Ok, Err } from 'ts-results-es';
+import { ReplyOptions } from '../../types/handler';
+import * as assert from 'assert';
 
 /**
- * @since 3.0.0
+ * @since 1.0.0
+ * Provides values shared between
+ * Message and ChatInputCommandInteraction
  */
-export abstract class CoreContext<M, I> {
-    protected constructor(protected ctx: Either<M, I>) {
-        assert.ok(typeof ctx.val === 'object' && ctx.val != null);
+export class Context extends CoreContext<Message, ChatInputCommandInteraction> {
+    get options() {
+        return this.interaction.options;
     }
-    get message(): M {
-        return this.ctx.expect(SernError.MismatchEvent);
-    }
-    get interaction(): I {
-        return this.ctx.expectErr(SernError.MismatchEvent);
+    protected constructor(protected ctx: Result<Message, ChatInputCommandInteraction>) {
+        super(ctx);
     }
 
-    public isMessage(): this is CoreContext<M, never> {
-        return this.ctx.map(() => true).unwrapOr(false);
+    public get id(): Snowflake {
+        return this.ctx.val.id;
     }
 
-    public isSlash(): this is CoreContext<never, I> {
-        return !this.isMessage();
+    public get channel() {
+        return this.ctx.val.channel;
     }
-    //todo: add agnostic options resolver for Context
-    abstract get options(): unknown;
+    /**
+     * If context is holding a message, message.author
+     * else, interaction.user
+     */
+    public get user(): User {
+        return safeUnwrap(this.ctx.map(m => m.author).mapErr(i => i.user));
+    }
 
-    abstract get id(): string;
+    public get createdTimestamp(): number {
+        return this.ctx.val.createdTimestamp;
+    }
 
-    static wrap(_: unknown): unknown {
-        throw Error('You need to override this method; cannot wrap an abstract class');
+    public get guild() {
+        return this.ctx.val.guild;
+    }
+
+    public get guildId() {
+        return this.ctx.val.guildId;
+    }
+    /*
+     * interactions can return APIGuildMember if the guild it is emitted from is not cached
+     */
+    public get member() {
+        return this.ctx.val.member;
+    }
+
+    public get client(): Client {
+        return this.ctx.val.client;
+    }
+
+    public get inGuild(): boolean {
+        return this.ctx.val.inGuild();
+    }
+
+    public async reply(content: ReplyOptions) {
+        return safeUnwrap(
+            this.ctx
+                .map(m => m.reply(content as string | MessageReplyOptions))
+                .mapErr(i =>
+                    i.reply(content as string | InteractionReplyOptions).then(() => i.fetchReply()),
+                ),
+        );
+    }
+
+    static override wrap(wrappable: BaseInteraction | Message): Context {
+        if ('interaction' in wrappable) {
+            return new Context(Ok(wrappable));
+        }
+        assert.ok(wrappable.isChatInputCommand())
+        return new Context(Err(wrappable));
     }
 }
+
+function safeUnwrap<T>(res: Result<T, T>) {
+    return res.val;
+}
+
