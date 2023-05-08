@@ -1,5 +1,5 @@
 import type { Processed } from '../../types/core';
-import type { BothCommand, CommandModule, Module } from '../../types/module';
+import type { BothCommand, CommandModule, EventModule, Module } from '../../types/module';
 import { EventEmitter } from 'node:events';
 import * as assert from 'node:assert';
 import { concatMap, from, fromEvent, map, OperatorFunction, pipe } from 'rxjs';
@@ -9,7 +9,7 @@ import { AutocompleteInteraction, BaseInteraction, Message } from 'discord.js';
 import { treeSearch } from '../../core/functions';
 import { SernError } from '../../core/structures/errors';
 import { Args } from '../../types/handler';
-import { CommandType, Context } from '../../core';
+import { CommandType, Context, EventType } from '../../core';
 import { isAutocomplete } from '../../core/predicates';
 
 export function dispatchInteraction<
@@ -24,7 +24,7 @@ export function dispatchInteraction<
         args: createArgs(payload.event),
     };
 }
-
+//TODO: refactor dispatchers so that it implements a strategy for each different type of payload?
 export function dispatchMessage(module: Processed<CommandModule>, args: [Context, Args]) {
     return {
         module,
@@ -46,6 +46,8 @@ export function dispatchAutocomplete(payload: { module: Processed<BothCommand>, 
 
 }
 
+
+
 export function contextArgs(
     wrappable: Message | BaseInteraction,
     messageArgs?: string[],
@@ -54,6 +56,7 @@ export function contextArgs(
     const args = ctx.isMessage() ? ['text', messageArgs!] : ['slash', ctx.options];
     return [ctx, args] as [Context, Args];
 }
+
 
 export function interactionArg<T extends BaseInteraction>(interaction: T) {
     return [interaction] as [T];

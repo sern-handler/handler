@@ -12,12 +12,12 @@ import { buildModules, callInitPlugins } from './generic';
 
 export function startReadyEvent(
     [sEmitter, errorHandler, , moduleManager, client]: DependencyList,
-    input: ObservableInput<string>,
+    allPaths: ObservableInput<string>,
 ) {
     const ready$ = fromEvent(client!, 'ready').pipe(take(1));
     return ready$
         .pipe(
-            buildModules(input, sEmitter),
+            buildModules(allPaths, sEmitter),
             callInitPlugins({
                 onStop: module => {
                     sEmitter.emit(

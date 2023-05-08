@@ -1,18 +1,16 @@
 import {
-    BaseInteraction,
     Interaction,
     InteractionType,
     Message,
 } from 'discord.js';
 import { EMPTY, Observable, concatMap, filter, from, map, of, throwError, tap } from 'rxjs';
-import { CommandType, ModuleManager } from '../../core';
+import { ModuleManager } from '../../core';
 import { SernError } from '../../core/structures/errors';
 import { callPlugin, everyPluginOk, filterMap, filterMapTo } from '../../core/operators';
 import { defaultModuleLoader } from '../../core/module-loading';
 import { ImportPayload, Processed } from '../../types/core';
 import { CommandModule, Module } from '../../types/module';
-import { contextArgs, createDispatcher, dispatchAutocomplete, dispatchInteraction, dispatchMessage, interactionArg } from './dispatchers';
-import { isAutocomplete } from '../../core/predicates';
+import { contextArgs, createDispatcher, dispatchMessage } from './dispatchers';
 import { ObservableInput, pipe, switchMap } from 'rxjs';
 import { SernEmitter } from '../../core';
 import { errTap } from '../../core/operators';

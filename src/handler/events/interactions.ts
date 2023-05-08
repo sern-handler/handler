@@ -10,6 +10,7 @@ import { DependencyList } from '../../types/core';
 export function makeInteractionHandler([emitter, _, _1, modules, client]: DependencyList ) {
     const interactionStream$ = sharedObservable<Interaction>(client, 'interactionCreate');
     const handle = createInteractionHandler(interactionStream$, modules);
+
     const interactionHandler$ = merge(
         handle(isMessageComponent),
         handle(isAutocomplete),

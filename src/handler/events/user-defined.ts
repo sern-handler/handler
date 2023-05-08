@@ -1,4 +1,4 @@
-import { catchError, finalize, map, mergeAll, of } from 'rxjs';
+import { ObservableInput, catchError, finalize, map, mergeAll, of } from 'rxjs';
 import type { Dependencies, Processed, Wrapper } from '../../types/core';
 import type { CommandModule, EventModule } from '../../types/module';
 import type { EventEmitter } from 'node:events';
@@ -11,9 +11,11 @@ import { handleError } from '../../core/contracts/error-handling';
 import { useContainerRaw } from '../../core/dependencies';
 import { buildModules, callInitPlugins } from './generic';
 
+
+
 export function makeEventsHandler(
     [s, err, log, client]: [SernEmitter, ErrorHandling, Logging | undefined, EventEmitter],
-    eventsPath: string,
+    allPaths: ObservableInput<string>,
     containerGetter: Wrapper['containerConfig'],
 ) {
     const lazy = (k: string) => containerGetter.get(k as keyof Dependencies)[0];
@@ -33,7 +35,7 @@ export function makeEventsHandler(
     };
     of(null)
         .pipe(
-            buildModules(eventsPath, s),
+            buildModules(allPaths, s),
             callInitPlugins({
                 onStop: module =>
                     s.emit('module.register', SernEmitter.failure(module, SernError.PluginFailure)),
