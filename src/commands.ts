@@ -27,7 +27,6 @@ function uniqueId(t: CommandType) {
     const am = (appBitField & t) !== 0 ? 'A' : 'C';
     return am + apiType(t);
 }
-
 /**
  * @since 1.0.0 The wrapper function to define command modules for sern
  * @param mod
@@ -90,3 +89,35 @@ export function discordEvent<T extends keyof ClientEvents>(mod: {
         ...mod,
     });
 }
+
+///**
+// * @Experimental
+// * Will be refactored / changed in future
+// */
+//export abstract class CommandExecutable<Type extends CommandType> {
+//    abstract type: Type;
+//    private static _fullPath = filePath();
+//    name = filename(CommandExecutable._fullPath);
+//    [sernMeta] = {
+//        id: ``,
+//        fullPath: CommandExecutable._fullPath
+//    }
+//    plugins: InitPlugin[] = [];
+//    onEvent: ControlPlugin[] = [];
+//    abstract execute() : Awaitable<unknown>
+//
+//}
+///**
+// * @Experimental
+// * Will be refactored in future
+// */
+//export abstract class EventExecutable<Type extends EventType> {
+//    abstract type: Type;
+//    [sernMeta] = {
+//        id: '',
+//        fullPath: ''
+//    }
+//    plugins: InitPlugin[] = [];
+//    onEvent: ControlPlugin[] = [];
+//    abstract execute(): Awaitable<unknown>;
+//}
