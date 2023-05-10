@@ -2456,11 +2456,11 @@ __metadata:
   linkType: hard
 
 "rxjs@npm:^7.8.0":
-  version: 7.8.0
-  resolution: "rxjs@npm:7.8.0"
+  version: 7.8.1
+  resolution: "rxjs@npm:7.8.1"
   dependencies:
     tslib: ^2.1.0
-  checksum: 61b4d4fd323c1043d8d6ceb91f24183b28bcf5def4f01ca111511d5c6b66755bc5578587fe714ef5d67cf4c9f2e26f4490d4e1d8cabf9bd5967687835e9866a2
+  checksum: de4b53db1063e618ec2eca0f7965d9137cabe98cf6be9272efe6c86b47c17b987383df8574861bcced18ebd590764125a901d5506082be84a8b8e364bf05f119
   languageName: node
   linkType: hard
 
@@ -2845,11 +2845,11 @@ __metadata:
 
 "typescript@patch:typescript@5.0.2#~builtin<compat/typescript>":
   version: 5.0.2
-  resolution: "typescript@patch:typescript@npm%3A5.0.2#~builtin<compat/typescript>::version=5.0.2&hash=85af82"
+  resolution: "typescript@patch:typescript@npm%3A5.0.2#~builtin<compat/typescript>::version=5.0.2&hash=b5f058"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: b63cb742fbb9aeb3085e002ad8f10d5fd963606aa4d6b3b65b4e76c396ff09739f03b5dbae08e1698c3bce9d5619d3f67aeb7ee470ed4016bd345b3cfe37b54a
+  checksum: 0411be9e19bf6a547d574b3261fa8598f55a5243123f2a50a79b0dc15a017abbf541f15b8b43331294e409cc978e548ac5ae4e0c5b98ba5ae98029304de047be
   languageName: node
   linkType: hard
 
