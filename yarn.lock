@@ -5,13 +5,6 @@ __metadata:
   version: 6
   cacheKey: 8
 
-"@cloudflare/workers-types@npm:^4.20230419.0":
-  version: 4.20230419.0
-  resolution: "@cloudflare/workers-types@npm:4.20230419.0"
-  checksum: db1eb1e74029da8ee3eaed8c8b83e1bc3a10801d328ccfddf39258e5eb679ffb34776fab441f6ac66aa304bc3715dedce77083aed3d79b4825639fb24970c164
-  languageName: node
-  linkType: hard
-
 "@discordjs/builders@npm:^1.6.3":
   version: 1.6.3
   resolution: "@discordjs/builders@npm:1.6.3"
@@ -449,7 +442,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@sern/handler@workspace:."
   dependencies:
-    "@cloudflare/workers-types": ^4.20230419.0
     "@types/node": ^18.15.11
     "@typescript-eslint/eslint-plugin": 5.58.0
     "@typescript-eslint/parser": 5.58.0

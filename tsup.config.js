@@ -19,7 +19,8 @@ export default defineConfig([
         target: 'node16',
         tsconfig: './tsconfig-esm.json',
         outDir: './dist/esm',
-        splitting: false,
+        splitting: true,
+        bundle: true,
         esbuildPlugins: [ifdefPlugin({ variables: { MODE: 'esm' }, verbose: true })],
         outExtension() {
             return {
@@ -50,5 +51,9 @@ export default defineConfig([
         },
         ...shared,
     },
-
+//    {
+//        dts: true,
+//        entry: ['src/presets/*.ts' ]
+//
+//    }
 ]);

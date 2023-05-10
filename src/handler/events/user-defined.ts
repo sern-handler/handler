@@ -1,32 +1,30 @@
 import { ObservableInput, catchError, finalize, map, mergeAll, of } from 'rxjs';
-import type { Dependencies, Processed, Wrapper } from '../../types/core';
 import type { CommandModule, EventModule } from '../../types/module';
-import type { EventEmitter } from 'node:events';
 import { SernEmitter } from '../../core';
-import type { ErrorHandling, Logging } from '../../core/contracts';
 import { EventType } from '../../core/structures';
 import { SernError } from '../../core/structures/errors';
 import { eventDispatcher } from './dispatchers';
-import { handleError } from '../../core/contracts/error-handling';
-import { useContainerRaw } from '../../core/dependencies';
 import { buildModules, callInitPlugins } from './generic';
+import { handleError } from '../../core/operators';
+import { Service, useContainerRaw } from '../../core/ioc';
+import { DependencyList, Processed } from '../types';
 
 
 
 export function makeEventsHandler(
-    [s, err, log, client]: [SernEmitter, ErrorHandling, Logging | undefined, EventEmitter],
+    [emitter, err, log,, client]: DependencyList,
     allPaths: ObservableInput<string>,
-    containerGetter: Wrapper['containerConfig'],
 ) {
-    const lazy = (k: string) => containerGetter.get(k as keyof Dependencies)[0];
+
+    //code smell
     const intoDispatcher = (e: Processed<EventModule | CommandModule>) => {
         switch (e.type) {
             case EventType.Sern:
-                return eventDispatcher(e, s);
+                return eventDispatcher(e, emitter);
             case EventType.Discord:
                 return eventDispatcher(e, client);
             case EventType.External:
-                return eventDispatcher(e, lazy(e.emitter));
+                return eventDispatcher(e, Service(e.emitter));
             default:
                 return err.crash(
                     Error(SernError.InvalidModuleType + ' while creating event handler'),
@@ -35,12 +33,12 @@ export function makeEventsHandler(
     };
     of(null)
         .pipe(
-            buildModules(allPaths, s),
+            buildModules(allPaths, emitter),
             callInitPlugins({
                 onStop: module =>
-                    s.emit('module.register', SernEmitter.failure(module, SernError.PluginFailure)),
+                    emitter.emit('module.register', SernEmitter.failure(module, SernError.PluginFailure)),
                 onNext: ({ module }) => {
-                    s.emit('module.register', SernEmitter.success(module));
+                    emitter.emit('module.register', SernEmitter.success(module));
                     return module;
                 },
             }),

@@ -2,12 +2,13 @@ import { makeEventsHandler } from './events/user-defined';
 import { makeInteractionHandler } from './events/interactions';
 import { startReadyEvent } from './events/ready';
 import { makeMessageHandler } from './events/messages';
-import { makeFetcher, makeDependencies, useContainerRaw } from '../core/dependencies';
 import { err, ok } from '../core/functions';
-import { Wrapper } from '../types/core';
-import { getCommands } from '../core/module-loading';
+import { getFullPathTree } from '../core/module-loading';
 import { catchError, finalize, merge } from 'rxjs';
-import { handleError } from '../core/contracts/error-handling';
+import { handleError } from '../core/operators';
+import { Services, useContainerRaw } from '../core/ioc';
+import { Wrapper } from '../shared';
+
 /**
  * @since 1.0.0
  * @param wrapper Options to pass into sern.
@@ -23,20 +24,20 @@ import { handleError } from '../core/contracts/error-handling';
  * })
  * ```
  */
+
 export function init(wrapper: Wrapper) {
     const startTime = performance.now();
-    const dependenciesAnd = makeFetcher(wrapper.containerConfig);
-    const dependencies = dependenciesAnd(['@sern/modules', '@sern/client']);
+
+    const dependencies = useDependencies();
 
     if (wrapper.events !== undefined) {
         makeEventsHandler(
-            dependenciesAnd(['@sern/client']),
-            wrapper.events,
-            wrapper.containerConfig,
+            dependencies,
+            getFullPathTree(wrapper.events),
         );
     }
 
-    startReadyEvent(dependencies, getCommands(wrapper.commands)).add(() => console.log('ready'));
+    startReadyEvent(dependencies, getFullPathTree(wrapper.commands)).add(() => console.log('ready'));
 
     const logger = dependencies[2];
     const errorHandler = dependencies[1];
@@ -50,27 +51,28 @@ export function init(wrapper: Wrapper) {
     ).pipe(
         catchError(handleError(errorHandler, logger)),
         finalize(() => {
-            logger?.info({ message: 'a stream closed or reached end of lifetime' });
+            logger?.info({ message: 'A stream closed or reached end of lifetime' });
             useContainerRaw()
                 ?.disposeAll()
                 .then(() => logger?.info({ message: 'Cleaning container and crashing' }));
         })
-    ).subscribe()
+    ).subscribe();
 
     const endTime = performance.now();
-    dependencies[2]?.info({ message: `sern : ${(endTime - startTime).toFixed(2)} ms` });
+    logger?.info({ message: `sern : ${(endTime - startTime).toFixed(2)} ms` });
 }
 
 
+function useDependencies() {
+    return Services(
+        '@sern/emitter',
+        '@sern/errors',
+        '@sern/logger',
+        '@sern/modules',
+        '@sern/client'
+    );
+}
 
-/**
- * @deprecated - Please import the function directly:
- * ```ts
- * import { makeDependencies } from '@sern/handler'
- *
- * ```
- */
-export { makeDependencies };
 /**
  * @since 1.0.0
  * The object passed into every plugin to control a command's behavior

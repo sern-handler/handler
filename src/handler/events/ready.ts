@@ -3,15 +3,15 @@ import { CommandType } from '../../core/structures';
 import { SernError } from '../../core/structures/errors';
 import { Result } from 'ts-results-es';
 import { ModuleManager } from '../../core/contracts';
-import { SernEmitter, } from '../../core';
-import { sernMeta } from '../../commands';
-import { Processed, DependencyList } from '../../types/core';
-import { Module } from '../../types/module';
+import { SernEmitter } from '../../core';
+import { sernMeta } from '../commands';
+import { Processed, DependencyList } from '../types';
 import * as assert from 'node:assert';
 import { buildModules, callInitPlugins } from './generic';
+import { Module } from '../../core/types/modules';
 
 export function startReadyEvent(
-    [sEmitter, errorHandler, , moduleManager, client]: DependencyList,
+    [sEmitter,,, moduleManager, client]: DependencyList,
     allPaths: ObservableInput<string>,
 ) {
     const ready$ = fromEvent(client!, 'ready').pipe(take(1));
@@ -32,9 +32,9 @@ export function startReadyEvent(
             }),
         )
         .subscribe(module => {
-            const result = registerModule(moduleManager, module as Processed<Module>);
+            const result = registerModule(moduleManager, module);
             if (result.err) {
-                errorHandler.crash(Error(SernError.InvalidModuleType));
+                throw Error(SernError.InvalidModuleType);
             }
         });
 }
@@ -44,7 +44,9 @@ function registerModule<T extends Processed<Module>>(
     module: T,
 ): Result<void, void> {
     const { id, fullPath } = module[sernMeta];
-    if (module.type === CommandType.Both || module.type === CommandType.Text) {
+    if (module.type === CommandType.Both 
+        || module.type === CommandType.Text
+    ) {
         assert.ok('alias' in module);
         assert.ok(Array.isArray(module.alias));
         module.alias?.forEach(a => manager.set(`${a}__A0`, fullPath));

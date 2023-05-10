@@ -10,8 +10,8 @@ import {
 } from 'discord.js';
 import { CoreContext } from './core-context';
 import { Result, Ok, Err } from 'ts-results-es';
-import { ReplyOptions } from '../../types/handler';
 import * as assert from 'assert';
+import { ReplyOptions } from '../../shared';
 
 /**
  * @since 1.0.0

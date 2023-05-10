@@ -5,9 +5,10 @@ import { SernEmitter } from '../../core';
 import { sharedObservable } from '../../core/operators';
 import { isAutocomplete, isCommand, isMessageComponent, isModal } from '../../core/predicates';
 import { createInteractionHandler, executeModule, makeModuleExecutor } from './generic';
-import { DependencyList } from '../../types/core';
+import { DependencyList } from '../types';
 
-export function makeInteractionHandler([emitter, _, _1, modules, client]: DependencyList ) {
+export function makeInteractionHandler([emitter,,, modules, client]: DependencyList ) {
+
     const interactionStream$ = sharedObservable<Interaction>(client, 'interactionCreate');
     const handle = createInteractionHandler(interactionStream$, modules);
 
@@ -22,6 +23,6 @@ export function makeInteractionHandler([emitter, _, _1, modules, client]: Depend
             makeModuleExecutor(module => {
                 emitter.emit('module.activate', SernEmitter.failure(module, SernError.PluginFailure));
             }),
-            concatMap(module => executeModule(emitter, module)),
+            concatMap(payload => executeModule(emitter, payload)),
         );
 }

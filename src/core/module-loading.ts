@@ -1,14 +1,15 @@
 import { SernError } from './structures/errors';
 import { type Result, Err, Ok } from 'ts-results-es';
-import { Processed } from '../types/core';
-import { Module } from '../types/module';
+import { Module } from './types/modules';
 import * as assert from 'node:assert';
 import util from 'node:util';
 import { type Observable, from, mergeMap, ObservableInput } from 'rxjs';
 import { readdir, stat } from 'fs/promises';
 import { basename, join, resolve } from 'path';
+import { Processed } from '../handler/types';
 
 export type ModuleResult<T> = Promise<Result<Processed<T>, SernError>>;
+
 export async function importModule<T>(absPath: string) {
     /// #if MODE === 'esm'
     return import(absPath).then(i => i.default as T);

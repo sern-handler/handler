@@ -1,5 +1,3 @@
-import type { Processed } from '../../types/core';
-import type { BothCommand, CommandModule, EventModule, Module } from '../../types/module';
 import { EventEmitter } from 'node:events';
 import * as assert from 'node:assert';
 import { concatMap, from, fromEvent, map, OperatorFunction, pipe } from 'rxjs';
@@ -8,9 +6,10 @@ import { createResultResolver } from './generic';
 import { AutocompleteInteraction, BaseInteraction, Message } from 'discord.js';
 import { treeSearch } from '../../core/functions';
 import { SernError } from '../../core/structures/errors';
-import { Args } from '../../types/handler';
-import { CommandType, Context, EventType } from '../../core';
+import { CommandType, Context } from '../../core';
 import { isAutocomplete } from '../../core/predicates';
+import { Args, Processed } from '../types';
+import { BothCommand, CommandModule, Module } from '../../core/types/modules';
 
 export function dispatchInteraction<
     T extends CommandModule,
@@ -101,7 +100,7 @@ export function createDispatcher(payload: {
 }) {
     switch (payload.module.type) {
         case CommandType.Text:
-            throw Error(SernError.MismatchEvent + ' Found a text module in interaction stream.');
+            throw Error(SernError.MismatchEvent + ' Found a text module in interaction stream. ' + payload.module);
         case CommandType.Slash:
         case CommandType.Both: {
             if (isAutocomplete(payload.event)) {
@@ -109,7 +108,7 @@ export function createDispatcher(payload: {
                  * Autocomplete is a special case that
                  * must be handled separately, since it's
                  * too different from regular command modules
-                 * cast safety: payload is already guaranteed to be a slash command or both command
+                 * CAST SAFETY: payload is already guaranteed to be a slash command or both command
                  */
                 return dispatchAutocomplete(payload as never);
             }

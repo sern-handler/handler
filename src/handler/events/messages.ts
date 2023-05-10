@@ -4,7 +4,7 @@ import type { Message } from 'discord.js';
 import { SernEmitter } from '../../core';
 import { sharedObservable } from '../../core/operators';
 import { createMessageHandler, executeModule, isNonBot, makeModuleExecutor } from './generic';
-import { DependencyList } from '../../types/core';
+import { DependencyList } from '../types';
 
 /**
  * Removes the first character(s) _[depending on prefix length]_ of the message
@@ -21,7 +21,7 @@ export function fmt(msg: string, prefix: string): string[] {
 }
 
 export function makeMessageHandler(
-    [emitter, , log, modules, client]: DependencyList,
+    [emitter,, log, modules, client]: DependencyList,
     defaultPrefix: string | undefined,
 ) {
     if (!defaultPrefix) {

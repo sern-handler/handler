@@ -1,10 +1,10 @@
 import { ClientEvents } from 'discord.js';
-import { CommandType, EventType, PluginType } from './core/structures';
-import { AnyEventPlugin, Plugin } from './types/plugin';
-import { CommandModule, EventModule, InputCommand, InputEvent } from './types/module';
-import { partition } from './core/functions';
-import { filename, filePath } from './core/module-loading';
-import { Awaitable } from './types/handler';
+import { CommandType, EventType, PluginType } from '../core/structures';
+import { AnyEventPlugin, Plugin } from '../core/types/plugins';
+import { CommandModule, EventModule, InputCommand, InputEvent } from '../core/types/modules';
+import { partition } from '../core/functions';
+import { filename, filePath } from '../core/module-loading';
+import { Awaitable } from '../shared';
 export const sernMeta = Symbol('@sern/meta');
 const appBitField = 0b000000011111;
 /*

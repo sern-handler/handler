@@ -17,12 +17,12 @@ import {
     share,
     switchMap,
 } from 'rxjs';
-import type { PluginResult, VoidResult } from '../types/plugin';
 import { Result } from 'ts-results-es';
-import { Awaitable } from '../types/handler';
 import { EventEmitter } from 'node:events';
 import { ErrorHandling, Logging } from './contracts';
 import util from 'node:util'
+import { Awaitable } from '../shared';
+import { PluginResult, VoidResult } from './types/plugins';
 /**
  * if {src} is true, mapTo V, else ignore
  * @param item

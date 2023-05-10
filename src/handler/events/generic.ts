@@ -8,19 +8,18 @@ import { ModuleManager } from '../../core';
 import { SernError } from '../../core/structures/errors';
 import { callPlugin, everyPluginOk, filterMap, filterMapTo } from '../../core/operators';
 import { defaultModuleLoader } from '../../core/module-loading';
-import { ImportPayload, Processed } from '../../types/core';
-import { CommandModule, Module } from '../../types/module';
+import { CommandModule, Module, AnyModule } from '../../core/types/modules';
 import { contextArgs, createDispatcher, dispatchMessage } from './dispatchers';
 import { ObservableInput, pipe, switchMap } from 'rxjs';
 import { SernEmitter } from '../../core';
 import { errTap } from '../../core/operators';
 import * as Files from '../../core/module-loading';
-import { sernMeta } from '../../commands';
-import { AnyModule } from '../../types/module';
+import { sernMeta } from '../commands';
 import { Err, Result } from 'ts-results-es';
-import { Awaitable } from '../../types/handler';
 import { fmt } from './messages';
-import { ControlPlugin, VoidResult } from '../../types/plugin';
+import { ControlPlugin, VoidResult } from '../../core/types/plugins';
+import { ImportPayload, Processed } from '../types';
+import { Awaitable } from '../../shared';
 
 function createGenericHandler<Source, Narrowed extends Source, Output>(
     source: Observable<Source>,
