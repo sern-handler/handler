@@ -8,8 +8,9 @@ import { treeSearch } from '../../core/functions';
 import { SernError } from '../../core/structures/errors';
 import { CommandType, Context } from '../../core';
 import { isAutocomplete } from '../../core/predicates';
-import { Args, Processed } from '../types';
+import { Processed } from '../types';
 import { BothCommand, CommandModule, Module } from '../../core/types/modules';
+import { Args } from '../../shared';
 
 export function dispatchInteraction<
     T extends CommandModule,

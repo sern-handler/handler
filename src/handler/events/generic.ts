@@ -75,27 +75,18 @@ export function createMessageHandler(
  * @returns A unique string ID based on the type and properties of the interaction object.
  */
 function createId<T extends Interaction>(event: T) {
-    let id: string;
     switch (event.type) {
-        case InteractionType.MessageComponent:
-            {
-                id = `${event.customId}__C${event.componentType}`;
-            }
-            break;
+        case InteractionType.MessageComponent: {
+            return `${event.customId}__C${event.componentType}`;
+        }
         case InteractionType.ApplicationCommand:
-        case InteractionType.ApplicationCommandAutocomplete:
-            {
-                id = `${event.commandName}__A${event.commandType}`;
-                console.log(id);
-            }
-            break;
-        case InteractionType.ModalSubmit:
-            {
-                id = `${event.customId}__C1`;
-            }
-            break;
+        case InteractionType.ApplicationCommandAutocomplete: {
+            return `${event.commandName}__A${event.commandType}`;
+        }
+        case InteractionType.ModalSubmit: {
+            return `${event.customId}__C1`;
+        }
     }
-    return id;
 }
 
 

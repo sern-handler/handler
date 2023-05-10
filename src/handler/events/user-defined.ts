@@ -1,5 +1,5 @@
 import { ObservableInput, catchError, finalize, map, mergeAll, of } from 'rxjs';
-import type { CommandModule, EventModule } from '../../types/module';
+import type { CommandModule, EventModule } from '../../core/types/modules';
 import { SernEmitter } from '../../core';
 import { EventType } from '../../core/structures';
 import { SernError } from '../../core/structures/errors';

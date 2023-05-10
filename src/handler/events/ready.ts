@@ -6,9 +6,8 @@ import { ModuleManager } from '../../core/contracts';
 import { SernEmitter } from '../../core';
 import { sernMeta } from '../commands';
 import { Processed, DependencyList } from '../types';
-import * as assert from 'node:assert';
 import { buildModules, callInitPlugins } from './generic';
-import { Module } from '../../core/types/modules';
+import { AnyModule } from '../../core/types/modules';
 
 export function startReadyEvent(
     [sEmitter,,, moduleManager, client]: DependencyList,
@@ -20,10 +19,7 @@ export function startReadyEvent(
             buildModules(allPaths, sEmitter),
             callInitPlugins({
                 onStop: module => {
-                    sEmitter.emit(
-                        'module.register',
-                        SernEmitter.failure(module, SernError.PluginFailure),
-                    );
+                    sEmitter.emit('module.register', SernEmitter.failure(module, SernError.PluginFailure));
                 },
                 onNext: ({ module }) => {
                     sEmitter.emit('module.register', SernEmitter.success(module));
@@ -39,7 +35,7 @@ export function startReadyEvent(
         });
 }
 
-function registerModule<T extends Processed<Module>>(
+function registerModule<T extends Processed<AnyModule>>(
     manager: ModuleManager,
     module: T,
 ): Result<void, void> {
@@ -47,8 +43,6 @@ function registerModule<T extends Processed<Module>>(
     if (module.type === CommandType.Both 
         || module.type === CommandType.Text
     ) {
-        assert.ok('alias' in module);
-        assert.ok(Array.isArray(module.alias));
         module.alias?.forEach(a => manager.set(`${a}__A0`, fullPath));
     }
     return Result.wrap(() => manager.set(id, fullPath));
