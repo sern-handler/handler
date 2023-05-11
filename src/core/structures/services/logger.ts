@@ -1,6 +1,7 @@
 import { LogPayload, Logging } from "../../contracts";
 
 /**
+ * @internal
  * @since 2.0.0
  */
 export class DefaultLogging implements Logging {

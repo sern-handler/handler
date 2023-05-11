@@ -17,7 +17,7 @@ export abstract class CoreContext<M, I> {
     }
 
     public isMessage(): this is CoreContext<M, never> {
-        return this.ctx.map(() => true).unwrapOr(false);
+        return this.ctx.ok;
     }
 
     public isSlash(): this is CoreContext<never, I> {

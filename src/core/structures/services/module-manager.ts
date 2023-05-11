@@ -1,9 +1,10 @@
-import { ModuleStore } from "../../../shared";
 import { ModuleManager } from "../../contracts";
 import { importModule } from "../../module-loading";
 import { CommandModule } from "../../types/modules";
+import { ModuleStore } from "../module-store";
 
 /**
+* @internal
 * @since 2.0.0
 */
 export class DefaultModuleManager implements ModuleManager {
@@ -14,14 +15,14 @@ export class DefaultModuleManager implements ModuleManager {
    }
 
    get(id: string) {
-       return this.moduleStore.get(id);
+       return this.moduleStore.commands.get(id);
    }
    set(id: string, path: string): void {
-       this.moduleStore.set(id, path);
+       this.moduleStore.commands.set(id, path);
    }
    //not tested
    getPublishableCommands(): Promise<CommandModule[]> {
-       const entries = this.moduleStore.entries();
+       const entries = this.moduleStore.commands.entries();
        const publishable = 0b000000110;
        return Promise.all(
            Array.from(entries)
