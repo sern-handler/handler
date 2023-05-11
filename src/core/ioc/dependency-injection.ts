@@ -1,4 +1,4 @@
-import type { CoreDependencies, Dependencies, DependencyConfiguration, MapDeps, IntoDependencies } from './types';
+import type { DependencyConfiguration, MapDeps, IntoDependencies } from './types';
 import { DefaultLogging } from '../structures';
 import { SernError } from '../structures/errors';
 import { useContainerRaw } from './base';
@@ -24,8 +24,7 @@ export function single<T>(cb: () => T) {
 export function transient<T>(cb: () => () => T) {
     return cb;
 }
-
-export function Service(key: string): unknown
+export function Service(key: string) : unknown
 export function Service<T extends keyof Dependencies>(key: T) {
     return useContainerRaw().get(key)!
 }
@@ -41,31 +40,35 @@ export function Services<const T extends (keyof Dependencies)[]>(...keys: [...T]
  * Finally, update the containerSubject with the new container state
  * @param conf
  */
-export async function composeRoot<T extends Dependencies>(conf: DependencyConfiguration<T>) {
+export async function composeRoot(
+    container: CoreContainer<Partial<Dependencies>>,
+    conf: DependencyConfiguration
+) {
     //container should have no client or logger yet.
-    const excludeLogger = conf.exclude?.has('@sern/logger');
-    const container = useContainerRaw();
-    if (!excludeLogger) {
+    const hasLogger = conf.exclude?.has('@sern/logger');
+    if (!hasLogger) {
         container.upsert({
             '@sern/logger': () => new DefaultLogging(),
         });
     }
     //Build the container based on the callback provided by the user
-    const updatedContainer = await conf.build(container as CoreContainer<CoreDependencies>);
+    conf.build(container as CoreContainer<CoreDependencies>);
     try {
-        updatedContainer.get('@sern/client');
+        container.get('@sern/client');
     } catch {
         throw new Error(SernError.MissingRequired + " No client was provided")
     }
 
-    if (!excludeLogger) {
-        updatedContainer.get('@sern/logger')?.info({ message: 'All dependencies loaded successfully.' });
+    if (!hasLogger) {
+        container.get('@sern/logger')?.info({ message: 'All dependencies loaded successfully.' });
     }
+    
+    container.ready();
 }
 
 export function useContainer<const T extends Dependencies>() {
     console.warn(`
-        Warning: using a container hook is not recommended.
+        Warning: using a container hook (useContainer) is not recommended.
         Could lead to many unwanted side effects.
         Use the new Service(s) api function instead.
         `

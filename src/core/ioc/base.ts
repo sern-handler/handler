@@ -1,6 +1,6 @@
 import * as assert from "assert";
 import { composeRoot, useContainer } from "./dependency-injection";
-import { DependencyConfiguration, Dependencies } from "./types";
+import { DependencyConfiguration } from "./types";
 import { CoreContainer } from "../structures/container";
 
 
@@ -24,16 +24,13 @@ export function useContainerRaw() {
  * @param conf a configuration for creating your project dependencies
  */
 export async function makeDependencies<const T extends Dependencies>(
-    conf: DependencyConfiguration<T>,
+    conf: DependencyConfiguration,
 ) {
     //Until there are more optional dependencies, just check if the logger exists
     //SIDE EFFECT
     containerSubject = new CoreContainer()
-    await composeRoot(conf);
+    await composeRoot(containerSubject, conf);
 
-    //SIDE EFFECT
-    containerSubject.ready();
-    
     return useContainer<T>();
 }
 
