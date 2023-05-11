@@ -3,8 +3,8 @@ import {
     InteractionType,
     Message,
 } from 'discord.js';
-import { EMPTY, Observable, concatMap, filter, from, map, of, throwError, tap } from 'rxjs';
-import { ModuleManager } from '../../core';
+import { EMPTY, Observable, concatMap, filter, from, of, throwError, tap, MonoTypeOperatorFunction } from 'rxjs';
+import { CommandType, EventType, ModuleManager } from '../../core';
 import { SernError } from '../../core/structures/errors';
 import { callPlugin, everyPluginOk, filterMap, filterMapTo } from '../../core/operators';
 import { defaultModuleLoader } from '../../core/module-loading';
@@ -20,6 +20,7 @@ import { fmt } from './messages';
 import { ControlPlugin, VoidResult } from '../../core/types/plugins';
 import { ImportPayload, Processed } from '../types';
 import { Awaitable } from '../../shared';
+import { createId, uniqueId } from '../id';
 
 function createGenericHandler<Source, Narrowed extends Source, Output>(
     source: Observable<Source>,
@@ -44,8 +45,8 @@ export function createInteractionHandler<T extends Interaction>(
             const fullPath = mg.get(createId(event as unknown as Interaction));
             if (!fullPath)
                 return Err(SernError.UndefinedModule + ' No full path found in module store');
-            return defaultModuleLoader<CommandModule>(fullPath).then(res =>
-                res.map(module => createDispatcher({ module, event })),
+            return defaultModuleLoader<Processed<CommandModule>>(fullPath).then(res =>
+                res.map(payload => createDispatcher({ module: payload.module, event })),
             );
         },
     );
@@ -58,38 +59,31 @@ export function createMessageHandler(
 ) {
     return createGenericHandler(source, event => {
         const [prefix, ...rest] = fmt(event.content, defaultPrefix);
-        const fullPath = mg.get(`${prefix}__A0`);
+        const fullPath = mg.get(`${prefix}_A0`);
         if (fullPath === undefined) {
             return Err(SernError.UndefinedModule + ' No full path found in module store');
         }
-        return defaultModuleLoader<CommandModule>(fullPath)
+        return defaultModuleLoader<Processed<CommandModule>>(fullPath)
             .then(result => {
                 const args = contextArgs(event, rest);
-                return result.map(module => dispatchMessage(module, args))
+                return result.map(payload => dispatchMessage(payload.module, args))
             })
     });
 }
 /**
- * Creates a unique ID for a given interaction object.
- * @param event The interaction object for which to create an ID.
- * @returns A unique string ID based on the type and properties of the interaction object.
- */
-function createId<T extends Interaction>(event: T) {
-    switch (event.type) {
-        case InteractionType.MessageComponent: {
-            return `${event.customId}__C${event.componentType}`;
-        }
-        case InteractionType.ApplicationCommand:
-        case InteractionType.ApplicationCommandAutocomplete: {
-            return `${event.commandName}__A${event.commandType}`;
-        }
-        case InteractionType.ModalSubmit: {
-            return `${event.customId}__C1`;
-        }
+  * IMPURE SIDE EFFECT
+  * This function assigns remaining, incomplete data to each imported module.
+  */
+function assignDefaults<T extends Module>(): MonoTypeOperatorFunction<ImportPayload<T>> {
+  return tap(
+    ({ module, absPath }) => {
+        module.name ??= Files.filename(absPath);
+        module.description ??= "...";
+        module[sernMeta].fullPath = absPath;
+        module[sernMeta].id = `${module.name}_${uniqueId(module.type)}`
     }
+  )
 }
-
-
 
 export function buildModules<T extends AnyModule>(
     input: ObservableInput<string>,
@@ -100,7 +94,7 @@ export function buildModules<T extends AnyModule>(
         errTap(error => {
             sernEmitter.emit('module.register', SernEmitter.failure(undefined, error));
         }),
-        map(module => ({ module, absPath: module[sernMeta].fullPath })),
+        assignDefaults<T>()
     );
 }
 
@@ -184,7 +178,7 @@ export function createResultResolver<
  * ignore the module
  */
 export function callInitPlugins<
-    T extends Processed<Module>,
+    T extends Processed<AnyModule>,
     Args extends ImportPayload<T>,
 >(config: { onStop?: (module: T) => unknown; onNext: (module: Args) => T }) {
     return concatMap(

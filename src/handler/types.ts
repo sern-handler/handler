@@ -20,4 +20,5 @@ export interface InitArgs<T extends Processed<Module>> {
 export interface ImportPayload<T> {
     module: T;
     absPath: string;
+    [key: string]: unknown
 }

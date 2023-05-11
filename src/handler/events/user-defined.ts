@@ -33,7 +33,7 @@ export function makeEventsHandler(
     };
     of(null)
         .pipe(
-            buildModules(allPaths, emitter),
+            buildModules<Processed<EventModule>>(allPaths, emitter),
             callInitPlugins({
                 onStop: module =>
                     emitter.emit('module.register', SernEmitter.failure(module, SernError.PluginFailure)),

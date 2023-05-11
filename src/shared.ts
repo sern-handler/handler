@@ -4,7 +4,6 @@ import type {
     MessageReplyOptions,
 } from 'discord.js';
 import { PayloadType } from './core';
-import { Dependencies } from './core/ioc/types';
 import { AnyModule } from './core/types/modules';
 
 export type ReplyOptions =
@@ -27,7 +26,6 @@ export interface SernEventsMapping {
 
 export type Awaitable<T> = PromiseLike<T> | T;
 
-export type ModuleStore = Map<string, string>;
 
 export type Deprecated<Message extends string> = [never, Message];
 

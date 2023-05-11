@@ -1,14 +1,13 @@
 import { SernError } from './structures/errors';
 import { type Result, Err, Ok } from 'ts-results-es';
 import { Module } from './types/modules';
-import * as assert from 'node:assert';
-import util from 'node:util';
 import { type Observable, from, mergeMap, ObservableInput } from 'rxjs';
 import { readdir, stat } from 'fs/promises';
 import { basename, join, resolve } from 'path';
-import { Processed } from '../handler/types';
-
-export type ModuleResult<T> = Promise<Result<Processed<T>, SernError>>;
+import { ImportPayload } from '../handler/types';
+import * as assert from 'node:assert'
+import { sernMeta } from '../handler/commands';
+export type ModuleResult<T> = Promise<Result<ImportPayload<T>, SernError>>;
 
 export async function importModule<T>(absPath: string) {
     /// #if MODE === 'esm'
@@ -18,19 +17,17 @@ export async function importModule<T>(absPath: string) {
     /// #endif
 }
 export async function defaultModuleLoader<T extends Module>(absPath: string): ModuleResult<T> {
-    // prettier-ignore
     const module = await importModule<T>(absPath);
     if (module === undefined) {
         return Err(SernError.UndefinedModule);
     }
-    checkIsProcessed(module);
-    return Ok(module);
+
+    assert.ok(module.type > 0 && module.type < 1<<10, "Found a module that does not have a valid type");
+    assert.ok(module[sernMeta], "Found a module that isn't marked with sernMeta");
+    
+    return Ok({ module, absPath });
 }
 
-function checkIsProcessed<T extends Module>(m: T): asserts m is Processed<T> {
-    assert.ok(m.name !== undefined, `name is not defined for ${util.format(m)}`);
-    assert.ok(m.description !== undefined, `description is not defined for ${util.format(m)}`);
-}
 
 export const fmtFileName = (n: string) => n.substring(0, n.length - 3);
 
@@ -42,7 +39,7 @@ export const fmtFileName = (n: string) => n.substring(0, n.length - 3);
  */
 export function buildModuleStream<T extends Module>(
     input: ObservableInput<string>,
-): Observable<Result<Processed<T>, SernError>> {
+): Observable<Result<ImportPayload<T>, SernError>> {
     return from(input).pipe(mergeMap(defaultModuleLoader<T>));
 }
 

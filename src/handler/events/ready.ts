@@ -16,7 +16,7 @@ export function startReadyEvent(
     const ready$ = fromEvent(client!, 'ready').pipe(take(1));
     return ready$
         .pipe(
-            buildModules(allPaths, sEmitter),
+            buildModules<Processed<AnyModule>>(allPaths, sEmitter),
             callInitPlugins({
                 onStop: module => {
                     sEmitter.emit('module.register', SernEmitter.failure(module, SernError.PluginFailure));
@@ -43,7 +43,7 @@ function registerModule<T extends Processed<AnyModule>>(
     if (module.type === CommandType.Both 
         || module.type === CommandType.Text
     ) {
-        module.alias?.forEach(a => manager.set(`${a}__A0`, fullPath));
+        module.alias?.forEach(a => manager.set(`${a}_A0`, fullPath));
     }
     return Result.wrap(() => manager.set(id, fullPath));
 }

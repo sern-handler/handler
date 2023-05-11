@@ -26,3 +26,4 @@ export function makeInteractionHandler([emitter,,, modules, client]: DependencyL
             concatMap(payload => executeModule(emitter, payload)),
         );
 }
+

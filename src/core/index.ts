@@ -23,7 +23,8 @@ export type {
     CommandModuleDefs,
     EventModuleDefs,
     BaseOptions,
-    SernAutocompleteData
+    SernAutocompleteData,
+    SernOptionsData
 } from './types/modules';
 export type {
     Controller,
