@@ -1,14 +1,14 @@
-import { ModuleManager } from "../../contracts";
+import { CoreModuleStore, ModuleManager } from "../../contracts";
 import { importModule } from "../../module-loading";
 import { CommandModule } from "../../types/modules";
-import { ModuleStore } from "../module-store";
 
 /**
 * @internal
-* @since 2.0.0
+* @since 2.0.0/*
+* Version 4.0.0 will internalize this api. Please refrain from using ModuleStore!
 */
 export class DefaultModuleManager implements ModuleManager {
-   constructor(private moduleStore: ModuleStore) {}
+   constructor(private moduleStore: CoreModuleStore) {}
 
    remove(id: string): boolean {
        throw new Error('Method not implemented.');

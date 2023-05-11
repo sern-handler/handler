@@ -4,6 +4,7 @@ import { isAsyncFunction} from "node:util/types";
 import * as assert from 'node:assert'
 import { Subject } from "rxjs";
 import { ModuleStore } from "./module-store";
+import { Dependencies } from "../ioc/types";
 
 /**
  * Provides all the defaults for sern to function properly.
@@ -27,9 +28,9 @@ export class CoreContainer<T extends Partial<Dependencies>> extends Container<T,
     }
     
     private listenForInsertions() {
-       assert.ok(this.isReady(), "listening for init functions should only occur prior to sern being ready.")  
+       assert.notEqual(this.isReady(), "listening for init functions should only occur prior to sern being ready.");  
+       const unsubscriber = this.on('containerUpserted', e => this.callInitHooks(e));
 
-       const unsubscriber = this.on('containerUpserted', this.callInitHooks);
        this.ready$.subscribe({
            complete: unsubscriber
        });
@@ -39,15 +40,15 @@ export class CoreContainer<T extends Partial<Dependencies>> extends Container<T,
 
         const dep = e.newContainer;
         assert.ok(dep);
-
         //Ignore any dependencies that are not objects or array
         if(typeof(dep) !== 'object' || Array.isArray(dep)) {
             return;
         }
+
         if('init' in dep && typeof dep.init === 'function') {
             isAsyncFunction(dep.init) 
                 ? await dep.init() 
-                : dep.init()
+                : dep.init();
         }    
     }
 
