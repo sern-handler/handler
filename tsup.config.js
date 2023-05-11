@@ -12,11 +12,12 @@ const shared = {
         correctVarValueBeforeDeclaration: true, //need this to treeshake esm discord.js empty import
         annotations: true,
     },
+    dts: false
 };
 export default defineConfig([
     {
         format: 'esm',
-        target: 'node16',
+        target: 'node18',
         tsconfig: './tsconfig-esm.json',
         outDir: './dist/esm',
         splitting: true,
@@ -37,7 +38,7 @@ export default defineConfig([
         format: 'cjs',
         esbuildPlugins: [ifdefPlugin({ variables: { MODE: 'cjs' }, verbose: true })],
         splitting: false,
-        target: 'node16',
+        target: 'node18',
         tsconfig: './tsconfig-cjs.json',
         outDir: './dist/cjs',
         outExtension() {
@@ -50,10 +51,12 @@ export default defineConfig([
             await writeFile('./dist/cjs/package.json', JSON.stringify({ type: 'commonjs' }));
         },
         ...shared,
-    },
-//    {
-//        dts: true,
-//        entry: ['src/presets/*.ts' ]
-//
-//    }
+    }, 
+    {
+        dts: {
+            only: true
+        },
+        entry: ['src/index.ts'],
+        outDir: 'dist'
+    }
 ]);

@@ -12,9 +12,8 @@
         "preserveSymlinks": true,
         "allowSyntheticDefaultImports": true,
         "forceConsistentCasingInFileNames": true,
-        "types": ["@types/node"],
         "isolatedModules": true
     },
     "exclude": ["node_modules", "dist"],
-    "include": ["src"]
+    "include": ["src", "**/*.d.ts"]
 }

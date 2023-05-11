@@ -10,7 +10,7 @@
         ".": {
             "import": "./dist/esm/index.mjs",
             "require": "./dist/cjs/index.cjs",
-            "types": "dist/index.d.ts"
+            "types": "./dist/index.d.ts"
         }
     },
     "scripts": {
@@ -18,8 +18,8 @@
         "clean-modules": "rimraf node_modules/ && npm install",
         "lint": "eslint src/**/*.ts",
         "format": "eslint src/**/*.ts --fix",
-        "build:dev": "tsup && tsup --dts-only --outDir dist",
-        "build:prod": "tsup --minify && tsup --dts-only --outDir dist",
+        "build:dev": "tsup --metafile",
+        "build:prod": "tsup --minify",
         "publish": "npm run build:prod",
         "pretty": "prettier --write ."
     },
