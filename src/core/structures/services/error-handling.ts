@@ -1,4 +1,4 @@
-import { ErrorHandling } from "../../contracts";
+import { ErrorHandling } from '../../contracts';
 
 /**
  * @internal

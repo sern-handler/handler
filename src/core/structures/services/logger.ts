@@ -1,4 +1,4 @@
-import { LogPayload, Logging } from "../../contracts";
+import { LogPayload, Logging } from '../../contracts';
 
 /**
  * @internal

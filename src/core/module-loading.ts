@@ -5,7 +5,7 @@ import { type Observable, from, mergeMap, ObservableInput } from 'rxjs';
 import { readdir, stat } from 'fs/promises';
 import { basename, join, resolve } from 'path';
 import { ImportPayload } from '../handler/types';
-import * as assert from 'node:assert'
+import * as assert from 'node:assert';
 import { sernMeta } from '../handler/commands';
 export type ModuleResult<T> = Promise<Result<ImportPayload<T>, SernError>>;
 
@@ -21,8 +21,8 @@ export async function defaultModuleLoader<T extends Module>(absPath: string): Mo
     if (module === undefined) {
         return Err(SernError.UndefinedModule);
     }
-
-    assert.ok(module.type > 0 && module.type < 1<<10, "Found a module that does not have a valid type");
+    //todo readd class modules
+    assert.ok(module.type > 0 && module.type < 1<<10, 'Found a module that does not have a valid type');
     assert.ok(module[sernMeta], "Found a module that isn't marked with sernMeta");
     
     return Ok({ module, absPath });

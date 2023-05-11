@@ -54,9 +54,9 @@ export default defineConfig([
     }, 
     {
         dts: {
-            only: true,
-            entry: 'src/index.ts'
+            only: true
         },
+        entry: ['src/index.ts'],
         outDir: 'dist'
     }
 ]);

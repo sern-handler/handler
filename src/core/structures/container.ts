@@ -1,10 +1,10 @@
-import { Container } from "iti";
-import { DefaultErrorHandling, DefaultModuleManager, SernEmitter } from "../";
-import { isAsyncFunction} from "node:util/types";
-import * as assert from 'node:assert'
-import { Subject } from "rxjs";
-import { ModuleStore } from "./module-store";
-import { Dependencies } from "../ioc/types";
+import { Container } from 'iti';
+import { DefaultErrorHandling, DefaultModuleManager, SernEmitter } from '../';
+import { isAsyncFunction} from 'node:util/types';
+import * as assert from 'node:assert';
+import { Subject } from 'rxjs';
+import { ModuleStore } from './module-store';
+import { Dependencies } from '../ioc/types';
 
 /**
  * Provides all the defaults for sern to function properly.
@@ -23,13 +23,13 @@ export class CoreContainer<T extends Partial<Dependencies>> extends Container<T,
                 '@sern/emitter': () => new SernEmitter(),
                 '@sern/store': () => new ModuleStore(),
             }).add(ctx => {
-                return { '@sern/modules': () => new DefaultModuleManager(ctx["@sern/store"]) };
-            })
+                return { '@sern/modules': () => new DefaultModuleManager(ctx['@sern/store']) };
+            });
     }
     
     private listenForInsertions() {
-       assert.notEqual(this.isReady(), "listening for init functions should only occur prior to sern being ready.");  
-       const unsubscriber = this.on('containerUpserted', e => this.callInitHooks(e));
+       assert.ok(!this.isReady(), 'listening for init functions should only occur prior to sern being ready.');  
+       const unsubscriber = this.on('containerUpserted', this.callInitHooks);
 
        this.ready$.subscribe({
            complete: unsubscriber

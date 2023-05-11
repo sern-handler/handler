@@ -1,4 +1,4 @@
-import type { DependencyConfiguration, MapDeps, IntoDependencies } from './types';
+import type { DependencyConfiguration, MapDeps, IntoDependencies, Dependencies, CoreDependencies } from './types';
 import { DefaultLogging } from '../structures';
 import { SernError } from '../structures/errors';
 import { useContainerRaw } from './base';
@@ -24,14 +24,14 @@ export function single<T>(cb: () => T) {
 export function transient<T>(cb: () => () => T) {
     return cb;
 }
-export function Service(key: string) : unknown
-export function Service<T extends keyof Dependencies>(key: T) {
-    return useContainerRaw().get(key)!
+
+export function Service<const T extends keyof Dependencies>(key: T) {
+    return useContainerRaw().get(key)!;
 }
 
 export function Services<const T extends (keyof Dependencies)[]>(...keys: [...T]) {
     const container = useContainerRaw();
-    return keys.map(k => container.get(k)!) as IntoDependencies<T>
+    return keys.map(k => container.get(k)!) as IntoDependencies<T>;
 }
 
 /**
@@ -56,13 +56,13 @@ export async function composeRoot(
     try {
         container.get('@sern/client');
     } catch {
-        throw new Error(SernError.MissingRequired + " No client was provided")
+        throw new Error(SernError.MissingRequired + ' No client was provided');
     }
 
     if (!hasLogger) {
         container.get('@sern/logger')?.info({ message: 'All dependencies loaded successfully.' });
     }
-    
+
     container.ready();
 }
 

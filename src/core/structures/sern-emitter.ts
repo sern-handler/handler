@@ -9,7 +9,7 @@ import { Module } from '../types/modules';
 export class SernEmitter extends EventEmitter {
 
     constructor() {
-        super({ captureRejections: true })
+        super({ captureRejections: true });
     }
     /**
      * Listening to sern events with on. This event stays on until a crash or a normal exit

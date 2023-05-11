@@ -1,4 +1,4 @@
-import { CommandModule } from "../types/modules";
+import { CommandModule } from '../types/modules';
 
 /**
  * @since 2.0.0

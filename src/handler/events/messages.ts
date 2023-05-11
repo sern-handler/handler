@@ -25,7 +25,7 @@ export function makeMessageHandler(
     defaultPrefix: string | undefined,
 ) {
     if (!defaultPrefix) {
-        log?.debug({ message: 'No prefix found. message handler shut down' });
+        log?.debug({ message: 'No prefix found. message handler shutting down' });
         return EMPTY;
     }
     const messageStream$ = sharedObservable<Message>(client, 'messageCreate');

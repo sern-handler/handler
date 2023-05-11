@@ -29,7 +29,7 @@ export function dispatchMessage(module: Processed<CommandModule>, args: [Context
     return {
         module,
         args
-    }
+    };
 }
 
 export function dispatchAutocomplete(payload: { module: Processed<BothCommand>, event: AutocompleteInteraction }) {

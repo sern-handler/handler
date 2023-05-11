@@ -1,12 +1,20 @@
-import { Container, UnpackFunction } from "iti";
-
+import { Container, UnpackFunction } from 'iti';
+import * as Contract from '../contracts';
 export type Singleton<T> = () => T;
 export type Transient<T> = () => () => T;
 
 
+export interface CoreDependencies {
+    '@sern/logger'?: Singleton<Contract.Logging>;
+    '@sern/emitter': Singleton<import('../structures/sern-emitter').SernEmitter>;
+    '@sern/store': Singleton<Contract.CoreModuleStore>;
+    '@sern/modules': Singleton<Contract.ModuleManager>;
+    '@sern/errors': Singleton<Contract.ErrorHandling>;
+}
 
-
-
+export interface Dependencies extends CoreDependencies {
+    '@sern/client': Singleton<import('node:events').EventEmitter>;
+}
 export type DependencyFromKey<T extends keyof Dependencies> = Dependencies[T]; 
 
 export type IntoDependencies<Tuple extends [...any[]]> = {
@@ -30,5 +38,4 @@ export type MapDeps<Deps extends Dependencies, T extends readonly unknown[]> = T
           ...(MapDeps<Deps, Rest> extends [never] ? [] : MapDeps<Deps, Rest>),
       ]
     : [never];
-
 

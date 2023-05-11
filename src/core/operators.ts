@@ -20,7 +20,7 @@ import {
 import { Result } from 'ts-results-es';
 import { EventEmitter } from 'node:events';
 import { ErrorHandling, Logging } from './contracts';
-import util from 'node:util'
+import util from 'node:util';
 import { Awaitable } from '../shared';
 import { PluginResult, VoidResult } from './types/plugins';
 /**

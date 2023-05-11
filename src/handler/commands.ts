@@ -5,8 +5,8 @@ import { CommandModule, EventModule, InputCommand, InputEvent } from '../core/ty
 import { partition } from '../core/functions';
 import { Awaitable } from '../shared';
 export const sernMeta = Symbol('@sern/meta');
-export const UNREGISTERED = "meow meow meow";
-export const EMPTY_PATH = "purr purr purr";
+export const UNREGISTERED = 'meow meow meow';
+export const EMPTY_PATH = 'purr purr purr';
 /**
  * @since 1.0.0 The wrapper function to define command modules for sern
  * @param mod

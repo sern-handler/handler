@@ -1,6 +1,6 @@
-import { CoreModuleStore, ModuleManager } from "../../contracts";
-import { importModule } from "../../module-loading";
-import { CommandModule } from "../../types/modules";
+import { CoreModuleStore, ModuleManager } from '../../contracts';
+import { importModule } from '../../module-loading';
+import { CommandModule } from '../../types/modules';
 
 /**
 * @internal

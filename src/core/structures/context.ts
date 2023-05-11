@@ -19,6 +19,9 @@ import { ReplyOptions } from '../../shared';
  * Message and ChatInputCommandInteraction
  */
 export class Context extends CoreContext<Message, ChatInputCommandInteraction> {
+    /*
+     * @Experimental
+     */
     get options() {
         return this.interaction.options;
     }
@@ -81,7 +84,7 @@ export class Context extends CoreContext<Message, ChatInputCommandInteraction> {
         if ('interaction' in wrappable) {
             return new Context(Ok(wrappable));
         }
-        assert.ok(wrappable.isChatInputCommand())
+        assert.ok(wrappable.isChatInputCommand());
         return new Context(Err(wrappable));
     }
 }

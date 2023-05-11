@@ -1,5 +1,5 @@
-import { Interaction, InteractionType } from "discord.js";
-import { CommandType, EventType } from "../core";
+import { Interaction, InteractionType } from 'discord.js';
+import { CommandType, EventType } from '../core';
 
 /**
  * Creates a unique ID for a given interaction object.

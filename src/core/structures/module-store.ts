@@ -1,4 +1,4 @@
-import { CoreModuleStore } from "../contracts";
+import { CoreModuleStore } from '../contracts';
 
 /*
  * @internal

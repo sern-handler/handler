@@ -1,7 +1,7 @@
-import * as assert from "assert";
-import { composeRoot, useContainer } from "./dependency-injection";
-import { DependencyConfiguration } from "./types";
-import { CoreContainer } from "../structures/container";
+import * as assert from 'assert';
+import { composeRoot, useContainer } from './dependency-injection';
+import { Dependencies, DependencyConfiguration } from './types';
+import { CoreContainer } from '../structures/container';
 
 
 //SIDE EFFECT: GLOBAL DI 
@@ -28,7 +28,7 @@ export async function makeDependencies<const T extends Dependencies>(
 ) {
     //Until there are more optional dependencies, just check if the logger exists
     //SIDE EFFECT
-    containerSubject = new CoreContainer()
+    containerSubject = new CoreContainer();
     await composeRoot(containerSubject, conf);
 
     return useContainer<T>();

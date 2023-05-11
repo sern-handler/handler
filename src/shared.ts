@@ -5,6 +5,7 @@ import type {
 } from 'discord.js';
 import { PayloadType } from './core';
 import { AnyModule } from './core/types/modules';
+import { Dependencies } from './core/ioc/types';
 
 export type ReplyOptions =
     | string
