@@ -3,7 +3,7 @@ import { type Result, Err, Ok } from 'ts-results-es';
 import { Module } from './types/modules';
 import { type Observable, from, mergeMap, ObservableInput } from 'rxjs';
 import { readdir, stat } from 'fs/promises';
-import { basename, join, resolve } from 'path';
+import { basename, extname, join, resolve } from 'path';
 import { ImportPayload } from '../handler/types';
 import * as assert from 'node:assert';
 import { sernMeta } from '../handler/commands';
@@ -51,10 +51,7 @@ export function getFullPathTree(dir: string, mode: boolean) {
 export function filename(path: string) {
     return fmtFileName(basename(path));
 }
-//https://stackoverflow.com/questions/190852/how-can-i-get-file-extensions-with-javascript
-function extension(fname: string) {
-    return fname.slice((fname.lastIndexOf(".") - 1 >>> 0) + 2);
-}
+
 async function* readPaths(dir: string, shouldDebug: boolean): AsyncGenerator<string> {
     try {
         const files = await readdir(dir);
@@ -62,16 +59,18 @@ async function* readPaths(dir: string, shouldDebug: boolean): AsyncGenerator<str
             const fullPath = join(dir, file);
             const fileStats = await stat(fullPath);
             const base = basename(file);
-            const isSkippable = fmtFileName(base).endsWith('-ignore!')
-                || !['js', 'cjs', 'mts', 'mjs'].includes(extension(base));
             if (fileStats.isDirectory()) {
-                if(isSkippable) {
+                //Todo: refactor so that i dont repeat myself for files (line 71)
+                if(base.endsWith('-ignore!')) {
                     if(shouldDebug) 
                         console.info(`ignored directory: ${fullPath}`);
                 } else {
                     yield* readPaths(fullPath, shouldDebug);
                 }
             } else {
+                const isSkippable = fmtFileName(base).endsWith('-ignore!')
+                || !['.js', '.cjs', '.mts', '.mjs'].includes(extname(base));
+
                 if(isSkippable) {
                     if(shouldDebug)
                         console.info(`ignored: ${fullPath}`);
