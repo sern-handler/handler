@@ -7,6 +7,7 @@ import { basename, join, resolve } from 'path';
 import { ImportPayload } from '../handler/types';
 import * as assert from 'node:assert';
 import { sernMeta } from '../handler/commands';
+
 export type ModuleResult<T> = Promise<Result<ImportPayload<T>, SernError>>;
 
 export async function importModule<T>(absPath: string) {
@@ -43,28 +44,44 @@ export function buildModuleStream<T extends Module>(
     return from(input).pipe(mergeMap(defaultModuleLoader<T>));
 }
 
-export function getFullPathTree(dir: string) {
-    return readPath(resolve(dir));
+export function getFullPathTree(dir: string, mode: boolean) {
+    return readPaths(resolve(dir), mode);
 }
 
 export function filename(path: string) {
     return fmtFileName(basename(path));
 }
-
-async function* readPath(dir: string): AsyncGenerator<string> {
+//https://stackoverflow.com/questions/190852/how-can-i-get-file-extensions-with-javascript
+function extension(fname: string) {
+    return fname.slice((fname.lastIndexOf(".") - 1 >>> 0) + 2);
+}
+async function* readPaths(dir: string, shouldDebug: boolean): AsyncGenerator<string> {
     try {
         const files = await readdir(dir);
         for (const file of files) {
             const fullPath = join(dir, file);
             const fileStats = await stat(fullPath);
+            const base = basename(file);
+            const isSkippable = fmtFileName(base).endsWith('-ignore!')
+                || !['js', 'cjs', 'mts', 'mjs'].includes(extension(base));
             if (fileStats.isDirectory()) {
-                yield* readPath(fullPath);
+                if(isSkippable) {
+                    if(shouldDebug) 
+                        console.info(`ignored directory: ${fullPath}`);
+                } else {
+                    yield* readPaths(fullPath, shouldDebug);
+                }
             } else {
-                /// #if MODE === 'esm'
-                yield 'file:///' + fullPath;
-                /// #elif MODE === 'cjs'
-                yield fullPath;
-                /// #endif
+                if(isSkippable) {
+                    if(shouldDebug)
+                        console.info(`ignored: ${fullPath}`);
+                } else {
+                    /// #if MODE === 'esm'
+                    yield 'file:///' + fullPath;
+                    /// #elif MODE === 'cjs'
+                    yield fullPath;
+                    /// #endif
+                }
             }
         }
     } catch (err) {
@@ -72,18 +89,3 @@ async function* readPath(dir: string): AsyncGenerator<string> {
     }
 }
 
-//https://stackoverflow.com/questions/16697791/nodejs-get-filename-of-caller-function
-export function filePath() {
-    const err = new Error();
-
-    Error.prepareStackTrace = (_, stack) => stack;
-
-    const stack = err.stack as unknown as NodeJS.CallSite[];
-
-    Error.prepareStackTrace = undefined;
-    const path = stack[2].getFileName();
-    if (path === null) {
-        throw Error('Could not get the name of commandModule.');
-    }
-    return path;
-}

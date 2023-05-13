@@ -21,7 +21,6 @@ export default defineConfig([
         tsconfig: './tsconfig-esm.json',
         outDir: './dist/esm',
         splitting: true,
-        bundle: true,
         esbuildPlugins: [ifdefPlugin({ variables: { MODE: 'esm' }, verbose: true })],
         outExtension() {
             return {

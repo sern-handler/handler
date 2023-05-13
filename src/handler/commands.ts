@@ -1,6 +1,6 @@
 import { ClientEvents } from 'discord.js';
-import { EventType, PluginType } from '../core/structures';
-import { AnyEventPlugin, Plugin } from '../core/types/plugins';
+import { CommandType, EventType, PluginType } from '../core/structures';
+import { AnyEventPlugin, ControlPlugin, InitPlugin, Plugin } from '../core/types/plugins';
 import { CommandModule, EventModule, InputCommand, InputEvent } from '../core/types/modules';
 import { partition } from '../core/functions';
 import { Awaitable } from '../shared';
@@ -64,34 +64,32 @@ export function discordEvent<T extends keyof ClientEvents>(mod: {
     });
 }
 
-///**
-// * @Experimental
-// * Will be refactored / changed in future
-// */
-//export abstract class CommandExecutable<Type extends CommandType> {
-//    abstract type: Type;
-//    private static _fullPath = filePath();
-//    name = filename(CommandExecutable._fullPath);
-//    [sernMeta] = {
-//        id: ``,
-//        fullPath: CommandExecutable._fullPath
-//    }
-//    plugins: InitPlugin[] = [];
-//    onEvent: ControlPlugin[] = [];
-//    abstract execute() : Awaitable<unknown>
-//
-//}
-///**
-// * @Experimental
-// * Will be refactored in future
-// */
-//export abstract class EventExecutable<Type extends EventType> {
-//    abstract type: Type;
-//    [sernMeta] = {
-//        id: '',
-//        fullPath: ''
-//    }
-//    plugins: InitPlugin[] = [];
-//    onEvent: ControlPlugin[] = [];
-//    abstract execute(): Awaitable<unknown>;
-//}
+/**
+ * @Experimental
+ * Will be refactored / changed in future
+ */
+export abstract class CommandExecutable<Type extends CommandType> {
+    abstract type: Type;
+    [sernMeta] = {
+        id: UNREGISTERED,
+        fullPath: EMPTY_PATH
+    };
+    plugins: InitPlugin[] = [];
+    onEvent: ControlPlugin[] = [];
+    abstract execute() : Awaitable<unknown>
+
+}
+/**
+ * @Experimental
+ * Will be refactored in future
+ */
+export abstract class EventExecutable<Type extends EventType> {
+    abstract type: Type;
+    [sernMeta] = {
+        id: UNREGISTERED,
+        fullPath: EMPTY_PATH
+    };
+    plugins: InitPlugin[] = [];
+    onEvent: ControlPlugin[] = [];
+    abstract execute(): Awaitable<unknown>;
+}

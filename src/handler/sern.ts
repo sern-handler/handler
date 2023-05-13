@@ -26,22 +26,30 @@ import { Wrapper } from '../shared';
  */
 
 export function init(wrapper: Wrapper) {
+
     const startTime = performance.now();
 
     const dependencies = useDependencies();
+    const logger = dependencies[2];
+    const errorHandler = dependencies[1];
+    const mode = debugModuleLoading(process.env.MODE);
 
     if (wrapper.events !== undefined) {
         makeEventsHandler(
             dependencies,
-            getFullPathTree(wrapper.events),
+            getFullPathTree(wrapper.events, mode),
         );
     }
 
-    startReadyEvent(dependencies, getFullPathTree(wrapper.commands)).add(() => console.log('ready'));
+    startReadyEvent(
+        dependencies,
+        getFullPathTree(wrapper.commands, mode)
+    ).add(() => { 
+        const endTime = performance.now();
+        logger?.info({ message: `sern: registered all modules in ${((endTime - startTime) / 1000).toFixed(2)} s` });
+    });
 
-    const logger = dependencies[2];
-    const errorHandler = dependencies[1];
-
+    
     const messages$ = makeMessageHandler(dependencies, wrapper.defaultPrefix);
     const interactions$ = makeInteractionHandler(dependencies);
 
@@ -58,10 +66,23 @@ export function init(wrapper: Wrapper) {
         })
     ).subscribe();
 
-    const endTime = performance.now();
-    logger?.info({ message: `sern : ${(endTime - startTime).toFixed(2)} ms` });
 }
 
+function debugModuleLoading(mode: string|undefined) {
+    console.info(`Detected mode: "${mode}"`)
+    if(mode === undefined) {
+       console.info("No mode found in process.env, assuming DEV");
+    }
+    switch(mode) {
+        case 'PROD': return false;                
+        case 'DEV':
+        case undefined: return true;
+        default: {
+            console.warn(mode + " is not a valid. Should be PROD or DEV");
+            return false;
+        }
+    }
+}
 
 function useDependencies() {
     return Services(
