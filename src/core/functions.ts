@@ -1,22 +1,24 @@
 import { Err, Ok } from 'ts-results-es';
 import { ApplicationCommandOptionType, AutocompleteInteraction } from 'discord.js';
 import type { SernAutocompleteData, SernOptionsData } from './types/modules';
+import { AnyCommandPlugin, AnyEventPlugin, Plugin } from './types/plugins';
+import { PluginType } from './structures';
 
 //function wrappers for empty ok / err
 export const ok = /* @__PURE__*/ () => Ok.EMPTY;
 export const err = /* @__PURE__*/ () => Err.EMPTY;
 
-export function partition<T, V>(arr: (T & V)[], condition: (e: T & V) => boolean): [T[], V[]] {
-    const t: T[] = [];
-    const v: V[] = [];
+export function partitionPlugins(arr: (AnyEventPlugin|AnyCommandPlugin)[] = []): [Plugin[], Plugin[]] {
+    const controlPlugins = [];
+    const initPlugins = [];
     for (const el of arr) {
-        if (condition(el)) {
-            t.push(el as T);
-        } else {
-            v.push(el as V);
+        switch(el.type)
+        {
+            case PluginType.Control: controlPlugins.push(el); break;
+            case PluginType.Init: initPlugins.push(el); break;
         }
     }
-    return [t, v];
+    return [controlPlugins, initPlugins];
 }
 
 /**
