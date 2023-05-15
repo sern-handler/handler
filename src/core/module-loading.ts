@@ -6,7 +6,7 @@ import { readdir, stat } from 'fs/promises';
 import { basename, extname, join, resolve } from 'path';
 import { ImportPayload } from '../handler/types';
 import * as assert from 'node:assert';
-import { sernMeta } from '../handler/commands';
+import { clazz } from '../handler/commands';
 
 export type ModuleResult<T> = Promise<Result<ImportPayload<T>, SernError>>;
 
@@ -18,14 +18,16 @@ export async function importModule<T>(absPath: string) {
     /// #endif
 }
 export async function defaultModuleLoader<T extends Module>(absPath: string): ModuleResult<T> {
-    const module = await importModule<T>(absPath);
+    let module = await importModule<T>(absPath);
     if (module === undefined) {
         return Err(SernError.UndefinedModule);
     }
+    if(Reflect.has(module, clazz)) {
+        //@ts-ignore
+        module = module.getInstance(); 
+    }
     //todo readd class modules
     assert.ok(module.type > 0 && module.type < 1<<10, 'Found a module that does not have a valid type');
-    assert.ok(module[sernMeta], "Found a module that isn't marked with sernMeta");
-    
     return Ok({ module, absPath });
 }
 

@@ -13,7 +13,7 @@ import { Dependencies } from '../../core/ioc/types';
 
 
 export function makeEventsHandler(
-    [emitter, err, log,, client]: DependencyList,
+    [emitter, err, log, moduleManager, client]: DependencyList,
     allPaths: ObservableInput<string>,
 ) {
 
@@ -34,7 +34,7 @@ export function makeEventsHandler(
     };
     of(null)
         .pipe(
-            buildModules<Processed<EventModule>>(allPaths, emitter),
+            buildModules<Processed<EventModule>>(allPaths, emitter, moduleManager),
             callInitPlugins({
                 onStop: module =>
                     emitter.emit('module.register', SernEmitter.failure(module, SernError.PluginFailure)),

@@ -1,14 +1,24 @@
 import { CoreModuleStore, ModuleManager } from '../../contracts';
 import { importModule } from '../../module-loading';
-import { CommandModule } from '../../types/modules';
-
+import { CommandMeta, CommandModule, Module } from '../../types/modules';
 /**
 * @internal
-* @since 2.0.0/*
+* @since 2.0.0
 * Version 4.0.0 will internalize this api. Please refrain from using ModuleStore!
 */
 export class DefaultModuleManager implements ModuleManager {
    constructor(private moduleStore: CoreModuleStore) {}
+   setMetadata(m: Module, c: CommandMeta): void {
+        this.moduleStore.metadata.set(m, c);
+   }
+
+   getMetadata(m: Module): CommandMeta {
+       const maybeModule = this.moduleStore.metadata.get(m);
+       if(!maybeModule) {
+            throw Error("Could not find metadata in store for " + maybeModule);
+       }
+       return maybeModule;
+    }
 
    remove(id: string): boolean {
        throw new Error('Method not implemented.');

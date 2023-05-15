@@ -13,7 +13,6 @@ import { ObservableInput, pipe, switchMap } from 'rxjs';
 import { SernEmitter } from '../../core';
 import { errTap } from '../../core/operators';
 import * as Files from '../../core/module-loading';
-import { sernMeta } from '../commands';
 import { Err, Result } from 'ts-results-es';
 import { fmt } from './messages';
 import { ControlPlugin, VoidResult } from '../../core/types/plugins';
@@ -73,13 +72,14 @@ export function createMessageHandler(
   * IMPURE SIDE EFFECT
   * This function assigns remaining, incomplete data to each imported module.
   */
-function assignDefaults<T extends Module>(): MonoTypeOperatorFunction<ImportPayload<T>> {
+function assignDefaults<T extends Module>(moduleManager: ModuleManager): MonoTypeOperatorFunction<ImportPayload<T>> {
   return tap(
     ({ module, absPath }) => {
         module.name ??= Files.filename(absPath);
         module.description ??= '...';
-        module[sernMeta].fullPath = absPath;
-        module[sernMeta].id = `${module.name}_${uniqueId(module.type)}`;
+        moduleManager.setMetadata(
+            module, { fullPath: absPath, id: `${module.name}_${uniqueId(module.type)}` }
+        );
     }
   );
 }
@@ -87,13 +87,14 @@ function assignDefaults<T extends Module>(): MonoTypeOperatorFunction<ImportPayl
 export function buildModules<T extends AnyModule>(
     input: ObservableInput<string>,
     sernEmitter: SernEmitter,
+    moduleManager: ModuleManager
 ) {
     return pipe(
         switchMap(() => Files.buildModuleStream<T>(input)),
         errTap(error => {
             sernEmitter.emit('module.register', SernEmitter.failure(undefined, error));
         }),
-        assignDefaults<T>()
+        assignDefaults<T>(moduleManager)
     );
 }
 
@@ -146,7 +147,7 @@ export function executeModule(
  * A higher order function that
  * - creates a stream of {@link VoidResult} { config.createStream }
  * - any failures results to { config.onFailure } being called
- * - if all results are ok, the stream is converted to { config.onSuccess }
+ * - if all results are ok, the stream is converted to { config.onNext }
  * emit config.onSuccess Observable
  * @param config
  * @returns receiver function for flattening a stream of data

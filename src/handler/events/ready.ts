@@ -4,7 +4,6 @@ import { SernError } from '../../core/structures/errors';
 import { Result } from 'ts-results-es';
 import { ModuleManager } from '../../core/contracts';
 import { SernEmitter } from '../../core';
-import { sernMeta } from '../commands';
 import { Processed, DependencyList } from '../types';
 import { buildModules, callInitPlugins } from './generic';
 import { AnyModule } from '../../core/types/modules';
@@ -16,7 +15,7 @@ export function startReadyEvent(
     const ready$ = fromEvent(client!, 'ready').pipe(take(1));
     return ready$
         .pipe(
-            buildModules<Processed<AnyModule>>(allPaths, sEmitter),
+            buildModules<Processed<AnyModule>>(allPaths, sEmitter, moduleManager),
             callInitPlugins({
                 onStop: module => {
                     sEmitter.emit('module.register', SernEmitter.failure(module, SernError.PluginFailure));
@@ -39,7 +38,9 @@ function registerModule<T extends Processed<AnyModule>>(
     manager: ModuleManager,
     module: T,
 ): Result<void, void> {
-    const { id, fullPath } = module[sernMeta];
+
+    const { id, fullPath } = manager.getMetadata(module);
+
     if (module.type === CommandType.Both 
         || module.type === CommandType.Text
     ) {

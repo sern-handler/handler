@@ -26,13 +26,12 @@ import {
 import { CommandType, Context, EventType } from '../structures';
 import { AnyCommandPlugin, AnyEventPlugin, ControlPlugin, InitPlugin } from './plugins';
 import { Awaitable, SernEventsMapping } from '../../shared';
-import { sernMeta } from '../../handler/commands';
 import { Processed } from '../../handler/types';
 import { Args, SlashOptions } from '../../shared';
 
 
 
-interface CommandMeta {
+export interface CommandMeta {
     fullPath: string;
     id: string;
 }
@@ -45,7 +44,6 @@ export interface Module {
     onEvent: ControlPlugin[];
     plugins: InitPlugin[];
     description?: string;
-    [sernMeta]: CommandMeta;
     execute: (...args: any[]) => Awaitable<any>;
 }
 
@@ -108,7 +106,7 @@ export interface ModalSubmitCommand extends Module {
 }
 
 export interface AutocompleteCommand
-    extends Omit<Module, 'name' | 'type' | 'plugins' | 'description' | typeof sernMeta> {
+    extends Omit<Module, 'name' | 'type' | 'plugins' | 'description'> {
     onEvent: ControlPlugin[];
     execute: (ctx: AutocompleteInteraction) => Awaitable<unknown>;
 }
@@ -191,10 +189,10 @@ export interface SernAutocompleteData
 }
 
 export type CommandModuleNoPlugins = {
-    [T in CommandType]: Omit<CommandModuleDefs[T], 'plugins' | 'onEvent' | typeof sernMeta>;
+    [T in CommandType]: Omit<CommandModuleDefs[T], 'plugins' | 'onEvent'>;
 };
 export type EventModulesNoPlugins = {
-    [T in EventType]: Omit<EventModuleDefs[T], 'plugins' | 'onEvent' | typeof sernMeta>;
+    [T in EventType]: Omit<EventModuleDefs[T], 'plugins' | 'onEvent'>;
 };
 
 export type InputEvent = {
