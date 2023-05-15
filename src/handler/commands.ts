@@ -1,6 +1,6 @@
 import { ClientEvents } from 'discord.js';
 import { CommandType, EventType, PluginType } from '../core/structures';
-import { AnyCommandPlugin, AnyEventPlugin, CommandArgs, EventArgs } from '../core/types/plugins';
+import { AnyCommandPlugin, AnyEventPlugin, CommandArgs, ControlPlugin, EventArgs } from '../core/types/plugins';
 import { CommandModule, EventModule, InputCommand, InputEvent } from '../core/types/modules';
 import { partitionPlugins } from '../core/functions';
 import { Awaitable } from '../shared';
@@ -62,13 +62,20 @@ export function discordEvent<T extends keyof ClientEvents>(mod: {
 export abstract class CommandExecutable<const Type extends CommandType> {
     abstract type: Type;
     plugins?: AnyCommandPlugin[];
+    onEvent?: ControlPlugin[]
     private static _instance : CommandModule;
     static readonly [clazz] = true;
+
     constructor() {
-       const [onEvent, plugins] = partitionPlugins(this.plugins);
-       this.plugins = plugins as AnyCommandPlugin[];
-       Reflect.set(this, 'onEvent', onEvent);
+       if(this.onEvent) {
+          console.warn('Put control plugins in `onEvent` into the `plugins` field, as it\'s automatically handled in v3.');
+       } else {
+          const [onEvent, plugins] = partitionPlugins(this.plugins);
+          this.plugins = plugins as AnyCommandPlugin[];
+          Reflect.set(this, 'onEvent', onEvent);
+       }
     }
+
     static getInstance() {
         if (!CommandExecutable._instance) {
             //@ts-ignore
@@ -76,6 +83,7 @@ export abstract class CommandExecutable<const Type extends CommandType> {
         }
         return CommandExecutable._instance;
     }
+
     abstract execute(...args: CommandArgs<Type, PluginType.Control>) : Awaitable<unknown>
 
 }
@@ -88,11 +96,16 @@ export abstract class EventExecutable<Type extends EventType> {
     abstract type: Type;
     plugins?: AnyEventPlugin[];
     static readonly [clazz] = true;
+    onEvent?: ControlPlugin[]
     private static _instance : EventModule;
     constructor() {
-       const [onEvent, plugins] = partitionPlugins(this.plugins);
-        this.plugins = plugins as AnyEventPlugin[];
-        Reflect.set(this, 'onEvent', onEvent);
+        if(this.onEvent) {
+          console.warn('Put control plugins in `onEvent` into the `plugins` field, as it\'s automatically handled in v3.');
+        } else {
+            const [onEvent, plugins] = partitionPlugins(this.plugins);
+            this.plugins = plugins as AnyEventPlugin[];
+            Reflect.set(this, 'onEvent', onEvent);
+        }
     }
     static getInstance() {
         if (!EventExecutable._instance) {

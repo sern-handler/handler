@@ -18,9 +18,6 @@ import { Wrapper } from '../shared';
  * Sern.init({
  *     commands: 'dist/commands',
  *     events: 'dist/events',
- *     containerConfig : {
- *         get: useContainer
- *     }
  * })
  * ```
  */
@@ -32,7 +29,7 @@ export function init(wrapper: Wrapper) {
     const dependencies = useDependencies();
     const logger = dependencies[2];
     const errorHandler = dependencies[1];
-    const mode = debugModuleLoading(process.env.MODE);
+    const mode = debugModuleLoading(wrapper.mode ?? process.env.MODE);
 
     if (wrapper.events !== undefined) {
         makeEventsHandler(

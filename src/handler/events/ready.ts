@@ -7,6 +7,7 @@ import { SernEmitter } from '../../core';
 import { Processed, DependencyList } from '../types';
 import { buildModules, callInitPlugins } from './generic';
 import { AnyModule } from '../../core/types/modules';
+import * as assert from 'node:assert';
 
 export function startReadyEvent(
     [sEmitter,,, moduleManager, client]: DependencyList,
@@ -41,6 +42,7 @@ function registerModule<T extends Processed<AnyModule>>(
 
     const { id, fullPath } = manager.getMetadata(module);
 
+    assert.ok(module.type > 0 && module.type < 1<<10, `Found ${module}, which does not have a valid type`);
     if (module.type === CommandType.Both 
         || module.type === CommandType.Text
     ) {

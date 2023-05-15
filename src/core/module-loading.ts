@@ -27,7 +27,6 @@ export async function defaultModuleLoader<T extends Module>(absPath: string): Mo
         module = module.getInstance(); 
     }
     //todo readd class modules
-    assert.ok(module.type > 0 && module.type < 1<<10, 'Found a module that does not have a valid type');
     return Ok({ module, absPath });
 }
 
