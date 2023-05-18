@@ -9,19 +9,18 @@ import { CommandExecutable, clazz } from '../handler/commands';
 
 export type ModuleResult<T> = Promise<Result<ImportPayload<T>, SernError>>;
 
-
 function isClassModule(m: unknown): m is typeof CommandExecutable {
     return m != undefined && Reflect.has(m, clazz);
 }
 
 export async function importModule<T>(absPath: string) {
-    let module = 
-    /// #if MODE === 'esm'
-    import(absPath).then(i => i.default);  // eslint-disable-line
+    let module =
+        /// #if MODE === 'esm'
+        import(absPath).then(i => i.default); // eslint-disable-line
     /// #elif MODE === 'cjs'
     require(absPath).default; // eslint-disable-line
     /// #endif
-    return module.then(m => isClassModule(m) ? m.getInstance():m) as T;
+    return module.then(m => (isClassModule(m) ? m.getInstance() : m)) as T;
 }
 export async function defaultModuleLoader<T extends Module>(absPath: string): ModuleResult<T> {
     let module = await importModule<T>(absPath);
@@ -31,7 +30,6 @@ export async function defaultModuleLoader<T extends Module>(absPath: string): Mo
     //todo readd class modules
     return Ok({ module, absPath });
 }
-
 
 export const fmtFileName = (n: string) => n.substring(0, n.length - 3);
 
@@ -64,19 +62,18 @@ async function* readPaths(dir: string, shouldDebug: boolean): AsyncGenerator<str
             const base = basename(file);
             if (fileStats.isDirectory()) {
                 //Todo: refactor so that i dont repeat myself for files (line 71)
-                if(base.endsWith('-ignore!')) {
-                    if(shouldDebug) 
-                        console.info(`ignored directory: ${fullPath}`);
+                if (base.endsWith('-ignore!')) {
+                    if (shouldDebug) console.info(`ignored directory: ${fullPath}`);
                 } else {
                     yield* readPaths(fullPath, shouldDebug);
                 }
             } else {
-                const isSkippable = fmtFileName(base).endsWith('-ignore!')
-                || !['.js', '.cjs', '.mts', '.mjs'].includes(extname(base));
+                const isSkippable =
+                    fmtFileName(base).endsWith('-ignore!') ||
+                    !['.js', '.cjs', '.mts', '.mjs'].includes(extname(base));
 
-                if(isSkippable) {
-                    if(shouldDebug)
-                        console.info(`ignored: ${fullPath}`);
+                if (isSkippable) {
+                    if (shouldDebug) console.info(`ignored: ${fullPath}`);
                 } else {
                     /// #if MODE === 'esm'
                     yield 'file:///' + fullPath;
@@ -90,4 +87,3 @@ async function* readPaths(dir: string, shouldDebug: boolean): AsyncGenerator<str
         throw err;
     }
 }
-

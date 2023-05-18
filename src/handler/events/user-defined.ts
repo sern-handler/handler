@@ -10,13 +10,10 @@ import { Service, useContainerRaw } from '../../core/ioc';
 import { DependencyList, Processed } from '../types';
 import { Dependencies } from '../../core/ioc/types';
 
-
-
 export function makeEventsHandler(
     [emitter, err, log, moduleManager, client]: DependencyList,
     allPaths: ObservableInput<string>,
 ) {
-
     //code smell
     const intoDispatcher = (e: Processed<EventModule | CommandModule>) => {
         switch (e.type) {
@@ -37,7 +34,10 @@ export function makeEventsHandler(
             buildModules<Processed<EventModule>>(allPaths, emitter, moduleManager),
             callInitPlugins({
                 onStop: module =>
-                    emitter.emit('module.register', SernEmitter.failure(module, SernError.PluginFailure)),
+                    emitter.emit(
+                        'module.register',
+                        SernEmitter.failure(module, SernError.PluginFailure),
+                    ),
                 onNext: ({ module }) => {
                     emitter.emit('module.register', SernEmitter.success(module));
                     return module;

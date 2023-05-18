@@ -1,8 +1,15 @@
+import { Interaction, Message } from 'discord.js';
 import {
-    Interaction,
-    Message,
-} from 'discord.js';
-import { EMPTY, Observable, concatMap, filter, from, of, throwError, tap, MonoTypeOperatorFunction } from 'rxjs';
+    EMPTY,
+    Observable,
+    concatMap,
+    filter,
+    from,
+    of,
+    throwError,
+    tap,
+    MonoTypeOperatorFunction,
+} from 'rxjs';
 import { ModuleManager } from '../../core';
 import { SernError } from '../../core/structures/errors';
 import { callPlugin, everyPluginOk, filterMap, filterMapTo } from '../../core/operators';
@@ -61,40 +68,40 @@ export function createMessageHandler(
         if (fullPath === undefined) {
             return Err(SernError.UndefinedModule + ' No full path found in module store');
         }
-        return defaultModuleLoader<Processed<CommandModule>>(fullPath)
-            .then(result => {
-                const args = contextArgs(event, rest);
-                return result.map(payload => dispatchMessage(payload.module, args));
-            });
+        return defaultModuleLoader<Processed<CommandModule>>(fullPath).then(result => {
+            const args = contextArgs(event, rest);
+            return result.map(payload => dispatchMessage(payload.module, args));
+        });
     });
 }
 /**
-  * IMPURE SIDE EFFECT
-  * This function assigns remaining, incomplete data to each imported module.
-  */
-function assignDefaults<T extends Module>(moduleManager: ModuleManager): MonoTypeOperatorFunction<ImportPayload<T>> {
-  return tap(
-    ({ module, absPath }) => {
+ * IMPURE SIDE EFFECT
+ * This function assigns remaining, incomplete data to each imported module.
+ */
+function assignDefaults<T extends Module>(
+    moduleManager: ModuleManager,
+): MonoTypeOperatorFunction<ImportPayload<T>> {
+    return tap(({ module, absPath }) => {
         module.name ??= Files.filename(absPath);
         module.description ??= '...';
-        moduleManager.setMetadata(
-            module, { fullPath: absPath, id: `${module.name}_${uniqueId(module.type)}` }
-        );
-    }
-  );
+        moduleManager.setMetadata(module, {
+            fullPath: absPath,
+            id: `${module.name}_${uniqueId(module.type)}`,
+        });
+    });
 }
 
 export function buildModules<T extends AnyModule>(
     input: ObservableInput<string>,
     sernEmitter: SernEmitter,
-    moduleManager: ModuleManager
+    moduleManager: ModuleManager,
 ) {
     return pipe(
         switchMap(() => Files.buildModuleStream<T>(input)),
         errTap(error => {
             sernEmitter.emit('module.register', SernEmitter.failure(undefined, error));
         }),
-        assignDefaults<T>(moduleManager)
+        assignDefaults<T>(moduleManager),
     );
 }
 
@@ -206,5 +213,3 @@ export function makeModuleExecutor<
         }),
     );
 }
-
-

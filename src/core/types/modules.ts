@@ -29,8 +29,6 @@ import { Awaitable, SernEventsMapping } from '../../shared';
 import { Processed } from '../../handler/types';
 import { Args, SlashOptions } from '../../shared';
 
-
-
 export interface CommandMeta {
     fullPath: string;
     id: string;

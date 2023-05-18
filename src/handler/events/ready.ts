@@ -10,7 +10,7 @@ import { AnyModule } from '../../core/types/modules';
 import * as assert from 'node:assert';
 
 export function startReadyEvent(
-    [sEmitter,,, moduleManager, client]: DependencyList,
+    [sEmitter, , , moduleManager, client]: DependencyList,
     allPaths: ObservableInput<string>,
 ) {
     const ready$ = fromEvent(client!, 'ready').pipe(take(1));
@@ -19,7 +19,10 @@ export function startReadyEvent(
             buildModules<Processed<AnyModule>>(allPaths, sEmitter, moduleManager),
             callInitPlugins({
                 onStop: module => {
-                    sEmitter.emit('module.register', SernEmitter.failure(module, SernError.PluginFailure));
+                    sEmitter.emit(
+                        'module.register',
+                        SernEmitter.failure(module, SernError.PluginFailure),
+                    );
                 },
                 onNext: ({ module }) => {
                     sEmitter.emit('module.register', SernEmitter.success(module));
@@ -30,7 +33,7 @@ export function startReadyEvent(
         .subscribe(module => {
             const result = registerModule(moduleManager, module);
             if (result.err) {
-                throw Error(SernError.InvalidModuleType + " " + result.val);
+                throw Error(SernError.InvalidModuleType + ' ' + result.val);
             }
         });
 }
@@ -39,16 +42,14 @@ function registerModule<T extends Processed<AnyModule>>(
     manager: ModuleManager,
     module: T,
 ): Result<void, void> {
-
     const { id, fullPath } = manager.getMetadata(module);
 
-    assert.ok(module.type > 0 && module.type < 1<<10, `Found ${module.name} at ${fullPath}, which does not have a valid type`);
-    if (module.type === CommandType.Both 
-        || module.type === CommandType.Text
-    ) {
+    assert.ok(
+        module.type > 0 && module.type < 1 << 10,
+        `Found ${module.name} at ${fullPath}, which does not have a valid type`,
+    );
+    if (module.type === CommandType.Both || module.type === CommandType.Text) {
         module.alias?.forEach(a => manager.set(`${a}_A0`, fullPath));
     }
     return Result.wrap(() => manager.set(id, fullPath));
 }
-
-

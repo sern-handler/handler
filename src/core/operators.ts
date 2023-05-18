@@ -97,9 +97,7 @@ export const sharedObservable = <T>(e: EventEmitter, eventName: string) => {
 export function handleError<C>(crashHandler: ErrorHandling, logging?: Logging) {
     return (pload: unknown, caught: Observable<C>) => {
         // This is done to fit the ErrorHandling contract
-        const err = pload instanceof Error 
-            ? pload 
-            : Error(util.inspect(pload, { colors: true }));
+        const err = pload instanceof Error ? pload : Error(util.inspect(pload, { colors: true }));
         if (crashHandler.keepAlive == 0) {
             crashHandler.crash(err);
         }

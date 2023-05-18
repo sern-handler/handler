@@ -3,7 +3,6 @@ import * as Contract from '../contracts';
 export type Singleton<T> = () => T;
 export type Transient<T> = () => () => T;
 
-
 export interface CoreDependencies {
     '@sern/logger'?: Singleton<Contract.Logging>;
     '@sern/emitter': Singleton<import('../structures/sern-emitter').SernEmitter>;
@@ -15,10 +14,10 @@ export interface CoreDependencies {
 export interface Dependencies extends CoreDependencies {
     '@sern/client': Singleton<import('node:events').EventEmitter>;
 }
-export type DependencyFromKey<T extends keyof Dependencies> = Dependencies[T]; 
+export type DependencyFromKey<T extends keyof Dependencies> = Dependencies[T];
 
 export type IntoDependencies<Tuple extends [...any[]]> = {
-  [Index in keyof Tuple]: UnpackFunction<DependencyFromKey<Tuple[Index]>&{}>; //Unpack and make NonNullable
+    [Index in keyof Tuple]: UnpackFunction<DependencyFromKey<Tuple[Index]> & {}>; //Unpack and make NonNullable
 } & { length: Tuple['length'] };
 
 export interface DependencyConfiguration {
@@ -38,4 +37,3 @@ export type MapDeps<Deps extends Dependencies, T extends readonly unknown[]> = T
           ...(MapDeps<Deps, Rest> extends [never] ? [] : MapDeps<Deps, Rest>),
       ]
     : [never];
-

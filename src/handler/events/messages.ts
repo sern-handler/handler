@@ -21,7 +21,7 @@ export function fmt(msg: string, prefix: string): string[] {
 }
 
 export function makeMessageHandler(
-    [emitter,, log, modules, client]: DependencyList,
+    [emitter, , log, modules, client]: DependencyList,
     defaultPrefix: string | undefined,
 ) {
     if (!defaultPrefix) {

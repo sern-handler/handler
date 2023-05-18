@@ -1,5 +1,5 @@
 import { Interaction } from 'discord.js';
-import { concatMap,  merge } from 'rxjs';
+import { concatMap, merge } from 'rxjs';
 import { SernError } from '../../core/structures/errors';
 import { SernEmitter } from '../../core';
 import { sharedObservable } from '../../core/operators';
@@ -7,8 +7,7 @@ import { isAutocomplete, isCommand, isMessageComponent, isModal } from '../../co
 import { createInteractionHandler, executeModule, makeModuleExecutor } from './generic';
 import { DependencyList } from '../types';
 
-export function makeInteractionHandler([emitter,,, modules, client]: DependencyList ) {
-
+export function makeInteractionHandler([emitter, , , modules, client]: DependencyList) {
     const interactionStream$ = sharedObservable<Interaction>(client, 'interactionCreate');
     const handle = createInteractionHandler(interactionStream$, modules);
 
@@ -18,12 +17,10 @@ export function makeInteractionHandler([emitter,,, modules, client]: DependencyL
         handle(isCommand),
         handle(isModal),
     );
-    return interactionHandler$
-        .pipe(
-            makeModuleExecutor(module => {
-                emitter.emit('module.activate', SernEmitter.failure(module, SernError.PluginFailure));
-            }),
-            concatMap(payload => executeModule(emitter, payload)),
-        );
+    return interactionHandler$.pipe(
+        makeModuleExecutor(module => {
+            emitter.emit('module.activate', SernEmitter.failure(module, SernError.PluginFailure));
+        }),
+        concatMap(payload => executeModule(emitter, payload)),
+    );
 }
-

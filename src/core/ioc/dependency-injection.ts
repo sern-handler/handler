@@ -1,9 +1,14 @@
-import type { DependencyConfiguration, MapDeps, IntoDependencies, Dependencies, CoreDependencies } from './types';
+import type {
+    DependencyConfiguration,
+    MapDeps,
+    IntoDependencies,
+    Dependencies,
+    CoreDependencies,
+} from './types';
 import { DefaultLogging } from '../structures';
 import { SernError } from '../structures/errors';
 import { useContainerRaw } from './base';
 import { CoreContainer } from '../structures/container';
-
 
 /**
  * @__PURE__
@@ -18,7 +23,7 @@ export function single<T>(cb: () => T) {
 /**
  * @__PURE__
  * @since 2.0.0
- * Creates a transient object  
+ * Creates a transient object
  * @param cb
  */
 export function transient<T>(cb: () => () => T) {
@@ -42,7 +47,7 @@ export function Services<const T extends (keyof Dependencies)[]>(...keys: [...T]
  */
 export async function composeRoot(
     container: CoreContainer<Partial<Dependencies>>,
-    conf: DependencyConfiguration
+    conf: DependencyConfiguration,
 ) {
     //container should have no client or logger yet.
     const hasLogger = conf.exclude?.has('@sern/logger');
@@ -71,11 +76,7 @@ export function useContainer<const T extends Dependencies>() {
         Warning: using a container hook (useContainer) is not recommended.
         Could lead to many unwanted side effects.
         Use the new Service(s) api function instead.
-        `
-    );
+        `);
     return <V extends (keyof T)[]>(...keys: [...V]) =>
         keys.map(key => useContainerRaw().get(key as keyof Dependencies)) as MapDeps<T, V>;
 }
-
-
-

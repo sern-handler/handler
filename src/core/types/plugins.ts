@@ -12,11 +12,40 @@
  */
 
 import type { Err, Ok, Result } from 'ts-results-es';
-import type { BothCommand, ButtonCommand, ChannelSelectCommand, CommandModule, ContextMenuMsg, ContextMenuUser, DiscordEventCommand, EventModule, ExternalEventCommand, MentionableSelectCommand, ModalSubmitCommand, RoleSelectCommand, SernEventCommand, SlashCommand, StringSelectCommand, TextCommand, UserSelectCommand } from './modules';
+import type {
+    BothCommand,
+    ButtonCommand,
+    ChannelSelectCommand,
+    CommandModule,
+    ContextMenuMsg,
+    ContextMenuUser,
+    DiscordEventCommand,
+    EventModule,
+    ExternalEventCommand,
+    MentionableSelectCommand,
+    ModalSubmitCommand,
+    RoleSelectCommand,
+    SernEventCommand,
+    SlashCommand,
+    StringSelectCommand,
+    TextCommand,
+    UserSelectCommand,
+} from './modules';
 import { Args, Awaitable, Payload, SlashOptions } from '../../shared';
 import { CommandType, Context, EventType, PluginType } from '../structures';
 import { InitArgs, Processed } from '../../handler/types';
-import { ButtonInteraction, ChannelSelectMenuInteraction, ClientEvents, MentionableSelectMenuInteraction, MessageContextMenuCommandInteraction, ModalSubmitInteraction, RoleSelectMenuInteraction, StringSelectMenuInteraction, UserContextMenuCommandInteraction, UserSelectMenuInteraction } from 'discord.js';
+import {
+    ButtonInteraction,
+    ChannelSelectMenuInteraction,
+    ClientEvents,
+    MentionableSelectMenuInteraction,
+    MessageContextMenuCommandInteraction,
+    ModalSubmitInteraction,
+    RoleSelectMenuInteraction,
+    StringSelectMenuInteraction,
+    UserContextMenuCommandInteraction,
+    UserSelectMenuInteraction,
+} from 'discord.js';
 
 export type PluginResult = Awaitable<VoidResult>;
 export type VoidResult = Result<void, void>;

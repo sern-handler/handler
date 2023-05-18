@@ -1,10 +1,22 @@
 import { ClientEvents } from 'discord.js';
 import { CommandType, EventType, PluginType } from '../core/structures';
-import { AnyCommandPlugin, AnyEventPlugin, CommandArgs, ControlPlugin, EventArgs, InitPlugin } from '../core/types/plugins';
-import { CommandModule, EventModule, InputCommand, InputEvent, Module } from '../core/types/modules';
+import {
+    AnyCommandPlugin,
+    AnyEventPlugin,
+    CommandArgs,
+    ControlPlugin,
+    EventArgs,
+    InitPlugin,
+} from '../core/types/plugins';
+import {
+    CommandModule,
+    EventModule,
+    InputCommand,
+    InputEvent,
+    Module,
+} from '../core/types/modules';
 import { partitionPlugins } from '../core/functions';
 import { Awaitable } from '../shared';
-
 
 export const clazz = Symbol('@sern/class');
 /**
@@ -29,7 +41,7 @@ export function eventModule(mod: InputEvent): EventModule {
     return {
         ...mod,
         plugins,
-        onEvent
+        onEvent,
     } as EventModule;
 }
 
@@ -66,20 +78,19 @@ function prepareClassPlugins(c: Module) {
 export abstract class CommandExecutable<const Type extends CommandType = CommandType> {
     abstract type: Type;
     plugins: AnyCommandPlugin[] = [];
-    private static _instance : CommandModule;
+    private static _instance: CommandModule;
     static readonly [clazz] = true;
 
     static getInstance() {
         if (!CommandExecutable._instance) {
             //@ts-ignore
             CommandExecutable._instance = new this();
-            prepareClassPlugins(CommandExecutable._instance);            
+            prepareClassPlugins(CommandExecutable._instance);
         }
         return CommandExecutable._instance;
     }
 
-    abstract execute(...args: CommandArgs<Type, PluginType.Control>) : Awaitable<unknown>
-
+    abstract execute(...args: CommandArgs<Type, PluginType.Control>): Awaitable<unknown>;
 }
 
 /**
@@ -90,7 +101,7 @@ export abstract class EventExecutable<Type extends EventType> {
     abstract type: Type;
     plugins: AnyEventPlugin[] = [];
     static readonly [clazz] = true;
-    private static _instance : EventModule;
+    private static _instance: EventModule;
     static getInstance() {
         if (!EventExecutable._instance) {
             //@ts-ignore
@@ -98,8 +109,6 @@ export abstract class EventExecutable<Type extends EventType> {
             prepareClassPlugins(EventExecutable._instance);
         }
         return EventExecutable._instance;
-    }    
+    }
     abstract execute(...args: EventArgs<Type, PluginType.Control>): Awaitable<unknown>;
 }
-
-

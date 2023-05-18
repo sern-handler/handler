@@ -12,12 +12,9 @@ import { Processed } from '../types';
 import { BothCommand, CommandModule, Module } from '../../core/types/modules';
 import { Args } from '../../shared';
 
-export function dispatchInteraction<
-    T extends CommandModule,
-    V extends BaseInteraction | Message
->(
+export function dispatchInteraction<T extends CommandModule, V extends BaseInteraction | Message>(
     payload: { module: Processed<T>; event: V },
-    createArgs: (m: typeof payload.event) => unknown[]
+    createArgs: (m: typeof payload.event) => unknown[],
 ) {
     return {
         module: payload.module,
@@ -28,11 +25,14 @@ export function dispatchInteraction<
 export function dispatchMessage(module: Processed<CommandModule>, args: [Context, Args]) {
     return {
         module,
-        args
+        args,
     };
 }
 
-export function dispatchAutocomplete(payload: { module: Processed<BothCommand>, event: AutocompleteInteraction }) {
+export function dispatchAutocomplete(payload: {
+    module: Processed<BothCommand>;
+    event: AutocompleteInteraction;
+}) {
     const option = treeSearch(payload.event, payload.module.options);
     if (option !== undefined) {
         return {
@@ -43,20 +43,13 @@ export function dispatchAutocomplete(payload: { module: Processed<BothCommand>, 
     throw Error(
         SernError.NotSupportedInteraction + ` There is no autocomplete tag for this option`,
     );
-
 }
 
-
-
-export function contextArgs(
-    wrappable: Message | BaseInteraction,
-    messageArgs?: string[],
-) {
+export function contextArgs(wrappable: Message | BaseInteraction, messageArgs?: string[]) {
     const ctx = Context.wrap(wrappable);
     const args = ctx.isMessage() ? ['text', messageArgs!] : ['slash', ctx.options];
     return [ctx, args] as [Context, Args];
 }
-
 
 export function interactionArg<T extends BaseInteraction>(interaction: T) {
     return [interaction] as [T];
@@ -101,7 +94,11 @@ export function createDispatcher(payload: {
 }) {
     switch (payload.module.type) {
         case CommandType.Text:
-            throw Error(SernError.MismatchEvent + ' Found a text module in interaction stream. ' + payload.module);
+            throw Error(
+                SernError.MismatchEvent +
+                    ' Found a text module in interaction stream. ' +
+                    payload.module,
+            );
         case CommandType.Slash:
         case CommandType.Both: {
             if (isAutocomplete(payload.event)) {

@@ -7,7 +7,6 @@ import { Module } from '../types/modules';
  * @since 1.0.0
  */
 export class SernEmitter extends EventEmitter {
-
     constructor() {
         super({ captureRejections: true });
     }

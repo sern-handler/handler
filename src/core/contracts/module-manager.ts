@@ -9,6 +9,5 @@ export interface ModuleManager {
     setMetadata(m: Module, c: CommandMeta): void;
     set(id: string, path: string): void;
     getPublishableCommands(): Promise<CommandModule[]>;
-    remove(id: string) : boolean
+    remove(id: string): boolean;
 }
-

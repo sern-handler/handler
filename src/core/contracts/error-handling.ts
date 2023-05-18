@@ -18,6 +18,4 @@ export interface ErrorHandling {
      * @param error
      */
     updateAlive(error: Error): void;
-
 }
-

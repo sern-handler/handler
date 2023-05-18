@@ -3,8 +3,7 @@ import { composeRoot, useContainer } from './dependency-injection';
 import { Dependencies, DependencyConfiguration } from './types';
 import { CoreContainer } from '../structures/container';
 
-
-//SIDE EFFECT: GLOBAL DI 
+//SIDE EFFECT: GLOBAL DI
 let containerSubject: CoreContainer<Partial<Dependencies>>;
 
 /**
@@ -14,7 +13,7 @@ let containerSubject: CoreContainer<Partial<Dependencies>>;
 export function useContainerRaw() {
     assert.ok(
         containerSubject && containerSubject.isReady(),
-        "Could not find container or container wasn't ready. Did you call makeDependencies?"
+        "Could not find container or container wasn't ready. Did you call makeDependencies?",
     );
     return containerSubject;
 }
@@ -33,4 +32,3 @@ export async function makeDependencies<const T extends Dependencies>(
 
     return useContainer<T>();
 }
-

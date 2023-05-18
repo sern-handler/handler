@@ -1,6 +1,6 @@
 import { Container } from 'iti';
 import { DefaultErrorHandling, DefaultModuleManager, SernEmitter } from '../';
-import { isAsyncFunction} from 'node:util/types';
+import { isAsyncFunction } from 'node:util/types';
 import * as assert from 'node:assert';
 import { Subject } from 'rxjs';
 import { ModuleStore } from './module-store';
@@ -22,34 +22,35 @@ export class CoreContainer<T extends Partial<Dependencies>> extends Container<T,
                 '@sern/errors': () => new DefaultErrorHandling(),
                 '@sern/emitter': () => new SernEmitter(),
                 '@sern/store': () => new ModuleStore(),
-            }).add(ctx => {
+            })
+            .add(ctx => {
                 return { '@sern/modules': () => new DefaultModuleManager(ctx['@sern/store']) };
             });
     }
-    
-    private listenForInsertions() {
-       assert.ok(!this.isReady(), 'listening for init functions should only occur prior to sern being ready.');  
-       const unsubscriber = this.on('containerUpserted', this.callInitHooks);
 
-       this.ready$.subscribe({
-           complete: unsubscriber
-       });
+    private listenForInsertions() {
+        assert.ok(
+            !this.isReady(),
+            'listening for init functions should only occur prior to sern being ready.',
+        );
+        const unsubscriber = this.on('containerUpserted', this.callInitHooks);
+
+        this.ready$.subscribe({
+            complete: unsubscriber,
+        });
     }
 
-    private async callInitHooks(e: { key: keyof T, newContainer: T[keyof T]|null }) {
-
+    private async callInitHooks(e: { key: keyof T; newContainer: T[keyof T] | null }) {
         const dep = e.newContainer;
         assert.ok(dep);
         //Ignore any dependencies that are not objects or array
-        if(typeof(dep) !== 'object' || Array.isArray(dep)) {
+        if (typeof dep !== 'object' || Array.isArray(dep)) {
             return;
         }
 
-        if('init' in dep && typeof dep.init === 'function') {
-            isAsyncFunction(dep.init) 
-                ? await dep.init() 
-                : dep.init();
-        }    
+        if ('init' in dep && typeof dep.init === 'function') {
+            isAsyncFunction(dep.init) ? await dep.init() : dep.init();
+        }
     }
 
     isReady() {

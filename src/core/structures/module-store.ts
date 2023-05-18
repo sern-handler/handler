@@ -7,6 +7,6 @@ import { Module, CommandMeta } from '../types/modules';
  * For interacting with modules, use the ModuleManager instead.
  */
 export class ModuleStore implements CoreModuleStore {
-    metadata  = new WeakMap<Module, CommandMeta>();
+    metadata = new WeakMap<Module, CommandMeta>();
     commands = new Map<string, string>();
 }

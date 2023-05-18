@@ -92,4 +92,3 @@ export class Context extends CoreContext<Message, ChatInputCommandInteraction> {
 function safeUnwrap<T>(res: Result<T, T>) {
     return res.val;
 }
-

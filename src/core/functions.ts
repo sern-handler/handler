@@ -8,14 +8,19 @@ import { PluginType } from './structures';
 export const ok = /* @__PURE__*/ () => Ok.EMPTY;
 export const err = /* @__PURE__*/ () => Err.EMPTY;
 
-export function partitionPlugins(arr: (AnyEventPlugin|AnyCommandPlugin)[] = []): [Plugin[], Plugin[]] {
+export function partitionPlugins(
+    arr: (AnyEventPlugin | AnyCommandPlugin)[] = [],
+): [Plugin[], Plugin[]] {
     const controlPlugins = [];
     const initPlugins = [];
     for (const el of arr) {
-        switch(el.type)
-        {
-            case PluginType.Control: controlPlugins.push(el); break;
-            case PluginType.Init: initPlugins.push(el); break;
+        switch (el.type) {
+            case PluginType.Control:
+                controlPlugins.push(el);
+                break;
+            case PluginType.Init:
+                initPlugins.push(el);
+                break;
         }
     }
     return [controlPlugins, initPlugins];
@@ -39,22 +44,22 @@ export function treeSearch(
         switch (cur.type) {
             case ApplicationCommandOptionType.Subcommand:
             case ApplicationCommandOptionType.SubcommandGroup:
-            {
+                {
                     for (const option of cur.options ?? []) {
                         _options.push(option);
                     }
-            }
-            break;
+                }
+                break;
             default:
-            {
-                if (cur.autocomplete) {
-                    const choice = iAutocomplete.options.getFocused(true);
-                    if (cur.name === choice.name && cur.autocomplete) {
-                        autocompleteData = cur;
+                {
+                    if (cur.autocomplete) {
+                        const choice = iAutocomplete.options.getFocused(true);
+                        if (cur.name === choice.name && cur.autocomplete) {
+                            autocompleteData = cur;
+                        }
                     }
                 }
-            }
-            break;
+                break;
         }
     }
     return autocompleteData;

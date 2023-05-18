@@ -24,12 +24,6 @@ export type {
     EventModuleDefs,
     BaseOptions,
     SernAutocompleteData,
-    SernOptionsData
+    SernOptionsData,
 } from './types/modules';
-export type {
-    Controller,
-    PluginResult,
-    InitPlugin,
-    ControlPlugin,
-    Plugin
-} from './types/plugins';
+export type { Controller, PluginResult, InitPlugin, ControlPlugin, Plugin } from './types/plugins';

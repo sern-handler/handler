@@ -12,7 +12,7 @@ const shared = {
         correctVarValueBeforeDeclaration: true, //need this to treeshake esm discord.js empty import
         annotations: true,
     },
-    dts: false
+    dts: false,
 };
 export default defineConfig([
     {
@@ -50,12 +50,12 @@ export default defineConfig([
             await writeFile('./dist/cjs/package.json', JSON.stringify({ type: 'commonjs' }));
         },
         ...shared,
-    }, 
+    },
     {
         dts: {
-            only: true
+            only: true,
         },
         entry: ['src/index.ts'],
-        outDir: 'dist'
-    }
+        outDir: 'dist',
+    },
 ]);

@@ -24,21 +24,18 @@ export interface SernEventsMapping {
     warning: [Payload];
 }
 
-
 export type Awaitable<T> = PromiseLike<T> | T;
 
-
 export type Deprecated<Message extends string> = [never, Message];
-
 
 export interface Wrapper {
     commands: string;
     defaultPrefix?: string;
     events?: string;
     /**
-      * Overload to enable mode in case developer does not use a .env file.
-      */
-    mode?: 'DEV' | 'PROD'
+     * Overload to enable mode in case developer does not use a .env file.
+     */
+    mode?: 'DEV' | 'PROD';
     /*
      * @deprecated
      */
@@ -46,7 +43,6 @@ export interface Wrapper {
         get: (...keys: (keyof Dependencies)[]) => unknown[];
     };
 }
-
 
 // Thanks to @kelsny
 export type ParseType<T> = {
@@ -56,4 +52,3 @@ export type ParseType<T> = {
 export type Args = ParseType<{ text: string[]; slash: SlashOptions }>;
 
 export type SlashOptions = Omit<CommandInteractionOptionResolver, 'getMessage' | 'getFocused'>;
-
