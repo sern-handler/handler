@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import { composeRoot, useContainer } from './dependency-injection';
-import { Dependencies, DependencyConfiguration } from './types';
+import { DependencyConfiguration } from './types';
 import { CoreContainer } from '../structures/container';
 
 //SIDE EFFECT: GLOBAL DI

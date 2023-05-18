@@ -1,9 +1,7 @@
 import type {
-    DependencyConfiguration,
-    MapDeps,
-    IntoDependencies,
-    Dependencies,
     CoreDependencies,
+    DependencyConfiguration,
+    IntoDependencies,
 } from './types';
 import { DefaultLogging } from '../structures';
 import { SernError } from '../structures/errors';
@@ -57,7 +55,7 @@ export async function composeRoot(
         });
     }
     //Build the container based on the callback provided by the user
-    conf.build(container as CoreContainer<CoreDependencies>);
+    conf.build(container as CoreContainer<Omit<CoreDependencies, '@sern/client'>>);
     try {
         container.get('@sern/client');
     } catch {
@@ -78,5 +76,5 @@ export function useContainer<const T extends Dependencies>() {
         Use the new Service(s) api function instead.
         `);
     return <V extends (keyof T)[]>(...keys: [...V]) =>
-        keys.map(key => useContainerRaw().get(key as keyof Dependencies)) as MapDeps<T, V>;
+        keys.map(key => useContainerRaw().get(key as keyof Dependencies)) as IntoDependencies<V>;
 }

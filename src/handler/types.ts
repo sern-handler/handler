@@ -1,5 +1,5 @@
 import { ErrorHandling, Logging, ModuleManager, SernEmitter } from '../core';
-import EventEmitter from 'node:events';
+import { EventEmitter } from 'node:events';
 import { Module } from '../core/types/modules';
 
 export type Processed<T> = T & { name: string; description: string };

@@ -4,7 +4,6 @@ import { isAsyncFunction } from 'node:util/types';
 import * as assert from 'node:assert';
 import { Subject } from 'rxjs';
 import { ModuleStore } from './module-store';
-import { Dependencies } from '../ioc/types';
 
 /**
  * Provides all the defaults for sern to function properly.
@@ -41,7 +40,8 @@ export class CoreContainer<T extends Partial<Dependencies>> extends Container<T,
     }
 
     private async callInitHooks(e: { key: keyof T; newContainer: T[keyof T] | null }) {
-        const dep = e.newContainer;
+        const dep = e.newContainer ;
+   
         assert.ok(dep);
         //Ignore any dependencies that are not objects or array
         if (typeof dep !== 'object' || Array.isArray(dep)) {
