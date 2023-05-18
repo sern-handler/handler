@@ -1,4 +1,3 @@
-import { clazz } from '../../../handler/commands';
 import { CoreModuleStore, ModuleManager } from '../../contracts';
 import { importModule } from '../../module-loading';
 import { CommandMeta, CommandModule, Module } from '../../types/modules';

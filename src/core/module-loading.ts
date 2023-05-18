@@ -1,26 +1,27 @@
 import { SernError } from './structures/errors';
-import { type Result, Err, Ok } from 'ts-results-es';
+import { Result, Err, Ok } from 'ts-results-es';
 import { Module } from './types/modules';
 import { type Observable, from, mergeMap, ObservableInput } from 'rxjs';
 import { readdir, stat } from 'fs/promises';
 import { basename, extname, join, resolve } from 'path';
 import { ImportPayload } from '../handler/types';
-import { CommandExecutable, clazz } from '../handler/commands';
 
 export type ModuleResult<T> = Promise<Result<ImportPayload<T>, SernError>>;
 
-function isClassModule(m: unknown): m is typeof CommandExecutable {
-    return m != undefined && Reflect.has(m, clazz);
-}
 
 export async function importModule<T>(absPath: string) {
+    // prettier-ignore
     let module =
-        /// #if MODE === 'esm'
-        import(absPath).then(i => i.default); // eslint-disable-line
+    /// #if MODE === 'esm'
+    import(absPath).then(i => i.default); // eslint-disable-line
     /// #elif MODE === 'cjs'
     require(absPath).default; // eslint-disable-line
     /// #endif
-    return module.then(m => (isClassModule(m) ? m.getInstance() : m)) as T;
+    return module.then(m => 
+       Result
+       .wrap(() => m.getInstance())
+       .unwrapOr(m)
+    ) as T;
 }
 export async function defaultModuleLoader<T extends Module>(absPath: string): ModuleResult<T> {
     let module = await importModule<T>(absPath);

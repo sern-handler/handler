@@ -32,6 +32,7 @@ import { Args, SlashOptions } from '../../shared';
 export interface CommandMeta {
     fullPath: string;
     id: string;
+    isClass: boolean
 }
 
 export type AnyDefinedModule = Processed<CommandModule | EventModule>;

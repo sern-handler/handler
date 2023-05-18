@@ -18,7 +18,6 @@ import {
 import { partitionPlugins } from '../core/functions';
 import { Awaitable } from '../shared';
 
-export const clazz = Symbol('@sern/class');
 /**
  * @since 1.0.0 The wrapper function to define command modules for sern
  * @param mod
@@ -79,7 +78,6 @@ export abstract class CommandExecutable<const Type extends CommandType = Command
     abstract type: Type;
     plugins: AnyCommandPlugin[] = [];
     private static _instance: CommandModule;
-    static readonly [clazz] = true;
 
     static getInstance() {
         if (!CommandExecutable._instance) {
@@ -100,7 +98,7 @@ export abstract class CommandExecutable<const Type extends CommandType = Command
 export abstract class EventExecutable<Type extends EventType> {
     abstract type: Type;
     plugins: AnyEventPlugin[] = [];
-    static readonly [clazz] = true;
+
     private static _instance: EventModule;
     static getInstance() {
         if (!EventExecutable._instance) {

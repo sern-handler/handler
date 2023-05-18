@@ -85,6 +85,7 @@ function assignDefaults<T extends Module>(
         module.name ??= Files.filename(absPath);
         module.description ??= '...';
         moduleManager.setMetadata(module, {
+            isClass: module.constructor.name === 'Function',
             fullPath: absPath,
             id: `${module.name}_${uniqueId(module.type)}`,
         });
