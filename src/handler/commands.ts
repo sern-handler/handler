@@ -1,7 +1,7 @@
 import { ClientEvents } from 'discord.js';
 import { CommandType, EventType, PluginType } from '../core/structures';
-import { AnyCommandPlugin, AnyEventPlugin, CommandArgs, ControlPlugin, EventArgs } from '../core/types/plugins';
-import { CommandModule, EventModule, InputCommand, InputEvent } from '../core/types/modules';
+import { AnyCommandPlugin, AnyEventPlugin, CommandArgs, ControlPlugin, EventArgs, InitPlugin } from '../core/types/plugins';
+import { CommandModule, EventModule, InputCommand, InputEvent, Module } from '../core/types/modules';
 import { partitionPlugins } from '../core/functions';
 import { Awaitable } from '../shared';
 
@@ -27,9 +27,9 @@ export function commandModule(mod: InputCommand): CommandModule {
 export function eventModule(mod: InputEvent): EventModule {
     const [onEvent, plugins] = partitionPlugins(mod.plugins);
     return {
-        onEvent,
-        plugins,
         ...mod,
+        plugins,
+        onEvent
     } as EventModule;
 }
 
@@ -50,7 +50,11 @@ export function discordEvent<T extends keyof ClientEvents>(mod: {
     });
 }
 
-
+function prepareClassPlugins(c: Module) {
+    const [onEvent, initPlugins] = partitionPlugins(c.plugins);
+    c.plugins = initPlugins as InitPlugin[];
+    c.onEvent = onEvent as ControlPlugin[];
+}
 //
 // Class modules:
 // Can be refactored.
@@ -59,27 +63,17 @@ export function discordEvent<T extends keyof ClientEvents>(mod: {
  * @Experimental
  * Will be refactored / changed in future
  */
-export abstract class CommandExecutable<const Type extends CommandType> {
+export abstract class CommandExecutable<const Type extends CommandType = CommandType> {
     abstract type: Type;
-    plugins?: AnyCommandPlugin[];
-    onEvent?: ControlPlugin[]
+    plugins: AnyCommandPlugin[] = [];
     private static _instance : CommandModule;
     static readonly [clazz] = true;
-
-    constructor() {
-       if(this.onEvent) {
-          console.warn('Put control plugins in `onEvent` into the `plugins` field, as it\'s automatically handled in v3.');
-       } else {
-          const [onEvent, plugins] = partitionPlugins(this.plugins);
-          this.plugins = plugins as AnyCommandPlugin[];
-          Reflect.set(this, 'onEvent', onEvent);
-       }
-    }
 
     static getInstance() {
         if (!CommandExecutable._instance) {
             //@ts-ignore
             CommandExecutable._instance = new this();
+            prepareClassPlugins(CommandExecutable._instance);            
         }
         return CommandExecutable._instance;
     }
@@ -94,23 +88,14 @@ export abstract class CommandExecutable<const Type extends CommandType> {
  */
 export abstract class EventExecutable<Type extends EventType> {
     abstract type: Type;
-    plugins?: AnyEventPlugin[];
+    plugins: AnyEventPlugin[] = [];
     static readonly [clazz] = true;
-    onEvent?: ControlPlugin[]
     private static _instance : EventModule;
-    constructor() {
-        if(this.onEvent) {
-          console.warn('Put control plugins in `onEvent` into the `plugins` field, as it\'s automatically handled in v3.');
-        } else {
-            const [onEvent, plugins] = partitionPlugins(this.plugins);
-            this.plugins = plugins as AnyEventPlugin[];
-            Reflect.set(this, 'onEvent', onEvent);
-        }
-    }
     static getInstance() {
         if (!EventExecutable._instance) {
             //@ts-ignore
             EventExecutable._instance = new this();
+            prepareClassPlugins(EventExecutable._instance);
         }
         return EventExecutable._instance;
     }    

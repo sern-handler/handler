@@ -1,3 +1,4 @@
+import { clazz } from '../../../handler/commands';
 import { CoreModuleStore, ModuleManager } from '../../contracts';
 import { importModule } from '../../module-loading';
 import { CommandMeta, CommandModule, Module } from '../../types/modules';
@@ -36,8 +37,8 @@ export class DefaultModuleManager implements ModuleManager {
        const publishable = 0b000000110;
        return Promise.all(
            Array.from(entries)
-               .filter(([id]) => (Number.parseInt(id.at(-1)!) & publishable) !== 0)
-               .map(([, path]) => importModule<CommandModule>(path)),
+               .filter(([id]) => !(Number.parseInt(id.at(-1)!) & publishable))
+               .map(([, path]) =>  importModule<CommandModule>(path))
        );
    }
 }

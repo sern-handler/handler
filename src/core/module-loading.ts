@@ -5,26 +5,28 @@ import { type Observable, from, mergeMap, ObservableInput } from 'rxjs';
 import { readdir, stat } from 'fs/promises';
 import { basename, extname, join, resolve } from 'path';
 import { ImportPayload } from '../handler/types';
-import * as assert from 'node:assert';
-import { clazz } from '../handler/commands';
+import { CommandExecutable, clazz } from '../handler/commands';
 
 export type ModuleResult<T> = Promise<Result<ImportPayload<T>, SernError>>;
 
+
+function isClassModule(m: unknown): m is typeof CommandExecutable {
+    return m != undefined && Reflect.has(m, clazz);
+}
+
 export async function importModule<T>(absPath: string) {
+    let module = 
     /// #if MODE === 'esm'
-    return import(absPath).then(i => i.default as T);
+    import(absPath).then(i => i.default);  // eslint-disable-line
     /// #elif MODE === 'cjs'
-    return require(absPath).default as T; // eslint-disable-line
+    require(absPath).default; // eslint-disable-line
     /// #endif
+    return module.then(m => isClassModule(m) ? m.getInstance():m) as T;
 }
 export async function defaultModuleLoader<T extends Module>(absPath: string): ModuleResult<T> {
     let module = await importModule<T>(absPath);
     if (module === undefined) {
         return Err(SernError.UndefinedModule);
-    }
-    if(Reflect.has(module, clazz)) {
-        //@ts-ignore
-        module = module.getInstance(); 
     }
     //todo readd class modules
     return Ok({ module, absPath });

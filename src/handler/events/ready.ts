@@ -30,7 +30,7 @@ export function startReadyEvent(
         .subscribe(module => {
             const result = registerModule(moduleManager, module);
             if (result.err) {
-                throw Error(SernError.InvalidModuleType);
+                throw Error(SernError.InvalidModuleType + " " + result.val);
             }
         });
 }
@@ -42,7 +42,7 @@ function registerModule<T extends Processed<AnyModule>>(
 
     const { id, fullPath } = manager.getMetadata(module);
 
-    assert.ok(module.type > 0 && module.type < 1<<10, `Found ${module}, which does not have a valid type`);
+    assert.ok(module.type > 0 && module.type < 1<<10, `Found ${module.name} at ${fullPath}, which does not have a valid type`);
     if (module.type === CommandType.Both 
         || module.type === CommandType.Text
     ) {
