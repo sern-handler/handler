@@ -38,7 +38,7 @@ export function init(wrapper: Wrapper) {
     startReadyEvent(dependencies, getFullPathTree(wrapper.commands, mode))
     .add(() => {
         const time = ((performance.now() - startTime) / 1000).toFixed(2);
-        dependencies[0].emit('modulesLoaded');
+        dependencies[0].emit('modulesLoaded' );
         logger?.info({
             message: `sern: registered all modules in ${time} s`,
         });

@@ -1,13 +1,15 @@
-import { CommandMeta, CommandModule, Module } from '../types/modules';
+import { CommandType } from '../structures';
+import { CommandMeta, CommandModule, CommandModuleDefs, Module } from '../types/modules';
 
 /**
  * @since 2.0.0
  */
 export interface ModuleManager {
     get(id: string): string | undefined;
-    getMetadata(m: Module): CommandMeta;
+    getMetadata(m: Module): CommandMeta|undefined;
     setMetadata(m: Module, c: CommandMeta): void;
     set(id: string, path: string): void;
     getPublishableCommands(): Promise<CommandModule[]>;
+    getByNameCommandType<T extends CommandType>(name: string, commandType: T): Promise<CommandModuleDefs[T]>|undefined;
     remove(id: string): boolean;
 }
