@@ -8,6 +8,7 @@ import { catchError, finalize, merge } from 'rxjs';
 import { handleError } from '../core/operators';
 import { Services, useContainerRaw } from '../core/ioc';
 import { Wrapper } from '../shared';
+import { handleCrash } from './events/generic';
 
 /**
  * @since 1.0.0
@@ -34,8 +35,10 @@ export function init(wrapper: Wrapper) {
         makeEventsHandler(dependencies, getFullPathTree(wrapper.events, mode));
     }
 
-    startReadyEvent(dependencies, getFullPathTree(wrapper.commands, mode)).add(() => {
+    startReadyEvent(dependencies, getFullPathTree(wrapper.commands, mode))
+    .add(() => {
         const time = ((performance.now() - startTime) / 1000).toFixed(2);
+        dependencies[0].emit('modulesLoaded');
         logger?.info({
             message: `sern: registered all modules in ${time} s`,
         });
@@ -45,15 +48,7 @@ export function init(wrapper: Wrapper) {
     const interactions$ = makeInteractionHandler(dependencies);
 
     merge(messages$, interactions$)
-        .pipe(
-            catchError(handleError(errorHandler, logger)),
-            finalize(() => {
-                logger?.info({ message: 'A stream closed or reached end of lifetime' });
-                useContainerRaw()
-                    ?.disposeAll()
-                    .then(() => logger?.info({ message: 'Cleaning container and crashing' }));
-            }),
-        )
+        .pipe(handleCrash(errorHandler, logger))
         .subscribe();
 }
 

@@ -21,6 +21,7 @@ export interface SernEventsMapping {
     'module.activate': [Payload];
     error: [Payload];
     warning: [Payload];
+    'modulesLoaded' : [];
 }
 
 export type Awaitable<T> = PromiseLike<T> | T;
