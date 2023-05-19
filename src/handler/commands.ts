@@ -61,7 +61,7 @@ export function discordEvent<T extends keyof ClientEvents>(mod: {
     });
 }
 
-function preparePlugins(c: Module) {
+function prepareClassPlugins(c: Module) {
     const [onEvent, initPlugins] = partitionPlugins(c.plugins);
     c.plugins = initPlugins as InitPlugin[];
     c.onEvent = onEvent as ControlPlugin[];
@@ -83,7 +83,7 @@ export abstract class CommandExecutable<const Type extends CommandType = Command
         if (!CommandExecutable._instance) {
             //@ts-ignore
             CommandExecutable._instance = new this();
-            preparePlugins(CommandExecutable._instance);
+            prepareClassPlugins(CommandExecutable._instance);
         }
         return CommandExecutable._instance;
     }
