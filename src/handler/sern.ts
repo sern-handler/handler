@@ -4,9 +4,8 @@ import { startReadyEvent } from './events/ready';
 import { makeMessageHandler } from './events/messages';
 import { err, ok } from '../core/functions';
 import { getFullPathTree } from '../core/module-loading';
-import { catchError, finalize, merge } from 'rxjs';
-import { handleError } from '../core/operators';
-import { Services, useContainerRaw } from '../core/ioc';
+import { merge } from 'rxjs';
+import { Services } from '../core/ioc';
 import { Wrapper } from '../shared';
 import { handleCrash } from './events/generic';
 

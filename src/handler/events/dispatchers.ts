@@ -12,6 +12,7 @@ import { Processed } from '../types';
 import { BothCommand, CommandModule, Module } from '../../core/types/modules';
 import { Args } from '../../shared';
 
+
 export function dispatchInteraction<T extends CommandModule, V extends BaseInteraction | Message>(
     payload: { module: Processed<T>; event: V },
     createArgs: (m: typeof payload.event) => unknown[],

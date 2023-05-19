@@ -21,7 +21,8 @@
         "build:dev": "tsup --metafile",
         "build:prod": "tsup --minify",
         "publish": "npm run build:prod",
-        "pretty": "prettier --write ."
+        "pretty": "prettier --write .",
+        "test": "vitest"
     },
     "keywords": [
         "sern-handler",
@@ -40,6 +41,7 @@
         "ts-results-es": "^3.6.0"
     },
     "devDependencies": {
+        "@faker-js/faker": "^8.0.1",
         "@types/node": "^18.15.11",
         "@typescript-eslint/eslint-plugin": "5.58.0",
         "@typescript-eslint/parser": "5.58.0",
@@ -49,7 +51,8 @@
         "eslint": "8.38.0",
         "prettier": "2.8.7",
         "tsup": "^6.7.0",
-        "typescript": "5.0.2"
+        "typescript": "5.0.2",
+        "vitest": "latest"
     },
     "prettier": {
         "semi": true,
