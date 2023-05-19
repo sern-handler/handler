@@ -9,10 +9,12 @@ import {
     throwError,
     tap,
     MonoTypeOperatorFunction,
+    catchError,
+    finalize,
 } from 'rxjs';
-import { ModuleManager } from '../../core';
+import { ErrorHandling, Logging, ModuleManager, useContainerRaw } from '../../core';
 import { SernError } from '../../core/structures/errors';
-import { callPlugin, everyPluginOk, filterMap, filterMapTo } from '../../core/operators';
+import { callPlugin, everyPluginOk, filterMap, filterMapTo, handleError } from '../../core/operators';
 import { defaultModuleLoader } from '../../core/module-loading';
 import { CommandModule, Module, AnyModule } from '../../core/types/modules';
 import { contextArgs, createDispatcher, dispatchMessage } from './dispatchers';
@@ -212,5 +214,19 @@ export function makeModuleExecutor<
             createStream: ({ args, module }) => from(module.onEvent).pipe(callPlugin(args)),
             onNext,
         }),
+    );
+}
+
+export function handleCrash(
+    errorHandler: ErrorHandling,
+    logger?: Logging,
+) {
+    return pipe(
+        catchError(handleError(errorHandler, logger)),
+        finalize(() => {
+            logger?.info({ message: 'A stream closed or reached end of lifetime' });
+            useContainerRaw()?.disposeAll()
+                .then(() => logger?.info({ message: 'Cleaning container and crashing' }));
+        })
     );
 }

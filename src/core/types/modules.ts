@@ -54,7 +54,7 @@ export interface SernEventCommand<T extends keyof SernEventsMapping = keyof Sern
 }
 export interface ExternalEventCommand extends Module {
     name?: string;
-    emitter: string;
+    emitter: keyof Dependencies;
     type: EventType.External;
     execute(...args: unknown[]): Awaitable<unknown>;
 }

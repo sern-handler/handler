@@ -8,7 +8,6 @@ import { buildModules, callInitPlugins } from './generic';
 import { handleError } from '../../core/operators';
 import { Service, useContainerRaw } from '../../core/ioc';
 import { DependencyList, Processed } from '../types';
-import { Dependencies } from '../../core/ioc/types';
 
 export function makeEventsHandler(
     [emitter, err, log, moduleManager, client]: DependencyList,
@@ -22,7 +21,7 @@ export function makeEventsHandler(
             case EventType.Discord:
                 return eventDispatcher(e, client);
             case EventType.External:
-                return eventDispatcher(e, Service(e.emitter as keyof Dependencies));
+                return eventDispatcher(e, Service(e.emitter));
             default:
                 return err.crash(
                     Error(SernError.InvalidModuleType + ' while creating event handler'),
