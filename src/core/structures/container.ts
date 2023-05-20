@@ -40,7 +40,7 @@ export class CoreContainer<T extends Partial<Dependencies>> extends Container<T,
     }
 
     private async callInitHooks(e: { key: keyof T; newContainer: T[keyof T] | null }) {
-        const dep = e.newContainer ;
+        const dep = e.newContainer;
    
         assert.ok(dep);
         //Ignore any dependencies that are not objects or array
