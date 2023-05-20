@@ -56,7 +56,14 @@ describe('services', () => {
     //todo add more
     it('error-handling', () => {
         const errorHandler = container.get('@sern/errors');
-        expect(() => errorHandler.crash(new Error("poo"))).toThrowError();
+        const lifetime = errorHandler.keepAlive;
+        for(let i = 0; i< lifetime; i++) {
+            if(i == lifetime-1) {
+                expect(() => errorHandler.updateAlive(new Error("poo"))).toThrowError();
+            } else {
+                expect(() => errorHandler.updateAlive(new Error("poo"))).not.toThrowError();
+            }
+        }
         
     })
     //todo add more, spy on every instance?

@@ -23,9 +23,7 @@ export function makeEventsHandler(
             case EventType.External:
                 return eventDispatcher(e, Service(e.emitter));
             default:
-                return err.crash(
-                    Error(SernError.InvalidModuleType + ' while creating event handler'),
-                );
+                throw Error(SernError.InvalidModuleType + ' while creating event handler');
         }
     };
     of(null)

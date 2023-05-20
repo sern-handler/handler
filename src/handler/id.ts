@@ -15,6 +15,7 @@ export function reconstructId<T extends Interaction>(event: T) {
         case InteractionType.ApplicationCommandAutocomplete: {
             return `${event.commandName}_A${event.commandType}`;
         }
+        //Modal interactions are classified as components for sern
         case InteractionType.ModalSubmit: {
             return `${event.customId}_C1`;
         }

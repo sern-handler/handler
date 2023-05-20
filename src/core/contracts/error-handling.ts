@@ -8,7 +8,8 @@ export interface ErrorHandling {
     keepAlive: number;
 
     /**
-     * A function that is called on every crash. Updates keepAlive
+     * A function that is called on every crash. Updates keepAlive.
+     * If keepAlive is 0, the process crashes.
      * @param error
      */
     updateAlive(error: Error): void;
