@@ -1,4 +1,4 @@
-import { uniqueId } from '../../../handler/id';
+import { createId } from '../../../handler/id';
 import { CoreModuleStore, ModuleManager } from '../../contracts';
 import { importModule } from '../../module-loading';
 import { CommandMeta, CommandModule, CommandModuleDefs, Module } from '../../types/modules';
@@ -12,7 +12,7 @@ export class DefaultModuleManager implements ModuleManager {
     constructor(private moduleStore: CoreModuleStore) {}
 
     getByNameCommandType<T extends CommandType>(name: string, commandType: T) {
-        const id = this.get(`${name}_${uniqueId(commandType)}`);
+        const id = this.get(createId(name, commandType));
         if(!id) {
             return undefined;
         }
@@ -31,9 +31,6 @@ export class DefaultModuleManager implements ModuleManager {
         return maybeModule;
     }
 
-    remove(id: string): boolean {
-        throw new Error('Method not implemented.');
-    }
 
     get(id: string) {
         return this.moduleStore.commands.get(id);

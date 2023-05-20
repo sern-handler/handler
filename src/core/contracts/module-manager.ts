@@ -11,5 +11,4 @@ export interface ModuleManager {
     set(id: string, path: string): void;
     getPublishableCommands(): Promise<CommandModule[]>;
     getByNameCommandType<T extends CommandType>(name: string, commandType: T): Promise<CommandModuleDefs[T]>|undefined;
-    remove(id: string): boolean;
 }

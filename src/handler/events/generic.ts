@@ -27,7 +27,7 @@ import { fmt } from './messages';
 import { ControlPlugin, VoidResult } from '../../core/types/plugins';
 import { ImportPayload, Processed } from '../types';
 import { Awaitable } from '../../shared';
-import { createId, uniqueId } from '../id';
+import { createId, reconstructId } from '../id';
 
 function createGenericHandler<Source, Narrowed extends Source, Output>(
     source: Observable<Source>,
@@ -49,7 +49,7 @@ export function createInteractionHandler<T extends Interaction>(
     return createGenericHandler<Interaction, T, ReturnType<typeof createDispatcher>>(
         source,
         event => {
-            const fullPath = mg.get(createId(event as unknown as Interaction));
+            const fullPath = mg.get(reconstructId(event as unknown as Interaction));
             if (!fullPath)
                 return Err(SernError.UndefinedModule + ' No full path found in module store');
             return defaultModuleLoader<Processed<CommandModule>>(fullPath).then(res =>
@@ -89,7 +89,7 @@ function assignDefaults<T extends Module>(
         moduleManager.setMetadata(module, {
             isClass: module.constructor.name === 'Function',
             fullPath: absPath,
-            id: `${module.name}_${uniqueId(module.type)}`,
+            id: createId(module.name, module.type),
         });
     });
 }
