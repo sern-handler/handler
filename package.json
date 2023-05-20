@@ -22,7 +22,8 @@
         "build:prod": "tsup --minify",
         "publish": "npm run build:prod",
         "pretty": "prettier --write .",
-        "test": "vitest"
+        "tdd" : "vitest",
+        "test": "vitest --run"
     },
     "keywords": [
         "sern-handler",

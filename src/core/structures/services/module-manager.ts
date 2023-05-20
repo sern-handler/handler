@@ -6,7 +6,7 @@ import { CommandType } from '../enums';
 /**
  * @internal
  * @since 2.0.0
- * Version 4.0.0 will internalize this api. Please refrain from using ModuleStore!
+ * Version 4.0.0 will internalize this api. Please refrain from using DefaultModuleManager!
  */
 export class DefaultModuleManager implements ModuleManager {
     constructor(private moduleStore: CoreModuleStore) {}
