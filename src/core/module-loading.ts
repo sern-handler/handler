@@ -54,26 +54,39 @@ export function filename(path: string) {
     return fmtFileName(basename(path));
 }
 
+function createSkipCondition(base: string) {
+    const validExtensions = ['.js', '.cjs', '.mts', '.mjs', 'cts'];
+    return ( type: 'file' | 'directory') => {
+        if(type === 'file') {
+           return fmtFileName(base)[0] === '!'
+            || !validExtensions.includes(extname(base));
+        }
+        return base[0] === '!';
+    }
+}
+async function deriveFileInfo(dir: string, file: string) {
+     const fullPath = join(dir, file);
+     return {
+       fullPath,
+       fileStats: await stat(fullPath),
+       base: basename(file)
+     }
+}
 async function* readPaths(dir: string, shouldDebug: boolean): AsyncGenerator<string> {
     try {
         const files = await readdir(dir);
         for (const file of files) {
-            const fullPath = join(dir, file);
-            const fileStats = await stat(fullPath);
-            const base = basename(file);
+            const { fullPath, fileStats, base } = await deriveFileInfo(dir, file);
+            const isSkippable = createSkipCondition(base);
             if (fileStats.isDirectory()) {
                 //Todo: refactor so that i dont repeat myself for files (line 71)
-                if (base.endsWith('-ignore!')) {
+                if (isSkippable('directory')) {
                     if (shouldDebug) console.info(`ignored directory: ${fullPath}`);
                 } else {
                     yield* readPaths(fullPath, shouldDebug);
                 }
             } else {
-                const isSkippable =
-                    fmtFileName(base).endsWith('-ignore!') ||
-                    !['.js', '.cjs', '.mts', '.mjs'].includes(extname(base));
-
-                if (isSkippable) {
+                if (isSkippable('file')) {
                     if (shouldDebug) console.info(`ignored: ${fullPath}`);
                 } else {
                     /// #if MODE === 'esm'

@@ -22,7 +22,6 @@ export type {
     ExternalEventCommand,
     CommandModuleDefs,
     EventModuleDefs,
-    BaseOptions,
     SernAutocompleteData,
     SernOptionsData,
 } from './types/modules';

@@ -1,4 +1,8 @@
 import type {
+    APIApplicationCommandBasicOption,
+    APIApplicationCommandOptionBase,
+    APIApplicationCommandOptionChoice,
+    APIApplicationCommandRoleOption,
     ApplicationCommandAttachmentOption,
     ApplicationCommandChannelOptionData,
     ApplicationCommandChoicesData,
@@ -9,6 +13,7 @@ import type {
     ApplicationCommandSubCommandData,
     ApplicationCommandSubGroupData,
     BaseApplicationCommandOptionsData,
+    CommandOptionNonChoiceResolvableType,
 } from 'discord.js';
 import {
     AutocompleteInteraction,
@@ -202,32 +207,22 @@ export type InputCommand = {
     [T in CommandType]: CommandModuleNoPlugins[T] & { plugins?: AnyCommandPlugin[] };
 }[CommandType];
 
+
 /**
  * Type that replaces autocomplete with {@link SernAutocompleteData}
  */
-export type BaseOptions =
-    | ApplicationCommandChoicesData
-    | ApplicationCommandNonOptionsData
-    | ApplicationCommandChannelOptionData
-    | ApplicationCommandNumericOptionData
-    | ApplicationCommandAttachmentOption
+export type SernOptionsData =
+    | SernSubCommandData
+    | SernSubCommandGroupData
+    | APIApplicationCommandBasicOption
     | SernAutocompleteData;
 
-export interface SernSubCommandData extends BaseApplicationCommandOptionsData {
+export interface SernSubCommandData extends APIApplicationCommandOptionBase<ApplicationCommandOptionType.Subcommand> {
     type: ApplicationCommandOptionType.Subcommand;
-    required?: never;
-    options?: BaseOptions[];
+    options?: SernOptionsData[];
 }
 
 export interface SernSubCommandGroupData extends BaseApplicationCommandOptionsData {
     type: ApplicationCommandOptionType.SubcommandGroup;
-    required?: never;
     options?: SernSubCommandData[];
 }
-
-export type SernOptionsData<U extends ApplicationCommandOptionData = ApplicationCommandOptionData> =
-    U extends ApplicationCommandSubCommandData
-        ? SernSubCommandData
-        : U extends ApplicationCommandSubGroupData
-        ? SernSubCommandGroupData
-        : BaseOptions;
