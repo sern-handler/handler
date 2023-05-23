@@ -80,9 +80,7 @@ typings/
 # FuseBox cache
 .fusebox/
 
-# TypeScript build output
-dist
-
+test
 # VisualStudio Config file
 .vs
 

@@ -24,5 +24,7 @@ export type {
     EventModuleDefs,
     SernAutocompleteData,
     SernOptionsData,
+    SernSubCommandData,
+    SernSubCommandGroupData
 } from './types/modules';
-export type { Controller, PluginResult, InitPlugin, ControlPlugin, Plugin } from './types/plugins';
+export type { Controller, PluginResult, InitPlugin, ControlPlugin, Plugin, AnyEventPlugin, AnyCommandPlugin } from './types/plugins';
