@@ -1,19 +1,8 @@
 import type {
     APIApplicationCommandBasicOption,
     APIApplicationCommandOptionBase,
-    APIApplicationCommandOptionChoice,
-    APIApplicationCommandRoleOption,
-    ApplicationCommandAttachmentOption,
-    ApplicationCommandChannelOptionData,
-    ApplicationCommandChoicesData,
-    ApplicationCommandNonOptionsData,
-    ApplicationCommandNumericOptionData,
-    ApplicationCommandOptionData,
     ApplicationCommandOptionType,
-    ApplicationCommandSubCommandData,
-    ApplicationCommandSubGroupData,
     BaseApplicationCommandOptionsData,
-    CommandOptionNonChoiceResolvableType,
 } from 'discord.js';
 import {
     AutocompleteInteraction,
@@ -192,10 +181,10 @@ export interface SernAutocompleteData
     command: AutocompleteCommand;
 }
 
-export type CommandModuleNoPlugins = {
+type CommandModuleNoPlugins = {
     [T in CommandType]: Omit<CommandModuleDefs[T], 'plugins' | 'onEvent'>;
 };
-export type EventModulesNoPlugins = {
+type EventModulesNoPlugins = {
     [T in EventType]: Omit<EventModuleDefs[T], 'plugins' | 'onEvent'>;
 };
 

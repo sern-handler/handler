@@ -1,7 +1,6 @@
-import { afterEach, describe, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { PluginType, SernOptionsData, controller } from '../../src/index'
 import { partitionPlugins, treeSearch } from "../../src/core/functions";
-import { expect } from "chai";
 import { faker } from '@faker-js/faker';
 import { ApplicationCommandOptionType, AutocompleteInteraction } from "discord.js";
 

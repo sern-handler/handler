@@ -26,8 +26,6 @@ export interface SernEventsMapping {
 
 export type Awaitable<T> = PromiseLike<T> | T;
 
-export type Deprecated<Message extends string> = [never, Message];
-
 export interface Wrapper {
     commands: string;
     defaultPrefix?: string;
@@ -45,7 +43,7 @@ export interface Wrapper {
 }
 
 // Thanks to @kelsny
-export type ParseType<T> = {
+type ParseType<T> = {
     [K in keyof T]: T[K] extends unknown ? [k: K, args: T[K]] : never;
 }[keyof T];
 

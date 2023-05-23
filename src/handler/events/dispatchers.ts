@@ -13,7 +13,7 @@ import { BothCommand, CommandModule, Module } from '../../core/types/modules';
 import { Args } from '../../shared';
 
 
-export function dispatchInteraction<T extends CommandModule, V extends BaseInteraction | Message>(
+function dispatchInteraction<T extends CommandModule, V extends BaseInteraction | Message>(
     payload: { module: Processed<T>; event: V },
     createArgs: (m: typeof payload.event) => unknown[],
 ) {
@@ -30,7 +30,7 @@ export function dispatchMessage(module: Processed<CommandModule>, args: [Context
     };
 }
 
-export function dispatchAutocomplete(payload: {
+function dispatchAutocomplete(payload: {
     module: Processed<BothCommand>;
     event: AutocompleteInteraction;
 }) {
@@ -52,7 +52,7 @@ export function contextArgs(wrappable: Message | BaseInteraction, messageArgs?: 
     return [ctx, args] as [Context, Args];
 }
 
-export function interactionArg<T extends BaseInteraction>(interaction: T) {
+function interactionArg<T extends BaseInteraction>(interaction: T) {
     return [interaction] as [T];
 }
 

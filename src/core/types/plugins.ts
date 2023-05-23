@@ -81,7 +81,7 @@ export type EventArgs<
     J extends PluginType = PluginType,
 > = EventArgsMatrix[I][J];
 
-export interface CommandArgsMatrix {
+interface CommandArgsMatrix {
     [CommandType.Text]: {
         [PluginType.Control]: [Context, ['text', string[]]];
         [PluginType.Init]: [InitArgs<Processed<TextCommand>>];
@@ -132,7 +132,7 @@ export interface CommandArgsMatrix {
     };
 }
 
-export interface EventArgsMatrix {
+interface EventArgsMatrix {
     [EventType.Discord]: {
         [PluginType.Control]: /* library coupled */ ClientEvents[keyof ClientEvents];
         [PluginType.Init]: [InitArgs<Processed<DiscordEventCommand>>];
