@@ -1,11 +1,11 @@
 {
     "name": "@sern/handler",
     "packageManager": "yarn@3.5.0",
-    "version": "3.0.0-rc3",
+    "version": "3.0.0-rc5",
     "description": "A complete, customizable, typesafe, & reactive framework for discord bots.",
     "main": "./dist/esm/index.mjs",
     "module": "./dist/cjs/index.cjs",
-    "types": "dist/index.d.ts",
+    "types": "./dist/index.d.ts",
     "exports": {
         ".": {
             "import": "./dist/esm/index.mjs",
@@ -20,7 +20,7 @@
         "format": "eslint src/**/*.ts --fix",
         "build:dev": "tsup --metafile",
         "build:prod": "tsup --minify",
-        "publish": "npm run build:prod",
+        "prepare": "npm run build:prod",
         "pretty": "prettier --write .",
         "tdd": "vitest",
         "test": "vitest --run"

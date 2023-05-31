@@ -26,7 +26,7 @@ export class DefaultModuleManager implements ModuleManager {
     getMetadata(m: Module): CommandMeta {
         const maybeModule = this.moduleStore.metadata.get(m);
         if (!maybeModule) {
-            throw Error('Could not find metadata in store for ' + maybeModule);
+            throw Error('Could not find metadata in store for ' + m);
         }
         return maybeModule;
     }

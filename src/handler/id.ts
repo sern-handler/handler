@@ -21,8 +21,11 @@ export function reconstructId<T extends Interaction>(event: T) {
         }
     }
 }
-
-const appBitField = 0b000000011111;
+/**
+  *
+  * A magic number to represent any commandtype that is an ApplicationCommand.
+  */
+const appBitField = 0b000000001111;
 /*
  * Generates a number based on CommandType.
  * This corresponds to an ApplicationCommandType or ComponentType

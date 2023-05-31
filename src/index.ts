@@ -8,4 +8,4 @@ export {
     CommandExecutable,
 } from './handler/commands';
 export { controller } from './handler/sern';
-export type { Wrapper, Args, SlashOptions } from './shared';
+export type { Wrapper, Args, SlashOptions, Payload } from './shared';
