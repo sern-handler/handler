@@ -42,10 +42,10 @@ function registerModule<T extends Processed<AnyModule>>(
     manager: ModuleManager,
     module: T,
 ): Result<void, void> {
-    const { id, fullPath } = manager.getMetadata(module);
+    const { id, fullPath } = manager.getMetadata(module)!;
 
     assert.ok(
-        module.type > 0 && module.type < 1 << 10,
+        module.type >= 0 && module.type <= 1 << 10,
         `Found ${module.name} at ${fullPath}, which does not have a valid type`,
     );
     if (module.type === CommandType.Both || module.type === CommandType.Text) {

@@ -23,10 +23,10 @@ export enum CommandType {
     Button = 1 << 4,
     StringSelect = 1 << 5,
     Modal = 1 << 6,
-    ChannelSelect = 1 << 7,
-    MentionableSelect = 1 << 8,
-    RoleSelect = 1 << 9,
-    UserSelect = 1 << 10,
+    UserSelect = 1 << 7,
+    RoleSelect = 1 << 8,
+    MentionableSelect = 1 << 9,
+    ChannelSelect = 1 << 10,
 }
 
 /**

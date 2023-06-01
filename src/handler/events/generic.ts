@@ -50,7 +50,6 @@ export function createInteractionHandler<T extends Interaction>(
         source,
         event => {
             const fullPath = mg.get(reconstructId(event as unknown as Interaction));
-            console.log(fullPath);
             if (!fullPath)
                 return Err(SernError.UndefinedModule + ' No full path found in module store');
             return defaultModuleLoader<Processed<CommandModule>>(fullPath).then(res =>
