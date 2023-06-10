@@ -2,10 +2,9 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { PluginType, SernOptionsData, controller } from '../../src/index'
 import { partitionPlugins, treeSearch } from "../../src/core/functions";
 import { faker } from '@faker-js/faker';
-import { ApplicationCommandOptionType, AutocompleteInteraction } from "discord.js";
+import { ApplicationCommandOptionType, AutocompleteInteraction, } from "discord.js";
 
 vi.mock('discord.js', () => {
-
         const Collection = Map
         const ModalSubmitInteraction = class {
             customId
@@ -60,9 +59,14 @@ vi.mock('discord.js', () => {
                Number : 10,
                Attachment : 11
             },
+            ApplicationCommandType: {
+                ChatInput: 1,
+                User: 2,
+                Message: 3,
+            },
             ModalSubmitInteraction,
             ButtonInteraction,
-            AutocompleteInteraction
+            AutocompleteInteraction,
         };
 })
 
@@ -101,7 +105,7 @@ describe('functions', () => {
               name: 'autocomplete',
               description: 'here',
               autocomplete: true,
-              command : { onEvent: [], execute:(a) => {} } 
+              command : { onEvent: [], execute: vi.fn() } 
             }
         ];
         autocmpInteraction.options.getFocused.mockReturnValue(

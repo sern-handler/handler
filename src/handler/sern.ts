@@ -28,7 +28,7 @@ export function init(wrapper: Wrapper) {
     const dependencies = useDependencies();
     const logger = dependencies[2];
     const errorHandler = dependencies[1];
-    const mode = debugModuleLoading(wrapper.mode ?? process.env.MODE);
+    const mode = isDevMode(wrapper.mode ?? process.env.MODE);
 
     if (wrapper.events !== undefined) {
         makeEventsHandler(dependencies, getFullPathTree(wrapper.events, mode));
@@ -37,7 +37,7 @@ export function init(wrapper: Wrapper) {
     startReadyEvent(dependencies, getFullPathTree(wrapper.commands, mode))
     .add(() => {
         const time = ((performance.now() - startTime) / 1000).toFixed(2);
-        dependencies[0].emit('modulesLoaded' );
+        dependencies[0].emit('modulesLoaded');
         logger?.info({
             message: `sern: registered all modules in ${time} s`,
         });
@@ -51,22 +51,12 @@ export function init(wrapper: Wrapper) {
         .subscribe();
 }
 
-function debugModuleLoading(mode: string | undefined) {
+function isDevMode(mode: string | undefined) {
     console.info(`Detected mode: "${mode}"`);
     if (mode === undefined) {
         console.info('No mode found in process.env, assuming DEV');
     }
-    switch (mode) {
-        case 'PROD':
-            return false;
-        case 'DEV':
-        case undefined:
-            return true;
-        default: {
-            console.warn(mode + ' is not a valid. Should be PROD or DEV');
-            return false;
-        }
-    }
+    return mode === 'DEV' || mode == undefined;
 }
 
 function useDependencies() {

@@ -49,7 +49,7 @@ function registerModule<T extends Processed<AnyModule>>(
         `Found ${module.name} at ${fullPath}, which does not have a valid type`,
     );
     if (module.type === CommandType.Both || module.type === CommandType.Text) {
-        module.alias?.forEach(a => manager.set(`${a}_A0`, fullPath));
+        module.alias?.forEach(a => manager.set(`${a}_A1`, fullPath));
     }
     return Result.wrap(() => manager.set(id, fullPath));
 }

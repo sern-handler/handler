@@ -66,7 +66,7 @@ export function createMessageHandler(
 ) {
     return createGenericHandler(source, event => {
         const [prefix, ...rest] = fmt(event.content, defaultPrefix);
-        const fullPath = mg.get(`${prefix}_A0`);
+        const fullPath = mg.get(`${prefix}_A1`);
         if (fullPath === undefined) {
             return Err(SernError.UndefinedModule + ' No full path found in module store');
         }
