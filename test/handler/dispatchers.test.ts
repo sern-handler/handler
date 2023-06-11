@@ -38,8 +38,6 @@ describe('eventDispatcher standard', () => {
         s.subscribe()
         ee.emit(m.name, faker.string.alpha())
        
-        expect(m.execute).toHaveBeenCalled()
+        expect(m.execute).toHaveBeenCalledOnce()
     })
-    
-    
 });
