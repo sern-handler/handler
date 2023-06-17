@@ -1,5 +1,6 @@
 import { ApplicationCommandOptionType, AutocompleteInteraction } from 'discord.js';
 import type { SernAutocompleteData, SernOptionsData } from '../../types/module';
+import assert from 'assert';
 
 /**
  * Uses an iterative DFS to check if an autocomplete node exists
@@ -11,37 +12,43 @@ export default function treeSearch(
     options: SernOptionsData[] | undefined,
 ): SernAutocompleteData | undefined {
     if (options === undefined) return undefined;
-    const _options = options.slice(); // required to prevent direct mutation of options
-    let autocompleteData: SernAutocompleteData | undefined;
-
+    //clone to prevent mutation of original command module 
+    const _options = options.map(a => ({...a}));
+    let subcommands = new Set();
     while (_options.length > 0) {
         const cur = _options.pop()!;
         switch (cur.type) {
             case ApplicationCommandOptionType.Subcommand:
                 {
-                    for (const option of cur.options ?? []) {
+                    subcommands.add(cur.name);
+                    for (const option of cur.options ?? []) 
                         _options.push(option);
-                    }
                 }
                 break;
             case ApplicationCommandOptionType.SubcommandGroup:
                 {
-                    for (const command of cur.options ?? []) {
+                    for (const command of cur.options ?? []) 
                         _options.push(command);
-                    }
                 }
                 break;
             default:
                 {
-                    if (cur.autocomplete) {
+                    if ('autocomplete' in cur && cur.autocomplete) {
                         const choice = iAutocomplete.options.getFocused(true);
-                        if (cur.name === choice.name && cur.autocomplete) {
-                            autocompleteData = cur;
+                        assert('command' in cur, "No command property found for autocomplete option");
+                        if(subcommands.size > 0) {
+                            const parent = iAutocomplete.options.getSubcommand(); 
+                            const parentAndOptionMatches = subcommands.has(parent) && cur.name === choice.name;
+                            if (parentAndOptionMatches) {
+                                return cur;
+                            }
+                        } else {
+                            if(cur.name === choice.name) {
+                                return cur;
+                            }
                         }
                     }
                 }
                 break;
         }
-    }
-    return autocompleteData;
-}
+    }}
