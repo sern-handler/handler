@@ -1,4 +1,5 @@
 {
+    "extends": ["config:base", "helpers:pinGitHubActionDigests", "group:allNonMajor"],
     "major": {
         "dependencyDashboardApproval": true,
         "reviewers": ["EvolutionX-10", "jacoobes", "Murtatrxx"]
