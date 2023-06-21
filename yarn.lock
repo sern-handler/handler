@@ -594,7 +594,6 @@ __metadata:
     "@typescript-eslint/eslint-plugin": 5.58.0
     "@typescript-eslint/parser": 5.58.0
     discord.js: 14.11.0
-    esbuild-ifdef: ^0.2.0
     eslint: 8.38.0
     iti: ^0.6.0
     prettier: 2.8.7
@@ -1372,15 +1371,6 @@ __metadata:
   version: 2.0.3
   resolution: "err-code@npm:2.0.3"
   checksum: 8b7b1be20d2de12d2255c0bc2ca638b7af5171142693299416e6a9339bd7d88fc8d7707d913d78e0993176005405a236b066b45666b27b797252c771156ace54
-  languageName: node
-  linkType: hard
-
-"esbuild-ifdef@npm:^0.2.0":
-  version: 0.2.0
-  resolution: "esbuild-ifdef@npm:0.2.0"
-  peerDependencies:
-    esbuild: ^0.15.2
-  checksum: b7702bab0ec56b9b0055abdc908b82cc278119475864341abcb9637e1ca51ced63b4308168e76b932ca1983ea9edad5259130310281c3c0b111d91cd4a9bf9e1
   languageName: node
   linkType: hard
 

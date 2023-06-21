@@ -8,20 +8,24 @@ import { ImportPayload } from '../handler/types';
 
 export type ModuleResult<T> = Promise<Result<ImportPayload<T>, SernError>>;
 
-
+/**
+  * Import any module based on the absolute path.
+  * This can accept four types of exported modules
+  * commonjs, javascript :
+  * ```js
+  * exports = commandModule({ })
+  * ```
+  * esm javascript, typescript, and commonjs typescript
+  * export default = commandModule({})
+  */
 export async function importModule<T>(absPath: string) {
-    // prettier-ignore
-    let module =
-    /// #if MODE === 'esm'
-    import(absPath).then(i => i.default); // eslint-disable-line
-    /// #elif MODE === 'cjs'
-    require(absPath).default; // eslint-disable-line
-    /// #endif
-    return module.then(m => 
-       Result
-       .wrap(() => m.getInstance())
-       .unwrapOr(m)
-    ) as T;
+    let module = await import(absPath).then(esm => esm.default); 
+    if('default' in module) {
+        module = module.default;
+    }
+    return Result
+        .wrap(() => module.getInstance())
+        .unwrapOr(module) as T;
 }
 export async function defaultModuleLoader<T extends Module>(absPath: string): ModuleResult<T> {
     let module = await importModule<T>(absPath);
@@ -89,11 +93,7 @@ async function* readPaths(dir: string, shouldDebug: boolean): AsyncGenerator<str
                 if (isSkippable('file')) {
                     if (shouldDebug) console.info(`ignored: ${fullPath}`);
                 } else {
-                    /// #if MODE === 'esm'
                     yield 'file:///' + fullPath;
-                    /// #elif MODE === 'cjs'
-                    yield fullPath;
-                    /// #endif
                 }
             }
         }
