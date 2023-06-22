@@ -16,12 +16,8 @@ export function partitionPlugins(
     const initPlugins = [];
     for (const el of arr) {
         switch (el.type) {
-            case PluginType.Control:
-                controlPlugins.push(el);
-                break;
-            case PluginType.Init:
-                initPlugins.push(el);
-                break;
+            case PluginType.Control: controlPlugins.push(el); break;
+            case PluginType.Init: initPlugins.push(el); break;
         }
     }
     return [controlPlugins, initPlugins];

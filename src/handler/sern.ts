@@ -28,8 +28,7 @@ export function init(maybeWrapper: Wrapper | 'file') {
     const startTime = performance.now();
     const wrapper = loadConfig(maybeWrapper);
     const dependencies = useDependencies();
-    const logger = dependencies[2];
-    const errorHandler = dependencies[1];
+    const logger = dependencies[2], errorHandler = dependencies[1];
     const mode = isDevMode(wrapper.mode ?? process.env.MODE);
 
     if (wrapper.events !== undefined) {
@@ -67,7 +66,8 @@ function loadConfig(wrapper: Wrapper | 'file'): Wrapper {
        const requir = createRequire(import.meta.url);
        const config = requir(path.resolve('sern.config.json')) as {
            language: string,
-           defaultPrefix?: string
+           defaultPrefix?: string,
+           mode?: 'PROD'| 'DEV'
            paths: {
                base: string;
                commands: string,
@@ -92,6 +92,7 @@ function loadConfig(wrapper: Wrapper | 'file'): Wrapper {
           defaultPrefix: config.defaultPrefix,
           commands: commandsPath,
           events: eventsPath,
+          mode : config.mode
        };
     }
     return wrapper;
