@@ -31,6 +31,7 @@ export function transient<T>(cb: () => () => T) {
   * The new Service api, a cleaner alternative to useContainer
   * To obtain intellisense, ensure a .d.ts file exists in the root of compilation.
   * Usually our scaffolding tool takes care of this.
+  * @since 3.0.0
   * @example 
   * ```ts
   * const client = Service('@sern/client');
@@ -42,6 +43,7 @@ export function Service<const T extends keyof Dependencies>(key: T) {
     return useContainerRaw().get(key)!;
 }
 /**
+ * @since 3.0.0
  * The plural version of {@link Service}
  * @returns array of dependencies, in the same order of keys provided
  */
