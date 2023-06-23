@@ -20,7 +20,7 @@ export function fmt(msg: string, prefix: string): string[] {
     return msg.slice(prefix.length).trim().split(/\s+/g);
 }
 
-export function makeMessageHandler(
+export function messageHandler(
     [emitter, , log, modules, client]: DependencyList,
     defaultPrefix: string | undefined,
 ) {

@@ -15,13 +15,10 @@ import {
     OperatorFunction,
     pipe,
     share,
-    switchMap,
 } from 'rxjs';
-import { Result } from 'ts-results-es';
 import { EventEmitter } from 'node:events';
 import { ErrorHandling, Logging } from './contracts';
 import util from 'node:util';
-import { Awaitable } from '../shared';
 import { PluginResult, VoidResult } from './types/plugins';
 /**
  * if {src} is true, mapTo V, else ignore
@@ -29,20 +26,6 @@ import { PluginResult, VoidResult } from './types/plugins';
  */
 export function filterMapTo<V>(item: () => V): OperatorFunction<boolean, V> {
     return concatMap(shouldKeep => (shouldKeep ? of(item()) : EMPTY));
-}
-
-export function filterMap<In, Out>(
-    cb: (i: In) => Awaitable<Result<Out, unknown>>,
-): OperatorFunction<In, Out> {
-    return pipe(
-        switchMap(async input => cb(input)),
-        concatMap(s => {
-            if (s.ok) {
-                return of(s.val);
-            }
-            return EMPTY;
-        }),
-    );
 }
 
 /**
@@ -65,22 +48,6 @@ export function callPlugin(args: unknown): OperatorFunction<
 
 export const arrayifySource = map(src => (Array.isArray(src) ? (src as unknown[]) : [src]));
 
-/**
- * If the current value in Result stream is an error, calls callback.
- * This also extracts the Ok value from Result
- * @param cb
- * @returns Observable<{ module: T; absPath: string }>
- */
-export function errTap<Ok, Err>(cb: (err: Err) => void): OperatorFunction<Result<Ok, Err>, Ok> {
-    return concatMap(result => {
-        if (result.ok) {
-            return of(result.val);
-        } else {
-            cb(result.val as Err);
-            return EMPTY;
-        }
-    });
-}
 
 /**
  * Checks if the stream of results is all ok.

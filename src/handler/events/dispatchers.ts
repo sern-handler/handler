@@ -35,15 +35,11 @@ function dispatchAutocomplete(payload: {
     event: AutocompleteInteraction;
 }) {
     const option = treeSearch(payload.event, payload.module.options);
-    if (option !== undefined) {
-        return {
-            module: option.command as Processed<Module>, //autocomplete is not a true "module" warning cast!
-            args: [payload.event],
-        };
-    }
-    throw Error(
-        SernError.NotSupportedInteraction + ` There is no autocomplete tag for this option`,
-    );
+    assert.ok(option, Error( SernError.NotSupportedInteraction + ` There is no autocomplete tag for this option`))
+    return {
+        module: option.command as Processed<Module>, //autocomplete is not a true "module" warning cast!
+        args: [payload.event],
+    };
 }
 
 export function contextArgs(wrappable: Message | BaseInteraction, messageArgs?: string[]) {
@@ -93,13 +89,11 @@ export function createDispatcher(payload: {
     module: Processed<CommandModule>;
     event: BaseInteraction;
 }) {
+    assert.ok(
+        CommandType.Text !== payload.module.type,
+        SernError.MismatchEvent + 'Found text command in interaction stream'
+    );
     switch (payload.module.type) {
-        case CommandType.Text:
-            throw Error(
-                SernError.MismatchEvent +
-                    ' Found a text module in interaction stream. ' +
-                    payload.module,
-            );
         case CommandType.Slash:
         case CommandType.Both: {
             if (isAutocomplete(payload.event)) {

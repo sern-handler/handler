@@ -7,7 +7,7 @@ import { isAutocomplete, isCommand, isMessageComponent, isModal } from '../../co
 import { createInteractionHandler, executeModule, makeModuleExecutor } from './generic';
 import { DependencyList } from '../types';
 
-export function makeInteractionHandler([emitter, , , modules, client]: DependencyList) {
+export function interactionHandler([emitter, , , modules, client]: DependencyList) {
     const interactionStream$ = sharedObservable<Interaction>(client, 'interactionCreate');
     const handle = createInteractionHandler(interactionStream$, modules);
 

@@ -5,8 +5,9 @@ import { type Observable, from, mergeMap, ObservableInput } from 'rxjs';
 import { readdir, stat } from 'fs/promises';
 import { basename, extname, join, resolve } from 'path';
 import { ImportPayload } from '../handler/types';
+import assert from 'assert';
 
-export type ModuleResult<T> = Promise<Result<ImportPayload<T>, SernError>>;
+export type ModuleResult<T> = Promise<ImportPayload<T>>;
 
 /**
   * Import any module based on the absolute path.
@@ -29,11 +30,8 @@ export async function importModule<T>(absPath: string) {
 }
 export async function defaultModuleLoader<T extends Module>(absPath: string): ModuleResult<T> {
     let module = await importModule<T>(absPath);
-    if (module === undefined) {
-        return Err(SernError.UndefinedModule);
-    }
-    //todo readd class modules
-    return Ok({ module, absPath });
+    assert.ok(module, "Found an undefined module. Forgot to ignore it with a '!' ie (!filename.ts)?");
+    return { module, absPath };
 }
 
 export const fmtFileName = (n: string) => n.substring(0, n.length - 3);
@@ -46,7 +44,7 @@ export const fmtFileName = (n: string) => n.substring(0, n.length - 3);
  */
 export function buildModuleStream<T extends Module>(
     input: ObservableInput<string>,
-): Observable<Result<ImportPayload<T>, SernError>> {
+): Observable<ImportPayload<T>> {
     return from(input).pipe(mergeMap(defaultModuleLoader<T>));
 }
 

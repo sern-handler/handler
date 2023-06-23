@@ -9,7 +9,7 @@ import { handleError } from '../../core/operators';
 import { Service, useContainerRaw } from '../../core/ioc';
 import { DependencyList, Processed } from '../types';
 
-export function makeEventsHandler(
+export function eventsHandler(
     [emitter, err, log, moduleManager, client]: DependencyList,
     allPaths: ObservableInput<string>,
 ) {
@@ -28,7 +28,7 @@ export function makeEventsHandler(
     };
     of(null)
         .pipe(
-            buildModules<Processed<EventModule>>(allPaths, emitter, moduleManager),
+            buildModules<Processed<EventModule>>(allPaths, moduleManager),
             callInitPlugins({
                 onStop: module =>
                     emitter.emit(

@@ -14,6 +14,7 @@ export function partitionPlugins(
 ): [Plugin[], Plugin[]] {
     const controlPlugins = [];
     const initPlugins = [];
+    
     for (const el of arr) {
         switch (el.type) {
             case PluginType.Control: controlPlugins.push(el); break;

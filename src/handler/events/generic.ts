@@ -14,26 +14,26 @@ import {
 } from 'rxjs';
 import { ErrorHandling, Logging, ModuleManager, useContainerRaw } from '../../core';
 import { SernError } from '../../core/structures/errors';
-import { callPlugin, everyPluginOk, filterMap, filterMapTo, handleError } from '../../core/operators';
+import { callPlugin, everyPluginOk, filterMapTo, handleError } from '../../core/operators';
 import { defaultModuleLoader } from '../../core/module-loading';
 import { CommandModule, Module, AnyModule } from '../../core/types/modules';
 import { contextArgs, createDispatcher, dispatchMessage } from './dispatchers';
-import { ObservableInput, pipe, switchMap } from 'rxjs';
+import { ObservableInput, pipe } from 'rxjs';
 import { SernEmitter } from '../../core';
-import { errTap } from '../../core/operators';
 import * as Files from '../../core/module-loading';
-import { Err, Result } from 'ts-results-es';
+import { Result } from 'ts-results-es';
 import { fmt } from './messages';
 import { ControlPlugin, VoidResult } from '../../core/types/plugins';
 import { ImportPayload, Processed } from '../types';
 import { Awaitable } from '../../shared';
 import { createId, reconstructId } from '../id';
+import assert from 'node:assert';
 
 function createGenericHandler<Source, Narrowed extends Source, Output>(
     source: Observable<Source>,
-    makeModule: (event: Narrowed) => Awaitable<Result<Output, unknown>>,
+    makeModule: (event: Narrowed) => Promise<Output>,
 ) {
-    return (pred: (i: Source) => i is Narrowed) => source.pipe(filter(pred), filterMap(makeModule));
+    return (pred: (i: Source) => i is Narrowed) => source.pipe(filter(pred), concatMap(makeModule));
 }
 /**
  *
@@ -48,13 +48,11 @@ export function createInteractionHandler<T extends Interaction>(
 ) {
     return createGenericHandler<Interaction, T, ReturnType<typeof createDispatcher>>(
         source,
-        event => {
+        async event => {
             const fullPath = mg.get(reconstructId(event as unknown as Interaction));
-            if (!fullPath)
-                return Err(SernError.UndefinedModule + ' No full path found in module store');
-            return defaultModuleLoader<Processed<CommandModule>>(fullPath).then(res =>
-                res.map(payload => createDispatcher({ module: payload.module, event })),
-            );
+            assert(fullPath, SernError.UndefinedModule + ' No full path found in module store');
+            return defaultModuleLoader<Processed<CommandModule>>(fullPath)
+                .then(payload => createDispatcher({ module: payload.module, event }))
         },
     );
 }
@@ -64,15 +62,14 @@ export function createMessageHandler(
     defaultPrefix: string,
     mg: ModuleManager,
 ) {
-    return createGenericHandler(source, event => {
+    return createGenericHandler(source, async event => {
         const [prefix, ...rest] = fmt(event.content, defaultPrefix);
         const fullPath = mg.get(`${prefix}_A1`);
-        if (fullPath === undefined) {
-            return Err(SernError.UndefinedModule + ' No full path found in module store');
-        }
-        return defaultModuleLoader<Processed<CommandModule>>(fullPath).then(result => {
+
+        assert(fullPath, SernError.UndefinedModule + ' No full path found in module store');
+        return defaultModuleLoader<Processed<CommandModule>>(fullPath).then(payload => {
             const args = contextArgs(event, rest);
-            return result.map(payload => dispatchMessage(payload.module, args));
+            return dispatchMessage(payload.module, args);
         });
     });
 }
@@ -96,16 +93,11 @@ function assignDefaults<T extends Module>(
 
 export function buildModules<T extends AnyModule>(
     input: ObservableInput<string>,
-    sernEmitter: SernEmitter,
     moduleManager: ModuleManager,
 ) {
-    return pipe(
-        switchMap(() => Files.buildModuleStream<T>(input)),
-        errTap(error => {
-            sernEmitter.emit('module.register', SernEmitter.failure(undefined, error));
-        }),
-        assignDefaults<T>(moduleManager),
-    );
+    return Files
+        .buildModuleStream<T>(input)
+        .pipe(assignDefaults(moduleManager));
 }
 
 function hasPrefix(prefix: string, content: string) {

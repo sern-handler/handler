@@ -1,7 +1,7 @@
-import { makeEventsHandler } from './events/user-defined';
-import { makeInteractionHandler } from './events/interactions';
+import { eventsHandler } from './events/user-defined';
+import { interactionHandler } from './events/interactions';
 import { startReadyEvent } from './events/ready';
-import { makeMessageHandler } from './events/messages';
+import { messageHandler } from './events/messages';
 import { err, ok } from '../core/functions';
 import { getFullPathTree } from '../core/module-loading';
 import { merge } from 'rxjs';
@@ -32,7 +32,7 @@ export function init(maybeWrapper: Wrapper | 'file') {
     const mode = isDevMode(wrapper.mode ?? process.env.MODE);
 
     if (wrapper.events !== undefined) {
-        makeEventsHandler(dependencies, getFullPathTree(wrapper.events, mode));
+        eventsHandler(dependencies, getFullPathTree(wrapper.events, mode));
     }
     //Ready event: load all modules and when finished, time should be taken and logged
     startReadyEvent(dependencies, getFullPathTree(wrapper.commands, mode))
@@ -44,8 +44,8 @@ export function init(maybeWrapper: Wrapper | 'file') {
             });
         });
 
-    const messages$ = makeMessageHandler(dependencies, wrapper.defaultPrefix);
-    const interactions$ = makeInteractionHandler(dependencies);
+    const messages$ = messageHandler(dependencies, wrapper.defaultPrefix);
+    const interactions$ = interactionHandler(dependencies);
     // listening to the message stream and interaction stream
     merge(messages$, interactions$)
         .pipe(handleCrash(errorHandler, logger))

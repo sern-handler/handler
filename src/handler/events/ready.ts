@@ -16,7 +16,7 @@ export function startReadyEvent(
     const ready$ = fromEvent(client!, 'ready').pipe(take(1));
     return ready$
         .pipe(
-            buildModules<Processed<AnyModule>>(allPaths, sEmitter, moduleManager),
+            buildModules<Processed<AnyModule>>(allPaths, moduleManager),
             callInitPlugins({
                 onStop: module => {
                     sEmitter.emit(
