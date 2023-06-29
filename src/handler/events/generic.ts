@@ -181,12 +181,20 @@ export function createResultResolver<
  */
 export function callInitPlugins<
     T extends Processed<AnyModule>,
-    Args extends ImportPayload<T>,
->(config: { onStop?: (module: T) => unknown; onNext: (module: Args) => T }) {
+>(sernEmitter: SernEmitter) {
     return concatMap(
         createResultResolver({
             createStream: args => from(args.module.plugins).pipe(callPlugin(args)),
-            ...config,
+            onStop: (module: T) => {
+                sernEmitter.emit(
+                    'module.register',
+                    SernEmitter.failure(module, SernError.PluginFailure),
+                );
+            },
+            onNext: ({ module }) => {
+                sernEmitter.emit('module.register', SernEmitter.success(module));
+                return module;
+            },
         }),
     );
 }

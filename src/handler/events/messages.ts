@@ -29,11 +29,11 @@ export function messageHandler(
         return EMPTY;
     }
     const messageStream$ = sharedObservable<Message>(client, 'messageCreate');
-    const handler = createMessageHandler(messageStream$, defaultPrefix, modules);
+    const handle = createMessageHandler(messageStream$, defaultPrefix, modules);
 
-    const prefixedMessages$ = handler(isNonBot(defaultPrefix) as (m: Message) => m is Message);
+    const msgCommands$ = handle(isNonBot(defaultPrefix) as (m: Message) => m is Message);
 
-    return prefixedMessages$.pipe(
+    return msgCommands$.pipe(
         makeModuleExecutor(module => {
             emitter.emit('module.activate', SernEmitter.failure(module, SernError.PluginFailure));
         }),

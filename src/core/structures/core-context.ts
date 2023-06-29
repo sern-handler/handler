@@ -26,8 +26,6 @@ export abstract class CoreContext<M, I> {
     //todo: add agnostic options resolver for Context
     abstract get options(): unknown;
 
-    abstract get id(): string;
-
     static wrap(_: unknown): unknown {
         throw Error('You need to override this method; cannot wrap an abstract class');
     }

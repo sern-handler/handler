@@ -15,7 +15,7 @@ export interface CoreDependencies {
 export type DependencyFromKey<T extends keyof Dependencies> = Dependencies[T];
 
 export type IntoDependencies<Tuple extends [...any[]]> = {
-    [Index in keyof Tuple]: UnpackFunction<DependencyFromKey<Tuple[Index]> & {}>; //Unpack and make NonNullable
+    [Index in keyof Tuple]: UnpackFunction<NonNullable<DependencyFromKey<Tuple[Index]>>>; //Unpack and make NonNullable
 } & { length: Tuple['length'] };
 
 export interface DependencyConfiguration {

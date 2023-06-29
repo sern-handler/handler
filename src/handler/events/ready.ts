@@ -3,12 +3,11 @@ import { CommandType } from '../../core/structures';
 import { SernError } from '../../core/structures/errors';
 import { Result } from 'ts-results-es';
 import { ModuleManager } from '../../core/contracts';
-import { SernEmitter } from '../../core';
 import { Processed, DependencyList } from '../types';
 import { buildModules, callInitPlugins } from './generic';
 import { AnyModule } from '../../core/types/modules';
 import * as assert from 'node:assert';
-
+import * as util from 'node:util';
 export function startReadyEvent(
     [sEmitter, , , moduleManager, client]: DependencyList,
     allPaths: ObservableInput<string>,
@@ -16,25 +15,12 @@ export function startReadyEvent(
     const ready$ = fromEvent(client!, 'ready').pipe(take(1));
     return ready$
         .pipe(
-            buildModules<Processed<AnyModule>>(allPaths, moduleManager),
-            callInitPlugins({
-                onStop: module => {
-                    sEmitter.emit(
-                        'module.register',
-                        SernEmitter.failure(module, SernError.PluginFailure),
-                    );
-                },
-                onNext: ({ module }) => {
-                    sEmitter.emit('module.register', SernEmitter.success(module));
-                    return module;
-                },
-            }),
+            buildModules<Processed<AnyModule>>(allPaths, sEmitter, moduleManager),
+            callInitPlugins(sEmitter),
         )
         .subscribe(module => {
-            const result = registerModule(moduleManager, module);
-            if (result.err) {
-                throw Error(SernError.InvalidModuleType + ' ' + result.val);
-            }
+            registerModule(moduleManager, module)
+                .expect(SernError.InvalidModuleType + ' ' + util.inspect(module))
         });
 }
 
@@ -43,9 +29,10 @@ function registerModule<T extends Processed<AnyModule>>(
     module: T,
 ): Result<void, void> {
     const { id, fullPath } = manager.getMetadata(module)!;
-
+    
+    const validModuleType = module.type >= 0 && module.type <= 1 << 10;
     assert.ok(
-        module.type >= 0 && module.type <= 1 << 10,
+        validModuleType,
         `Found ${module.name} at ${fullPath}, which does not have a valid type`,
     );
     if (module.type === CommandType.Both || module.type === CommandType.Text) {

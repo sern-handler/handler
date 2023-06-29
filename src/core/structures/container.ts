@@ -11,6 +11,7 @@ import { ModuleStore } from './module-store';
  */
 export class CoreContainer<T extends Partial<Dependencies>> extends Container<T, {}> {
     private ready$ = new Subject<never>();
+    private beenCalled = new Set<PropertyKey>();
     constructor() {
         super();
 
@@ -48,8 +49,9 @@ export class CoreContainer<T extends Partial<Dependencies>> extends Container<T,
             return;
         }
 
-        if ('init' in dep && typeof dep.init === 'function') {
+        if ('init' in dep && typeof dep.init === 'function' && !this.beenCalled.has(e.key)) {
             isAsyncFunction(dep.init) ? await dep.init() : dep.init();
+            this.beenCalled.add(e.key)
         }
     }
 

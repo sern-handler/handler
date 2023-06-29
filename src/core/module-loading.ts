@@ -15,9 +15,12 @@ export type ModuleResult<T> = Promise<ImportPayload<T>>;
   * commonjs, javascript :
   * ```js
   * exports = commandModule({ })
+  *
+  * //or 
+  * exports.default = commandModule({ })
   * ```
   * esm javascript, typescript, and commonjs typescript
-  * export default = commandModule({})
+  * export default commandModule({})
   */
 export async function importModule<T>(absPath: string) {
     let module = await import(absPath).then(esm => esm.default); 
@@ -48,13 +51,11 @@ export function buildModuleStream<T extends Module>(
     return from(input).pipe(mergeMap(defaultModuleLoader<T>));
 }
 
-export function getFullPathTree(dir: string, mode: boolean) {
-    return readPaths(resolve(dir), mode);
-}
+export const getFullPathTree = (dir: string, mode: boolean) => readPaths(resolve(dir), mode);
 
-export function filename(path: string) {
-    return fmtFileName(basename(path));
-}
+
+export const filename = (path: string) => fmtFileName(basename(path));
+
 
 function createSkipCondition(base: string) {
     const validExtensions = ['.js', '.cjs', '.mts', '.mjs', 'cts'];

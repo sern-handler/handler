@@ -1,6 +1,5 @@
 import { ObservableInput, catchError, finalize, map, mergeAll, of } from 'rxjs';
 import type { CommandModule, EventModule } from '../../core/types/modules';
-import { SernEmitter } from '../../core';
 import { EventType } from '../../core/structures';
 import { SernError } from '../../core/structures/errors';
 import { eventDispatcher } from './dispatchers';
@@ -28,18 +27,8 @@ export function eventsHandler(
     };
     of(null)
         .pipe(
-            buildModules<Processed<EventModule>>(allPaths, moduleManager),
-            callInitPlugins({
-                onStop: module =>
-                    emitter.emit(
-                        'module.register',
-                        SernEmitter.failure(module, SernError.PluginFailure),
-                    ),
-                onNext: ({ module }) => {
-                    emitter.emit('module.register', SernEmitter.success(module));
-                    return module;
-                },
-            }),
+            buildModules<Processed<EventModule>>(allPaths, emitter, moduleManager),
+            callInitPlugins(emitter),
             map(intoDispatcher),
             /**
              * Where all events are turned on
