@@ -33,7 +33,7 @@ export class CoreContainer<T extends Partial<Dependencies>> extends Container<T,
             !this.isReady(),
             'listening for init functions should only occur prior to sern being ready.',
         );
-        const unsubscriber = this.on('containerUpserted', this.callInitHooks);
+        const unsubscriber = this.on('containerUpserted', e => this.callInitHooks(e));
 
         this.ready$.subscribe({
             complete: unsubscriber,
@@ -48,8 +48,7 @@ export class CoreContainer<T extends Partial<Dependencies>> extends Container<T,
         if (typeof dep !== 'object' || Array.isArray(dep)) {
             return;
         }
-
-        if ('init' in dep && typeof dep.init === 'function' && !this.beenCalled.has(e.key)) {
+        if ('init' in dep && typeof dep.init === 'function' && !this.beenCalled.has(e.key) ) {
             isAsyncFunction(dep.init) ? await dep.init() : dep.init();
             this.beenCalled.add(e.key)
         }
@@ -62,3 +61,4 @@ export class CoreContainer<T extends Partial<Dependencies>> extends Container<T,
         this.ready$.unsubscribe();
     }
 }
+
