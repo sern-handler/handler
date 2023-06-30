@@ -2,7 +2,7 @@ import { concatMap, EMPTY } from 'rxjs';
 import { SernError } from '../../core/structures/errors';
 import type { Message } from 'discord.js';
 import { SernEmitter } from '../../core';
-import { sharedObservable } from '../../core/operators';
+import { sharedEventStream } from '../../core/operators';
 import { createMessageHandler, executeModule, isNonBot, makeModuleExecutor } from './generic';
 import { DependencyList } from '../types';
 
@@ -28,10 +28,10 @@ export function messageHandler(
         log?.debug({ message: 'No prefix found. message handler shutting down' });
         return EMPTY;
     }
-    const messageStream$ = sharedObservable<Message>(client, 'messageCreate');
+    const messageStream$ = sharedEventStream<Message>(client, 'messageCreate');
     const handle = createMessageHandler(messageStream$, defaultPrefix, modules);
 
-    const msgCommands$ = handle(isNonBot(defaultPrefix) as (m: Message) => m is Message);
+    const msgCommands$ = handle(isNonBot(defaultPrefix));
 
     return msgCommands$.pipe(
         makeModuleExecutor(module => {

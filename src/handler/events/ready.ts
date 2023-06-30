@@ -1,4 +1,4 @@
-import { ObservableInput, fromEvent, take } from 'rxjs';
+import { ObservableInput, fromEvent, switchMap, take } from 'rxjs';
 import { CommandType } from '../../core/structures';
 import { SernError } from '../../core/structures/errors';
 import { Result } from 'ts-results-es';
@@ -8,6 +8,7 @@ import { buildModules, callInitPlugins } from './generic';
 import { AnyModule } from '../../core/types/modules';
 import * as assert from 'node:assert';
 import * as util from 'node:util';
+
 export function startReadyEvent(
     [sEmitter, , , moduleManager, client]: DependencyList,
     allPaths: ObservableInput<string>,
@@ -15,7 +16,7 @@ export function startReadyEvent(
     const ready$ = fromEvent(client!, 'ready').pipe(take(1));
     return ready$
         .pipe(
-            buildModules<Processed<AnyModule>>(allPaths, sEmitter, moduleManager),
+            switchMap(() => buildModules<AnyModule>(allPaths,moduleManager)),
             callInitPlugins(sEmitter),
         )
         .subscribe(module => {

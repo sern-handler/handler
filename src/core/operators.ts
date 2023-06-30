@@ -57,7 +57,7 @@ export const everyPluginOk: OperatorFunction<VoidResult, boolean> = pipe(
     defaultIfEmpty(true),
 );
 
-export const sharedObservable = <T>(e: EventEmitter, eventName: string) => {
+export const sharedEventStream = <T>(e: EventEmitter, eventName: string) => {
     return (fromEvent(e, eventName) as Observable<T>).pipe(share());
 };
 

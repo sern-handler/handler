@@ -96,7 +96,7 @@ export function buildModules<T extends AnyModule>(
     moduleManager: ModuleManager,
 ) {
     return Files
-        .buildModuleStream<T>(input)
+        .buildModuleStream<Processed<T>>(input)
         .pipe(assignDefaults(moduleManager));
 }
 
@@ -110,7 +110,7 @@ function hasPrefix(prefix: string, content: string) {
  * @param prefix
  */
 export function isNonBot(prefix: string) {
-    return ({ author, content }: Message) => !author.bot && hasPrefix(prefix, content);
+    return (msg: Message): msg is Message => !msg.author.bot && hasPrefix(prefix, msg.content);
 }
 
 /**
@@ -217,16 +217,10 @@ export function makeModuleExecutor<
     );
 }
 
-export function handleCrash(
-    errorHandler: ErrorHandling,
-    logger?: Logging,
-) {
-    return pipe(
-        catchError(handleError(errorHandler, logger)),
-        finalize(() => {
-            logger?.info({ message: 'A stream closed or reached end of lifetime' });
-            useContainerRaw()?.disposeAll()
-                .then(() => logger?.info({ message: 'Cleaning container and crashing' }));
-        })
-    );
-}
+export const handleCrash = ( err: ErrorHandling, log?: Logging) => pipe(
+    catchError(handleError(err, log)),
+    finalize(() => {
+        log?.info({ message: 'A stream closed or reached end of lifetime' });
+        useContainerRaw()?.disposeAll()
+            .then(() => log?.info({ message: 'Cleaning container and crashing' }));
+    }));

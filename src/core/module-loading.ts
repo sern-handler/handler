@@ -1,5 +1,4 @@
-import { SernError } from './structures/errors';
-import { Result, Err, Ok } from 'ts-results-es';
+import { Result, } from 'ts-results-es';
 import { Module } from './types/modules';
 import { type Observable, from, mergeMap, ObservableInput } from 'rxjs';
 import { readdir, stat } from 'fs/promises';
@@ -24,6 +23,8 @@ export type ModuleResult<T> = Promise<ImportPayload<T>>;
   */
 export async function importModule<T>(absPath: string) {
     let module = await import(absPath).then(esm => esm.default); 
+    
+    assert(module, 'Found no default export for command module at ' + absPath + 'Forgot to ignore with "!"? (!filename.ts)?');
     if('default' in module) {
         module = module.default;
     }

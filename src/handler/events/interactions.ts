@@ -2,13 +2,13 @@ import { Interaction } from 'discord.js';
 import { concatMap, merge } from 'rxjs';
 import { SernError } from '../../core/structures/errors';
 import { SernEmitter } from '../../core';
-import { sharedObservable } from '../../core/operators';
+import { sharedEventStream } from '../../core/operators';
 import { isAutocomplete, isCommand, isMessageComponent, isModal } from '../../core/predicates';
 import { createInteractionHandler, executeModule, makeModuleExecutor } from './generic';
 import { DependencyList } from '../types';
 
 export function interactionHandler([emitter, , , modules, client]: DependencyList) {
-    const interactionStream$ = sharedObservable<Interaction>(client, 'interactionCreate');
+    const interactionStream$ = sharedEventStream<Interaction>(client, 'interactionCreate');
     const handle = createInteractionHandler(interactionStream$, modules);
 
     const interactionHandler$ = merge(

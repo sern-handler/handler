@@ -20,7 +20,6 @@ import {
 import { CommandType, Context, EventType } from '../structures';
 import { AnyCommandPlugin, AnyEventPlugin, ControlPlugin, InitPlugin } from './plugins';
 import { Awaitable, SernEventsMapping } from '../../shared';
-import { Processed } from '../../handler/types';
 import { Args, SlashOptions } from '../../shared';
 
 export interface CommandMeta {
@@ -29,7 +28,6 @@ export interface CommandMeta {
     isClass: boolean
 }
 
-export type AnyDefinedModule = Processed<CommandModule | EventModule>;
 
 export interface Module {
     type: CommandType | EventType;
@@ -37,7 +35,7 @@ export interface Module {
     onEvent: ControlPlugin[];
     plugins: InitPlugin[];
     description?: string;
-    execute: (...args: any[]) => Awaitable<any>;
+    execute(...args: any[]): Awaitable<any>
 }
 
 export interface SernEventCommand<T extends keyof SernEventsMapping = keyof SernEventsMapping>
