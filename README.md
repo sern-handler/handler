@@ -112,6 +112,7 @@ client.login("YOUR_BOT_TOKEN_HERE");
 - [ava](https://github.com/SrIzan10/ava), A discord bot that plays KNGI and Gensokyo Radio.
 - [Murayama](https://github.com/murayamabot/murayama), :pepega:
 - [Protector (WIP)](https://github.com/needhamgary/Protector), Just a simple bot to help enhance a private minecraft server.
+- [SmokinWeed 💨](https://github.com/Peter-MJ-Parker/sern-bud), A fun bot for a small - but growing - server.
 
 ## 💻 CLI
 
