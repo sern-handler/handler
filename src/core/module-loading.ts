@@ -3,9 +3,8 @@ import { type Observable, from, mergeMap, ObservableInput } from 'rxjs';
 import { readdir, stat } from 'fs/promises';
 import { basename, extname, join, resolve } from 'path';
 import assert from 'assert';
-import { Wrapper } from '../shared-types';
 import { createRequire } from 'node:module';
-import { ImportPayload } from '../types/core';
+import { ImportPayload, Wrapper } from '../types/core';
 import { Module } from '../types/core-modules';
 
 export type ModuleResult<T> = Promise<ImportPayload<T>>;

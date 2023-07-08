@@ -1,7 +1,7 @@
 import { Err, Ok } from 'ts-results-es';
 import { ApplicationCommandOptionType, AutocompleteInteraction } from 'discord.js';
-import type { SernAutocompleteData, SernOptionsData } from './types/modules';
-import { AnyCommandPlugin, AnyEventPlugin, Plugin } from './types/plugins';
+import type { SernAutocompleteData, SernOptionsData } from '../types/core-modules';
+import { AnyCommandPlugin, AnyEventPlugin, Plugin } from '../types/core-plugin';
 import { PluginType } from './structures';
 import assert from 'assert';
 

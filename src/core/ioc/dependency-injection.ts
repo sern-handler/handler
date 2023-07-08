@@ -2,7 +2,7 @@ import type {
     CoreDependencies,
     DependencyConfiguration,
     IntoDependencies,
-} from './types';
+} from '../../types/ioc';
 import { SernError, DefaultServices } from '../_internal';
 import { useContainerRaw } from './base';
 import { CoreContainer } from './container';

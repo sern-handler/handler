@@ -1,6 +1,6 @@
 export * as Sern from './sern';
 export * from './core';
-export {
+export type {
     CommandModule,
     EventModule,
     BothCommand,
@@ -24,10 +24,9 @@ export {
     SernOptionsData,
     SernSubCommandData,
     SernSubCommandGroupData,
-    Payload
 } from './types/core-modules'
 
-export {
+export type {
     Controller,
     PluginResult,
     InitPlugin,
@@ -37,14 +36,18 @@ export {
     AnyCommandPlugin
 } from './types/core-plugin'
 
-export {
+export type {
     Wrapper,
 } from './types/core'
 
-export {
+export type {
     Args,
-    SlashOptions
+    SlashOptions,
+    Payload,
+    SernEventsMapping
 } from './types/utility'
+
+export type { Singleton, Transient, CoreDependencies } from './types/ioc';
 
 export {
     commandModule,
@@ -53,5 +56,8 @@ export {
     EventExecutable,
     CommandExecutable,
 } from './core/modules';
+
+
+
 
 export { controller } from './sern';

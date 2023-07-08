@@ -1,7 +1,7 @@
 import { EventEmitter } from 'node:events';
 import { PayloadType } from '../../core/structures';
-import { SernEventsMapping } from '../../shared-types';
 import { Module } from '../../types/core-modules';
+import { SernEventsMapping, Payload } from '../../types/utility';
 
 /**
  * @since 1.0.0

@@ -4,7 +4,7 @@
 
 /* eslint-disable @typescript-eslint/consistent-type-imports */
 
-import { CoreDependencies } from './types'
+import { CoreDependencies } from './ioc'
 
 declare global {
 

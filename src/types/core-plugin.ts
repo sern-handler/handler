@@ -25,7 +25,6 @@ import type {
     MentionableSelectCommand,
     ModalSubmitCommand,
     Module,
-    Payload,
     RoleSelectCommand,
     SernEventCommand,
     SlashCommand,
@@ -33,7 +32,7 @@ import type {
     TextCommand,
     UserSelectCommand,
 } from './core-modules';
-import { Args, Awaitable, SlashOptions } from './utility';
+import { Args, Awaitable, Payload, SlashOptions } from './utility';
 import { CommandType, Context, EventType, PluginType } from '../core';
 import {
     ButtonInteraction,

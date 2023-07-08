@@ -15,10 +15,9 @@ import type {
     UserContextMenuCommandInteraction,
     UserSelectMenuInteraction,
 } from 'discord.js';
-import { CommandType, Context, EventType, PayloadType } from '../../src/core';
+import { CommandType, Context, EventType } from '../../src/core';
 import { AnyCommandPlugin, AnyEventPlugin, ControlPlugin, InitPlugin } from './core-plugin';
-import { Awaitable, Args, SlashOptions } from './utility';
-import { SernEventsMapping } from '../shared-types';
+import { Awaitable, Args, SlashOptions, SernEventsMapping } from './utility';
 
 export interface CommandMeta {
     fullPath: string;
@@ -143,10 +142,6 @@ export type CommandModule =
     | ModalSubmitCommand;
 
 export type AnyModule = CommandModule | EventModule;
-export type Payload =
-    | { type: PayloadType.Success; module: AnyModule }
-    | { type: PayloadType.Failure; module?: AnyModule; reason: string | Error }
-    | { type: PayloadType.Warning; reason: string };
 //https://stackoverflow.com/questions/64092736/alternative-to-switch-statement-for-typescript-discriminated-union
 // Explicit Module Definitions for mapping
 export interface CommandModuleDefs {

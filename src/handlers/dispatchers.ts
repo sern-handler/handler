@@ -7,7 +7,7 @@ import { AutocompleteInteraction, BaseInteraction, Message } from 'discord.js';
 import { CommandType, Context } from '../core';
 import { Args } from '../types/utility';
 import { Processed } from '../types/core-plugin';
-import { CommandModule } from '../types/core-modules';
+import { BothCommand, CommandModule, Module } from '../types/core-modules';
 
 
 function dispatchInteraction<T extends CommandModule, V extends BaseInteraction | Message>(

@@ -1,5 +1,6 @@
 import { Container, UnpackFunction } from 'iti';
-import * as Contracts from '../contracts'
+import * as Contracts from '../core/contracts'
+
 export type Singleton<T> = () => T;
 export type Transient<T> = () => () => T;
 
