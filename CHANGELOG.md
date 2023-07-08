@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.6.3](https://github.com/sern-handler/handler/compare/v2.6.2...v2.6.3) (2023-06-17)
+
+
+### Bug Fixes
+
+* autocomplete nested option and merge main ([5fdc1ed](https://github.com/sern-handler/handler/commit/5fdc1eda7f4fcc1f94af7eca661660c0edeb3251))
+
+## [2.6.2](https://github.com/sern-handler/handler/compare/v2.6.1...v2.6.2) (2023-04-15)
+
+
+### Miscellaneous Chores
+
+* release 2.6.2 ([c1f6906](https://github.com/sern-handler/handler/commit/c1f690633c55ba41db1e035b7c16f9e19c70b385))
+
 ## [2.6.1](https://github.com/sern-handler/handler/compare/v2.6.0...v2.6.1) (2023-03-17)
 
 
