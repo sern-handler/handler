@@ -1,11 +1,9 @@
 import { ObservableInput, map, mergeAll } from 'rxjs';
-import type { CommandModule, EventModule } from '../../core/types/modules';
-import { EventType } from '../../core/structures';
-import { SernError } from '../../core/structures/errors';
-import { eventDispatcher } from './dispatchers';
-import { buildModules, callInitPlugins, handleCrash } from './generic';
-import { Service } from '../../core/ioc';
-import { DependencyList, Processed } from '../types';
+import type { CommandModule, EventModule } from '../core/types/modules';
+import { EventType } from '../core/structures';
+import { SernError } from '../core/_internal';
+import { buildModules, callInitPlugins, handleCrash, eventDispatcher, DependencyList, Processed  } from './_internal';
+import { Service } from '../core/ioc';
 
 export function eventsHandler(
     [emitter, err, log, moduleManager, client]: DependencyList,

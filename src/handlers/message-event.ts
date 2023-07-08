@@ -1,10 +1,8 @@
 import { concatMap, EMPTY } from 'rxjs';
-import { SernError } from '../../core/structures/errors';
 import type { Message } from 'discord.js';
-import { SernEmitter } from '../../core';
-import { sharedEventStream } from '../../core/operators';
-import { createMessageHandler, executeModule, isNonBot, makeModuleExecutor } from './generic';
-import { DependencyList } from '../types';
+import { SernEmitter } from '../core';
+import { sharedEventStream, SernError } from '../core/_internal';
+import { createMessageHandler, executeModule, makeModuleExecutor, DependencyList } from './_internal';
 
 /**
  * Removes the first character(s) _[depending on prefix length]_ of the message
@@ -18,6 +16,19 @@ import { DependencyList } from '../types';
  */
 export function fmt(msg: string, prefix: string): string[] {
     return msg.slice(prefix.length).trim().split(/\s+/g);
+}
+
+/**
+ * Ignores messages from any person / bot except itself
+ * @param prefix
+ */
+function isNonBot(prefix: string) {
+    return (msg: Message): msg is Message => !msg.author.bot && hasPrefix(prefix, msg.content);
+}
+
+function hasPrefix(prefix: string, content: string) {
+    const prefixInContent = content.slice(0, prefix.length);
+    return prefixInContent.localeCompare(prefix, undefined, { sensitivity: 'accent' }) === 0;
 }
 
 export function messageHandler(

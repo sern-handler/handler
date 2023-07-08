@@ -1,8 +1,8 @@
 import { describe, expect, it, vi }  from 'vitest';
-import { createId } from '../../src/handler/id';
+import * as Id from '../../src/core/id';
 import { faker } from '@faker-js/faker';
 import { CommandModule, CommandType, commandModule } from "../../src";
-import { CommandTypeDiscordApi } from '../../src/handler/id';
+import { CommandTypeDiscordApi } from '../../src/core/id';
 
 function createRandomCommandModules() {
         const randomCommandType = [
@@ -27,7 +27,7 @@ function createRandomCommandModules() {
 function createMetadata(c: CommandModule) {
         return {
             fullPath: faker.system.filePath(),
-            id: createId(c.name, c.type),
+            id: Id.create(c.name, c.type),
             isClass: Boolean(Math.floor(Math.random()))
         }
 }

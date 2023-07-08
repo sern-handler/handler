@@ -31,9 +31,9 @@ import type {
     TextCommand,
     UserSelectCommand,
 } from './modules';
-import { Args, Awaitable, Payload, SlashOptions } from '../../shared';
+import { Args, Awaitable, Payload, SlashOptions } from '../../shared-types';
 import { CommandType, Context, EventType, PluginType } from '../structures';
-import { InitArgs, Processed } from '../../handler/types';
+import { InitArgs, Processed } from '../../handlers/types';
 import {
     ButtonInteraction,
     ChannelSelectMenuInteraction,

@@ -3,8 +3,6 @@ import type {
     APIApplicationCommandOptionBase,
     ApplicationCommandOptionType,
     BaseApplicationCommandOptionsData,
-} from 'discord.js';
-import {
     AutocompleteInteraction,
     ButtonInteraction,
     ChannelSelectMenuInteraction,
@@ -16,11 +14,12 @@ import {
     StringSelectMenuInteraction,
     UserContextMenuCommandInteraction,
     UserSelectMenuInteraction,
+
 } from 'discord.js';
+
 import { CommandType, Context, EventType } from '../structures';
 import { AnyCommandPlugin, AnyEventPlugin, ControlPlugin, InitPlugin } from './plugins';
-import { Awaitable, SernEventsMapping } from '../../shared';
-import { Args, SlashOptions } from '../../shared';
+import { Awaitable, SernEventsMapping, Args, SlashOptions } from '../../shared-types';
 
 export interface CommandMeta {
     fullPath: string;

@@ -50,3 +50,6 @@ type ParseType<T> = {
 export type Args = ParseType<{ text: string[]; slash: SlashOptions }>;
 
 export type SlashOptions = Omit<CommandInteractionOptionResolver, 'getMessage' | 'getFocused'>;
+
+
+export type AnyFunction = (...args:unknown[]) => unknown

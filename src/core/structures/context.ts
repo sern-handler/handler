@@ -8,10 +8,10 @@ import {
     Snowflake,
     User,
 } from 'discord.js';
-import { CoreContext } from './core-context';
+import { CoreContext } from '../_internal';
 import { Result, Ok, Err } from 'ts-results-es';
 import * as assert from 'assert';
-import { ReplyOptions } from '../../shared';
+import { ReplyOptions } from '../../shared-types';
 
 /**
  * @since 1.0.0

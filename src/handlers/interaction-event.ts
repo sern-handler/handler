@@ -1,11 +1,15 @@
 import { Interaction } from 'discord.js';
 import { concatMap, merge } from 'rxjs';
-import { SernError } from '../../core/structures/errors';
-import { SernEmitter } from '../../core';
-import { sharedEventStream } from '../../core/operators';
-import { isAutocomplete, isCommand, isMessageComponent, isModal } from '../../core/predicates';
-import { createInteractionHandler, executeModule, makeModuleExecutor } from './generic';
-import { DependencyList } from '../types';
+import { SernEmitter } from '../core';
+import { 
+    isAutocomplete,
+    isCommand,
+    isMessageComponent,
+    isModal,
+    sharedEventStream,
+    SernError
+} from '../core/_internal';
+import { createInteractionHandler, executeModule, makeModuleExecutor, DependencyList } from './_internal';
 
 export function interactionHandler([emitter, , , modules, client]: DependencyList) {
     const interactionStream$ = sharedEventStream<Interaction>(client, 'interactionCreate');

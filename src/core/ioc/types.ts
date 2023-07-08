@@ -1,7 +1,17 @@
 import { EventEmitter } from 'node:events';
 import { Container, UnpackFunction } from 'iti';
+import { AnyFunction } from '../../shared-types';
+
 export type Singleton<T> = () => T;
 export type Transient<T> = () => () => T;
+
+interface EmitterAdapter {
+    [eventName: string] : AnyFunction
+
+    removeListener (): this
+    addListener () : this
+}
+
 
 export interface CoreDependencies {
     '@sern/client': () => EventEmitter

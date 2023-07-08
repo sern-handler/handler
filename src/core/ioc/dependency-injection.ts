@@ -4,9 +4,8 @@ import type {
     IntoDependencies,
 } from './types';
 import { DefaultLogging } from '../structures';
-import { SernError } from '../structures/errors';
+import { SernError, CoreContainer } from '../_internal';
 import { useContainerRaw } from './base';
-import { CoreContainer } from '../structures/container';
 
 /**
  * @__PURE__

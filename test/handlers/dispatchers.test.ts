@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, vi, it } from 'vitest';
-import { eventDispatcher, contextArgs, createDispatcher } from '../../src/handler/events/dispatchers';
+import { eventDispatcher, contextArgs, createDispatcher } from '../../src/handlers/dispatchers';
 import { faker } from '@faker-js/faker'
 import { Module } from '../../src/core/types/modules';
-import { Processed } from '../../src/handler/types';
+import { Processed } from '../../src/handlers/types';
 import { CommandType } from '../../src/core';
 import { EventEmitter } from 'events';
 

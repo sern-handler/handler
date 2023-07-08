@@ -3,7 +3,7 @@ import { Module } from './types/modules';
 import { type Observable, from, mergeMap, ObservableInput } from 'rxjs';
 import { readdir, stat } from 'fs/promises';
 import { basename, extname, join, resolve } from 'path';
-import { ImportPayload } from '../handler/types';
+import { ImportPayload } from '../handlers/types';
 import assert from 'assert';
 
 export type ModuleResult<T> = Promise<ImportPayload<T>>;
@@ -58,15 +58,10 @@ export const getFullPathTree = (dir: string, mode: boolean) => readPaths(resolve
 export const filename = (path: string) => fmtFileName(basename(path));
 
 
-function createSkipCondition(base: string) {
-    const validExtensions = ['.js', '.cjs', '.mts', '.mjs', 'cts'];
-    return ( type: 'file' | 'directory') => {
-        if(type === 'file') {
-           return fmtFileName(base)[0] === '!'
-            || !validExtensions.includes(extname(base));
-        }
-        return base[0] === '!';
-    }
+const isSkippable = (filename: string) => {
+    //empty string is for non extension files (directories)
+    const validExtensions = ['.js', '.cjs', '.mts', '.mjs', 'cts', ''];
+    return filename[0] === '!' || !validExtensions.includes(extname(filename))
 }
 async function deriveFileInfo(dir: string, file: string) {
      const fullPath = join(dir, file);
@@ -81,16 +76,15 @@ async function* readPaths(dir: string, shouldDebug: boolean): AsyncGenerator<str
         const files = await readdir(dir);
         for (const file of files) {
             const { fullPath, fileStats, base } = await deriveFileInfo(dir, file);
-            const isSkippable = createSkipCondition(base);
             if (fileStats.isDirectory()) {
                 //Todo: refactor so that i dont repeat myself for files (line 71)
-                if (isSkippable('directory')) {
+                if (isSkippable(base)) {
                     if (shouldDebug) console.info(`ignored directory: ${fullPath}`);
                 } else {
                     yield* readPaths(fullPath, shouldDebug);
                 }
             } else {
-                if (isSkippable('file')) {
+                if (isSkippable(base)) {
                     if (shouldDebug) console.info(`ignored: ${fullPath}`);
                 } else {
                     yield 'file:///' + fullPath;

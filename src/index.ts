@@ -1,4 +1,4 @@
-export * as Sern from './handler/sern';
+export * as Sern from './sern';
 export * from './core';
 export {
     commandModule,
@@ -6,6 +6,6 @@ export {
     discordEvent,
     EventExecutable,
     CommandExecutable,
-} from './handler/commands';
-export { controller } from './handler/sern';
-export type { Wrapper, Args, SlashOptions, Payload } from './shared';
+} from './core/modules';
+export { controller } from './sern';
+export type { Wrapper, Args, SlashOptions, Payload } from './shared-types';

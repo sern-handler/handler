@@ -1,13 +1,14 @@
-import { eventsHandler } from './events/user-defined';
-import { interactionHandler } from './events/interactions';
-import { startReadyEvent } from './events/ready';
-import { messageHandler } from './events/messages';
-import { err, ok } from '../core/functions';
-import { getFullPathTree } from '../core/module-loading';
+import { 
+    eventsHandler,
+    interactionHandler,
+    messageHandler,
+    startReadyEvent,
+    handleCrash  
+} from './handlers/_internal'
+import { err, ok, Files } from './core/_internal';
 import { merge } from 'rxjs';
-import { Services } from '../core/ioc';
-import { Wrapper } from '../shared';
-import { handleCrash } from './events/generic';
+import { Services } from './core/ioc';
+import { Wrapper } from './shared-types';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 
@@ -32,10 +33,10 @@ export function init(maybeWrapper: Wrapper | 'file') {
     const mode = isDevMode(wrapper.mode ?? process.env.MODE);
 
     if (wrapper.events !== undefined) {
-        eventsHandler(dependencies, getFullPathTree(wrapper.events, mode));
+        eventsHandler(dependencies, Files.getFullPathTree(wrapper.events, mode));
     }
     //Ready event: load all modules and when finished, time should be taken and logged
-    startReadyEvent(dependencies, getFullPathTree(wrapper.commands, mode))
+    startReadyEvent(dependencies, Files.getFullPathTree(wrapper.commands, mode))
         .add(() => {
             const time = ((performance.now() - startTime) / 1000).toFixed(2);
             dependencies[0].emit('modulesLoaded');

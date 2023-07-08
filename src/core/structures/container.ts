@@ -1,9 +1,10 @@
 import { Container } from 'iti';
-import { DefaultErrorHandling, DefaultModuleManager, SernEmitter } from '../';
+import { SernEmitter } from '../';
 import { isAsyncFunction } from 'node:util/types';
+
 import * as assert from 'node:assert';
 import { Subject } from 'rxjs';
-import { ModuleStore } from './module-store';
+import { DefaultServices, ModuleStore } from '../_internal';
 
 /**
  * Provides all the defaults for sern to function properly.
@@ -19,12 +20,12 @@ export class CoreContainer<T extends Partial<Dependencies>> extends Container<T,
 
         (this as Container<{}, {}>)
             .add({
-                '@sern/errors': () => new DefaultErrorHandling(),
+                '@sern/errors': () => new DefaultServices.DefaultErrorHandling(),
                 '@sern/emitter': () => new SernEmitter(),
                 '@sern/store': () => new ModuleStore(),
             })
             .add(ctx => {
-                return { '@sern/modules': () => new DefaultModuleManager(ctx['@sern/store']) };
+                return { '@sern/modules': () => new DefaultServices.DefaultModuleManager(ctx['@sern/store']) };
             });
     }
 

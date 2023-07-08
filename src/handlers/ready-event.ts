@@ -1,11 +1,10 @@
 import { ObservableInput, fromEvent, switchMap, take } from 'rxjs';
-import { CommandType } from '../../core/structures';
-import { SernError } from '../../core/structures/errors';
+import { CommandType } from '../core/structures';
+import { SernError } from '../core/_internal';
 import { Result } from 'ts-results-es';
-import { ModuleManager } from '../../core/contracts';
-import { Processed, DependencyList } from '../types';
-import { buildModules, callInitPlugins } from './generic';
-import { AnyModule } from '../../core/types/modules';
+import { ModuleManager } from '../core/contracts';
+import { buildModules, callInitPlugins, Processed, DependencyList } from './_internal';
+import { AnyModule } from '../core/types/modules';
 import * as assert from 'node:assert';
 import * as util from 'node:util';
 

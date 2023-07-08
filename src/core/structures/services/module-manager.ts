@@ -1,6 +1,6 @@
-import { createId } from '../../../handler/id';
+import * as Id from '../../../core/id';
 import { CoreModuleStore, ModuleManager } from '../../contracts';
-import { importModule } from '../../module-loading';
+import { Files } from '../../_internal';
 import { CommandMeta, CommandModule, CommandModuleDefs, Module } from '../../types/modules';
 import { CommandType } from '../enums';
 /**
@@ -12,11 +12,11 @@ export class DefaultModuleManager implements ModuleManager {
     constructor(private moduleStore: CoreModuleStore) {}
 
     getByNameCommandType<T extends CommandType>(name: string, commandType: T) {
-        const id = this.get(createId(name, commandType));
+        const id = this.get(Id.create(name, commandType));
         if(!id) {
             return undefined;
         }
-        return importModule<CommandModuleDefs[T]>(id);
+        return Files.importModule<CommandModuleDefs[T]>(id);
     }
 
     setMetadata(m: Module, c: CommandMeta): void {

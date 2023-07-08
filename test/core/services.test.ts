@@ -3,7 +3,7 @@ import { CoreContainer } from '../../src/core/structures/container'
 import { DefaultLogging } from "../../src/core";
 import { faker } from '@faker-js/faker'
 import { commandModule } from "../../src";
-import { createId } from '../../src/handler/id'
+import * as Id from '../../src/core/id'
 import { CommandMeta } from "../../src/core/types/modules";
 
 describe('services', () => {
@@ -36,14 +36,14 @@ describe('services', () => {
         .map((path,i) => `${path}/${modules[i]}.js`);
 
        const metadata: CommandMeta[] = modules.map((cm, i) => ({
-           id: createId(cm.name, cm.type),
+           id: Id.create(cm.name, cm.type),
            isClass: false,
            fullPath: `${paths[i]}/${cm.name}.js` 
        }));
        const moduleManager = container.get('@sern/modules');
        let i =0;
        for(const m of modules) {
-        moduleManager.set(createId(m.name,m.type), paths[i]);
+        moduleManager.set(Id.create(m.name,m.type), paths[i]);
         moduleManager.setMetadata(m, metadata[i]);
         i++
       }

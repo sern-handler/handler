@@ -12,21 +12,16 @@ import {
     catchError,
     finalize,
 } from 'rxjs';
-import { ErrorHandling, Logging, ModuleManager, useContainerRaw } from '../../core';
-import { SernError } from '../../core/structures/errors';
-import { callPlugin, everyPluginOk, filterMapTo, handleError } from '../../core/operators';
-import { defaultModuleLoader } from '../../core/module-loading';
-import { CommandModule, Module, AnyModule } from '../../core/types/modules';
-import { contextArgs, createDispatcher, dispatchMessage } from './dispatchers';
+import { Files, Id, callPlugin, everyPluginOk, filterMapTo, handleError, SernError } from '../core/_internal';
+import { ErrorHandling, Logging, ModuleManager, useContainerRaw } from '../core';
+import { CommandModule, Module, AnyModule } from '../core/types/modules';
+import { contextArgs, createDispatcher, dispatchMessage, ImportPayload, Processed  } from './_internal';
 import { ObservableInput, pipe } from 'rxjs';
-import { SernEmitter } from '../../core';
-import * as Files from '../../core/module-loading';
+import { SernEmitter } from '../core';
 import { Result } from 'ts-results-es';
-import { fmt } from './messages';
-import { ControlPlugin, VoidResult } from '../../core/types/plugins';
-import { ImportPayload, Processed } from '../types';
-import { Awaitable } from '../../shared';
-import { createId, reconstructId } from '../id';
+import { fmt } from './message-event';
+import { ControlPlugin, VoidResult } from '../core/types/plugins';
+import { Awaitable } from '../shared-types';
 import assert from 'node:assert';
 
 function createGenericHandler<Source, Narrowed extends Source, Output>(
@@ -49,9 +44,10 @@ export function createInteractionHandler<T extends Interaction>(
     return createGenericHandler<Interaction, T, ReturnType<typeof createDispatcher>>(
         source,
         async event => {
-            const fullPath = mg.get(reconstructId(event as unknown as Interaction));
+            const fullPath = mg.get(Id.reconstruct(event as unknown as Interaction));
             assert(fullPath, SernError.UndefinedModule + ' No full path found in module store');
-            return defaultModuleLoader<Processed<CommandModule>>(fullPath)
+            return Files
+                .defaultModuleLoader<Processed<CommandModule>>(fullPath)
                 .then(payload => createDispatcher({ module: payload.module, event }))
         },
     );
@@ -67,11 +63,12 @@ export function createMessageHandler(
         const fullPath = mg.get(`${prefix}_A1`);
 
         assert(fullPath, SernError.UndefinedModule + ' No full path found in module store');
-        return defaultModuleLoader<Processed<CommandModule>>(fullPath).then(payload => {
-            const args = contextArgs(event, rest);
-            return dispatchMessage(payload.module, args);
+        return Files
+            .defaultModuleLoader<Processed<CommandModule>>(fullPath).then(payload => {
+                const args = contextArgs(event, rest);
+                return dispatchMessage(payload.module, args);
+            });
         });
-    });
 }
 /**
  * IMPURE SIDE EFFECT
@@ -86,7 +83,7 @@ function assignDefaults<T extends Module>(
         moduleManager.setMetadata(module, {
             isClass: module.constructor.name === 'Function',
             fullPath: absPath,
-            id: createId(module.name, module.type),
+            id: Id.create(module.name, module.type),
         });
     });
 }
@@ -100,18 +97,9 @@ export function buildModules<T extends AnyModule>(
         .pipe(assignDefaults(moduleManager));
 }
 
-function hasPrefix(prefix: string, content: string) {
-    const prefixInContent = content.slice(0, prefix.length);
-    return prefixInContent.localeCompare(prefix, undefined, { sensitivity: 'accent' }) === 0;
-}
 
-/**
- * Ignores messages from any person / bot except itself
- * @param prefix
- */
-export function isNonBot(prefix: string) {
-    return (msg: Message): msg is Message => !msg.author.bot && hasPrefix(prefix, msg.content);
-}
+
+
 
 /**
  * Wraps the task in a Result as a try / catch.

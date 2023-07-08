@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import { composeRoot, useContainer } from './dependency-injection';
 import { DependencyConfiguration } from './types';
-import { CoreContainer } from '../structures/container';
+import { CoreContainer } from '../_internal';
 
 //SIDE EFFECT: GLOBAL DI
 let containerSubject: CoreContainer<Partial<Dependencies>>;
