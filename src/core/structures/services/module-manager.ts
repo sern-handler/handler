@@ -1,7 +1,7 @@
 import * as Id from '../../../core/id';
 import { CoreModuleStore, ModuleManager } from '../../contracts';
 import { Files } from '../../_internal';
-import { CommandMeta, CommandModule, CommandModuleDefs, Module } from '../../types/modules';
+import { CommandMeta, CommandModule, CommandModuleDefs, Module } from '../../../types/core-modules';
 import { CommandType } from '../enums';
 /**
  * @internal
@@ -45,7 +45,7 @@ export class DefaultModuleManager implements ModuleManager {
         return Promise.all(
             Array.from(entries)
                 .filter(([id]) => !(Number.parseInt(id.at(-1)!) & publishable))
-                .map(([, path]) => importModule<CommandModule>(path)),
+                .map(([, path]) => Files.importModule<CommandModule>(path)),
         );
     }
 }

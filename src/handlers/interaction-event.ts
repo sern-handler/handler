@@ -7,9 +7,10 @@ import {
     isMessageComponent,
     isModal,
     sharedEventStream,
-    SernError
+    SernError,
+    DependencyList
 } from '../core/_internal';
-import { createInteractionHandler, executeModule, makeModuleExecutor, DependencyList } from './_internal';
+import { createInteractionHandler, executeModule, makeModuleExecutor  } from './_internal';
 
 export function interactionHandler([emitter, , , modules, client]: DependencyList) {
     const interactionStream$ = sharedEventStream<Interaction>(client, 'interactionCreate');

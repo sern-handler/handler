@@ -1,4 +1,4 @@
-import { CommandMeta, Module } from '../types/modules';
+import { CommandMeta, Module } from "../../types/core-modules";
 
 /**
  * Represents a core module store that stores IDs mapped to file paths.

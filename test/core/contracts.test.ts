@@ -1,7 +1,8 @@
-import { assertType, describe, it, vi } from "vitest";
+import { assertType, describe, it } from "vitest";
+
+import { ModuleStore } from "../../src";
 import * as DefaultContracts from '../../src/core/structures/services'
 import * as Contracts from '../../src/core/contracts/index.js'
-import { ModuleStore } from "../../src/core";
 
 describe('default contracts', () => {
     it('should satisfy contracts', () => {

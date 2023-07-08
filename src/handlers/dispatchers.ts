@@ -1,12 +1,13 @@
 import { EventEmitter } from 'node:events';
 import * as assert from 'node:assert';
 import { concatMap, from, fromEvent, map, OperatorFunction, pipe } from 'rxjs';
-import { arrayifySource, callPlugin, isAutocomplete, treeSearch, SernError  } from '../core/_internal';
-import { createResultResolver, Processed } from './_internal';
+import { arrayifySource, callPlugin, isAutocomplete, treeSearch, SernError } from '../core/_internal';
+import { createResultResolver } from './event-utils';
 import { AutocompleteInteraction, BaseInteraction, Message } from 'discord.js';
 import { CommandType, Context } from '../core';
-import { BothCommand, CommandModule, Module } from '../core/types/modules';
-import { Args } from '../shared-types';
+import { Args } from '../types/utility';
+import { Processed } from '../types/core-plugin';
+import { CommandModule } from '../types/core-modules';
 
 
 function dispatchInteraction<T extends CommandModule, V extends BaseInteraction | Message>(

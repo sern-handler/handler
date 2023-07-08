@@ -24,16 +24,17 @@ import type {
     ExternalEventCommand,
     MentionableSelectCommand,
     ModalSubmitCommand,
+    Module,
+    Payload,
     RoleSelectCommand,
     SernEventCommand,
     SlashCommand,
     StringSelectCommand,
     TextCommand,
     UserSelectCommand,
-} from './modules';
-import { Args, Awaitable, Payload, SlashOptions } from '../../shared-types';
-import { CommandType, Context, EventType, PluginType } from '../structures';
-import { InitArgs, Processed } from '../../handlers/types';
+} from './core-modules';
+import { Args, Awaitable, SlashOptions } from './utility';
+import { CommandType, Context, EventType, PluginType } from '../core';
 import {
     ButtonInteraction,
     ChannelSelectMenuInteraction,
@@ -49,7 +50,12 @@ import {
 
 export type PluginResult = Awaitable<VoidResult>;
 export type VoidResult = Result<void, void>;
+export type Processed<T> = T & { name: string; description: string };
 
+export interface InitArgs<T extends Processed<Module>> {
+    module: T;
+    absPath: string;
+}
 export interface Controller {
     next: () => Ok<void>;
     stop: () => Err<void>;

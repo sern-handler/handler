@@ -1,10 +1,10 @@
 import { SpyInstance, afterAll, beforeEach, describe, expect, it, vi } from "vitest";
-import { CoreContainer } from '../../src/core/structures/container'
+import { CoreContainer } from '../../src/core/ioc/container'
 import { DefaultLogging } from "../../src/core";
 import { faker } from '@faker-js/faker'
 import { commandModule } from "../../src";
 import * as Id from '../../src/core/id'
-import { CommandMeta } from "../../src/core/types/modules";
+import { CommandMeta } from "../../src/types/core-modules";
 
 describe('services', () => {
     //@ts-ignore

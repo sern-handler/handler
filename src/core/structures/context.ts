@@ -8,10 +8,14 @@ import {
     Snowflake,
     User,
 } from 'discord.js';
-import { CoreContext } from '../_internal';
+import { CoreContext } from '../structures/core-context';
 import { Result, Ok, Err } from 'ts-results-es';
 import * as assert from 'assert';
-import { ReplyOptions } from '../../shared-types';
+
+type ReplyOptions =
+    | string
+    | Omit<InteractionReplyOptions, 'fetchReply'>
+    | MessageReplyOptions;
 
 /**
  * @since 1.0.0

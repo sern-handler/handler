@@ -1,16 +1,14 @@
 import { 
-    eventsHandler,
-    interactionHandler,
-    messageHandler,
-    startReadyEvent,
     handleCrash  
 } from './handlers/_internal'
 import { err, ok, Files } from './core/_internal';
 import { merge } from 'rxjs';
 import { Services } from './core/ioc';
-import { Wrapper } from './shared-types';
-import { createRequire } from 'node:module';
-import path from 'node:path';
+import { Wrapper } from './types/core';
+import { eventsHandler } from './handlers/user-defined-events';
+import { startReadyEvent } from './handlers/ready-event';
+import { messageHandler } from './handlers/message-event';
+import { interactionHandler } from './handlers/interaction-event';
 
 /**
  * @since 1.0.0
@@ -27,7 +25,7 @@ import path from 'node:path';
 
 export function init(maybeWrapper: Wrapper | 'file') {
     const startTime = performance.now();
-    const wrapper = loadConfig(maybeWrapper);
+    const wrapper = Files.loadConfig(maybeWrapper);
     const dependencies = useDependencies();
     const logger = dependencies[2], errorHandler = dependencies[1];
     const mode = isDevMode(wrapper.mode ?? process.env.MODE);
@@ -61,43 +59,7 @@ function isDevMode(mode: string | undefined) {
     return mode === 'DEV' || mode == undefined;
 }
 
-function loadConfig(wrapper: Wrapper | 'file'): Wrapper {
-    if(wrapper === 'file') {
-       console.log('Experimental loading of sern.config.json');
-       const requir = createRequire(import.meta.url);
-       const config = requir(path.resolve('sern.config.json')) as {
-           language: string,
-           defaultPrefix?: string,
-           mode?: 'PROD'| 'DEV'
-           paths: {
-               base: string;
-               commands: string,
-               events?: string  
-           } 
-       };
-       const makePath = (dir: keyof typeof config.paths) => 
-        config.language === 'typescript' 
-            ? path.join('dist', config.paths[dir]!)
-            : path.join(config.paths[dir]!);
 
-       console.log('Loading config: ', config);
-       const commandsPath = makePath('commands');
-
-       console.log('Commands path is set to', commandsPath);
-       let eventsPath: string|undefined;
-       if(config.paths.events) {
-           eventsPath = makePath('events');
-           console.log('Events path is set to', eventsPath);
-       }
-       return {
-          defaultPrefix: config.defaultPrefix,
-          commands: commandsPath,
-          events: eventsPath,
-          mode : config.mode
-       };
-    }
-    return wrapper;
-}
 
 function useDependencies() {
     return Services(

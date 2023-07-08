@@ -16,10 +16,9 @@ import {
     pipe,
     share,
 } from 'rxjs';
-import { EventEmitter } from 'node:events';
-import { ErrorHandling, Logging } from './contracts';
+import { Emitter, ErrorHandling, Logging } from './contracts';
 import util from 'node:util';
-import { PluginResult, VoidResult } from './types/plugins';
+import { PluginResult, VoidResult } from '../types/core-plugin';
 /**
  * if {src} is true, mapTo V, else ignore
  * @param item
@@ -57,7 +56,7 @@ export const everyPluginOk: OperatorFunction<VoidResult, boolean> = pipe(
     defaultIfEmpty(true),
 );
 
-export const sharedEventStream = <T>(e: EventEmitter, eventName: string) => {
+export const sharedEventStream = <T>(e: Emitter, eventName: string) => {
     return (fromEvent(e, eventName) as Observable<T>).pipe(share());
 };
 

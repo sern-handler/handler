@@ -1,5 +1,5 @@
+import { CommandMeta, Module } from '../../types/core-modules';
 import { CoreModuleStore } from '../contracts';
-import { Module, CommandMeta } from '../types/modules';
 
 /*
  * @internal

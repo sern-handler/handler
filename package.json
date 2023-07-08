@@ -23,7 +23,8 @@
         "prepare": "npm run build:prod",
         "pretty": "prettier --write .",
         "tdd": "vitest",
-        "test": "vitest --run"
+        "test": "vitest --run",
+        "analyze-imports": "npx depcruise src --include-only \"^src\" --output-type dot | dot -T svg > dependency-graph.svg"
     },
     "keywords": [
         "sern-handler",

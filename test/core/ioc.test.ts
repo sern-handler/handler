@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { CoreContainer } from '../../src/core/structures/container'
+import { CoreContainer } from '../../src/core/ioc/container'
 import { CoreDependencies } from "../../src/core/ioc";
 import { EventEmitter } from "events";
 import { DefaultLogging, Init, Logging } from "../../src/core";

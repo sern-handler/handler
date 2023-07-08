@@ -1,5 +1,5 @@
+import { CommandMeta, CommandModule, CommandModuleDefs, Module } from '../../types/core-modules';
 import { CommandType } from '../structures';
-import { CommandMeta, CommandModule, CommandModuleDefs, Module } from '../types/modules';
 
 /**
  * @since 2.0.0

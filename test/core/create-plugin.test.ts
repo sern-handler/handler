@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { CommandControlPlugin, CommandInitPlugin, EventControlPlugin, EventInitPlugin } from '../../src/core/create-plugins'
-import { PluginType, controller } from '../../src/index'
+import { PluginType, controller } from '../../src'
 
 describe('create-plugins', () => {
     it('should make proper control plugins', () => {

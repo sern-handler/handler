@@ -1,25 +1,24 @@
-import { EventEmitter } from 'node:events';
 import { Container, UnpackFunction } from 'iti';
-import { AnyFunction } from '../../shared-types';
-
+import * as Contracts from '../contracts'
 export type Singleton<T> = () => T;
 export type Transient<T> = () => () => T;
 
-interface EmitterAdapter {
-    [eventName: string] : AnyFunction
 
-    removeListener (): this
-    addListener () : this
-}
-
+export type DependencyList = [
+    Contracts.Emitter,
+    Contracts.ErrorHandling,
+    Contracts.Logging | undefined,
+    Contracts.ModuleManager,
+    Contracts.Emitter,
+];
 
 export interface CoreDependencies {
-    '@sern/client': () => EventEmitter
-    '@sern/logger'?: () => import('../contracts').Logging;
-    '@sern/emitter': () => import('../structures/sern-emitter').SernEmitter;
-    '@sern/store': () => import('../contracts').CoreModuleStore;
-    '@sern/modules': () => import('../contracts').ModuleManager;
-    '@sern/errors': () => import('../contracts').ErrorHandling;
+    '@sern/client': () => Contracts.Emitter
+    '@sern/logger'?: () => Contracts.Logging;
+    '@sern/emitter': () => Contracts.Emitter;
+    '@sern/store': () => Contracts.CoreModuleStore;
+    '@sern/modules': () => Contracts.ModuleManager;
+    '@sern/errors': () => Contracts.ErrorHandling;
 }
 
 export type DependencyFromKey<T extends keyof Dependencies> = Dependencies[T];

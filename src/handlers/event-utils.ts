@@ -12,17 +12,17 @@ import {
     catchError,
     finalize,
 } from 'rxjs';
-import { Files, Id, callPlugin, everyPluginOk, filterMapTo, handleError, SernError } from '../core/_internal';
-import { ErrorHandling, Logging, ModuleManager, useContainerRaw } from '../core';
-import { CommandModule, Module, AnyModule } from '../core/types/modules';
-import { contextArgs, createDispatcher, dispatchMessage, ImportPayload, Processed  } from './_internal';
+import { Files, Id, callPlugin, everyPluginOk, filterMapTo, handleError, SernError, VoidResult } from '../core/_internal';
+import { CommandModule, Emitter, ErrorHandling, Logging, ModuleManager, useContainerRaw } from '../core';
+import { contextArgs, createDispatcher, dispatchMessage } from './dispatchers';
 import { ObservableInput, pipe } from 'rxjs';
 import { SernEmitter } from '../core';
 import { Result } from 'ts-results-es';
-import { fmt } from './message-event';
-import { ControlPlugin, VoidResult } from '../core/types/plugins';
-import { Awaitable } from '../shared-types';
+import { Awaitable } from '../types/utility';
 import assert from 'node:assert';
+import { ControlPlugin, Processed } from '../types/core-plugin';
+import { AnyModule, Module } from '../types/core-modules';
+import { ImportPayload } from '../types/core';
 
 function createGenericHandler<Source, Narrowed extends Source, Output>(
     source: Observable<Source>,
@@ -30,6 +30,21 @@ function createGenericHandler<Source, Narrowed extends Source, Output>(
 ) {
     return (pred: (i: Source) => i is Narrowed) => source.pipe(filter(pred), concatMap(makeModule));
 }
+
+/**
+ * Removes the first character(s) _[depending on prefix length]_ of the message
+ * @param msg
+ * @param prefix The prefix to remove
+ * @returns The message without the prefix
+ * @example
+ * message.content = '!ping';
+ * console.log(fmt(message, '!'));
+ * // [ 'ping' ]
+ */
+export function fmt(msg: string, prefix: string): string[] {
+    return msg.slice(prefix.length).trim().split(/\s+/g);
+}
+
 /**
  *
  * Creates an RxJS observable that filters and maps incoming interactions to their respective modules.
@@ -98,9 +113,6 @@ export function buildModules<T extends AnyModule>(
 }
 
 
-
-
-
 /**
  * Wraps the task in a Result as a try / catch.
  * if the task is ok, an event is emitted and the stream becomes empty
@@ -110,7 +122,7 @@ export function buildModules<T extends AnyModule>(
  * @param task the deferred execution which will be called
  */
 export function executeModule(
-    emitter: SernEmitter,
+    emitter: Emitter,
     {
         module,
         task,
@@ -169,7 +181,7 @@ export function createResultResolver<
  */
 export function callInitPlugins<
     T extends Processed<AnyModule>,
->(sernEmitter: SernEmitter) {
+>(sernEmitter: Emitter) {
     return concatMap(
         createResultResolver({
             createStream: args => from(args.module.plugins).pipe(callPlugin(args)),

@@ -1,4 +1,4 @@
-import { Awaitable } from '../../shared-types';
+import { Awaitable } from '../../types/utility';
 
 /**
  * Represents an initialization contract.

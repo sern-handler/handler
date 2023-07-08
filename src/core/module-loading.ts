@@ -1,10 +1,12 @@
 import { Result, } from 'ts-results-es';
-import { Module } from './types/modules';
 import { type Observable, from, mergeMap, ObservableInput } from 'rxjs';
 import { readdir, stat } from 'fs/promises';
 import { basename, extname, join, resolve } from 'path';
-import { ImportPayload } from '../handlers/types';
 import assert from 'assert';
+import { Wrapper } from '../shared-types';
+import { createRequire } from 'node:module';
+import { ImportPayload } from '../types/core';
+import { Module } from '../types/core-modules';
 
 export type ModuleResult<T> = Promise<ImportPayload<T>>;
 
@@ -94,4 +96,43 @@ async function* readPaths(dir: string, shouldDebug: boolean): AsyncGenerator<str
     } catch (err) {
         throw err;
     }
+}
+
+const requir = createRequire(import.meta.url)
+
+export function loadConfig(wrapper: Wrapper | 'file'): Wrapper {
+    if(wrapper === 'file') {
+       console.log('Experimental loading of sern.config.json');
+       const config = requir(resolve('sern.config.json')) as {
+           language: string,
+           defaultPrefix?: string,
+           mode?: 'PROD'| 'DEV'
+           paths: {
+               base: string;
+               commands: string,
+               events?: string  
+           } 
+       };
+       const makePath = (dir: keyof typeof config.paths) => 
+        config.language === 'typescript' 
+            ? join('dist', config.paths[dir]!)
+            : join(config.paths[dir]!);
+
+       console.log('Loading config: ', config);
+       const commandsPath = makePath('commands');
+
+       console.log('Commands path is set to', commandsPath);
+       let eventsPath: string|undefined;
+       if(config.paths.events) {
+           eventsPath = makePath('events');
+           console.log('Events path is set to', eventsPath);
+       }
+       return {
+          defaultPrefix: config.defaultPrefix,
+          commands: commandsPath,
+          events: eventsPath,
+          mode : config.mode
+       };
+    }
+    return wrapper;
 }

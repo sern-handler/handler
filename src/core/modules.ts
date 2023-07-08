@@ -7,16 +7,16 @@ import {
     ControlPlugin,
     EventArgs,
     InitPlugin,
-} from './types/plugins';
+} from '../types/core-plugin';
 import {
     CommandModule,
     EventModule,
     InputCommand,
     InputEvent,
     Module,
-} from './types/modules';
+} from '../types/core-modules';
 import { partitionPlugins } from './_internal';
-import { Awaitable } from '../shared-types';
+import { Awaitable } from '../types/utility';
 
 /**
  * @since 1.0.0 The wrapper function to define command modules for sern

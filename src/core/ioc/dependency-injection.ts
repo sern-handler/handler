@@ -3,9 +3,9 @@ import type {
     DependencyConfiguration,
     IntoDependencies,
 } from './types';
-import { DefaultLogging } from '../structures';
-import { SernError, CoreContainer } from '../_internal';
+import { SernError, DefaultServices } from '../_internal';
 import { useContainerRaw } from './base';
+import { CoreContainer } from './container';
 
 /**
  * @__PURE__
@@ -65,7 +65,7 @@ export async function composeRoot(
     const hasLogger = conf.exclude?.has('@sern/logger');
     if (!hasLogger) {
         container.upsert({
-            '@sern/logger': () => new DefaultLogging(),
+            '@sern/logger': () => new DefaultServices.DefaultLogging(),
         });
     }
     //Build the container based on the callback provided by the user

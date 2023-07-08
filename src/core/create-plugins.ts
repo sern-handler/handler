@@ -1,5 +1,5 @@
 import { CommandType, EventType, PluginType } from './structures';
-import type { Plugin, PluginResult, EventArgs, CommandArgs } from './types/plugins';
+import type { Plugin, PluginResult, EventArgs, CommandArgs } from '../types/core-plugin';
 import type { ClientEvents } from 'discord.js';
 
 export function makePlugin<V extends unknown[]>(
