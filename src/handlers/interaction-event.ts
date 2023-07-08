@@ -8,9 +8,9 @@ import {
     isModal,
     sharedEventStream,
     SernError,
-    DependencyList
 } from '../core/_internal';
 import { createInteractionHandler, executeModule, makeModuleExecutor  } from './_internal';
+import { DependencyList } from '../types/ioc';
 
 export function interactionHandler([emitter, , , modules, client]: DependencyList) {
     const interactionStream$ = sharedEventStream<Interaction>(client, 'interactionCreate');

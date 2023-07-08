@@ -25,6 +25,7 @@ import type {
     MentionableSelectCommand,
     ModalSubmitCommand,
     Module,
+    Processed,
     RoleSelectCommand,
     SernEventCommand,
     SlashCommand,
@@ -49,7 +50,6 @@ import {
 
 export type PluginResult = Awaitable<VoidResult>;
 export type VoidResult = Result<void, void>;
-export type Processed<T> = T & { name: string; description: string };
 
 export interface InitArgs<T extends Processed<Module>> {
     module: T;

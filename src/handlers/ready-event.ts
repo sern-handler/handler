@@ -1,13 +1,13 @@
 import { ObservableInput, fromEvent, switchMap, take } from 'rxjs';
 import { CommandType } from '../core/structures';
-import { DependencyList, SernError } from '../core/_internal';
+import { SernError } from '../core/_internal';
 import { Result } from 'ts-results-es';
 import { ModuleManager } from '../core/contracts';
 import { buildModules, callInitPlugins } from './_internal';
-import { AnyModule } from '../core/types/modules';
 import * as assert from 'node:assert';
 import * as util from 'node:util';
-import { Processed } from '../core/types/plugins';
+import { DependencyList } from '../types/ioc';
+import { AnyModule, Processed } from '../types/core-modules';
 
 export function startReadyEvent(
     [sEmitter, , , moduleManager, client]: DependencyList,

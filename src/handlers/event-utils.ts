@@ -13,15 +13,15 @@ import {
     finalize,
 } from 'rxjs';
 import { Files, Id, callPlugin, everyPluginOk, filterMapTo, handleError, SernError, VoidResult } from '../core/_internal';
-import { CommandModule, Emitter, ErrorHandling, Logging, ModuleManager, useContainerRaw } from '../core';
+import { Emitter, ErrorHandling, Logging, ModuleManager, useContainerRaw } from '../core';
 import { contextArgs, createDispatcher, dispatchMessage } from './dispatchers';
 import { ObservableInput, pipe } from 'rxjs';
 import { SernEmitter } from '../core';
 import { Result } from 'ts-results-es';
 import { Awaitable } from '../types/utility';
 import assert from 'node:assert';
-import { ControlPlugin, Processed } from '../types/core-plugin';
-import { AnyModule, Module } from '../types/core-modules';
+import { ControlPlugin } from '../types/core-plugin';
+import { AnyModule, CommandModule, Module, Processed } from '../types/core-modules';
 import { ImportPayload } from '../types/core';
 
 function createGenericHandler<Source, Narrowed extends Source, Output>(

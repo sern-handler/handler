@@ -1,8 +1,9 @@
 import { concatMap, EMPTY } from 'rxjs';
 import type { Message } from 'discord.js';
 import { SernEmitter } from '../core';
-import { sharedEventStream, SernError, DependencyList } from '../core/_internal';
+import { sharedEventStream, SernError } from '../core/_internal';
 import { createMessageHandler, executeModule, makeModuleExecutor } from './_internal';
+import { DependencyList } from '../types/ioc';
 
 
 /**

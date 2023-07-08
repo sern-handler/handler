@@ -25,6 +25,7 @@ export interface CommandMeta {
     isClass: boolean
 }
 
+export type Processed<T> = T & { name: string; description: string };
 
 export interface Module {
     type: CommandType | EventType;
