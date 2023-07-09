@@ -1,4 +1,4 @@
-import { ObservableInput, fromEvent, switchMap, take } from 'rxjs';
+import { ObservableInput, concat, first, fromEvent, ignoreElements, pipe } from 'rxjs';
 import { CommandType } from '../core/structures';
 import { SernError } from '../core/_internal';
 import { Result } from 'ts-results-es';
@@ -13,20 +13,24 @@ export function startReadyEvent(
     [sEmitter, , , moduleManager, client]: DependencyList,
     allPaths: ObservableInput<string>,
 ) {
-    const ready$ = fromEvent(client!, 'ready').pipe(take(1));
-    return ready$
-        .pipe(
-            switchMap(() => buildModules<AnyModule>(allPaths, moduleManager)),
-            callInitPlugins(sEmitter),
-        )
+    const ready$ = fromEvent(client!, 'ready').pipe(once());
+
+    return concat(ready$, buildModules<AnyModule>(allPaths, moduleManager))
+        .pipe(callInitPlugins(sEmitter))
         .subscribe(module => {
-            registerModule(moduleManager, module).expect(
+            register(moduleManager, module).expect(
                 SernError.InvalidModuleType + ' ' + util.inspect(module),
             );
         });
 }
 
-function registerModule<T extends Processed<AnyModule>>(
+const once = () => pipe(
+    first(),
+    ignoreElements()
+)
+
+
+function register<T extends Processed<AnyModule>>(
     manager: ModuleManager,
     module: T,
 ): Result<void, void> {

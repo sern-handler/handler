@@ -68,7 +68,7 @@ export function createInteractionHandler<T extends Interaction>(
     return createGenericHandler<Interaction, T, ReturnType<typeof createDispatcher>>(
         source,
         async event => {
-            const fullPath = mg.get(Id.reconstruct(event as unknown as Interaction));
+            const fullPath = mg.get(Id.reconstruct(event));
             assert(fullPath, SernError.UndefinedModule + ' No full path found in module store');
             return Files.defaultModuleLoader<Processed<CommandModule>>(fullPath).then(payload =>
                 createDispatcher({ module: payload.module, event }),
@@ -210,7 +210,10 @@ export function makeModuleExecutor<
     M extends Processed<Module>,
     Args extends { module: M; args: unknown[] },
 >(onStop: (m: M) => unknown) {
-    const onNext = ({ args, module }: Args) => ({ task: () => module.execute(...args), module });
+    const onNext = ({ args, module }: Args) => ({
+        task: () => module.execute(...args),
+        module,
+    });
     return concatMap(
         createResultResolver({
             onStop,
@@ -224,7 +227,9 @@ export const handleCrash = (err: ErrorHandling, log?: Logging) =>
     pipe(
         catchError(handleError(err, log)),
         finalize(() => {
-            log?.info({ message: 'A stream closed or reached end of lifetime' });
+            log?.info({
+                message: 'A stream closed or reached end of lifetime',
+            });
             useContainerRaw()
                 ?.disposeAll()
                 .then(() => log?.info({ message: 'Cleaning container and crashing' }));

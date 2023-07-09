@@ -35,7 +35,9 @@ const appBitField = 0b000000001111;
 
 describe('id resolution', () => {
     it('should resolve application commands correctly', () => {
-        const modules = faker.helpers.multiple(createRandomCommandModules, { count: 20 });
+        const modules = faker.helpers.multiple(createRandomCommandModules, {
+            count: 20,
+        });
         const metadata = modules.map(createMetadata);
         metadata.forEach((meta, idx) => {
             const associatedModule = modules[idx];

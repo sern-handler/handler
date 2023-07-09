@@ -30,7 +30,9 @@ describe('services', () => {
             });
         }
 
-        const modules = faker.helpers.multiple(createRandomCommandModules, { count: 40 });
+        const modules = faker.helpers.multiple(createRandomCommandModules, {
+            count: 40,
+        });
 
         const paths = faker.helpers
             .multiple(faker.system.directoryPath, { count: 40 })

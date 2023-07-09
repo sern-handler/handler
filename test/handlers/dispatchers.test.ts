@@ -8,7 +8,10 @@ import { EventEmitter } from 'events';
 
 function createRandomModule(): Processed<Module> {
     return {
-        type: faker.number.int({ min: CommandType.Text, max: CommandType.ChannelSelect }),
+        type: faker.number.int({
+            min: CommandType.Text,
+            max: CommandType.ChannelSelect,
+        }),
         description: faker.string.alpha(),
         name: faker.string.alpha(),
         onEvent: [],

@@ -15,7 +15,11 @@ function isNonBot(prefix: string) {
 
 function hasPrefix(prefix: string, content: string) {
     const prefixInContent = content.slice(0, prefix.length);
-    return prefixInContent.localeCompare(prefix, undefined, { sensitivity: 'accent' }) === 0;
+    return (
+        prefixInContent.localeCompare(prefix, undefined, {
+            sensitivity: 'accent',
+        }) === 0
+    );
 }
 
 export function messageHandler(
@@ -23,7 +27,9 @@ export function messageHandler(
     defaultPrefix: string | undefined,
 ) {
     if (!defaultPrefix) {
-        log?.debug({ message: 'No prefix found. message handler shutting down' });
+        log?.debug({
+            message: 'No prefix found. message handler shutting down',
+        });
         return EMPTY;
     }
     const messageStream$ = sharedEventStream<Message>(client, 'messageCreate');
