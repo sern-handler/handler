@@ -1,13 +1,18 @@
 import { EventEmitter } from 'node:events';
 import * as assert from 'node:assert';
 import { concatMap, from, fromEvent, map, OperatorFunction, pipe } from 'rxjs';
-import { arrayifySource, callPlugin, isAutocomplete, treeSearch, SernError } from '../core/_internal';
+import {
+    arrayifySource,
+    callPlugin,
+    isAutocomplete,
+    treeSearch,
+    SernError,
+} from '../core/_internal';
 import { createResultResolver } from './event-utils';
 import { AutocompleteInteraction, BaseInteraction, Message } from 'discord.js';
 import { CommandType, Context } from '../core';
-import { Args } from '../types/utility';
-import { BothCommand, CommandModule, Module, Processed } from '../types/core-modules';
-
+import type { Args } from '../types/utility';
+import type { BothCommand, CommandModule, Module, Processed } from '../types/core-modules';
 
 function dispatchInteraction<T extends CommandModule, V extends BaseInteraction | Message>(
     payload: { module: Processed<T>; event: V },
@@ -31,7 +36,10 @@ function dispatchAutocomplete(payload: {
     event: AutocompleteInteraction;
 }) {
     const option = treeSearch(payload.event, payload.module.options);
-    assert.ok(option, Error( SernError.NotSupportedInteraction + ` There is no autocomplete tag for this option`))
+    assert.ok(
+        option,
+        Error(SernError.NotSupportedInteraction + ` There is no autocomplete tag for this option`),
+    );
     return {
         module: option.command as Processed<Module>, //autocomplete is not a true "module" warning cast!
         args: [payload.event],
@@ -87,7 +95,7 @@ export function createDispatcher(payload: {
 }) {
     assert.ok(
         CommandType.Text !== payload.module.type,
-        SernError.MismatchEvent + 'Found text command in interaction stream'
+        SernError.MismatchEvent + 'Found text command in interaction stream',
     );
     switch (payload.module.type) {
         case CommandType.Slash:

@@ -13,7 +13,7 @@ export class DefaultModuleManager implements ModuleManager {
 
     getByNameCommandType<T extends CommandType>(name: string, commandType: T) {
         const id = this.get(Id.create(name, commandType));
-        if(!id) {
+        if (!id) {
             return undefined;
         }
         return Files.importModule<CommandModuleDefs[T]>(id);
@@ -30,7 +30,6 @@ export class DefaultModuleManager implements ModuleManager {
         }
         return maybeModule;
     }
-
 
     get(id: string) {
         return this.moduleStore.commands.get(id);

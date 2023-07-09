@@ -12,17 +12,26 @@ import {
     catchError,
     finalize,
 } from 'rxjs';
-import { Files, Id, callPlugin, everyPluginOk, filterMapTo, handleError, SernError, VoidResult } from '../core/_internal';
+import {
+    Files,
+    Id,
+    callPlugin,
+    everyPluginOk,
+    filterMapTo,
+    handleError,
+    SernError,
+    VoidResult,
+} from '../core/_internal';
 import { Emitter, ErrorHandling, Logging, ModuleManager, useContainerRaw } from '../core';
 import { contextArgs, createDispatcher, dispatchMessage } from './dispatchers';
 import { ObservableInput, pipe } from 'rxjs';
 import { SernEmitter } from '../core';
 import { Result } from 'ts-results-es';
-import { Awaitable } from '../types/utility';
+import type { Awaitable } from '../types/utility';
 import assert from 'node:assert';
-import { ControlPlugin } from '../types/core-plugin';
-import { AnyModule, CommandModule, Module, Processed } from '../types/core-modules';
-import { ImportPayload } from '../types/core';
+import type { ControlPlugin } from '../types/core-plugin';
+import type { AnyModule, CommandModule, Module, Processed } from '../types/core-modules';
+import type { ImportPayload } from '../types/core';
 
 function createGenericHandler<Source, Narrowed extends Source, Output>(
     source: Observable<Source>,
@@ -61,9 +70,9 @@ export function createInteractionHandler<T extends Interaction>(
         async event => {
             const fullPath = mg.get(Id.reconstruct(event as unknown as Interaction));
             assert(fullPath, SernError.UndefinedModule + ' No full path found in module store');
-            return Files
-                .defaultModuleLoader<Processed<CommandModule>>(fullPath)
-                .then(payload => createDispatcher({ module: payload.module, event }))
+            return Files.defaultModuleLoader<Processed<CommandModule>>(fullPath).then(payload =>
+                createDispatcher({ module: payload.module, event }),
+            );
         },
     );
 }
@@ -78,12 +87,11 @@ export function createMessageHandler(
         const fullPath = mg.get(`${prefix}_A1`);
 
         assert(fullPath, SernError.UndefinedModule + ' No full path found in module store');
-        return Files
-            .defaultModuleLoader<Processed<CommandModule>>(fullPath).then(payload => {
-                const args = contextArgs(event, rest);
-                return dispatchMessage(payload.module, args);
-            });
+        return Files.defaultModuleLoader<Processed<CommandModule>>(fullPath).then(payload => {
+            const args = contextArgs(event, rest);
+            return dispatchMessage(payload.module, args);
         });
+    });
 }
 /**
  * IMPURE SIDE EFFECT
@@ -107,11 +115,8 @@ export function buildModules<T extends AnyModule>(
     input: ObservableInput<string>,
     moduleManager: ModuleManager,
 ) {
-    return Files
-        .buildModuleStream<Processed<T>>(input)
-        .pipe(assignDefaults(moduleManager));
+    return Files.buildModuleStream<Processed<T>>(input).pipe(assignDefaults(moduleManager));
 }
-
 
 /**
  * Wraps the task in a Result as a try / catch.
@@ -179,9 +184,7 @@ export function createResultResolver<
  * Calls a module's init plugins and checks for Err. If so, call { onStop } and
  * ignore the module
  */
-export function callInitPlugins<
-    T extends Processed<AnyModule>,
->(sernEmitter: Emitter) {
+export function callInitPlugins<T extends Processed<AnyModule>>(sernEmitter: Emitter) {
     return concatMap(
         createResultResolver({
             createStream: args => from(args.module.plugins).pipe(callPlugin(args)),
@@ -217,10 +220,13 @@ export function makeModuleExecutor<
     );
 }
 
-export const handleCrash = ( err: ErrorHandling, log?: Logging) => pipe(
-    catchError(handleError(err, log)),
-    finalize(() => {
-        log?.info({ message: 'A stream closed or reached end of lifetime' });
-        useContainerRaw()?.disposeAll()
-            .then(() => log?.info({ message: 'Cleaning container and crashing' }));
-    }));
+export const handleCrash = (err: ErrorHandling, log?: Logging) =>
+    pipe(
+        catchError(handleError(err, log)),
+        finalize(() => {
+            log?.info({ message: 'A stream closed or reached end of lifetime' });
+            useContainerRaw()
+                ?.disposeAll()
+                .then(() => log?.info({ message: 'Cleaning container and crashing' }));
+        }),
+    );

@@ -24,7 +24,7 @@ export type {
     SernOptionsData,
     SernSubCommandData,
     SernSubCommandGroupData,
-} from './types/core-modules'
+} from './types/core-modules';
 
 export type {
     Controller,
@@ -33,19 +33,12 @@ export type {
     ControlPlugin,
     Plugin,
     AnyEventPlugin,
-    AnyCommandPlugin
-} from './types/core-plugin'
+    AnyCommandPlugin,
+} from './types/core-plugin';
 
-export type {
-    Wrapper,
-} from './types/core'
+export type { Wrapper } from './types/core';
 
-export type {
-    Args,
-    SlashOptions,
-    Payload,
-    SernEventsMapping
-} from './types/utility'
+export type { Args, SlashOptions, Payload, SernEventsMapping } from './types/utility';
 
 export type { Singleton, Transient, CoreDependencies } from './types/ioc';
 
@@ -56,8 +49,5 @@ export {
     EventExecutable,
     CommandExecutable,
 } from './core/modules';
-
-
-
 
 export { controller } from './sern';

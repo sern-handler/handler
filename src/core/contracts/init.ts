@@ -1,4 +1,4 @@
-import { Awaitable } from '../../types/utility';
+import type { Awaitable } from '../../types/utility';
 
 /**
  * Represents an initialization contract.

@@ -12,10 +12,7 @@ import { CoreContext } from '../structures/core-context';
 import { Result, Ok, Err } from 'ts-results-es';
 import * as assert from 'assert';
 
-type ReplyOptions =
-    | string
-    | Omit<InteractionReplyOptions, 'fetchReply'>
-    | MessageReplyOptions;
+type ReplyOptions = string | Omit<InteractionReplyOptions, 'fetchReply'> | MessageReplyOptions;
 
 /**
  * @since 1.0.0

@@ -1,9 +1,8 @@
 import { Container, UnpackFunction } from 'iti';
-import * as Contracts from '../core/contracts'
+import * as Contracts from '../core/contracts';
 
 export type Singleton<T> = () => T;
 export type Transient<T> = () => () => T;
-
 
 export type DependencyList = [
     Contracts.Emitter,
@@ -14,7 +13,7 @@ export type DependencyList = [
 ];
 
 export interface CoreDependencies {
-    '@sern/client': () => Contracts.Emitter
+    '@sern/client': () => Contracts.Emitter;
     '@sern/logger'?: () => Contracts.Logging;
     '@sern/emitter': () => Contracts.Emitter;
     '@sern/store': () => Contracts.CoreModuleStore;
@@ -31,6 +30,7 @@ export type IntoDependencies<Tuple extends [...any[]]> = {
 export interface DependencyConfiguration {
     //@deprecated. Loggers will always be included in the future
     exclude?: Set<'@sern/logger'>;
-    build: (root: Container<Omit<CoreDependencies, '@sern/client'>, {}>) => Container<Dependencies, {}>;
+    build: (
+        root: Container<Omit<CoreDependencies, '@sern/client'>, {}>,
+    ) => Container<Dependencies, {}>;
 }
-

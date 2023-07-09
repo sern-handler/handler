@@ -6,8 +6,8 @@ import { ModuleManager } from '../core/contracts';
 import { buildModules, callInitPlugins } from './_internal';
 import * as assert from 'node:assert';
 import * as util from 'node:util';
-import { DependencyList } from '../types/ioc';
-import { AnyModule, Processed } from '../types/core-modules';
+import type { DependencyList } from '../types/ioc';
+import type { AnyModule, Processed } from '../types/core-modules';
 
 export function startReadyEvent(
     [sEmitter, , , moduleManager, client]: DependencyList,
@@ -16,12 +16,13 @@ export function startReadyEvent(
     const ready$ = fromEvent(client!, 'ready').pipe(take(1));
     return ready$
         .pipe(
-            switchMap(() => buildModules<AnyModule>(allPaths,moduleManager)),
+            switchMap(() => buildModules<AnyModule>(allPaths, moduleManager)),
             callInitPlugins(sEmitter),
         )
         .subscribe(module => {
-            registerModule(moduleManager, module)
-                .expect(SernError.InvalidModuleType + ' ' + util.inspect(module))
+            registerModule(moduleManager, module).expect(
+                SernError.InvalidModuleType + ' ' + util.inspect(module),
+            );
         });
 }
 
@@ -30,7 +31,7 @@ function registerModule<T extends Processed<AnyModule>>(
     module: T,
 ): Result<void, void> {
     const { id, fullPath } = manager.getMetadata(module)!;
-    
+
     const validModuleType = module.type >= 0 && module.type <= 1 << 10;
     assert.ok(
         validModuleType,

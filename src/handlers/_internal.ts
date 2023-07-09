@@ -1,2 +1,2 @@
-export * from './dispatchers'
-export * from './event-utils'
+export * from './dispatchers';
+export * from './event-utils';

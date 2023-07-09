@@ -3,8 +3,7 @@ import type { Message } from 'discord.js';
 import { SernEmitter } from '../core';
 import { sharedEventStream, SernError } from '../core/_internal';
 import { createMessageHandler, executeModule, makeModuleExecutor } from './_internal';
-import { DependencyList } from '../types/ioc';
-
+import type { DependencyList } from '../types/ioc';
 
 /**
  * Ignores messages from any person / bot except itself

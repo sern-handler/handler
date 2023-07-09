@@ -25,7 +25,10 @@ export class CoreContainer<T extends Partial<Dependencies>> extends Container<T,
                 '@sern/store': () => new ModuleStore(),
             })
             .add(ctx => {
-                return { '@sern/modules': () => new DefaultServices.DefaultModuleManager(ctx['@sern/store']) };
+                return {
+                    '@sern/modules': () =>
+                        new DefaultServices.DefaultModuleManager(ctx['@sern/store']),
+                };
             });
     }
 
@@ -43,15 +46,15 @@ export class CoreContainer<T extends Partial<Dependencies>> extends Container<T,
 
     private async callInitHooks(e: { key: keyof T; newContainer: T[keyof T] | null }) {
         const dep = e.newContainer;
-   
+
         assert.ok(dep);
         //Ignore any dependencies that are not objects or array
         if (typeof dep !== 'object' || Array.isArray(dep)) {
             return;
         }
-        if ('init' in dep && typeof dep.init === 'function' && !this.beenCalled.has(e.key) ) {
+        if ('init' in dep && typeof dep.init === 'function' && !this.beenCalled.has(e.key)) {
             isAsyncFunction(dep.init) ? await dep.init() : dep.init();
-            this.beenCalled.add(e.key)
+            this.beenCalled.add(e.key);
         }
     }
 
@@ -62,4 +65,3 @@ export class CoreContainer<T extends Partial<Dependencies>> extends Container<T,
         this.ready$.unsubscribe();
     }
 }
-

@@ -1,16 +1,15 @@
-import { CommandInteractionOptionResolver } from "discord.js";
-import { PayloadType } from "../core";
-import { AnyModule } from "./core-modules";
+import { CommandInteractionOptionResolver } from 'discord.js';
+import { PayloadType } from '../core';
+import { AnyModule } from './core-modules';
 
 export type Awaitable<T> = PromiseLike<T> | T;
 
-export type AnyFunction = (...args:unknown[]) => unknown
+export type AnyFunction = (...args: unknown[]) => unknown;
 
 // Thanks to @kelsny
 type ParseType<T> = {
     [K in keyof T]: T[K] extends unknown ? [k: K, args: T[K]] : never;
 }[keyof T];
-
 
 export type SlashOptions = Omit<CommandInteractionOptionResolver, 'getMessage' | 'getFocused'>;
 
@@ -21,14 +20,10 @@ export interface SernEventsMapping {
     'module.activate': [Payload];
     error: [Payload];
     warning: [Payload];
-    'modulesLoaded': [never?];
+    modulesLoaded: [never?];
 }
-
-
 
 export type Payload =
     | { type: PayloadType.Success; module: AnyModule }
     | { type: PayloadType.Failure; module?: AnyModule; reason: string | Error }
     | { type: PayloadType.Warning; reason: string };
-
-

@@ -18,7 +18,7 @@ import {
 } from 'rxjs';
 import { Emitter, ErrorHandling, Logging } from './contracts';
 import util from 'node:util';
-import { PluginResult, VoidResult } from '../types/core-plugin';
+import type { PluginResult, VoidResult } from '../types/core-plugin';
 /**
  * if {src} is true, mapTo V, else ignore
  * @param item
@@ -46,7 +46,6 @@ export function callPlugin(args: unknown): OperatorFunction<
 }
 
 export const arrayifySource = map(src => (Array.isArray(src) ? (src as unknown[]) : [src]));
-
 
 /**
  * Checks if the stream of results is all ok.

@@ -1,8 +1,4 @@
-import type {
-    CoreDependencies,
-    DependencyConfiguration,
-    IntoDependencies,
-} from '../../types/ioc';
+import type { CoreDependencies, DependencyConfiguration, IntoDependencies } from '../../types/ioc';
 import { SernError, DefaultServices } from '../_internal';
 import { useContainerRaw } from './base';
 import { CoreContainer } from './container';
@@ -27,17 +23,17 @@ export function transient<T>(cb: () => () => T) {
     return cb;
 }
 /**
-  * The new Service api, a cleaner alternative to useContainer
-  * To obtain intellisense, ensure a .d.ts file exists in the root of compilation.
-  * Usually our scaffolding tool takes care of this.
-  * @since 3.0.0
-  * @example 
-  * ```ts
-  * const client = Service('@sern/client');
-  * ```
-  * @param key a key that corresponds to a dependency registered.
-  *
-  */
+ * The new Service api, a cleaner alternative to useContainer
+ * To obtain intellisense, ensure a .d.ts file exists in the root of compilation.
+ * Usually our scaffolding tool takes care of this.
+ * @since 3.0.0
+ * @example
+ * ```ts
+ * const client = Service('@sern/client');
+ * ```
+ * @param key a key that corresponds to a dependency registered.
+ *
+ */
 export function Service<const T extends keyof Dependencies>(key: T) {
     return useContainerRaw().get(key)!;
 }

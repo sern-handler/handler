@@ -3,8 +3,8 @@ import { EventType } from '../core/structures';
 import { SernError } from '../core/_internal';
 import { buildModules, callInitPlugins, handleCrash, eventDispatcher } from './_internal';
 import { Service } from '../core/ioc';
-import { DependencyList } from '../types/ioc';
-import { CommandModule, EventModule, Processed } from '../types/core-modules';
+import type { DependencyList } from '../types/ioc';
+import type { CommandModule, EventModule, Processed } from '../types/core-modules';
 
 export function eventsHandler(
     [emitter, err, log, moduleManager, client]: DependencyList,

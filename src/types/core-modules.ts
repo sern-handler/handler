@@ -22,7 +22,7 @@ import { Awaitable, Args, SlashOptions, SernEventsMapping } from './utility';
 export interface CommandMeta {
     fullPath: string;
     id: string;
-    isClass: boolean
+    isClass: boolean;
 }
 
 export type Processed<T> = T & { name: string; description: string };
@@ -33,7 +33,7 @@ export interface Module {
     onEvent: ControlPlugin[];
     plugins: InitPlugin[];
     description?: string;
-    execute(...args: any[]): Awaitable<any>
+    execute(...args: any[]): Awaitable<any>;
 }
 
 export interface SernEventCommand<T extends keyof SernEventsMapping = keyof SernEventsMapping>
@@ -191,7 +191,6 @@ export type InputCommand = {
     [T in CommandType]: CommandModuleNoPlugins[T] & { plugins?: AnyCommandPlugin[] };
 }[CommandType];
 
-
 /**
  * Type that replaces autocomplete with {@link SernAutocompleteData}
  */
@@ -201,7 +200,8 @@ export type SernOptionsData =
     | APIApplicationCommandBasicOption
     | SernAutocompleteData;
 
-export interface SernSubCommandData extends APIApplicationCommandOptionBase<ApplicationCommandOptionType.Subcommand> {
+export interface SernSubCommandData
+    extends APIApplicationCommandOptionBase<ApplicationCommandOptionType.Subcommand> {
     type: ApplicationCommandOptionType.Subcommand;
     options?: SernOptionsData[];
 }

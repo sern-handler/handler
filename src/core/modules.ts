@@ -1,6 +1,6 @@
 import { ClientEvents } from 'discord.js';
 import { CommandType, EventType, PluginType } from '../core/structures';
-import {
+import type {
     AnyCommandPlugin,
     AnyEventPlugin,
     CommandArgs,
@@ -8,7 +8,7 @@ import {
     EventArgs,
     InitPlugin,
 } from '../types/core-plugin';
-import {
+import type {
     CommandModule,
     EventModule,
     InputCommand,
@@ -16,7 +16,7 @@ import {
     Module,
 } from '../types/core-modules';
 import { partitionPlugins } from './_internal';
-import { Awaitable } from '../types/utility';
+import type { Awaitable } from '../types/utility';
 
 /**
  * @since 1.0.0 The wrapper function to define command modules for sern

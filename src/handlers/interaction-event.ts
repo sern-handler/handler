@@ -1,7 +1,7 @@
 import { Interaction } from 'discord.js';
 import { concatMap, merge } from 'rxjs';
 import { SernEmitter } from '../core';
-import { 
+import {
     isAutocomplete,
     isCommand,
     isMessageComponent,
@@ -9,8 +9,8 @@ import {
     sharedEventStream,
     SernError,
 } from '../core/_internal';
-import { createInteractionHandler, executeModule, makeModuleExecutor  } from './_internal';
-import { DependencyList } from '../types/ioc';
+import { createInteractionHandler, executeModule, makeModuleExecutor } from './_internal';
+import type { DependencyList } from '../types/ioc';
 
 export function interactionHandler([emitter, , , modules, client]: DependencyList) {
     const interactionStream$ = sharedEventStream<Interaction>(client, 'interactionCreate');

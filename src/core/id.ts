@@ -22,15 +22,15 @@ export function reconstruct<T extends Interaction>(event: T) {
     }
 }
 /**
-  *
-  * A magic number to represent any commandtype that is an ApplicationCommand.
-  */
+ *
+ * A magic number to represent any commandtype that is an ApplicationCommand.
+ */
 const appBitField = 0b000000001111;
 
 // Each index represents the exponent of a CommandType.
-// Every CommandType is a power of two. 
+// Every CommandType is a power of two.
 export const CommandTypeDiscordApi = [
-    1,  // CommandType.Text 
+    1, // CommandType.Text
     ApplicationCommandType.ChatInput,
     ApplicationCommandType.User,
     ApplicationCommandType.Message,
@@ -40,7 +40,7 @@ export const CommandTypeDiscordApi = [
     ComponentType.UserSelect,
     ComponentType.RoleSelect,
     ComponentType.MentionableSelect,
-    ComponentType.ChannelSelect
+    ComponentType.ChannelSelect,
 ];
 /*
  * Generates a number based on CommandType.
@@ -49,7 +49,7 @@ export const CommandTypeDiscordApi = [
  */
 function apiType(t: CommandType | EventType) {
     if (t === CommandType.Both || t === CommandType.Modal) return 1;
-    return CommandTypeDiscordApi[Math.log2(t)]; 
+    return CommandTypeDiscordApi[Math.log2(t)];
 }
 
 /*
@@ -59,5 +59,5 @@ function apiType(t: CommandType | EventType) {
  */
 export function create(name: string, type: CommandType | EventType) {
     const am = (appBitField & type) !== 0 ? 'A' : 'C';
-    return name+"_"+ am + apiType(type);
+    return name + '_' + am + apiType(type);
 }
