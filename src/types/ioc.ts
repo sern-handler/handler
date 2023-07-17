@@ -1,8 +1,20 @@
 import { Container, UnpackFunction } from 'iti';
 import * as Contracts from '../core/contracts';
-
+/**
+  * Type to annotate that something is a singleton. 
+  * T is created once and lazily.
+  */
 export type Singleton<T> = () => T;
+/**
+  * Type to annotate that something is transient. 
+  * Every time this is called, a new object is created
+  */
 export type Transient<T> = () => () => T;
+/**
+  * Type to annotate that something is initializable. 
+  * If T has an init method, this will be called.
+  */
+export type Initializable<T extends Contracts.Init> = T
 
 export type DependencyList = [
     Contracts.Emitter,
