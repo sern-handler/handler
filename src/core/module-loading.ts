@@ -65,7 +65,7 @@ export const filename = (path: string) => fmtFileName(basename(path));
 
 const isSkippable = (filename: string) => {
     //empty string is for non extension files (directories)
-    const validExtensions = ['.js', '.cjs', '.mts', '.mjs', 'cts', ''];
+    const validExtensions = ['.js', '.cjs', '.mts', '.mjs', '.cts', '.ts', ''];
     return filename[0] === '!' || !validExtensions.includes(extname(filename));
 };
 async function deriveFileInfo(dir: string, file: string) {
