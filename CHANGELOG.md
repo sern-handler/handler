@@ -1,5 +1,21 @@
 # Changelog
 
+## [3.0.0](https://github.com/sern-handler/handler/compare/v2.6.3...v3.0.0) (2023-07-29)
+
+
+### ⚠ BREAKING CHANGES
+
+* v3 ([#294](https://github.com/sern-handler/handler/issues/294))
+
+### Features
+
+* v3 ([#294](https://github.com/sern-handler/handler/issues/294)) ([7798e36](https://github.com/sern-handler/handler/commit/7798e36458c7f555d2bcb8a5857a6db47b7211da))
+
+
+### Miscellaneous Chores
+
+* release 3.0.0 ([70cca0d](https://github.com/sern-handler/handler/commit/70cca0dbb01e70b47a8c899b1fc4f43dee5ed8ed))
+
 ## [2.6.3](https://github.com/sern-handler/handler/compare/v2.6.2...v2.6.3) (2023-06-17)
 
 
