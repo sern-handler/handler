@@ -1,18 +1,53 @@
-import SernEmitter from './handler/sernEmitter';
+export * as Sern from './sern';
+export * from './core';
+export type {
+    CommandModule,
+    EventModule,
+    BothCommand,
+    ContextMenuMsg,
+    ContextMenuUser,
+    SlashCommand,
+    TextCommand,
+    ButtonCommand,
+    StringSelectCommand,
+    MentionableSelectCommand,
+    UserSelectCommand,
+    ChannelSelectCommand,
+    RoleSelectCommand,
+    ModalSubmitCommand,
+    DiscordEventCommand,
+    SernEventCommand,
+    ExternalEventCommand,
+    CommandModuleDefs,
+    EventModuleDefs,
+    SernAutocompleteData,
+    SernOptionsData,
+    SernSubCommandData,
+    SernSubCommandGroupData,
+} from './types/core-modules';
+
+export type {
+    Controller,
+    PluginResult,
+    InitPlugin,
+    ControlPlugin,
+    Plugin,
+    AnyEventPlugin,
+    AnyCommandPlugin,
+} from './types/core-plugin';
+
+export type { Wrapper } from './types/core';
+
+export type { Args, SlashOptions, Payload, SernEventsMapping } from './types/utility';
+
+export type { Singleton, Transient, CoreDependencies, Initializable } from './types/ioc';
+
 export {
-    eventModule,
     commandModule,
+    eventModule,
+    discordEvent,
     EventExecutable,
     CommandExecutable,
-    controller,
-    discordEvent,
-} from './handler/sern';
-export * as Sern from './handler/sern';
-export * from './types/handler';
-export * from './types/module';
-export * from './types/plugin';
-export * from './handler/structures';
-export * from './handler/plugins';
-export * from './handler/contracts';
-export { SernEmitter };
-export * from './handler/dependencies';
+} from './core/modules';
+
+export { controller } from './sern';

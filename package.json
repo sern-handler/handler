@@ -1,15 +1,16 @@
 {
     "name": "@sern/handler",
-    "packageManager": "yarn@3.5.1",
-    "version": "2.6.3",
+    "packageManager": "yarn@3.5.0",
+    "version": "3.0.0",
     "description": "A complete, customizable, typesafe, & reactive framework for discord bots.",
-    "main": "dist/cjs/index.cjs",
-    "module": "dist/esm/index.mjs",
-    "types": "dist/index.d.ts",
+    "main": "./dist/index.js",
+    "module": "./dist/cjs/index.cjs",
+    "types": "./dist/index.d.ts",
     "exports": {
         ".": {
-            "import": "./dist/esm/index.mjs",
-            "require": "./dist/cjs/index.cjs"
+            "import": "./dist/index.mjs",
+            "require": "./dist/index.js",
+            "types": "./dist/index.d.ts"
         }
     },
     "scripts": {
@@ -17,10 +18,13 @@
         "clean-modules": "rimraf node_modules/ && npm install",
         "lint": "eslint src/**/*.ts",
         "format": "eslint src/**/*.ts --fix",
-        "build:dev": "tsup && tsup --dts-only --outDir dist",
-        "build:prod": "tsup --minify && tsup --dts-only --outDir dist",
-        "publish": "npm run build:prod",
-        "pretty": "prettier --write ."
+        "build:dev": "tsup --metafile",
+        "build:prod": "tsup --minify",
+        "prepare": "npm run build:prod",
+        "pretty": "prettier --write .",
+        "tdd": "vitest",
+        "test": "vitest --run",
+        "analyze-imports": "npx depcruise src --include-only \"^src\" --output-type dot | dot -T svg > dependency-graph.svg"
     },
     "keywords": [
         "sern-handler",
@@ -39,16 +43,54 @@
         "ts-results-es": "^3.6.0"
     },
     "devDependencies": {
+        "@faker-js/faker": "^8.0.1",
         "@types/node": "^18.15.11",
         "@typescript-eslint/eslint-plugin": "5.58.0",
         "@typescript-eslint/parser": "5.59.1",
-        "discord.js": "^14.9.0",
+        "dependency-cruiser": "^13.0.5",
+        "discord.js": "14.11.0",
         "esbuild": "^0.17.0",
-        "esbuild-ifdef": "^0.2.0",
         "eslint": "8.39.0",
         "prettier": "2.8.8",
         "tsup": "^6.7.0",
-        "typescript": "5.0.2"
+        "typescript": "5.0.2",
+        "vitest": "latest"
+    },
+    "prettier": {
+        "semi": true,
+        "trailingComma": "all",
+        "singleQuote": true,
+        "printWidth": 100,
+        "tabWidth": 4,
+        "arrowParens": "avoid"
+    },
+    "eslintConfig": {
+        "parser": "@typescript-eslint/parser",
+        "extends": [
+            "plugin:@typescript-eslint/recommended"
+        ],
+        "parserOptions": {
+            "ecmaVersion": "latest",
+            "sourceType": "script"
+        },
+        "rules": {
+            "@typescript-eslint/no-non-null-assertion": "off",
+            "quotes": [
+                2,
+                "single",
+                {
+                    "avoidEscape": true,
+                    "allowTemplateLiterals": true
+                }
+            ],
+            "semi": [
+                "error",
+                "always"
+            ],
+            "@typescript-eslint/no-empty-interface": 0,
+            "@typescript-eslint/ban-types": 0,
+            "@typescript-eslint/no-explicit-any": "off"
+        }
     },
     "repository": {
         "type": "git",

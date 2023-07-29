@@ -8,6 +8,7 @@ logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+.yarn
 # Runtime data
 pids
 *.pid
@@ -80,9 +81,7 @@ typings/
 # FuseBox cache
 .fusebox/
 
-# TypeScript build output
-dist
-
+test
 # VisualStudio Config file
 .vs
 
