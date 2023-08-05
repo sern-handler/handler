@@ -40,7 +40,7 @@
     "dependencies": {
         "iti": "^0.6.0",
         "rxjs": "^7.8.0",
-        "ts-results-es": "^3.6.0"
+        "ts-results-es": "latest"
     },
     "devDependencies": {
         "@faker-js/faker": "^8.0.1",

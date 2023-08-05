@@ -26,9 +26,8 @@ import { Emitter, ErrorHandling, Logging, ModuleManager, useContainerRaw } from 
 import { contextArgs, createDispatcher, dispatchMessage } from './dispatchers';
 import { ObservableInput, pipe } from 'rxjs';
 import { SernEmitter } from '../core';
-import { Result } from 'ts-results-es';
+import { Err, Ok, Result } from 'ts-results-es';
 import type { Awaitable } from '../types/utility';
-import assert from 'node:assert';
 import type { ControlPlugin } from '../types/core-plugin';
 import type { AnyModule, CommandModule, Module, Processed } from '../types/core-modules';
 import type { ImportPayload } from '../types/core';
@@ -37,7 +36,10 @@ function createGenericHandler<Source, Narrowed extends Source, Output>(
     source: Observable<Source>,
     makeModule: (event: Narrowed) => Promise<Output>,
 ) {
-    return (pred: (i: Source) => i is Narrowed) => source.pipe(filter(pred), concatMap(makeModule));
+    return (pred: (i: Source) => i is Narrowed) => 
+        source.pipe(
+            filter(pred),
+            concatMap(makeModule));
 }
 
 /**
@@ -65,14 +67,18 @@ export function createInteractionHandler<T extends Interaction>(
     source: Observable<Interaction>,
     mg: ModuleManager,
 ) {
-    return createGenericHandler<Interaction, T, ReturnType<typeof createDispatcher>>(
+    return createGenericHandler<Interaction, T, Result<ReturnType<typeof createDispatcher>, void>>(
         source,
         async event => {
             const fullPath = mg.get(Id.reconstruct(event));
-            assert(fullPath, SernError.UndefinedModule + ' No full path found in module store');
-            return Files.defaultModuleLoader<Processed<CommandModule>>(fullPath).then(payload =>
-                createDispatcher({ module: payload.module, event }),
-            );
+            if(!fullPath) {
+                return Err.EMPTY
+            }
+            return Files
+                .defaultModuleLoader<Processed<CommandModule>>(fullPath)
+                .then(payload =>
+                   Ok(createDispatcher({ module: payload.module, event }))
+                );
         },
     );
 }
@@ -86,11 +92,15 @@ export function createMessageHandler(
         const [prefix, ...rest] = fmt(event.content, defaultPrefix);
         const fullPath = mg.get(`${prefix}_A1`);
 
-        assert(fullPath, SernError.UndefinedModule + ' No full path found in module store');
-        return Files.defaultModuleLoader<Processed<CommandModule>>(fullPath).then(payload => {
-            const args = contextArgs(event, rest);
-            return dispatchMessage(payload.module, args);
-        });
+        if(!fullPath) {
+            return Err('Possibly undefined behavior: could not find a static id to resolve  ')
+        }
+        return Files
+            .defaultModuleLoader<Processed<CommandModule>>(fullPath)
+            .then(payload => {
+                const args = contextArgs(event, rest);
+                return Ok(dispatchMessage(payload.module, args));
+            });
     });
 }
 /**

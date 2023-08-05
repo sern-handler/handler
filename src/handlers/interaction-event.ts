@@ -8,6 +8,7 @@ import {
     isModal,
     sharedEventStream,
     SernError,
+    filterTap,
 } from '../core/_internal';
 import { createInteractionHandler, executeModule, makeModuleExecutor } from './_internal';
 import type { DependencyList } from '../types/ioc';
@@ -22,10 +23,11 @@ export function interactionHandler([emitter, , , modules, client]: DependencyLis
         handle(isCommand),
         handle(isModal),
     );
-    return interactionHandler$.pipe(
-        makeModuleExecutor(module => {
-            emitter.emit('module.activate', SernEmitter.failure(module, SernError.PluginFailure));
-        }),
-        concatMap(payload => executeModule(emitter, payload)),
+    return interactionHandler$
+        .pipe(
+            filterTap(e => emitter.emit('warning', SernEmitter.warning(e))),
+            makeModuleExecutor(module => 
+                emitter.emit('module.activate', SernEmitter.failure(module, SernError.PluginFailure))),
+            concatMap(payload => executeModule(emitter, payload)),
     );
 }

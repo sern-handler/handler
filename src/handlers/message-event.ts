@@ -1,7 +1,7 @@
 import { concatMap, EMPTY } from 'rxjs';
 import type { Message } from 'discord.js';
 import { SernEmitter } from '../core';
-import { sharedEventStream, SernError } from '../core/_internal';
+import { sharedEventStream, SernError, filterTap } from '../core/_internal';
 import { createMessageHandler, executeModule, makeModuleExecutor } from './_internal';
 import type { DependencyList } from '../types/ioc';
 
@@ -38,6 +38,7 @@ export function messageHandler(
     const msgCommands$ = handle(isNonBot(defaultPrefix));
 
     return msgCommands$.pipe(
+        filterTap((e) => emitter.emit('warning', SernEmitter.warning(e))),
         makeModuleExecutor(module => {
             emitter.emit('module.activate', SernEmitter.failure(module, SernError.PluginFailure));
         }),
