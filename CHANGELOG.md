@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.0.1](https://github.com/sern-handler/handler/compare/v3.0.0...v3.0.1) (2023-08-05)
+
+
+### Bug Fixes
+
+* collectors ([4134460](https://github.com/sern-handler/handler/commit/41344608c677b6069c46412f5f16e4337182ca7d))
+
 ## [3.0.0](https://github.com/sern-handler/handler/compare/v2.6.3...v3.0.0) (2023-07-29)
 
 
