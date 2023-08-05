@@ -80,11 +80,6 @@ export async function composeRoot(
 }
 
 export function useContainer<const T extends Dependencies>() {
-    console.warn(`
-        Warning: using a container hook (useContainer) is not recommended.
-        Could lead to many unwanted side effects.
-        Use the new Service(s) api function instead.
-        `);
     return <V extends (keyof T)[]>(...keys: [...V]) =>
         keys.map(key => useContainerRaw().get(key as keyof Dependencies)) as IntoDependencies<V>;
 }
