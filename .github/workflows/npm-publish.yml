@@ -2,6 +2,9 @@ name: NPM / Publish
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - 'main'
 jobs:
   test-and-publish:
     runs-on: ubuntu-latest
