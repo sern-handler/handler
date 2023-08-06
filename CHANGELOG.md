@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.0.2](https://github.com/sern-handler/handler/compare/v3.0.1...v3.0.2) (2023-08-06)
+
+
+### Bug Fixes
+
+* invalid id for cts, mts, cjs, mjs files, node paths ([#318](https://github.com/sern-handler/handler/issues/318)) ([a7f5ea2](https://github.com/sern-handler/handler/commit/a7f5ea269fb344e221d10dbdc26a1611ffc8138f))
+
 ## [3.0.1](https://github.com/sern-handler/handler/compare/v3.0.0...v3.0.1) (2023-08-05)
 
 
