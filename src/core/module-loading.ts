@@ -25,23 +25,17 @@ export type ModuleResult<T> = Promise<ImportPayload<T>>;
 export async function importModule<T>(absPath: string) {
     let module = await import(absPath).then(esm => esm.default);
 
-    assert(
-        module,
-        'Found no default export for command module at ' +
-            absPath +
-            'Forgot to ignore with "!"? (!filename.ts)?',
-    );
+    assert(module, `Found no export for module at ${absPath}. Forgot to ignore with "!"? (!${basename(absPath)})?`);
     if ('default' in module) {
         module = module.default;
     }
-    return Result.wrap(() => module.getInstance()).unwrapOr(module) as T;
+    return Result
+        .wrap(() => module.getInstance())
+        .unwrapOr(module) as T;
 }
 export async function defaultModuleLoader<T extends Module>(absPath: string): ModuleResult<T> {
     let module = await importModule<T>(absPath);
-    assert.ok(
-        module,
-        "Found an undefined module. Forgot to ignore it with a '!' ie (!filename.ts)?",
-    );
+    assert(module, `Found an undefined module: ${absPath}`);
     return { module, absPath };
 }
 
