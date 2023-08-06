@@ -1,7 +1,7 @@
 import { Result } from 'ts-results-es';
 import { type Observable, from, mergeMap, ObservableInput } from 'rxjs';
 import { readdir, stat } from 'fs/promises';
-import { basename, extname, join, resolve } from 'path';
+import { basename, extname, join, resolve, parse } from 'path';
 import assert from 'assert';
 import { createRequire } from 'node:module';
 import type { ImportPayload, Wrapper } from '../types/core';
@@ -25,27 +25,21 @@ export type ModuleResult<T> = Promise<ImportPayload<T>>;
 export async function importModule<T>(absPath: string) {
     let module = await import(absPath).then(esm => esm.default);
 
-    assert(
-        module,
-        'Found no default export for command module at ' +
-            absPath +
-            'Forgot to ignore with "!"? (!filename.ts)?',
-    );
+    assert(module, `Found no export for module at ${absPath}. Forgot to ignore with "!"? (!${basename(absPath)})?`);
     if ('default' in module) {
         module = module.default;
     }
-    return Result.wrap(() => module.getInstance()).unwrapOr(module) as T;
+    return Result
+        .wrap(() => module.getInstance())
+        .unwrapOr(module) as T;
 }
 export async function defaultModuleLoader<T extends Module>(absPath: string): ModuleResult<T> {
     let module = await importModule<T>(absPath);
-    assert.ok(
-        module,
-        "Found an undefined module. Forgot to ignore it with a '!' ie (!filename.ts)?",
-    );
+    assert(module, `Found an undefined module: ${absPath}`);
     return { module, absPath };
 }
 
-export const fmtFileName = (n: string) => n.substring(0, n.length - 3);
+export const fmtFileName = (fileName: string) => parse(fileName).name;
 
 /**
  * a directory string is converted into a stream of modules.
