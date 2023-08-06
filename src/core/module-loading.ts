@@ -1,7 +1,7 @@
 import { Result } from 'ts-results-es';
 import { type Observable, from, mergeMap, ObservableInput } from 'rxjs';
 import { readdir, stat } from 'fs/promises';
-import { basename, extname, join, resolve } from 'path';
+import { basename, extname, join, resolve, parse } from 'path';
 import assert from 'assert';
 import { createRequire } from 'node:module';
 import type { ImportPayload, Wrapper } from '../types/core';
@@ -39,7 +39,7 @@ export async function defaultModuleLoader<T extends Module>(absPath: string): Mo
     return { module, absPath };
 }
 
-export const fmtFileName = (n: string) => n.substring(0, n.length - 3);
+export const fmtFileName = (fileName: string) => parse(fileName).name;
 
 /**
  * a directory string is converted into a stream of modules.
