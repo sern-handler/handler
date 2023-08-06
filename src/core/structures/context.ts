@@ -37,12 +37,21 @@ export class Context extends CoreContext<Message, ChatInputCommandInteraction> {
     public get channel() {
         return this.ctx.val.channel;
     }
+
+    public get channelId(): Snowflake {
+        return safeUnwrap(this.ctx.map(m => m.channelId).mapErr(i => i.channelId));
+    }
+    
     /**
      * If context is holding a message, message.author
      * else, interaction.user
      */
     public get user(): User {
         return safeUnwrap(this.ctx.map(m => m.author).mapErr(i => i.user));
+    }
+
+    public get userId(): Snowflake {
+        return this.user.id;
     }
 
     public get createdTimestamp(): number {
