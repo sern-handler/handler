@@ -77,16 +77,14 @@ export default commandModule({
 </details>
 <details open><summary>index.ts</summary>
 
-```ts
+	
+```ts 
 import { Client, GatewayIntentBits } from 'discord.js';
-import { Sern, single, type Dependencies } from '@sern/handler';
+import { Sern, single } from '@sern/handler';
 
 //client has been declared previously
-
-interface MyDependencies extends Dependencies {
-    '@sern/client': Singleton<Client>;
-}
-export const useContainer = Sern.makeDependencies<MyDependencies>({
+//Version 3
+await makeDependencies({
     build: root => root
         .add({ '@sern/client': single(() => client)  })
 });
@@ -96,9 +94,6 @@ Sern.init({
 	defaultPrefix: '!', // removing defaultPrefix will shut down text commands
 	commands: 'src/commands',
 	// events: 'src/events' (optional),
-	containerConfig : {
-	    get: useContainer
-	}
 });
 
 client.login("YOUR_BOT_TOKEN_HERE");
