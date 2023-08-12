@@ -66,12 +66,7 @@ export async function composeRoot(
     }
     //Build the container based on the callback provided by the user
     conf.build(container as CoreContainer<Omit<CoreDependencies, '@sern/client'>>);
-    try {
-        container.get('@sern/client');
-    } catch {
-        throw new Error(SernError.MissingRequired + ' No client was provided');
-    }
-
+    
     if (!hasLogger) {
         container.get('@sern/logger')?.info({ message: 'All dependencies loaded successfully.' });
     }

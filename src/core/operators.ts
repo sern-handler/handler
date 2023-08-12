@@ -52,7 +52,7 @@ export const arrayifySource = map(src => (Array.isArray(src) ? (src as unknown[]
  * Checks if the stream of results is all ok.
  */
 export const everyPluginOk: OperatorFunction<VoidResult, boolean> = pipe(
-    every(result => result.ok),
+    every(result => result.isOk()),
     defaultIfEmpty(true),
 );
 
@@ -74,10 +74,10 @@ export function handleError<C>(crashHandler: ErrorHandling, logging?: Logging) {
 export const filterTap = <K, R>(onErr: (e: R) => void): OperatorFunction<Result<K, R>, K> => 
     pipe(
         concatMap(result => {
-            if(result.ok) {
-                return of(result.val)
+            if(result.isOk()) {
+                return of(result.value)
             }
-            onErr(result.val);
+            onErr(result.error);
             return EMPTY
 
         })

@@ -8,7 +8,6 @@ describe('module-loading', () => {
         const filename = Files.fmtFileName(name+'.'+extension);
         expect(filename).toBe(name)
     })
-
     
 //    todo: handle commands with multiple extensions
 //    it('should properly extract filename from file, nested multiple', () => {
