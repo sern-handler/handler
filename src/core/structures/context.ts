@@ -31,15 +31,21 @@ export class Context extends CoreContext<Message, ChatInputCommandInteraction> {
     }
 
     public get id(): Snowflake {
-        return this.ctx.val.id;
+        return safeUnwrap(this.ctx
+                            .map(m => m.id)
+                            .mapErr(i => i.id));
     }
 
     public get channel() {
-        return this.ctx.val.channel;
+        return safeUnwrap(this.ctx
+                            .map(m => m.channel)
+                            .mapErr(i => i.channel));
     }
 
     public get channelId(): Snowflake {
-        return safeUnwrap(this.ctx.map(m => m.channelId).mapErr(i => i.channelId));
+        return safeUnwrap(this.ctx
+                            .map(m => m.channelId)
+                            .mapErr(i => i.channelId));
     }
     
     /**
@@ -47,7 +53,9 @@ export class Context extends CoreContext<Message, ChatInputCommandInteraction> {
      * else, interaction.user
      */
     public get user(): User {
-        return safeUnwrap(this.ctx.map(m => m.author).mapErr(i => i.user));
+        return safeUnwrap(this.ctx
+                            .map(m => m.author)
+                            .mapErr(i => i.user));
     }
 
     public get userId(): Snowflake {
@@ -55,29 +63,41 @@ export class Context extends CoreContext<Message, ChatInputCommandInteraction> {
     }
 
     public get createdTimestamp(): number {
-        return this.ctx.val.createdTimestamp;
+        return safeUnwrap(this.ctx 
+                            .map(m => m.createdTimestamp)
+                            .mapErr(i => i.createdTimestamp));
     }
 
     public get guild() {
-        return this.ctx.val.guild;
+        return safeUnwrap(this.ctx
+                            .map(m => m.guild)
+                            .mapErr(i => i.guild));
     }
 
     public get guildId() {
-        return this.ctx.val.guildId;
+        return safeUnwrap(this.ctx
+                            .map(m => m.guildId)
+                            .mapErr(i => i.guildId));
     }
     /*
      * interactions can return APIGuildMember if the guild it is emitted from is not cached
      */
     public get member() {
-        return this.ctx.val.member;
+        return safeUnwrap(this.ctx
+                            .map(m => m.member)
+                            .mapErr(i => i.member));
     }
 
     public get client(): Client {
-        return this.ctx.val.client;
+        return safeUnwrap(this.ctx
+                            .map(m => m.client)
+                            .mapErr(i => i.client));
     }
 
     public get inGuild(): boolean {
-        return this.ctx.val.inGuild();
+        return safeUnwrap(this.ctx
+                            .map(m => m.inGuild())
+                            .mapErr(i => i.inGuild()));
     }
 
     public async reply(content: ReplyOptions) {
@@ -100,5 +120,5 @@ export class Context extends CoreContext<Message, ChatInputCommandInteraction> {
 }
 
 function safeUnwrap<T>(res: Result<T, T>) {
-    return res.val;
+    return res.unwrap()
 }

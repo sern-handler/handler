@@ -150,11 +150,11 @@ export function executeModule(
         //converting the task into a promise so rxjs can resolve the Awaitable properly
         concatMap(() => Result.wrapAsync(async () => task())),
         concatMap(result => {
-            if (result.ok) {
+            if (result.isOk()) {
                 emitter.emit('module.activate', SernEmitter.success(module));
                 return EMPTY;
             } else {
-                return throwError(() => SernEmitter.failure(module, result.val));
+                return throwError(() => SernEmitter.failure(module, result.error));
             }
         }),
     );
@@ -182,7 +182,7 @@ export function createResultResolver<
         const task$ = config.createStream(args);
         return task$.pipe(
             tap(result => {
-                result.err && config.onStop?.(args.module);
+                result.isErr() && config.onStop?.(args.module);
             }),
             everyPluginOk,
             filterMapTo(() => config.onNext(args)),

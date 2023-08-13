@@ -7,7 +7,7 @@ import * as assert from 'node:assert';
  */
 export abstract class CoreContext<M, I> {
     protected constructor(protected ctx: Either<M, I>) {
-        assert.ok(typeof ctx.val === 'object' && ctx.val != null);
+        assert.ok(typeof ctx === 'object' && ctx != null);
     }
     get message(): M {
         return this.ctx.expect(SernError.MismatchEvent);
@@ -17,7 +17,7 @@ export abstract class CoreContext<M, I> {
     }
 
     public isMessage(): this is CoreContext<M, never> {
-        return this.ctx.ok;
+        return this.ctx.isOk();
     }
 
     public isSlash(): this is CoreContext<never, I> {
