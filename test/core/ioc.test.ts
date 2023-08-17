@@ -1,23 +1,37 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { CoreContainer } from '../../src/core/ioc/container';
-import { CoreDependencies } from '../../src/core/ioc';
 import { EventEmitter } from 'events';
-import { DefaultLogging, Init, Logging } from '../../src/core';
+import { DefaultLogging, Disposable, Init, Logging } from '../../src/core';
+import { CoreDependencies } from '../../src/types/ioc';
+import { promisify } from 'util';
 
 describe('ioc container', () => {
-    let container: CoreContainer<{}>;
-    let initDependency: Logging & Init;
+    let container: CoreContainer<{}> = new CoreContainer();
+    let dependency: Logging & Init & Disposable;
     beforeEach(() => {
-        initDependency = {
+        dependency = {
             init: vi.fn(),
             error(): void {},
             warning(): void {},
             info(): void {},
             debug(): void {},
+            dispose: vi.fn()
         };
         container = new CoreContainer();
     });
-
+    const wait = (seconds: number) =>  new Promise((resolve) => setTimeout(resolve, seconds));
+    class DB implements Init, Disposable {
+      public connected = false
+      constructor() {}
+      async init() {
+        this.connected = true
+        await wait(10)
+      }
+      async dispose() {
+        await wait(20)
+        this.connected = false
+      }
+    }
     it('should be ready after calling container.ready()', () => {
         container.ready();
         expect(container.isReady()).toBe(true);
@@ -39,14 +53,36 @@ describe('ioc container', () => {
         }
     });
     it('should init modules', () => {
-        container.upsert({ '@sern/logger': initDependency });
+        container.upsert({ '@sern/logger': dependency });
         container.ready();
-        expect(initDependency.init).to.toHaveBeenCalledOnce();
+        expect(dependency.init).to.toHaveBeenCalledOnce();
+    });
+    it('should dispose modules', async () => {
+        
+        container.upsert({ '@sern/logger': dependency })
+
+        container.ready();
+
+        // We need to access the dependency at least once to be able to dispose of it.
+        container.get('@sern/logger' as never);
+        await container.disposeAll();
+        expect(dependency.dispose).toHaveBeenCalledOnce();
     });
 
+    it('should init and dispose', async () => {
+        container.add({ db: new DB() })
+        container.ready()
+        const db = container.get('db' as never) as DB
+        expect(db.connected).toBeTruthy()
+
+        await container.disposeAll();
+
+        expect(db.connected).toBeFalsy()
+    })
+
     it('should not lazy module', () => {
-        container.upsert({ '@sern/logger': () => initDependency });
+        container.upsert({ '@sern/logger': () => dependency });
         container.ready();
-        expect(initDependency.init).toHaveBeenCalledTimes(0);
+        expect(dependency.init).toHaveBeenCalledTimes(0);
     });
 });
