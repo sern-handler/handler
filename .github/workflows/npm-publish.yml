@@ -10,13 +10,13 @@ jobs:
   test-and-publish:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3
+      - uses: actions/setup-node@5e21ff4d9bc1a8cf6de233a3057d20ec6b3fb69d # v3
         with:
           node-version: 17
       - run: yarn --immutable
       - run: yarn build:prod
-      - uses: JS-DevTools/npm-publish@v1
+      - uses: JS-DevTools/npm-publish@0f451a94170d1699fd50710966d48fb26194d939 # v1
         with:
           token: ${{ secrets.NPM_TOKEN }}
           access: "public"
