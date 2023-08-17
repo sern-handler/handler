@@ -50,4 +50,7 @@ export {
     CommandExecutable,
 } from './core/modules';
 
+export {
+    useContainerRaw
+} from './core/_internal'
 export { controller } from './sern';

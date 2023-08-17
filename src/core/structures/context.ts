@@ -120,5 +120,8 @@ export class Context extends CoreContext<Message, ChatInputCommandInteraction> {
 }
 
 function safeUnwrap<T>(res: Result<T, T>) {
-    return res.unwrap()
+    if(res.isOk()) {
+        return res.expect("Tried unwrapping message field: " + res)
+    } 
+    return res.expectErr("Tried unwrapping interaction field" + res)
 }
