@@ -19,7 +19,7 @@
         "lint": "eslint src/**/*.ts",
         "format": "eslint src/**/*.ts --fix",
         "build:dev": "tsup --metafile",
-        "build:prod": "tsup --minify",
+        "build:prod": "tsup ",
         "prepare": "npm run build:prod",
         "pretty": "prettier --write .",
         "tdd": "vitest",
