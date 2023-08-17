@@ -1,11 +1,10 @@
-import type { Disposable } from "../contracts";
 import type { CoreContainer } from "./container"
 
 interface HookEvent { 
     key : PropertyKey
     newContainer: any
 }
-type HookName = 'init' | 'dispose';
+type HookName = 'init';
 
 export const createInitListener = (coreContainer : CoreContainer<any>) => {
     const initCalled = new Set<PropertyKey>();
@@ -14,10 +13,6 @@ export const createInitListener = (coreContainer : CoreContainer<any>) => {
        
         if(isNotHookable(event)) {
             return;
-        }
-
-        if(hasCallableMethod('dispose', event)) {
-            coreContainer.addDisposer({ [event.key]: (l: Disposable) =>  l.dispose() })
         }
 
         if(hasCallableMethod('init', event)) {

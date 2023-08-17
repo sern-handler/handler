@@ -7,8 +7,10 @@ import { CoreContainer } from './container';
 let containerSubject: CoreContainer<Partial<Dependencies>>;
 
 /**
+ * @deprecated
  * Returns the underlying data structure holding all dependencies.
  * Exposes methods from iti
+ * Use the Service API. The container should be readonly
  */
 export function useContainerRaw() {
     assert.ok(

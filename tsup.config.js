@@ -4,7 +4,7 @@ const shared = {
     external: ['discord.js', 'iti'],
     platform: 'node',
     clean: true,
-    sourcemap: false,
+    sourcemap: true,
     treeshake: {
         moduleSideEffects: false,
         correctVarValueBeforeDeclaration: true, //need this to treeshake esm discord.js empty import
@@ -19,6 +19,8 @@ export default defineConfig([
         outDir: './dist',
         splitting: true,
         dts: true,
+        minify: false,
+        bundle: false,
         ...shared,
     },
     //    {

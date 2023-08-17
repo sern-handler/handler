@@ -95,3 +95,5 @@ dist
 .yalc
 
 yalc.lock
+
+*.svg

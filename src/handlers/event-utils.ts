@@ -21,8 +21,9 @@ import {
     handleError,
     SernError,
     VoidResult,
+    useContainerRaw,
 } from '../core/_internal';
-import { Emitter, ErrorHandling, Logging, ModuleManager, useContainerRaw } from '../core';
+import { Emitter, ErrorHandling, Logging, ModuleManager } from '../core';
 import { contextArgs, createDispatcher, dispatchMessage } from './dispatchers';
 import { ObservableInput, pipe } from 'rxjs';
 import { SernEmitter } from '../core';

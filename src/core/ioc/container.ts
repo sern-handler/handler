@@ -1,5 +1,5 @@
 import { Container } from 'iti';
-import { SernEmitter } from '../';
+import { Disposable, SernEmitter } from '../';
 import * as assert from 'node:assert';
 import { Subject } from 'rxjs';
 import { DefaultServices, ModuleStore } from '../_internal';
@@ -34,8 +34,24 @@ export class CoreContainer<T extends Partial<Dependencies>> extends Container<T,
             });
     }
 
+
     isReady() {
+
         return this.ready$.closed;
+    }
+    override async disposeAll() {
+        
+        const otherDisposables = Object
+            .entries(this._context)
+            .flatMap(([key, value]) => 
+                'dispose' in value
+                    ? [key]
+                    : []);
+
+        for(const key of otherDisposables) {
+            this.addDisposer({ [key]: (dep: Disposable) => dep.dispose() } as never);
+        }
+        await super.disposeAll() 
     }
     ready() {
         this.ready$.complete();

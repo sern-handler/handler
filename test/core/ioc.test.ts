@@ -3,7 +3,6 @@ import { CoreContainer } from '../../src/core/ioc/container';
 import { EventEmitter } from 'events';
 import { DefaultLogging, Disposable, Init, Logging } from '../../src/core';
 import { CoreDependencies } from '../../src/types/ioc';
-import { promisify } from 'util';
 
 describe('ioc container', () => {
     let container: CoreContainer<{}> = new CoreContainer();
@@ -62,7 +61,6 @@ describe('ioc container', () => {
         container.upsert({ '@sern/logger': dependency })
 
         container.ready();
-
         // We need to access the dependency at least once to be able to dispose of it.
         container.get('@sern/logger' as never);
         await container.disposeAll();
