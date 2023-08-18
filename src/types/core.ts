@@ -9,9 +9,9 @@ export interface Wrapper {
     defaultPrefix?: string;
     events?: string;
     /**
-     * Overload to enable mode in case developer does not use a .env file.
+     * @deprecated
      */
-    mode?: 'DEV' | 'PROD';
+    mode?: string
     /*
      * @deprecated
      */
