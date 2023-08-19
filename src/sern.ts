@@ -27,13 +27,12 @@ export function init(maybeWrapper: Wrapper | 'file') {
     const dependencies = useDependencies();
     const logger = dependencies[2],
         errorHandler = dependencies[1];
-    const mode = isDevMode(wrapper.mode ?? process.env.MODE);
 
     if (wrapper.events !== undefined) {
-        eventsHandler(dependencies, Files.getFullPathTree(wrapper.events, mode));
+        eventsHandler(dependencies, Files.getFullPathTree(wrapper.events));
     }
     //Ready event: load all modules and when finished, time should be taken and logged
-    startReadyEvent(dependencies, Files.getFullPathTree(wrapper.commands, mode)).add(() => {
+    startReadyEvent(dependencies, Files.getFullPathTree(wrapper.commands)).add(() => {
         const time = ((performance.now() - startTime) / 1000).toFixed(2);
         dependencies[0].emit('modulesLoaded');
         logger?.info({
@@ -45,14 +44,6 @@ export function init(maybeWrapper: Wrapper | 'file') {
     const interactions$ = interactionHandler(dependencies);
     // listening to the message stream and interaction stream
     merge(messages$, interactions$).pipe(handleCrash(errorHandler, logger)).subscribe();
-}
-
-function isDevMode(mode: string | undefined) {
-    console.info(`Detected mode: "${mode}"`);
-    if (mode === undefined) {
-        console.info('No mode found in process.env, assuming DEV');
-    }
-    return mode === 'DEV' || mode == undefined;
 }
 
 function useDependencies() {
