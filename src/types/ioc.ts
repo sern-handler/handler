@@ -17,17 +17,17 @@ export type Transient<T> = () => () => T;
 export type Initializable<T extends Contracts.Init> = T
 
 export type DependencyList = [
-    Contracts.Emitter,
+    Contracts.Emitter&Contracts.Listener,
     Contracts.ErrorHandling,
     Contracts.Logging | undefined,
     Contracts.ModuleManager,
-    Contracts.Emitter,
+    Contracts.Emitter&Contracts.Listener,
 ];
 
 export interface CoreDependencies {
-    '@sern/client': () => Contracts.Emitter;
+    '@sern/client': () => (Contracts.Emitter & Contracts.Listener);
     '@sern/logger'?: () => Contracts.Logging;
-    '@sern/emitter': () => Contracts.Emitter;
+    '@sern/emitter': () => (Contracts.Emitter & Contracts.Listener);
     '@sern/store': () => Contracts.CoreModuleStore;
     '@sern/modules': () => Contracts.ModuleManager;
     '@sern/errors': () => Contracts.ErrorHandling;

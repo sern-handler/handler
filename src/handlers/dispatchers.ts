@@ -10,7 +10,7 @@ import {
 } from '../core/_internal';
 import { createResultResolver } from './event-utils';
 import { AutocompleteInteraction, BaseInteraction, Message } from 'discord.js';
-import { CommandType, Context } from '../core';
+import { CommandType, Context, Listener } from '../core';
 import type { Args } from '../types/utility';
 import type { BothCommand, CommandModule, Module, Processed } from '../types/core-modules';
 
@@ -71,13 +71,20 @@ const createResult = createResultResolver<
     createStream: ({ module, args }) => from(module.onEvent).pipe(callPlugin(args)),
     onNext: ({ args }) => args,
 });
+
+const isListener = (source: any): source is Listener => {
+    return typeof source === 'object'
+    && source !== null 
+    && typeof source.addListener === 'function' 
+    && typeof source.removeListener === 'function'
+}
 /**
  * Creates an observable from { source }
  * @param module
  * @param source
  */
 export function eventDispatcher(module: Processed<Module>, source: unknown) {
-    assert.ok(source instanceof EventEmitter, `${source} is not an EventEmitter`);
+    assert.ok(isListener(source), 'Could not create something to listen to: ' + source )
 
     const execute: OperatorFunction<unknown[], unknown> = concatMap(async args =>
         module.execute(...args),

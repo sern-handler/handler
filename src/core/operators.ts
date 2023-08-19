@@ -16,7 +16,7 @@ import {
     pipe,
     share,
 } from 'rxjs';
-import { Emitter, ErrorHandling, Logging } from './contracts';
+import { ErrorHandling, Listener, Logging } from './contracts';
 import util from 'node:util';
 import type { PluginResult, VoidResult } from '../types/core-plugin';
 import type { Result } from 'ts-results-es'
@@ -56,7 +56,7 @@ export const everyPluginOk: OperatorFunction<VoidResult, boolean> = pipe(
     defaultIfEmpty(true),
 );
 
-export const sharedEventStream = <T>(e: Emitter, eventName: string) => {
+export const sharedEventStream = <T>(e: Listener, eventName: string) => {
     return (fromEvent(e, eventName) as Observable<T>).pipe(share());
 };
 
