@@ -14,7 +14,7 @@ type ListenerAdapterArgs<T> = {
  * import { createNanoEvents } from 'nanoevents'
  *
  * // Now, we can pass this into dependencies and register this incompatible emitter into sern.
- * const listener = createListenerAdapter({
+ * const listener = listenerAdapter({
  *    source: createNanoEvents(),
  *    addListener: ({ source, name, listener }) => source.on(name, handler),
  *    removeListener: ({ unsubscribe }) => unsubscribe()
@@ -25,7 +25,7 @@ type ListenerAdapterArgs<T> = {
  * @param {ListenerAdapterArgs} options - Options for creating the listener adapter.
  * @returns {Listener} A listener adapter object that satisfies the Listener contract.
  */
-export const createListenerAdapter = <T>(options: ListenerAdapterArgs<T>) => {
+export const listenerAdapter = <T>(options: ListenerAdapterArgs<T>) => {
     const { source, addListener, removeListener } = options;
     let maybeUnsub : unknown;
     return {

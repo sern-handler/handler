@@ -1,5 +1,5 @@
 import { assertType, beforeEach, describe, expect, it, vi } from 'vitest';
-import { Listener, ModuleStore, createListenerAdapter } from '../../src';
+import { Listener, ModuleStore, listenerAdapter } from '../../src';
 import * as DefaultContracts from '../../src/core/structures/services';
 import * as Contracts from '../../src/core/contracts/index.js';
 import { fromEvent, map, take } from 'rxjs';
@@ -18,7 +18,7 @@ describe('default contracts', () => {
 
 
 // Mock emitter object for testing
-describe('createListenerAdapter', () => {
+describe('listenerAdapter', () => {
     let testListener: Listener & { source : any };
     let mockEmitter;
     let testScheduler = new TestScheduler((expected, actual) => {
@@ -30,7 +30,7 @@ describe('createListenerAdapter', () => {
             addListener: vi.fn().mockReturnValue("unsubscribe"),
             removeListener: vi.fn(),
         }
-        testListener = createListenerAdapter({
+        testListener = listenerAdapter({
             source: mockEmitter,
             addListener: mockEmitter.addListener,
             removeListener: mockEmitter.removeListener
@@ -61,7 +61,7 @@ describe('createListenerAdapter', () => {
     });
     
     it('adapts into fromEvent', () => {
-        const listener = createListenerAdapter({
+        const listener = listenerAdapter({
             source: mockEmitter,
             addListener: mockEmitter.addListener,
             removeListener: mockEmitter.removeListener,
