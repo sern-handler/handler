@@ -18,7 +18,7 @@ function createRandomCommandModules() {
         CommandType.Button,
     ];
     return commandModule({
-        type: randomCommandType[Math.floor(Math.random() * randomCommandType.length)],
+        type: faker.helpers.uniqueArray(randomCommandType, 1)[0],
         description: faker.string.alpha(),
         name: faker.string.alpha(),
         execute: () => {},

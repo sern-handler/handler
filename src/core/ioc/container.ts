@@ -1,22 +1,24 @@
 import { Container } from 'iti';
-import { SernEmitter } from '../';
-import { isAsyncFunction } from 'node:util/types';
-
+import { Disposable, SernEmitter } from '../';
 import * as assert from 'node:assert';
 import { Subject } from 'rxjs';
 import { DefaultServices, ModuleStore } from '../_internal';
+import * as Hooks from './hooks'
+
 
 /**
- * Provides all the defaults for sern to function properly.
- * The only user provided dependency needs to be @sern/client
+ * A semi-generic container that provides error handling, emitter, and module store. 
+ * For the handler to operate correctly, The only user provided dependency needs to be @sern/client
  */
 export class CoreContainer<T extends Partial<Dependencies>> extends Container<T, {}> {
-    private ready$ = new Subject<never>();
-    private beenCalled = new Set<PropertyKey>();
+    private ready$ = new Subject<void>();
     constructor() {
         super();
+        assert.ok(!this.isReady(), 'Listening for dispose & init should occur prior to sern being ready.');
 
-        this.listenForInsertions();
+        const { unsubscribe } = Hooks.createInitListener(this);
+        this.ready$
+            .subscribe({ complete: unsubscribe });
 
         (this as Container<{}, {}>)
             .add({
@@ -32,36 +34,27 @@ export class CoreContainer<T extends Partial<Dependencies>> extends Container<T,
             });
     }
 
-    private listenForInsertions() {
-        assert.ok(
-            !this.isReady(),
-            'listening for init functions should only occur prior to sern being ready.',
-        );
-        const unsubscriber = this.on('containerUpserted', e => this.callInitHooks(e));
-
-        this.ready$.subscribe({
-            complete: unsubscriber,
-        });
-    }
-
-    private async callInitHooks(e: { key: keyof T; newContainer: T[keyof T] | null }) {
-        const dep = e.newContainer;
-
-        assert.ok(dep);
-        //Ignore any dependencies that are not objects or array
-        if (typeof dep !== 'object' || Array.isArray(dep)) {
-            return;
-        }
-        if ('init' in dep && typeof dep.init === 'function' && !this.beenCalled.has(e.key)) {
-            isAsyncFunction(dep.init) ? await dep.init() : dep.init();
-            this.beenCalled.add(e.key);
-        }
-    }
 
     isReady() {
+
         return this.ready$.closed;
     }
+    override async disposeAll() {
+        
+        const otherDisposables = Object
+            .entries(this._context)
+            .flatMap(([key, value]) => 
+                'dispose' in value
+                    ? [key]
+                    : []);
+
+        for(const key of otherDisposables) {
+            this.addDisposer({ [key]: (dep: Disposable) => dep.dispose() } as never);
+        }
+        await super.disposeAll() 
+    }
     ready() {
+        this.ready$.complete();
         this.ready$.unsubscribe();
     }
 }

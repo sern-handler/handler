@@ -1,5 +1,5 @@
 import type { CoreDependencies, DependencyConfiguration, IntoDependencies } from '../../types/ioc';
-import { SernError, DefaultServices } from '../_internal';
+import { DefaultServices } from '../_internal';
 import { useContainerRaw } from './base';
 import { CoreContainer } from './container';
 
@@ -66,12 +66,7 @@ export async function composeRoot(
     }
     //Build the container based on the callback provided by the user
     conf.build(container as CoreContainer<Omit<CoreDependencies, '@sern/client'>>);
-    try {
-        container.get('@sern/client');
-    } catch {
-        throw new Error(SernError.MissingRequired + ' No client was provided');
-    }
-
+    
     if (!hasLogger) {
         container.get('@sern/logger')?.info({ message: 'All dependencies loaded successfully.' });
     }

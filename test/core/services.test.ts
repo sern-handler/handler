@@ -39,14 +39,14 @@ describe('services', () => {
             .map((path, i) => `${path}/${modules[i]}.js`);
 
         const metadata: CommandMeta[] = modules.map((cm, i) => ({
-            id: Id.create(cm.name, cm.type),
+            id: Id.create(cm.name!, cm.type),
             isClass: false,
             fullPath: `${paths[i]}/${cm.name}.js`,
         }));
         const moduleManager = container.get('@sern/modules');
         let i = 0;
         for (const m of modules) {
-            moduleManager.set(Id.create(m.name, m.type), paths[i]);
+            moduleManager.set(Id.create(m.name!, m.type), paths[i]);
             moduleManager.setMetadata(m, metadata[i]);
             i++;
         }
