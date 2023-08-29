@@ -17,11 +17,10 @@ export function startReadyEvent(
 
     return concat(ready$, buildModules<AnyModule>(allPaths, moduleManager))
         .pipe(callInitPlugins(sEmitter))
-        .subscribe(module => {
-            register(moduleManager, module).expect(
-                SernError.InvalidModuleType + ' ' + util.inspect(module),
-            );
-        });
+        .subscribe(module => 
+            register(moduleManager, module)
+                .expect(SernError.InvalidModuleType + ' ' + util.inspect(module))
+        );
 }
 
 const once = () => pipe(
