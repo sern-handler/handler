@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.1.0](https://github.com/sern-handler/handler/compare/v3.0.2...v3.1.0) (2023-09-04)
+
+
+### Features
+
+* add guaranteed `channelId` and `userId` getters to `Context` ([#320](https://github.com/sern-handler/handler/issues/320)) ([50253ca](https://github.com/sern-handler/handler/commit/50253ca322e7d6dbd2313139c0187a1028f71109))
+* dispose hooks (deprecate useContainerRaw) ([#323](https://github.com/sern-handler/handler/issues/323)) ([26ccd11](https://github.com/sern-handler/handler/commit/26ccd118ff8cbcde94158a4d09fc0df18da9f254))
+
 ## [3.0.2](https://github.com/sern-handler/handler/compare/v3.0.1...v3.0.2) (2023-08-06)
 
 
