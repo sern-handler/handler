@@ -132,6 +132,12 @@ export function buildModules<T extends AnyModule>(
     return Files.buildModuleStream<Processed<T>>(input).pipe(assignDefaults(moduleManager));
 }
 
+
+interface ExecutePayload {
+    module: Processed<Module>;
+    task: () => Awaitable<unknown>;
+    onError: OnError
+}
 /**
  * Wraps the task in a Result as a try / catch.
  * if the task is ok, an event is emitted and the stream becomes empty
@@ -145,10 +151,8 @@ export function executeModule(
     {
         module,
         task,
-    }: {
-        module: Processed<Module>;
-        task: () => Awaitable<unknown>;
-    },
+        onError
+    }: ExecutePayload,
 ) {
     return of(module).pipe(
         //converting the task into a promise so rxjs can resolve the Awaitable properly
@@ -158,6 +162,9 @@ export function executeModule(
                 emitter.emit('module.activate', SernEmitter.success(module));
                 return EMPTY;
             } else {
+                if(onError) {
+                    
+                }
                 return throwError(() => SernEmitter.failure(module, result.error));
             }
         }),
