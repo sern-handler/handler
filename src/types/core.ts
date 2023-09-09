@@ -1,6 +1,7 @@
 export interface ImportPayload<T> {
     module: T;
     absPath: string;
+    onError: Function
     [key: string]: unknown;
 }
 

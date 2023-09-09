@@ -9,40 +9,16 @@ import {
     SernError,
 } from '../core/_internal';
 import { createResultResolver } from './event-utils';
-import { AutocompleteInteraction, BaseInteraction, Message } from 'discord.js';
+import { BaseInteraction, Message } from 'discord.js';
 import { CommandType, Context } from '../core';
 import type { Args } from '../types/utility';
 import type { BothCommand, CommandModule, Module, Processed } from '../types/core-modules';
 
-function dispatchInteraction<T extends CommandModule, V extends BaseInteraction | Message>(
-    payload: { module: Processed<T>; event: V },
-    createArgs: (m: typeof payload.event) => unknown[],
-) {
-    return {
-        module: payload.module,
-        args: createArgs(payload.event),
-    };
-}
 //TODO: refactor dispatchers so that it implements a strategy for each different type of payload?
 export function dispatchMessage(module: Processed<CommandModule>, args: [Context, Args]) {
     return {
         module,
         args,
-    };
-}
-
-function dispatchAutocomplete(payload: {
-    module: Processed<BothCommand>;
-    event: AutocompleteInteraction;
-}) {
-    const option = treeSearch(payload.event, payload.module.options);
-    assert.ok(
-        option,
-        Error(SernError.NotSupportedInteraction + ` There is no autocomplete tag for this option`),
-    );
-    return {
-        module: option.command as Processed<Module>, //autocomplete is not a true "module" warning cast!
-        args: [payload.event],
     };
 }
 
@@ -56,16 +32,16 @@ function interactionArg<T extends BaseInteraction>(interaction: T) {
     return [interaction] as [T];
 }
 
-function intoPayload(module: Processed<Module>) {
+function intoPayload(module: Processed<Module>, onError: Function|undefined) {
     return pipe(
         arrayifySource,
-        map(args => ({ module, args })),
+        map(args => ({ module, args, onError })),
     );
 }
 
 const createResult = createResultResolver<
     Processed<Module>,
-    { module: Processed<Module>; args: unknown[] },
+    { module: Processed<Module>; args: unknown[], onError: Function|undefined },
     unknown[]
 >({
     createStream: ({ module, args }) => from(module.onEvent).pipe(callPlugin(args)),
@@ -76,14 +52,14 @@ const createResult = createResultResolver<
  * @param module
  * @param source
  */
-export function eventDispatcher(module: Processed<Module>, source: unknown) {
+export function eventDispatcher(module: Processed<Module>, onError: Function|undefined, source: unknown) {
     assert.ok(source instanceof EventEmitter, `${source} is not an EventEmitter`);
 
     const execute: OperatorFunction<unknown[], unknown> = concatMap(async args =>
         module.execute(...args),
     );
     return fromEvent(source, module.name).pipe(
-        intoPayload(module),
+        intoPayload(module, onError),
         concatMap(createResult),
         execute,
     );
@@ -92,6 +68,7 @@ export function eventDispatcher(module: Processed<Module>, source: unknown) {
 export function createDispatcher(payload: {
     module: Processed<CommandModule>;
     event: BaseInteraction;
+    onError: Function
 }) {
     assert.ok(
         CommandType.Text !== payload.module.type,
@@ -101,17 +78,26 @@ export function createDispatcher(payload: {
         case CommandType.Slash:
         case CommandType.Both: {
             if (isAutocomplete(payload.event)) {
-                /**
-                 * Autocomplete is a special case that
-                 * must be handled separately, since it's
-                 * too different from regular command modules
-                 * CAST SAFETY: payload is already guaranteed to be a slash command or both command
-                 */
-                return dispatchAutocomplete(payload as never);
+                const option = treeSearch(payload.event, payload.module.options);
+                assert.ok(
+                    option,
+                    Error(SernError.NotSupportedInteraction + ` There is no autocomplete tag for this option`),
+                );
+             	return {
+             	    module: option.command as Processed<Module>, //autocomplete is not a true "module" warning cast!
+             	    args: [payload.event],
+                    onError: undefined
+             	};
             }
-            return dispatchInteraction(payload, contextArgs);
+            return { 
+                args: contextArgs(payload.event),
+                ...payload
+            }; 
         }
         default:
-            return dispatchInteraction(payload, interactionArg);
+            return {
+                args: interactionArg(payload.event),
+                ...payload
+            }
     }
 }

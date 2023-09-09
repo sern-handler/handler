@@ -15,9 +15,11 @@ import type {
     UserContextMenuCommandInteraction,
     UserSelectMenuInteraction,
 } from 'discord.js';
-import { CommandType, Context, EventType } from '../../src/core';
+import { CommandType, Context, ErrorHandling, EventType } from '../../src/core';
 import { AnyCommandPlugin, AnyEventPlugin, ControlPlugin, InitPlugin } from './core-plugin';
 import { Awaitable, Args, SlashOptions, SernEventsMapping } from './utility';
+
+export type OnError = (errorHandling: ErrorHandling, err: unknown) => unknown
 
 export interface CommandMeta {
     fullPath: string;

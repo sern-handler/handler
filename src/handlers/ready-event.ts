@@ -17,10 +17,12 @@ export function startReadyEvent(
 
     return concat(ready$, buildModules<AnyModule>(allPaths, moduleManager))
         .pipe(callInitPlugins(sEmitter))
-        .subscribe(module => 
+        .subscribe(({ module, onError }) => {
             register(moduleManager, module)
-                .expect(SernError.InvalidModuleType + ' ' + util.inspect(module))
-        );
+                .expect(SernError.InvalidModuleType + ' ' + util.inspect(module));
+            registerOnError(moduleManager, module, onError);
+            
+        });
 }
 
 const once = () => pipe(
@@ -28,6 +30,11 @@ const once = () => pipe(
     ignoreElements()
 )
 
+const registerOnError = (manager: ModuleManager, module: Processed<AnyModule>, onError: Function|undefined) => {
+    if(onError) {
+        manager.setErrorCallback(module, onError) 
+    }
+}
 
 function register<T extends Processed<AnyModule>>(
     manager: ModuleManager,

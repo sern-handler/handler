@@ -78,8 +78,7 @@ export function createInteractionHandler<T extends Interaction>(
             return Files
                 .defaultModuleLoader<Processed<CommandModule>>(fullPath)
                 .then(payload =>
-                   Ok(createDispatcher({ module: payload.module, event }))
-                );
+                   Ok(createDispatcher({ module: payload.module, event, onError: payload.onError })));
         },
     );
 }
@@ -172,7 +171,7 @@ export function executeModule(
  */
 export function createResultResolver<
     T extends { execute: (...args: any[]) => any; onEvent: ControlPlugin[] },
-    Args extends { module: T; [key: string]: unknown },
+    Args extends { module: T; onError: Function|undefined, [key: string]: unknown },
     Output,
 >(config: {
     onStop?: (module: T) => unknown;
@@ -205,9 +204,9 @@ export function callInitPlugins<T extends Processed<AnyModule>>(sernEmitter: Emi
                     SernEmitter.failure(module, SernError.PluginFailure),
                 );
             },
-            onNext: ({ module }) => {
+            onNext: ({ module, onError }) => {
                 sernEmitter.emit('module.register', SernEmitter.success(module));
-                return module;
+                return { module, onError };
             },
         }),
     );
@@ -219,16 +218,23 @@ export function callInitPlugins<T extends Processed<AnyModule>>(sernEmitter: Emi
  */
 export function makeModuleExecutor<
     M extends Processed<Module>,
-    Args extends { module: M; args: unknown[] },
+    Args extends { 
+        module: M;
+        args: unknown[];
+        onError: Function|undefined 
+    },
 >(onStop: (m: M) => unknown) {
-    const onNext = ({ args, module }: Args) => ({
+    const onNext = ({ args, module, onError }: Args) => ({
         task: () => module.execute(...args),
         module,
+        onError
     });
     return concatMap(
         createResultResolver({
             onStop,
-            createStream: ({ args, module }) => from(module.onEvent).pipe(callPlugin(args)),
+            createStream: ({ args, module }) => 
+                from(module.onEvent)
+                    .pipe(callPlugin(args)),
             onNext,
         }),
     );

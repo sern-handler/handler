@@ -36,15 +36,14 @@ export async function importModule<T>(absPath: string) {
         .wrap(() => ({ module: commandModule.getInstance(), onError }))
         .unwrapOr({ module: commandModule, onError }) as T;
 }
-interface FileModuleImports<T extends Module> { 
-    module: T,
+interface FileExtras { 
     onError : Function 
 }
 
 export async function defaultModuleLoader<T extends Module>(absPath: string): ModuleResult<T> {
-    let module = await importModule<T>(absPath);
+    let { onError, module } = await importModule<{ module: T } & FileExtras>(absPath);
     assert(module, `Found an undefined module: ${absPath}`);
-    return { module, absPath, errorHandler: '' };
+    return { module, absPath, onError };
 }
 
 export const fmtFileName = (fileName: string) => parse(fileName).name;
@@ -58,7 +57,8 @@ export const fmtFileName = (fileName: string) => parse(fileName).name;
 export function buildModuleStream<T extends Module>(
     input: ObservableInput<string>,
 ): Observable<ImportPayload<T>> {
-    return from(input).pipe(mergeMap(defaultModuleLoader<T>));
+    return from(input)
+        .pipe(mergeMap(defaultModuleLoader<T>));
 }
 
 export const getFullPathTree = (dir: string) => readPaths(resolve(dir));
