@@ -11,6 +11,13 @@ import { CommandType } from '../enums';
 export class DefaultModuleManager implements ModuleManager {
     constructor(private moduleStore: CoreModuleStore) {}
 
+    getErrorCallback(m: Module): Function | undefined {
+        return this.moduleStore.onError.get(m);
+    }
+    setErrorCallback(m: Module, c: Function): void {
+        this.moduleStore.onError.set(m, c);
+    }
+
     getByNameCommandType<T extends CommandType>(name: string, commandType: T) {
         const id = this.get(Id.create(name, commandType));
         if (!id) {
