@@ -12,12 +12,12 @@ interface MetadataAccess {
 }
 
 interface OnErrorAccess {
-    getErrorCallback(m: Module): Function|undefined;
-    setErrorCallback(m: Module, c: Function): void;
+    getErrorCallback(m: Module): Record<string,Function>|undefined;
+    setErrorCallback(m: Module, c: Record<string,Function>): void;
 }
 /**
  * @since 2.0.0
- * @deprecated - direct access to the module manager will be removed in version 4
+ * @internal - direct access to the module manager will be removed in version 4
  */
 export interface ModuleManager extends MetadataAccess, OnErrorAccess {
     get(id: string): string | undefined;

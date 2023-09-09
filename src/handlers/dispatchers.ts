@@ -12,7 +12,7 @@ import { createResultResolver } from './event-utils';
 import { BaseInteraction, Message } from 'discord.js';
 import { CommandType, Context } from '../core';
 import type { Args } from '../types/utility';
-import type { BothCommand, CommandModule, Module, Processed } from '../types/core-modules';
+import type { CommandModule, Module, Processed } from '../types/core-modules';
 
 //TODO: refactor dispatchers so that it implements a strategy for each different type of payload?
 export function dispatchMessage(module: Processed<CommandModule>, args: [Context, Args]) {
@@ -32,7 +32,7 @@ function interactionArg<T extends BaseInteraction>(interaction: T) {
     return [interaction] as [T];
 }
 
-function intoPayload(module: Processed<Module>, onError: Function|undefined) {
+function intoPayload(module: Processed<Module>, onError: Record<string,Function>|undefined) {
     return pipe(
         arrayifySource,
         map(args => ({ module, args, onError })),
@@ -41,7 +41,7 @@ function intoPayload(module: Processed<Module>, onError: Function|undefined) {
 
 const createResult = createResultResolver<
     Processed<Module>,
-    { module: Processed<Module>; args: unknown[], onError: Function|undefined },
+    { module: Processed<Module>; args: unknown[], onError: Record<string,Function>|undefined },
     unknown[]
 >({
     createStream: ({ module, args }) => from(module.onEvent).pipe(callPlugin(args)),
@@ -52,7 +52,7 @@ const createResult = createResultResolver<
  * @param module
  * @param source
  */
-export function eventDispatcher(module: Processed<Module>, onError: Function|undefined, source: unknown) {
+export function eventDispatcher(module: Processed<Module>, onError: Record<string,Function>|undefined, source: unknown) {
     assert.ok(source instanceof EventEmitter, `${source} is not an EventEmitter`);
 
     const execute: OperatorFunction<unknown[], unknown> = concatMap(async args =>
@@ -68,7 +68,7 @@ export function eventDispatcher(module: Processed<Module>, onError: Function|und
 export function createDispatcher(payload: {
     module: Processed<CommandModule>;
     event: BaseInteraction;
-    onError: Function
+    onError: Record<string,Function>|undefined 
 }) {
     assert.ok(
         CommandType.Text !== payload.module.type,

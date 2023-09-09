@@ -78,7 +78,11 @@ export function createInteractionHandler<T extends Interaction>(
             return Files
                 .defaultModuleLoader<Processed<CommandModule>>(fullPath)
                 .then(payload =>
-                   Ok(createDispatcher({ module: payload.module, event, onError: payload.onError })));
+                   Ok(createDispatcher({ 
+                       module: payload.module,
+                       onError: payload.onError,
+                       event,
+                      })));
         },
     );
 }
@@ -99,7 +103,7 @@ export function createMessageHandler(
             .defaultModuleLoader<Processed<CommandModule>>(fullPath)
             .then(payload => {
                 const args = contextArgs(event, rest);
-                return Ok(dispatchMessage(payload.module, args));
+                return Ok({ args, ...payload });
             });
     });
 }
@@ -171,7 +175,7 @@ export function executeModule(
  */
 export function createResultResolver<
     T extends { execute: (...args: any[]) => any; onEvent: ControlPlugin[] },
-    Args extends { module: T; onError: Function|undefined, [key: string]: unknown },
+    Args extends { module: T; onError: Record<string, Function>|undefined, [key: string]: unknown },
     Output,
 >(config: {
     onStop?: (module: T) => unknown;
@@ -221,7 +225,7 @@ export function makeModuleExecutor<
     Args extends { 
         module: M;
         args: unknown[];
-        onError: Function|undefined 
+        onError: Record<string,Function>|undefined
     },
 >(onStop: (m: M) => unknown) {
     const onNext = ({ args, module, onError }: Args) => ({

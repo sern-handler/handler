@@ -11,10 +11,11 @@ import { CommandType } from '../enums';
 export class DefaultModuleManager implements ModuleManager {
     constructor(private moduleStore: CoreModuleStore) {}
 
-    getErrorCallback(m: Module): Function | undefined {
+
+    getErrorCallback(m: Module): Record<string, Function> | undefined {
         return this.moduleStore.onError.get(m);
     }
-    setErrorCallback(m: Module, c: Function): void {
+    setErrorCallback(m: Module, c: Record<string, Function>): void {
         this.moduleStore.onError.set(m, c);
     }
 

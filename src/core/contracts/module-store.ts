@@ -6,5 +6,5 @@ import type { CommandMeta, Module } from '../../types/core-modules';
 export interface CoreModuleStore {
     commands: Map<string, string>;
     metadata: WeakMap<Module, CommandMeta>;
-    onError: WeakMap<Module, Function>;
+    onError: WeakMap<Module, Record<string,Function>>;
 }

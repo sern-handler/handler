@@ -7,7 +7,7 @@ import { CoreModuleStore } from '../contracts';
  * For interacting with modules, use the ModuleManager instead.
  */
 export class ModuleStore implements CoreModuleStore {
-    onError = new WeakMap<Module, Function>();
+    onError = new WeakMap<Module, Record<string, Function>>();
     metadata = new WeakMap<Module, CommandMeta>();
     commands = new Map<string, string>();
 }

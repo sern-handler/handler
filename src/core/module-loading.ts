@@ -37,7 +37,7 @@ export async function importModule<T>(absPath: string) {
         .unwrapOr({ module: commandModule, onError }) as T;
 }
 interface FileExtras { 
-    onError : Function 
+    onError : Record<string, Function>|undefined 
 }
 
 export async function defaultModuleLoader<T extends Module>(absPath: string): ModuleResult<T> {

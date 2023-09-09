@@ -30,7 +30,7 @@ const once = () => pipe(
     ignoreElements()
 )
 
-const registerOnError = (manager: ModuleManager, module: Processed<AnyModule>, onError: Function|undefined) => {
+const registerOnError = (manager: ModuleManager, module: Processed<AnyModule>, onError: Record<string,Function>|undefined) => {
     if(onError) {
         manager.setErrorCallback(module, onError) 
     }

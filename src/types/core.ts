@@ -1,7 +1,7 @@
 export interface ImportPayload<T> {
     module: T;
     absPath: string;
-    onError: Function
+    onError: Record<string, Function>|undefined 
     [key: string]: unknown;
 }
 
