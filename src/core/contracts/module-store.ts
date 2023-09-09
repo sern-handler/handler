@@ -1,4 +1,4 @@
-import type { CommandMeta, Module } from '../../types/core-modules';
+import type { CommandMeta, Module, OnError } from '../../types/core-modules';
 
 /**
  * Represents a core module store that stores IDs mapped to file paths.
@@ -6,5 +6,5 @@ import type { CommandMeta, Module } from '../../types/core-modules';
 export interface CoreModuleStore {
     commands: Map<string, string>;
     metadata: WeakMap<Module, CommandMeta>;
-    onError: WeakMap<Module, Record<string,Function>>;
+    onError: WeakMap<Module, NonNullable<OnError>>;
 }

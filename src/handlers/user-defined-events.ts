@@ -4,14 +4,14 @@ import { SernError } from '../core/_internal';
 import { buildModules, callInitPlugins, handleCrash, eventDispatcher } from './_internal';
 import { Service } from '../core/ioc';
 import type { DependencyList } from '../types/ioc';
-import type { EventModule, Processed } from '../types/core-modules';
+import type { EventModule, OnError, Processed } from '../types/core-modules';
 
 export function eventsHandler(
     [emitter, err, log, moduleManager, client]: DependencyList,
     allPaths: ObservableInput<string>,
 ) {
     //code smell
-    const intoDispatcher = (e: { module: Processed<EventModule>, onError: Record<string, Function>|undefined }) => {
+    const intoDispatcher = (e: { module: Processed<EventModule>, onError: OnError }) => {
         switch (e.module.type) {
             case EventType.Sern:
                 return eventDispatcher(e.module, e.onError, emitter);

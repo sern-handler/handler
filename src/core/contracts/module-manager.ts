@@ -3,6 +3,7 @@ import type {
     CommandModule,
     CommandModuleDefs,
     Module,
+    OnError,
 } from '../../types/core-modules';
 import { CommandType } from '../structures';
 
@@ -12,8 +13,8 @@ interface MetadataAccess {
 }
 
 interface OnErrorAccess {
-    getErrorCallback(m: Module): Record<string,Function>|undefined;
-    setErrorCallback(m: Module, c: Record<string,Function>): void;
+    getErrorCallback(m: Module): OnError;
+    setErrorCallback(m: Module, c: NonNullable<OnError>): void;
 }
 /**
  * @since 2.0.0

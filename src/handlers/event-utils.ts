@@ -30,7 +30,7 @@ import { SernEmitter } from '../core';
 import { Err, Ok, Result } from 'ts-results-es';
 import type { Awaitable } from '../types/utility';
 import type { ControlPlugin } from '../types/core-plugin';
-import type { AnyModule, CommandModule, Module, Processed } from '../types/core-modules';
+import type { AnyModule, CommandModule, Module, OnError, Processed } from '../types/core-modules';
 import type { ImportPayload } from '../types/core';
 
 function createGenericHandler<Source, Narrowed extends Source, Output>(
@@ -175,7 +175,7 @@ export function executeModule(
  */
 export function createResultResolver<
     T extends { execute: (...args: any[]) => any; onEvent: ControlPlugin[] },
-    Args extends { module: T; onError: Record<string, Function>|undefined, [key: string]: unknown },
+    Args extends { module: T; onError: OnError, [key: string]: unknown },
     Output,
 >(config: {
     onStop?: (module: T) => unknown;
@@ -225,7 +225,7 @@ export function makeModuleExecutor<
     Args extends { 
         module: M;
         args: unknown[];
-        onError: Record<string,Function>|undefined
+        onError: OnError 
     },
 >(onStop: (m: M) => unknown) {
     const onNext = ({ args, module, onError }: Args) => ({

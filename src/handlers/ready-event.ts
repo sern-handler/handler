@@ -7,7 +7,7 @@ import { buildModules, callInitPlugins } from './_internal';
 import * as assert from 'node:assert';
 import * as util from 'node:util';
 import type { DependencyList } from '../types/ioc';
-import type { AnyModule, Processed } from '../types/core-modules';
+import type { AnyModule, OnError, Processed } from '../types/core-modules';
 
 export function startReadyEvent(
     [sEmitter, , , moduleManager, client]: DependencyList,
@@ -30,7 +30,7 @@ const once = () => pipe(
     ignoreElements()
 )
 
-const registerOnError = (manager: ModuleManager, module: Processed<AnyModule>, onError: Record<string,Function>|undefined) => {
+const registerOnError = (manager: ModuleManager, module: Processed<AnyModule>, onError: OnError) => {
     if(onError) {
         manager.setErrorCallback(module, onError) 
     }

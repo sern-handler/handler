@@ -5,7 +5,7 @@ import { basename, extname, join, resolve, parse } from 'path';
 import assert from 'assert';
 import { createRequire } from 'node:module';
 import type { ImportPayload, Wrapper } from '../types/core';
-import type { Module } from '../types/core-modules';
+import type { Module, OnError } from '../types/core-modules';
 
 export type ModuleResult<T> = Promise<ImportPayload<T>>;
 
@@ -37,7 +37,7 @@ export async function importModule<T>(absPath: string) {
         .unwrapOr({ module: commandModule, onError }) as T;
 }
 interface FileExtras { 
-    onError : Record<string, Function>|undefined 
+    onError : OnError
 }
 
 export async function defaultModuleLoader<T extends Module>(absPath: string): ModuleResult<T> {

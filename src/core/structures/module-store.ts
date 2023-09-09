@@ -1,4 +1,4 @@
-import { CommandMeta, Module } from '../../types/core-modules';
+import { CommandMeta, Module, OnError } from '../../types/core-modules';
 import { CoreModuleStore } from '../contracts';
 
 /*
@@ -7,7 +7,7 @@ import { CoreModuleStore } from '../contracts';
  * For interacting with modules, use the ModuleManager instead.
  */
 export class ModuleStore implements CoreModuleStore {
-    onError = new WeakMap<Module, Record<string, Function>>();
+    onError = new WeakMap<Module, NonNullable<OnError>>();
     metadata = new WeakMap<Module, CommandMeta>();
     commands = new Map<string, string>();
 }
