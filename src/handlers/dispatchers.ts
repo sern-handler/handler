@@ -11,7 +11,7 @@ import {
 import { createResultResolver } from './event-utils';
 import { BaseInteraction, Message } from 'discord.js';
 import { CommandType, Context } from '../core';
-import type { Args } from '../types/utility';
+import type { AnyFunction, Args } from '../types/utility';
 import type { CommandModule, Module, OnError, Processed } from '../types/core-modules';
 
 //TODO: refactor dispatchers so that it implements a strategy for each different type of payload?
@@ -32,7 +32,7 @@ function interactionArg<T extends BaseInteraction>(interaction: T) {
     return [interaction] as [T];
 }
 
-function intoPayload(module: Processed<Module>, onError: OnError) {
+function intoPayload(module: Processed<Module>, onError: AnyFunction|undefined) {
     return pipe(
         arrayifySource,
         map(args => ({ module, args, onError })),
@@ -41,7 +41,7 @@ function intoPayload(module: Processed<Module>, onError: OnError) {
 
 const createResult = createResultResolver<
     Processed<Module>,
-    { module: Processed<Module>; args: unknown[], onError: OnError },
+    { module: Processed<Module>; args: unknown[], onError: AnyFunction|undefined },
     unknown[]
 >({
     createStream: ({ module, args }) => from(module.onEvent).pipe(callPlugin(args)),
@@ -59,7 +59,7 @@ export function eventDispatcher(module: Processed<Module>, onError: OnError, sou
         module.execute(...args),
     );
     return fromEvent(source, module.name).pipe(
-        intoPayload(module, onError),
+        intoPayload(module, onError?.default),
         concatMap(createResult),
         execute,
     );
@@ -83,21 +83,28 @@ export function createDispatcher(payload: {
                     option,
                     Error(SernError.NotSupportedInteraction + ` There is no autocomplete tag for this option`),
                 );
+                const { command, name, parent } = option;
+                const resolvedErrorHandler = parent 
+                    ? 'option:'+parent+':'+name
+                    : 'option:'+name
              	return {
-             	    module: option.command as Processed<Module>, //autocomplete is not a true "module" warning cast!
+                    ...payload,
+             	    module: command as Processed<Module>, //autocomplete is not a true "module" warning cast!
              	    args: [payload.event],
-                    onError: undefined
+                    onError: payload.onError?.[resolvedErrorHandler]
              	};
             }
             return { 
                 args: contextArgs(payload.event),
-                ...payload
+                ...payload,
+                onError: payload.onError?.default
             }; 
         }
         default:
             return {
                 args: interactionArg(payload.event),
-                ...payload
+                ...payload,
+                onError: payload.onError?.default
             }
     }
 }

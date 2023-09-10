@@ -36,7 +36,7 @@ export function partitionPlugins(
 export function treeSearch(
     iAutocomplete: AutocompleteInteraction,
     options: SernOptionsData[] | undefined,
-): SernAutocompleteData | undefined {
+): SernAutocompleteData & { parent?: string } | undefined {
     if (options === undefined) return undefined;
     //clone to prevent mutation of original command module
     const _options = options.map(a => ({ ...a }));
@@ -68,11 +68,11 @@ export function treeSearch(
                             const parentAndOptionMatches =
                                 subcommands.has(parent) && cur.name === choice.name;
                             if (parentAndOptionMatches) {
-                                return cur;
+                                return { ...cur, parent };
                             }
                         } else {
                             if (cur.name === choice.name) {
-                                return cur;
+                                return { ...cur, parent: undefined };
                             }
                         }
                     }

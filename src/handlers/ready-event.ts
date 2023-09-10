@@ -7,7 +7,7 @@ import { buildModules, callInitPlugins } from './_internal';
 import * as assert from 'node:assert';
 import * as util from 'node:util';
 import type { DependencyList } from '../types/ioc';
-import type { AnyModule, OnError, Processed } from '../types/core-modules';
+import type { AnyModule, Processed } from '../types/core-modules';
 
 export function startReadyEvent(
     [sEmitter, , , moduleManager, client]: DependencyList,
@@ -17,11 +17,9 @@ export function startReadyEvent(
 
     return concat(ready$, buildModules<AnyModule>(allPaths, moduleManager))
         .pipe(callInitPlugins(sEmitter))
-        .subscribe(({ module, onError }) => {
+        .subscribe(({ module }) => {
             register(moduleManager, module)
                 .expect(SernError.InvalidModuleType + ' ' + util.inspect(module));
-            registerOnError(moduleManager, module, onError);
-            
         });
 }
 
@@ -30,11 +28,6 @@ const once = () => pipe(
     ignoreElements()
 )
 
-const registerOnError = (manager: ModuleManager, module: Processed<AnyModule>, onError: OnError) => {
-    if(onError) {
-        manager.setErrorCallback(module, onError) 
-    }
-}
 
 function register<T extends Processed<AnyModule>>(
     manager: ModuleManager,

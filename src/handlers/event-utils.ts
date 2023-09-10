@@ -24,11 +24,11 @@ import {
     useContainerRaw,
 } from '../core/_internal';
 import { Emitter, ErrorHandling, Logging, ModuleManager } from '../core';
-import { contextArgs, createDispatcher, dispatchMessage } from './dispatchers';
+import { contextArgs, createDispatcher } from './dispatchers';
 import { ObservableInput, pipe } from 'rxjs';
 import { SernEmitter } from '../core';
 import { Err, Ok, Result } from 'ts-results-es';
-import type { Awaitable } from '../types/utility';
+import type { AnyFunction, Awaitable } from '../types/utility';
 import type { ControlPlugin } from '../types/core-plugin';
 import type { AnyModule, CommandModule, Module, OnError, Processed } from '../types/core-modules';
 import type { ImportPayload } from '../types/core';
@@ -97,13 +97,13 @@ export function createMessageHandler(
         const fullPath = mg.get(`${prefix}_A1`);
 
         if(!fullPath) {
-            return Err('Possibly undefined behavior: could not find a static id to resolve  ')
+            return Err('Possibly undefined behavior: could not find a static id to resolve')
         }
         return Files
             .defaultModuleLoader<Processed<CommandModule>>(fullPath)
             .then(payload => {
                 const args = contextArgs(event, rest);
-                return Ok({ args, ...payload });
+                return Ok({ args, ...payload, onError: payload.onError?.default });
             });
     });
 }
@@ -136,7 +136,8 @@ export function buildModules<T extends AnyModule>(
 interface ExecutePayload {
     module: Processed<Module>;
     task: () => Awaitable<unknown>;
-    onError: OnError
+    onError: AnyFunction|undefined 
+    args: unknown[]
 }
 /**
  * Wraps the task in a Result as a try / catch.
@@ -151,7 +152,8 @@ export function executeModule(
     {
         module,
         task,
-        onError
+        onError,
+        args
     }: ExecutePayload,
 ) {
     return of(module).pipe(
@@ -163,7 +165,8 @@ export function executeModule(
                 return EMPTY;
             } else {
                 if(onError) {
-                    
+                    console.log(onError())
+                    return EMPTY
                 }
                 return throwError(() => SernEmitter.failure(module, result.error));
             }
@@ -182,7 +185,7 @@ export function executeModule(
  */
 export function createResultResolver<
     T extends { execute: (...args: any[]) => any; onEvent: ControlPlugin[] },
-    Args extends { module: T; onError: OnError, [key: string]: unknown },
+    Args extends { module: T; onError: unknown, [key: string]: unknown },
     Output,
 >(config: {
     onStop?: (module: T) => unknown;
@@ -217,7 +220,7 @@ export function callInitPlugins<T extends Processed<AnyModule>>(sernEmitter: Emi
             },
             onNext: ({ module, onError }) => {
                 sernEmitter.emit('module.register', SernEmitter.success(module));
-                return { module, onError };
+                return { module, onError: onError as OnError };
             },
         }),
     );
@@ -232,13 +235,14 @@ export function makeModuleExecutor<
     Args extends { 
         module: M;
         args: unknown[];
-        onError: OnError 
+        onError: AnyFunction|undefined 
     },
 >(onStop: (m: M) => unknown) {
     const onNext = ({ args, module, onError }: Args) => ({
         task: () => module.execute(...args),
         module,
-        onError
+        onError,
+        args
     });
     return concatMap(
         createResultResolver({
