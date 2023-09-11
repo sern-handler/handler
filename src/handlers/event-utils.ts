@@ -149,6 +149,7 @@ interface ExecutePayload {
  */
 export function executeModule(
     emitter: Emitter,
+    errHandler: ErrorHandling,
     {
         module,
         task,
@@ -165,7 +166,7 @@ export function executeModule(
                 return EMPTY;
             } else {
                 if(onError) {
-                    console.log(onError())
+                    const result = onError()
                     return EMPTY
                 }
                 return throwError(() => SernEmitter.failure(module, result.error));

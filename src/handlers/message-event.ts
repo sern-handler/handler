@@ -23,7 +23,7 @@ function hasPrefix(prefix: string, content: string) {
 }
 
 export function messageHandler(
-    [emitter, , log, modules, client]: DependencyList,
+    [emitter, err, log, modules, client]: DependencyList,
     defaultPrefix: string | undefined,
 ) {
     if (!defaultPrefix) {
@@ -42,6 +42,6 @@ export function messageHandler(
         makeModuleExecutor(module => {
             emitter.emit('module.activate', SernEmitter.failure(module, SernError.PluginFailure));
         }),
-        concatMap(payload => executeModule(emitter, payload)),
+        concatMap(payload => executeModule(emitter, err, payload)),
     );
 }

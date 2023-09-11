@@ -3,8 +3,6 @@
         "rootDir": "src",
         "strict": true,
         "esModuleInterop": true,
-        "noImplicitAny": true,
-        "experimentalDecorators": true,
         "strictNullChecks": true,
         "moduleResolution": "node",
         "skipLibCheck": true,
