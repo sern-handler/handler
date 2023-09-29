@@ -11,8 +11,8 @@ import {
 import { CoreContext } from '../structures/core-context';
 import { Result, Ok, Err } from 'ts-results-es';
 import * as assert from 'assert';
+import { ReplyOptions } from '../../types/utility';
 
-type ReplyOptions = string | Omit<InteractionReplyOptions, 'fetchReply'> | MessageReplyOptions;
 
 /**
  * @since 1.0.0
@@ -103,9 +103,9 @@ export class Context extends CoreContext<Message, ChatInputCommandInteraction> {
     public async reply(content: ReplyOptions) {
         return safeUnwrap(
             this.ctx
-                .map(m => m.reply(content as string | MessageReplyOptions))
+                .map(m => m.reply(content as MessageReplyOptions))
                 .mapErr(i =>
-                    i.reply(content as string | InteractionReplyOptions).then(() => i.fetchReply()),
+                    i.reply(content as InteractionReplyOptions).then(() => i.fetchReply()),
                 ),
         );
     }

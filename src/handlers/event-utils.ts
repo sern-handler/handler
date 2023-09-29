@@ -23,7 +23,7 @@ import {
     VoidResult,
     useContainerRaw,
 } from '../core/_internal';
-import { Emitter, ErrorHandling, Logging, ModuleManager } from '../core';
+import { CommandError, Emitter, ErrorHandling, Logging, ModuleManager } from '../core';
 import { contextArgs, createDispatcher } from './dispatchers';
 import { ObservableInput, pipe } from 'rxjs';
 import { SernEmitter } from '../core';
@@ -166,7 +166,8 @@ export function executeModule(
                 return EMPTY;
             } else {
                 if(onError) {
-                    const result = onError()
+                    const payload = onError() as CommandError.Response
+                    
                     return EMPTY
                 }
                 return throwError(() => SernEmitter.failure(module, result.error));
