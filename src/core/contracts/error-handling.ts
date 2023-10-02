@@ -10,7 +10,7 @@ export interface ErrorHandling {
      */
     crash(err: Error): never;
     /**
-     * A function that is called on every crash.
+     * A function that is called on every throw.
      * @param error
      */
     updateAlive(error: Error): void;

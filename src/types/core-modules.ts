@@ -21,6 +21,11 @@ import { Awaitable, Args, SlashOptions, SernEventsMapping, AnyFunction } from '.
 
 export type OnError = Record<string, AnyFunction>|undefined
 
+export interface ErrorResponse<T> {
+    status: 'throw' | 'handle' 
+    body: T
+}
+
 export interface CommandMeta {
     fullPath: string;
     id: string;

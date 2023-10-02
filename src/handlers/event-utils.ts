@@ -30,7 +30,7 @@ import { SernEmitter } from '../core';
 import { Err, Ok, Result } from 'ts-results-es';
 import type { AnyFunction, Awaitable } from '../types/utility';
 import type { ControlPlugin } from '../types/core-plugin';
-import type { AnyModule, CommandModule, Module, OnError, Processed } from '../types/core-modules';
+import type { AnyModule, CommandModule, ErrorResponse, Module, OnError, Processed } from '../types/core-modules';
 import type { ImportPayload } from '../types/core';
 
 function createGenericHandler<Source, Narrowed extends Source, Output>(
@@ -166,8 +166,11 @@ export function executeModule(
                 return EMPTY;
             } else {
                 if(onError) {
-                    const payload = onError() as CommandError.Response
-                    
+                    const err = onError() as CommandError.Response
+                    if(!err) {
+                        return throwError(() => 
+                                          SernEmitter.failure(module, "Failed to handle onError: returned nothing"));
+                    }
                     return EMPTY
                 }
                 return throwError(() => SernEmitter.failure(module, result.error));
