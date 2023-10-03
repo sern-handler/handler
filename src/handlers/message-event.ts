@@ -42,6 +42,6 @@ export function messageHandler(
         makeModuleExecutor(module => {
             emitter.emit('module.activate', SernEmitter.failure(module, SernError.PluginFailure));
         }),
-        concatMap(payload => executeModule(emitter, err, payload)),
+        concatMap(payload => executeModule(emitter, log, err, payload)),
     );
 }

@@ -30,7 +30,7 @@ import { SernEmitter } from '../core';
 import { Err, Ok, Result } from 'ts-results-es';
 import type { AnyFunction, Awaitable } from '../types/utility';
 import type { ControlPlugin } from '../types/core-plugin';
-import type { AnyModule, CommandModule, ErrorResponse, Module, OnError, Processed } from '../types/core-modules';
+import type { AnyModule, CommandModule, Module, OnError, Processed } from '../types/core-modules';
 import type { ImportPayload } from '../types/core';
 
 function createGenericHandler<Source, Narrowed extends Source, Output>(
@@ -149,6 +149,7 @@ interface ExecutePayload {
  */
 export function executeModule(
     emitter: Emitter,
+    logger: Logging|undefined,
     errHandler: ErrorHandling,
     {
         module,
@@ -164,17 +165,22 @@ export function executeModule(
             if (result.isOk()) {
                 emitter.emit('module.activate', SernEmitter.success(module));
                 return EMPTY;
-            } else {
-                if(onError) {
-                    const err = onError() as CommandError.Response
-                    if(!err) {
-                        return throwError(() => 
-                                          SernEmitter.failure(module, "Failed to handle onError: returned nothing"));
-                    }
-                    return EMPTY
+            } 
+            if(onError) {
+                const err = onError() as CommandError.Response
+                if(!err) {
+                    return throwError(() => 
+                                      SernEmitter.failure(module, "Failed to handle onError: returned nothing"));
                 }
-                return throwError(() => SernEmitter.failure(module, result.error));
+                if(err.log) {
+                    const { type, message } = err.log;
+                    logger?.[type]({ message });
+                };
+                    
+                return EMPTY
             }
+            return throwError(() => SernEmitter.failure(module, result.error));
+            
         }),
     );
 }
