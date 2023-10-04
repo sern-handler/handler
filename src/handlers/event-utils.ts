@@ -32,6 +32,7 @@ import type { AnyFunction, Awaitable } from '../types/utility';
 import type { ControlPlugin } from '../types/core-plugin';
 import type { AnyModule, CommandModule, Module, OnError, Processed } from '../types/core-modules';
 import type { ImportPayload } from '../types/core';
+import assert from 'node:assert';
 
 function createGenericHandler<Source, Narrowed extends Source, Output>(
     source: Observable<Source>,
@@ -167,17 +168,27 @@ export function executeModule(
                 return EMPTY;
             } 
             if(onError) {
+                //Could be promise
                 const err = onError() as CommandError.Response
                 if(!err) {
-                    return throwError(() => 
-                                      SernEmitter.failure(module, "Failed to handle onError: returned nothing"));
+                    const failure = SernEmitter.failure(module, "Handling onError: returned undefined");
+                    return throwError(() => failure);
                 }
                 if(err.log) {
                     const { type, message } = err.log;
                     logger?.[type]({ message });
                 };
-                    
-                return EMPTY
+                //args[0] will be Repliable ( has reply method ), unless it is autocomplete
+                const apiObject = args[0];
+                assert(apiObject && typeof apiObject === 'object', "Args[0] was falsy while trying to create onError");
+                assert(err.body, "Body of error response cannot be empty");
+                if('reply' in apiObject && typeof apiObject.reply === 'function') {
+                    return from(apiObject.reply(err.body))
+                } 
+                if('respond' in apiObject && typeof apiObject.respond === 'function') {
+                    return from(apiObject.respond(err.body))
+                }
+                return EMPTY;
             }
             return throwError(() => SernEmitter.failure(module, result.error));
             
