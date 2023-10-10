@@ -20,17 +20,33 @@ export function useContainerRaw() {
     return containerSubject;
 }
 
+const dependencyBuilder = (container: any) => {
+    const excluded = new Set();
+    return {
+        add(key: keyof Dependencies, v: Function) {
+            container.add(key, v);
+        },
+        exclude(key: keyof Dependencies) {
+           excluded.add(key); 
+        },
+        update(key: keyof Dependencies, v: Function) {
+            container.upsert(key, v);
+        },
+    };
+};
+
+
 /**
  * @since 2.0.0
  * @param conf a configuration for creating your project dependencies
  */
 export async function makeDependencies<const T extends Dependencies>(
-    conf: DependencyConfiguration,
+    conf: (builder: ReturnType<typeof dependencyBuilder>) => DependencyConfiguration,
 ) {
     //Until there are more optional dependencies, just check if the logger exists
     //SIDE EFFECT
     containerSubject = new CoreContainer();
-    await composeRoot(containerSubject, conf);
+    await composeRoot(containerSubject, conf(dependencyBuilder(containerSubject)));
 
     return useContainer<T>();
 }
