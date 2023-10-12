@@ -1,5 +1,15 @@
-import { ClientEvents } from 'discord.js';
-import { CommandType, EventType, PluginType } from '../core/structures';
+import {
+    ButtonInteraction,
+    ChannelSelectMenuInteraction,
+    ClientEvents,
+    MentionableSelectMenuInteraction,
+    MessageContextMenuCommandInteraction,
+    ModalSubmitInteraction,
+    RoleSelectMenuInteraction,
+    StringSelectMenuInteraction,
+    UserSelectMenuInteraction,
+} from 'discord.js';
+import { CommandType, Context, EventType, PluginType } from '../core/structures';
 import type {
     AnyCommandPlugin,
     AnyEventPlugin,
@@ -14,9 +24,10 @@ import type {
     InputCommand,
     InputEvent,
     Module,
+    SernOptionsData,
 } from '../types/core-modules';
 import { partitionPlugins } from './_internal';
-import type { Awaitable } from '../types/utility';
+import type { Args, Awaitable, SlashOptions } from '../types/utility';
 
 /**
  * @since 1.0.0 The wrapper function to define command modules for sern
@@ -30,6 +41,174 @@ export function commandModule(mod: InputCommand): CommandModule {
         plugins,
     } as CommandModule;
 }
+/**
+ * @since 3.2.0 The wrapper function to create Both Commands for sern.
+ * @param mod
+ */
+export function bothCommand(mod: {
+    name?: string;
+    description: string;
+    options?: SernOptionsData[];
+    plugins?: (InitPlugin | ControlPlugin)[];
+    execute: (ctx: Context, options: Args) => Awaitable<unknown>;
+}): CommandModule {
+    return commandModule({
+        type: CommandType.Both,
+        ...mod,
+    });
+}
+/**
+ * @since 3.2.0 The wrapper function to create Slash Commands for sern.
+ * @param mod
+ */
+export function slashCommand(mod: {
+    name?: string;
+    description: string;
+    options?: SernOptionsData[];
+    plugins?: (InitPlugin | ControlPlugin)[];
+    execute: (ctx: Context, options: ['slash', SlashOptions]) => Awaitable<unknown>;
+}) {
+    return commandModule({
+        type: CommandType.Slash,
+        ...mod,
+    });
+}
+/**
+ * @since 3.2.0 The wrapper function to create Text Commands for sern.
+ * @param mod
+ */
+export function textCommand(mod: {
+    name?: string;
+    description: string;
+    plugins?: AnyCommandPlugin[];
+    execute: (ctx: Context, options: ['text', string[]]) => Awaitable<unknown>;
+}) {
+    return commandModule({
+        type: CommandType.Text,
+        ...mod,
+    });
+}
+/**
+ * @since 3.2.0 The wrapper function to create Modal Commands for sern.
+ * @param mod
+ */
+export function modalCommand(mod: {
+    name?: string;
+    description: string;
+    plugins?: AnyCommandPlugin[];
+    execute: (ctx: ModalSubmitInteraction) => Awaitable<unknown>;
+}) {
+    return commandModule({
+        type: CommandType.Modal,
+        ...mod,
+    });
+}
+/**
+ * @since 3.2.0 The wrapper function to create Button Commands for sern.
+ * @param mod
+ */
+export function buttonCommand(mod: {
+    name?: string;
+    description: string;
+    plugins?: AnyCommandPlugin[];
+    execute: (ctx: ButtonInteraction) => Awaitable<unknown>;
+}) {
+    return commandModule({
+        type: CommandType.Button,
+        ...mod,
+    });
+}
+/**
+ * @since 3.2.0 The wrapper function to create String Select Menu Commands for sern.
+ * @param mod
+ */
+export function stringSelectMenuCommand(mod: {
+    name?: string;
+    description: string;
+    plugins?: AnyCommandPlugin[];
+    execute: (ctx: StringSelectMenuInteraction) => Awaitable<unknown>;
+}) {
+    return commandModule({
+        type: CommandType.StringSelect,
+        ...mod,
+    });
+}
+/**
+ * @since 3.2.0 The wrapper function to create Mention Select Menu Commands for sern.
+ * @param mod
+ */
+export function mentionableSelectMenuCommand(mod: {
+    name?: string;
+    description: string;
+    plugins?: AnyCommandPlugin[];
+    execute: (ctx: MentionableSelectMenuInteraction) => Awaitable<unknown>;
+}) {
+    return commandModule({
+        type: CommandType.MentionableSelect,
+        ...mod,
+    });
+}
+/**
+ * @since 3.2.0 The wrapper function to create Channel Select Menu Commands for sern.
+ * @param mod
+ */
+export function channelSelectMenuCommand(mod: {
+    name?: string;
+    description: string;
+    plugins?: AnyCommandPlugin[];
+    execute: (ctx: ChannelSelectMenuInteraction) => Awaitable<unknown>;
+}) {
+    return commandModule({
+        type: CommandType.ChannelSelect,
+        ...mod,
+    });
+}
+/**
+ * @since 3.2.0 The wrapper function to create User Select Menu Commands for sern.
+ * @param mod
+ */
+export function userSelectMenuCommand(mod: {
+    name?: string;
+    description: string;
+    plugins?: AnyCommandPlugin[];
+    execute: (ctx: UserSelectMenuInteraction) => Awaitable<unknown>;
+}) {
+    return commandModule({
+        type: CommandType.UserSelect,
+        ...mod,
+    });
+}
+/**
+ * @since 3.2.0 The wrapper function to create Role Select Menu Commands for sern.
+ * @param mod
+ */
+export function roleSelectMenuCommand(mod: {
+    name?: string;
+    description: string;
+    plugins?: AnyCommandPlugin[];
+    execute: (ctx: RoleSelectMenuInteraction) => Awaitable<unknown>;
+}) {
+    return commandModule({
+        type: CommandType.RoleSelect,
+        ...mod,
+    });
+}
+/**
+ * @since 3.2.0 The wrapper function to create Msg Context2 Menu Commands for sern.
+ * @param mod
+ */
+export function msgContextMenuCommand(mod: {
+    name?: string;
+    description: string;
+    plugins?: AnyCommandPlugin[];
+    execute: (ctx: MessageContextMenuCommandInteraction) => Awaitable<unknown>;
+}) {
+    return commandModule({
+        type: CommandType.CtxMsg,
+        ...mod,
+    });
+}
+
 /**
  * @since 1.0.0
  * The wrapper function to define event modules for sern
@@ -76,7 +255,7 @@ function prepareClassPlugins(c: Module) {
  */
 export abstract class CommandExecutable<const Type extends CommandType = CommandType> {
     abstract type: Type;
-    plugins: AnyCommandPlugin[] = [];
+    plugins?: AnyCommandPlugin[] = [];
     private static _instance: CommandModule;
 
     static getInstance() {
@@ -97,7 +276,7 @@ export abstract class CommandExecutable<const Type extends CommandType = Command
  */
 export abstract class EventExecutable<Type extends EventType> {
     abstract type: Type;
-    plugins: AnyEventPlugin[] = [];
+    plugins?: AnyEventPlugin[] = [];
 
     private static _instance: EventModule;
     static getInstance() {

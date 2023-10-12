@@ -15,7 +15,7 @@
     },
     "scripts": {
         "watch": "tsup --watch",
-        "clean-modules": "rimraf node_modules/ && npm install",
+        "clean-modules": "rimraf node_modules/ && yarn install",
         "lint": "eslint src/**/*.ts",
         "format": "eslint src/**/*.ts --fix",
         "build:dev": "tsup --metafile",
