@@ -1,4 +1,4 @@
-import {
+import type {
     ButtonInteraction,
     ChannelSelectMenuInteraction,
     ClientEvents,
@@ -205,7 +205,7 @@ export function roleSelectMenuCommand(mod: {
 }
 
 /**
- * @since 3.2.0 The wrapper function to create Msg Context2 Menu Commands for sern.
+ * @since 3.2.0 The wrapper function to create Msg Context Menu Commands for sern.
  * @param mod
  */
 export function msgContextMenuCommand(mod: {
