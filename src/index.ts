@@ -44,13 +44,22 @@ export type { Singleton, Transient, CoreDependencies, Initializable } from './ty
 
 export {
     commandModule,
+    bothCommand,
+    textCommand,
+    modalCommand,
+    slashCommand,
+    buttonCommand,
+    msgContextMenuCommand,
+    roleSelectMenuCommand,
+    userSelectMenuCommand,
+    stringSelectMenuCommand,
+    channelSelectMenuCommand,
+    mentionableSelectMenuCommand,
     eventModule,
     discordEvent,
     EventExecutable,
     CommandExecutable,
 } from './core/modules';
 
-export {
-    useContainerRaw
-} from './core/_internal'
+export { useContainerRaw } from './core/_internal';
 export { controller } from './sern';
