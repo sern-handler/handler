@@ -159,6 +159,33 @@ export function executeModule(
         args
     }: ExecutePayload,
 ) {
+    const onError$ = (err) => {
+        if(!onError) {
+            return throwError(() => SernEmitter.failure(module, err));
+        }
+        //Could be promise
+        const err = onError() as CommandError.Response
+        if(!err) {
+            const failure = SernEmitter.failure(module, "Handling onError: returned undefined");
+            return throwError(() => failure);
+        }
+        if(err.log) {
+           const { type, message } = err.log;
+           logger?.[type]({ message });
+        };
+        //args[0] will be Repliable ( has reply method ), unless it is autocomplete
+        const apiObject = args[0];
+        assert(apiObject && typeof apiObject === 'object', "Args[0] was falsy while trying to create onError");
+        assert(err.body, "Body of error response cannot be empty");
+        if('reply' in apiObject && typeof apiObject.reply === 'function') {
+            return from(apiObject.reply(err.body))
+        } 
+        if('respond' in apiObject && typeof apiObject.respond === 'function') {
+            return from(apiObject.respond(err.body))
+        }
+        return EMPTY;
+
+    }
     return of(module).pipe(
         //converting the task into a promise so rxjs can resolve the Awaitable properly
         concatMap(() => Result.wrapAsync(async () => task())),
@@ -167,30 +194,7 @@ export function executeModule(
                 emitter.emit('module.activate', SernEmitter.success(module));
                 return EMPTY;
             } 
-            if(onError) {
-                //Could be promise
-                const err = onError() as CommandError.Response
-                if(!err) {
-                    const failure = SernEmitter.failure(module, "Handling onError: returned undefined");
-                    return throwError(() => failure);
-                }
-                if(err.log) {
-                    const { type, message } = err.log;
-                    logger?.[type]({ message });
-                };
-                //args[0] will be Repliable ( has reply method ), unless it is autocomplete
-                const apiObject = args[0];
-                assert(apiObject && typeof apiObject === 'object', "Args[0] was falsy while trying to create onError");
-                assert(err.body, "Body of error response cannot be empty");
-                if('reply' in apiObject && typeof apiObject.reply === 'function') {
-                    return from(apiObject.reply(err.body))
-                } 
-                if('respond' in apiObject && typeof apiObject.respond === 'function') {
-                    return from(apiObject.respond(err.body))
-                }
-                return EMPTY;
-            }
-            return throwError(() => SernEmitter.failure(module, result.error));
+            return onError$(result.error);
             
         }),
     );
