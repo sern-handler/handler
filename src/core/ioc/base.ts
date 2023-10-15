@@ -21,23 +21,28 @@ export function useContainerRaw() {
 }
 
 const dependencyBuilder = (container: any) => {
+    type Insertable = (container: CoreContainer<Dependencies>) => any;
     const excluded = new Set();
     return {
-        add(key: keyof Dependencies, v: Function) {
+        add(key: keyof Dependencies, v: Insertable) {
             Result
                 .wrap(() => container.add(key, v))
                 .expect("Failed to add " + key);
         },
-        exclude(key: keyof Dependencies) {
-            Result
-                .wrap(() => excluded.add(key, v))
-                .expect("Failed to exclude " + key);
+        exclude(...keys: (keyof Dependencies)[]) {
+            keys.forEach(key => excluded.add(key));
         },
-        update(key: keyof Dependencies, v: Function) {
+        update(key: keyof Dependencies, v: Insertable) {
             Result
                 .wrap(() => container.upsert(key, v))
                 .expect("Failed to update " + key);
         },
+        /**
+          Internal method. do not call this!
+         **/
+        get __excluded() {
+            return excluded
+        }
     };
 };
 
@@ -47,27 +52,20 @@ type ValidDependencyConfig =
     | CallbackBuilder
     | DependencyConfiguration;
     
-/**
- * @since 3.2.0
- * @param conf a configuration for creating your project dependencies
- */
-export async function makeDependencies<const T extends Dependencies>(conf: CallbackBuilder);
-/**
- * @since 2.0.0
- * @param conf a configuration for creating your project dependencies
- */
-export async function makeDependencies<const T extends Dependencies>(conf: DependencyConfiguration);
+
 export async function makeDependencies<const T extends Dependencies>(
     conf: ValidDependencyConfig
 ) {
     //Until there are more optional dependencies, just check if the logger exists
     //SIDE EFFECT
     containerSubject = new CoreContainer();
-    const typeOfConfig = typeof conf;
-    if(typeOfConfig === 'function') {
+    if(typeof conf === 'function') {
+        const resultContainer = dependencyBuilder(containerSubject);
+        const builtContainer = conf(dependencyBuilder(containerSubject));
+        
         // todo
     } else {
-        await composeRoot(containerSubject, conf(builder));
+        await composeRoot(containerSubject, conf);
     }
 
     return useContainer<T>();
