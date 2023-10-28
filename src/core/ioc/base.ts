@@ -22,7 +22,9 @@ export function useContainerRaw() {
 }
 
 const dependencyBuilder = (container: any, excluded: Set<string>) => {
-    type Insertable = (container: CoreContainer<Dependencies>) => any;
+    type Insertable = 
+        | ((container: CoreContainer<Dependencies>) => unknown)
+        | Record<PropertyKey, any>
     return {
         add(key: keyof Dependencies, v: Insertable) {
             Result
