@@ -12,6 +12,7 @@ import * as Hooks from './hooks'
  */
 export class CoreContainer<T extends Partial<Dependencies>> extends Container<T, {}> {
     private ready$ = new Subject<void>();
+    private excluded = new Set();
     constructor() {
         super();
         assert.ok(!this.isReady(), 'Listening for dispose & init should occur prior to sern being ready.');
@@ -34,10 +35,11 @@ export class CoreContainer<T extends Partial<Dependencies>> extends Container<T,
             });
     }
 
-
     isReady() {
-
         return this.ready$.closed;
+    }
+    addExcluded() {
+
     }
     override async disposeAll() {
         

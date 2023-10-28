@@ -3,6 +3,7 @@ import { composeRoot, useContainer } from './dependency-injection';
 import type { DependencyConfiguration } from '../../types/ioc';
 import { CoreContainer } from './container';
 import { Result } from 'ts-results-es'
+import { DefaultServices } from '../_internal';
 //SIDE EFFECT: GLOBAL DI
 let containerSubject: CoreContainer<Partial<Dependencies>>;
 
@@ -20,13 +21,12 @@ export function useContainerRaw() {
     return containerSubject;
 }
 
-const dependencyBuilder = (container: any) => {
+const dependencyBuilder = (container: any, excluded: Set<string>) => {
     type Insertable = (container: CoreContainer<Dependencies>) => any;
-    const excluded = new Set();
     return {
         add(key: keyof Dependencies, v: Insertable) {
             Result
-                .wrap(() => container.add(key, v))
+                .wrap(() => container.add({ [key]: v}))
                 .expect("Failed to add " + key);
         },
         exclude(...keys: (keyof Dependencies)[]) {
@@ -34,16 +34,10 @@ const dependencyBuilder = (container: any) => {
         },
         update(key: keyof Dependencies, v: Insertable) {
             Result
-                .wrap(() => container.upsert(key, v))
+                .wrap(() => container.upsert({ [key]: v }))
                 .expect("Failed to update " + key);
         },
-        /**
-          Internal method. do not call this!
-         **/
-        get __excluded() {
-            return excluded
-        }
-    };
+   };
 };
 
 type CallbackBuilder = (c: ReturnType<typeof dependencyBuilder>) => any
@@ -52,7 +46,10 @@ type ValidDependencyConfig =
     | CallbackBuilder
     | DependencyConfiguration;
     
-
+export const insertLogger = (containerSubject: CoreContainer<any>) => {
+    containerSubject
+        .upsert({'@sern/logger': () => DefaultServices.DefaultLogging});
+}
 export async function makeDependencies<const T extends Dependencies>(
     conf: ValidDependencyConfig
 ) {
@@ -60,13 +57,21 @@ export async function makeDependencies<const T extends Dependencies>(
     //SIDE EFFECT
     containerSubject = new CoreContainer();
     if(typeof conf === 'function') {
-        const resultContainer = dependencyBuilder(containerSubject);
-        const builtContainer = conf(dependencyBuilder(containerSubject));
-        
+        const excluded = new Set<string>();
+        conf(dependencyBuilder(containerSubject, excluded));
+        if(!excluded.has('@sern/logger')) {
+            assert.ok(!containerSubject.getTokens()['@sern/logger'])
+            insertLogger(containerSubject);
+        }
+        containerSubject.ready();
+        return useContainer<T>();
         // todo
     } else {
-        await composeRoot(containerSubject, conf);
+        composeRoot(containerSubject, conf);
     }
 
     return useContainer<T>();
 }
+
+
+
