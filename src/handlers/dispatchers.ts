@@ -83,15 +83,12 @@ export function createDispatcher(payload: {
                     option,
                     Error(SernError.NotSupportedInteraction + ` There is no autocomplete tag for this option`),
                 );
-                const { command, name, parent } = option;
-                const resolvedErrorHandler = parent 
-                    ? 'option:'+parent+':'+name
-                    : 'option:'+name
+                const { command } = option;
              	return {
                     ...payload,
              	    module: command as Processed<Module>, //autocomplete is not a true "module" warning cast!
              	    args: [payload.event],
-                    onError: payload.onError?.[resolvedErrorHandler]
+                    onError: undefined
              	};
             }
             return { 

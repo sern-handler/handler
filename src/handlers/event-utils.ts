@@ -27,7 +27,7 @@ import { CommandError, Emitter, ErrorHandling, Logging, ModuleManager } from '..
 import { contextArgs, createDispatcher } from './dispatchers';
 import { ObservableInput, pipe } from 'rxjs';
 import { SernEmitter } from '../core';
-import { Err, Ok, Result } from 'ts-results-es';
+import { Err, ErrImpl, Ok, Result } from 'ts-results-es';
 import type { AnyFunction, Awaitable } from '../types/utility';
 import type { ControlPlugin } from '../types/core-plugin';
 import type { AnyModule, CommandModule, Module, OnError, Processed } from '../types/core-modules';
@@ -159,7 +159,7 @@ export function executeModule(
         args
     }: ExecutePayload,
 ) {
-    const onError$ = (err) => {
+    const onError$ = (err_msg: unknown) => {
         if(!onError) {
             return throwError(() => SernEmitter.failure(module, err));
         }
@@ -177,12 +177,12 @@ export function executeModule(
         const apiObject = args[0];
         assert(apiObject && typeof apiObject === 'object', "Args[0] was falsy while trying to create onError");
         assert(err.body, "Body of error response cannot be empty");
+        if('respond' in apiObject && typeof apiObject.respond === 'function') {
+            return throwError(() => SernEmitter.failure(module, "Cannot handle autocomplete errors"));
+        }
         if('reply' in apiObject && typeof apiObject.reply === 'function') {
             return from(apiObject.reply(err.body))
-        } 
-        if('respond' in apiObject && typeof apiObject.respond === 'function') {
-            return from(apiObject.respond(err.body))
-        }
+        }  
         return EMPTY;
 
     }
