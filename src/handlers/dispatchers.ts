@@ -59,7 +59,7 @@ export function eventDispatcher(module: Processed<Module>, onError: OnError, sou
         module.execute(...args),
     );
     return fromEvent(source, module.name).pipe(
-        intoPayload(module, onError?.default),
+        intoPayload(module, onError),
         concatMap(createResult),
         execute,
     );
@@ -94,14 +94,14 @@ export function createDispatcher(payload: {
             return { 
                 args: contextArgs(payload.event),
                 ...payload,
-                onError: payload.onError?.default
+                onError: payload.onError
             }; 
         }
         default:
             return {
                 args: interactionArg(payload.event),
                 ...payload,
-                onError: payload.onError?.default
+                onError: payload.onError
             }
     }
 }

@@ -19,7 +19,7 @@ import { CommandType, Context, EventType } from '../../src/core';
 import { AnyCommandPlugin, AnyEventPlugin, ControlPlugin, InitPlugin } from './core-plugin';
 import { Awaitable, Args, SlashOptions, SernEventsMapping, AnyFunction } from './utility';
 
-export type OnError = Record<string, AnyFunction>|undefined
+export type OnError = AnyFunction|undefined
 
 
 export interface CommandMeta {

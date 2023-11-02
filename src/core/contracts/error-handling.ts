@@ -10,9 +10,17 @@ export interface ErrorHandling {
      */
     crash(err: Error): never;
     /**
-     * A function that is called on every throw.
+     * A function that is called on every throw,
+     * If and only if the command is not handled properly
      * @param error
      */
     updateAlive(error: Error): void;
+
+    /**
+     * This callback is called if a module  
+     * handles onError with type 'fail'
+     *
+     */
+    handleError(error: Error): void;
 
 }

@@ -27,7 +27,7 @@ import { CommandError, Emitter, ErrorHandling, Logging, ModuleManager } from '..
 import { contextArgs, createDispatcher } from './dispatchers';
 import { ObservableInput, pipe } from 'rxjs';
 import { SernEmitter } from '../core';
-import { Err, ErrImpl, Ok, Result } from 'ts-results-es';
+import { Err, Ok, Result } from 'ts-results-es';
 import type { AnyFunction, Awaitable } from '../types/utility';
 import type { ControlPlugin } from '../types/core-plugin';
 import type { AnyModule, CommandModule, Module, OnError, Processed } from '../types/core-modules';
@@ -104,7 +104,7 @@ export function createMessageHandler(
             .defaultModuleLoader<Processed<CommandModule>>(fullPath)
             .then(payload => {
                 const args = contextArgs(event, rest);
-                return Ok({ args, ...payload, onError: payload.onError?.default });
+                return Ok({ args, ...payload });
             });
     });
 }
@@ -164,27 +164,21 @@ export function executeModule(
             return throwError(() => SernEmitter.failure(module, err));
         }
         //Could be promise
-        const err = onError() as CommandError.Response
+        const err = onError(err_msg) as CommandError.Response
         if(!err) {
-            const failure = SernEmitter.failure(module, "Handling onError: returned undefined");
+            const failure = SernEmitter.failure(module, "onError: returned undefined/null");
             return throwError(() => failure);
         }
         if(err.log) {
            const { type, message } = err.log;
            logger?.[type]({ message });
         };
-        //args[0] will be Repliable ( has reply method ), unless it is autocomplete
-        const apiObject = args[0];
-        assert(apiObject && typeof apiObject === 'object', "Args[0] was falsy while trying to create onError");
-        assert(err.body, "Body of error response cannot be empty");
-        if('respond' in apiObject && typeof apiObject.respond === 'function') {
-            return throwError(() => SernEmitter.failure(module, "Cannot handle autocomplete errors"));
-        }
-        if('reply' in apiObject && typeof apiObject.reply === 'function') {
-            return from(apiObject.reply(err.body))
-        }  
-        return EMPTY;
+        if(err.type === 'fail') {
 
+        } else {
+            
+        }
+        return EMPTY;
     }
     return of(module).pipe(
         //converting the task into a promise so rxjs can resolve the Awaitable properly
@@ -195,7 +189,6 @@ export function executeModule(
                 return EMPTY;
             } 
             return onError$(result.error);
-            
         }),
     );
 }
