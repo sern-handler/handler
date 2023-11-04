@@ -24,7 +24,7 @@ import {
     useContainerRaw,
 } from '../core/_internal';
 import { Emitter, ErrorHandling, Logging, ModuleManager } from '../core';
-import { contextArgs, createDispatcher, dispatchMessage } from './dispatchers';
+import { contextArgs, createDispatcher } from './dispatchers';
 import { ObservableInput, pipe } from 'rxjs';
 import { SernEmitter } from '../core';
 import { Err, Ok, Result } from 'ts-results-es';
@@ -78,8 +78,7 @@ export function createInteractionHandler<T extends Interaction>(
             return Files
                 .defaultModuleLoader<Processed<CommandModule>>(fullPath)
                 .then(payload =>
-                   Ok(createDispatcher({ module: payload.module, event }))
-                );
+                   Ok(createDispatcher({ module: payload.module, event })));
         },
     );
 }
@@ -98,9 +97,9 @@ export function createMessageHandler(
         }
         return Files
             .defaultModuleLoader<Processed<CommandModule>>(fullPath)
-            .then(payload => {
+            .then(({ module })=> {
                 const args = contextArgs(event, rest);
-                return Ok(dispatchMessage(payload.module, args));
+                return Ok({ module, args });
             });
     });
 }
@@ -126,7 +125,9 @@ export function buildModules<T extends AnyModule>(
     input: ObservableInput<string>,
     moduleManager: ModuleManager,
 ) {
-    return Files.buildModuleStream<Processed<T>>(input).pipe(assignDefaults(moduleManager));
+    return Files
+        .buildModuleStream<Processed<T>>(input)
+        .pipe(assignDefaults(moduleManager));
 }
 
 /**
