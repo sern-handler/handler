@@ -82,7 +82,7 @@ export function slashCommand(mod: {
  */
 export function textCommand(mod: {
     name?: string;
-    description: string;
+    description?: string;
     plugins?: AnyCommandPlugin[];
     execute: (ctx: Context, options: ['text', string[]]) => Awaitable<unknown>;
 }) {
@@ -98,7 +98,7 @@ export function textCommand(mod: {
  */
 export function modalCommand(mod: {
     name?: string;
-    description: string;
+    description?: string;
     plugins?: AnyCommandPlugin[];
     execute: (ctx: ModalSubmitInteraction) => Awaitable<unknown>;
 }) {
@@ -114,7 +114,7 @@ export function modalCommand(mod: {
  */
 export function buttonCommand(mod: {
     name?: string;
-    description: string;
+    description?: string;
     plugins?: AnyCommandPlugin[];
     execute: (ctx: ButtonInteraction) => Awaitable<unknown>;
 }) {
@@ -130,7 +130,7 @@ export function buttonCommand(mod: {
  */
 export function stringSelectMenuCommand(mod: {
     name?: string;
-    description: string;
+    description?: string;
     plugins?: AnyCommandPlugin[];
     execute: (ctx: StringSelectMenuInteraction) => Awaitable<unknown>;
 }) {
@@ -146,7 +146,7 @@ export function stringSelectMenuCommand(mod: {
  */
 export function mentionableSelectMenuCommand(mod: {
     name?: string;
-    description: string;
+    description?: string;
     plugins?: AnyCommandPlugin[];
     execute: (ctx: MentionableSelectMenuInteraction) => Awaitable<unknown>;
 }) {
@@ -162,7 +162,7 @@ export function mentionableSelectMenuCommand(mod: {
  */
 export function channelSelectMenuCommand(mod: {
     name?: string;
-    description: string;
+    description?: string;
     plugins?: AnyCommandPlugin[];
     execute: (ctx: ChannelSelectMenuInteraction) => Awaitable<unknown>;
 }) {
@@ -178,7 +178,7 @@ export function channelSelectMenuCommand(mod: {
  */
 export function userSelectMenuCommand(mod: {
     name?: string;
-    description: string;
+    description?: string;
     plugins?: AnyCommandPlugin[];
     execute: (ctx: UserSelectMenuInteraction) => Awaitable<unknown>;
 }) {
@@ -194,7 +194,7 @@ export function userSelectMenuCommand(mod: {
  */
 export function roleSelectMenuCommand(mod: {
     name?: string;
-    description: string;
+    description?: string;
     plugins?: AnyCommandPlugin[];
     execute: (ctx: RoleSelectMenuInteraction) => Awaitable<unknown>;
 }) {
@@ -210,7 +210,7 @@ export function roleSelectMenuCommand(mod: {
  */
 export function msgContextMenuCommand(mod: {
     name?: string;
-    description: string;
+    description?: string;
     plugins?: AnyCommandPlugin[];
     execute: (ctx: MessageContextMenuCommandInteraction) => Awaitable<unknown>;
 }) {
