@@ -50,7 +50,7 @@ export function bothCommand(mod: {
     name?: string;
     description: string;
     options?: SernOptionsData[];
-    plugins?: (InitPlugin | ControlPlugin)[];
+    plugins?: AnyCommandPlugin[];
     execute: (ctx: Context, options: Args) => Awaitable<unknown>;
 }): CommandModule {
     return commandModule({
@@ -67,7 +67,7 @@ export function slashCommand(mod: {
     name?: string;
     description: string;
     options?: SernOptionsData[];
-    plugins?: (InitPlugin | ControlPlugin)[];
+    plugins?: AnyCommandPlugin[];
     execute: (ctx: Context, options: ['slash', SlashOptions]) => Awaitable<unknown>;
 }) {
     return commandModule({
