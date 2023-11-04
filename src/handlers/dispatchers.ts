@@ -14,23 +14,6 @@ import { CommandType, Context } from '../core';
 import type { Args } from '../types/utility';
 import type { BothCommand, CommandModule, Module, Processed } from '../types/core-modules';
 
-function dispatchInteraction<T extends CommandModule, V extends BaseInteraction | Message>(
-    payload: { module: Processed<T>; event: V },
-    createArgs: (m: typeof payload.event) => unknown[],
-) {
-    return {
-        module: payload.module,
-        args: createArgs(payload.event),
-    };
-}
-//TODO: refactor dispatchers so that it implements a strategy for each different type of payload?
-export function dispatchMessage(module: Processed<CommandModule>, args: [Context, Args]) {
-    return {
-        module,
-        args,
-    };
-}
-
 function dispatchAutocomplete(payload: {
     module: Processed<BothCommand>;
     event: AutocompleteInteraction;
@@ -52,9 +35,6 @@ export function contextArgs(wrappable: Message | BaseInteraction, messageArgs?: 
     return [ctx, args] as [Context, Args];
 }
 
-function interactionArg<T extends BaseInteraction>(interaction: T) {
-    return [interaction] as [T];
-}
 
 function intoPayload(module: Processed<Module>) {
     return pipe(
@@ -109,9 +89,14 @@ export function createDispatcher(payload: {
                  */
                 return dispatchAutocomplete(payload as never);
             }
-            return dispatchInteraction(payload, contextArgs);
+            return {
+                module: payload.module,
+                args: contextArgs(payload.event),
+            };
         }
-        default:
-            return dispatchInteraction(payload, interactionArg);
+        default: return { 
+            module: payload.module,
+            args: [payload.event],
+        };
     }
 }
