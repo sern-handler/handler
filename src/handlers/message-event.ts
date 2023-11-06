@@ -1,4 +1,4 @@
-import { concatMap, EMPTY } from 'rxjs';
+import { mergeMap, EMPTY } from 'rxjs';
 import type { Message } from 'discord.js';
 import { SernEmitter } from '../core';
 import { sharedEventStream, SernError, filterTap } from '../core/_internal';
@@ -42,6 +42,6 @@ export function messageHandler(
         makeModuleExecutor(module => {
             emitter.emit('module.activate', SernEmitter.failure(module, SernError.PluginFailure));
         }),
-        concatMap(payload => executeModule(emitter, payload)),
+        mergeMap(payload => executeModule(emitter, payload)),
     );
 }
