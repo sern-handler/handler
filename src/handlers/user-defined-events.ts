@@ -24,14 +24,12 @@ export function eventsHandler(
         }
     };
     buildModules<EventModule>(allPaths, moduleManager)
-        .pipe(
-            callInitPlugins(emitter),
-            map(intoDispatcher),
-            /**
-             * Where all events are turned on
-             */
-            mergeAll(),
-            handleCrash(err, log),
-        )
+        .pipe(callInitPlugins(emitter),
+              map(intoDispatcher),
+              /**
+                * Where all events are turned on
+               */
+              mergeAll(),
+              handleCrash(err, log))
         .subscribe();
 }
