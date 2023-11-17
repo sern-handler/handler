@@ -21,20 +21,33 @@ export function useContainerRaw() {
     return containerSubject;
 }
 
-const dependencyBuilder = (container: any, excluded: Set<string>) => {
+const dependencyBuilder = (container: any, excluded: string[]) => {
     type Insertable = 
-        | ((container: CoreContainer<Dependencies>) => unknown)
-        | Record<PropertyKey, any>
+        | ((container: CoreContainer<Dependencies>) => { new(): unknown })
+        | { new (): unknown }
     return {
+        /**
+          * Insert a dependency into your container.
+          * Supply the correct key and dependency
+          */
         add(key: keyof Dependencies, v: Insertable) {
             Result
                 .wrap(() => container.add({ [key]: v}))
                 .expect("Failed to add " + key);
         },
+        /**
+          * Exclude any dependencies from being added.
+          * Warning: this could lead to bad errors if not used correctly
+          */
         exclude(...keys: (keyof Dependencies)[]) {
-            keys.forEach(key => excluded.add(key));
+            keys.forEach(key => excluded.push(key));
         },
-        update(key: keyof Dependencies, v: Insertable) {
+        /**
+          * @param key the key of the dependency
+          * @param v The dependency to swap out.
+          * Swap out a preexisting dependency.
+          */
+        switch(key: keyof Dependencies, v: Insertable) {
             Result
                 .wrap(() => container.upsert({ [key]: v }))
                 .expect("Failed to update " + key);
@@ -59,9 +72,9 @@ export async function makeDependencies<const T extends Dependencies>(
     //SIDE EFFECT
     containerSubject = new CoreContainer();
     if(typeof conf === 'function') {
-        const excluded = new Set<string>();
+        const excluded: string[] = [];
         conf(dependencyBuilder(containerSubject, excluded));
-        if(!excluded.has('@sern/logger')) {
+        if(!excluded.includes('@sern/logger')) {
             assert.ok(!containerSubject.getTokens()['@sern/logger'])
             insertLogger(containerSubject);
         }
