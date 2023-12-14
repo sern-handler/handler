@@ -5,7 +5,7 @@ import { basename, extname, join, resolve, parse } from 'path';
 import assert from 'assert';
 import { createRequire } from 'node:module';
 import type { ImportPayload, Wrapper } from '../types/core';
-import type { Module, OnError } from '../types/core-modules';
+import type { Module } from '../types/core-modules';
 
 export type ModuleResult<T> = Promise<ImportPayload<T>>;
 
@@ -25,25 +25,21 @@ export type ModuleResult<T> = Promise<ImportPayload<T>>;
 export async function importModule<T>(absPath: string) {
     let fileModule = await import(absPath);
 
-    let commandModule = fileModule.default, 
-        onError = fileModule.onError;
+    let commandModule = fileModule.default;
 
     assert(commandModule , `Found no export @ ${absPath}. Forgot to ignore with "!"? (!${basename(absPath)})?`);
     if ('default' in commandModule ) {
         commandModule = commandModule.default;
     }
     return Result
-        .wrap(() => ({ module: commandModule.getInstance(), onError }))
-        .unwrapOr({ module: commandModule, onError }) as T;
-}
-interface FileExtras { 
-    onError : OnError
+        .wrap(() => ({ module: commandModule.getInstance()  }))
+        .unwrapOr({ module: commandModule }) as T;
 }
 
 export async function defaultModuleLoader<T extends Module>(absPath: string): ModuleResult<T> {
-    let { onError, module } = await importModule<{ module: T } & FileExtras>(absPath);
+    let { module } = await importModule<{ module: T }>(absPath);
     assert(module, `Found an undefined module: ${absPath}`);
-    return { module, absPath, onError };
+    return { module, absPath };
 }
 
 export const fmtFileName = (fileName: string) => parse(fileName).name;

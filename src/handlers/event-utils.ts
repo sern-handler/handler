@@ -30,7 +30,7 @@ import { SernEmitter } from '../core';
 import { Err, Ok, Result } from 'ts-results-es';
 import type { AnyFunction, Awaitable } from '../types/utility';
 import type { ControlPlugin } from '../types/core-plugin';
-import type { AnyModule, CommandModule, Module, OnError, Processed } from '../types/core-modules';
+import type { AnyModule, CommandModule, Module, Processed } from '../types/core-modules';
 import type { ImportPayload } from '../types/core';
 import assert from 'node:assert';
 
@@ -81,7 +81,6 @@ export function createInteractionHandler<T extends Interaction>(
                 .then(payload =>
                    Ok(createDispatcher({ 
                        module: payload.module,
-                       onError: payload.onError,
                        event,
                       })));
         },
@@ -104,7 +103,7 @@ export function createMessageHandler(
             .defaultModuleLoader<Processed<CommandModule>>(fullPath)
             .then(payload => {
                 const args = contextArgs(event, rest);
-                return Ok({ args, ...payload, onError: payload.onError?.default });
+                return Ok({ args, ...payload });
             });
     });
 }
@@ -137,7 +136,6 @@ export function buildModules<T extends AnyModule>(
 interface ExecutePayload {
     module: Processed<Module>;
     task: () => Awaitable<unknown>;
-    onError: AnyFunction|undefined 
     args: unknown[]
 }
 /**
@@ -155,7 +153,6 @@ export function executeModule(
     {
         module,
         task,
-        onError,
         args
     }: ExecutePayload,
 ) {
@@ -167,29 +164,6 @@ export function executeModule(
                 emitter.emit('module.activate', SernEmitter.success(module));
                 return EMPTY;
             } 
-            if(onError) {
-                //Could be promise
-                const err = onError() as CommandError.Response
-                if(!err) {
-                    const failure = SernEmitter.failure(module, "Handling onError: returned undefined");
-                    return throwError(() => failure);
-                }
-                if(err.log) {
-                    const { type, message } = err.log;
-                    logger?.[type]({ message });
-                };
-                //args[0] will be Repliable ( has reply method ), unless it is autocomplete
-                const apiObject = args[0];
-                assert(apiObject && typeof apiObject === 'object', "Args[0] was falsy while trying to create onError");
-                assert(err.body, "Body of error response cannot be empty");
-                if('reply' in apiObject && typeof apiObject.reply === 'function') {
-                    return from(apiObject.reply(err.body))
-                } 
-                if('respond' in apiObject && typeof apiObject.respond === 'function') {
-                    return from(apiObject.respond(err.body))
-                }
-                return EMPTY;
-            }
             return throwError(() => SernEmitter.failure(module, result.error));
             
         }),
@@ -207,7 +181,7 @@ export function executeModule(
  */
 export function createResultResolver<
     T extends { execute: (...args: any[]) => any; onEvent: ControlPlugin[] },
-    Args extends { module: T; onError: unknown, [key: string]: unknown },
+    Args extends { module: T; [key: string]: unknown },
     Output,
 >(config: {
     onStop?: (module: T) => unknown;
@@ -240,9 +214,9 @@ export function callInitPlugins<T extends Processed<AnyModule>>(sernEmitter: Emi
                     SernEmitter.failure(module, SernError.PluginFailure),
                 );
             },
-            onNext: ({ module, onError }) => {
+            onNext: ({ module }) => {
                 sernEmitter.emit('module.register', SernEmitter.success(module));
-                return { module, onError: onError as OnError };
+                return { module };
             },
         }),
     );
@@ -257,13 +231,11 @@ export function makeModuleExecutor<
     Args extends { 
         module: M;
         args: unknown[];
-        onError: AnyFunction|undefined 
     },
 >(onStop: (m: M) => unknown) {
-    const onNext = ({ args, module, onError }: Args) => ({
+    const onNext = ({ args, module }: Args) => ({
         task: () => module.execute(...args),
         module,
-        onError,
         args
     });
     return concatMap(

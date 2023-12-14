@@ -21,11 +21,9 @@ export class CoreContainer<T extends Partial<Dependencies>> extends Container<T,
             .subscribe({ complete: unsubscribe });
 
         (this as Container<{}, {}>)
-            .add({
-                '@sern/errors': () => new DefaultServices.DefaultErrorHandling(),
-                '@sern/emitter': () => new SernEmitter(),
-                '@sern/store': () => new ModuleStore(),
-            })
+            .add({ '@sern/errors': () => new DefaultServices.DefaultErrorHandling(),
+                   '@sern/emitter': () => new SernEmitter(),
+                   '@sern/store': () => new ModuleStore() })
             .add(ctx => {
                 return {
                     '@sern/modules': () =>
@@ -36,9 +34,6 @@ export class CoreContainer<T extends Partial<Dependencies>> extends Container<T,
 
     isReady() {
         return this.ready$.closed;
-    }
-    addExcluded() {
-
     }
     override async disposeAll() {
         

@@ -1,7 +1,7 @@
 import * as Id from '../../../core/id';
 import { CoreModuleStore, ModuleManager } from '../../contracts';
 import { Files } from '../../_internal';
-import { CommandMeta, CommandModule, CommandModuleDefs, Module, OnError } from '../../../types/core-modules';
+import { CommandMeta, CommandModule, CommandModuleDefs, Module } from '../../../types/core-modules';
 import { CommandType } from '../enums';
 /**
  * @internal
@@ -11,13 +11,6 @@ import { CommandType } from '../enums';
 export class DefaultModuleManager implements ModuleManager {
     constructor(private moduleStore: CoreModuleStore) {}
 
-
-    getErrorCallback(m: Module): OnError {
-        return this.moduleStore.onError.get(m);
-    }
-    setErrorCallback(m: Module, c: NonNullable<OnError>): void {
-        this.moduleStore.onError.set(m, c);
-    }
 
     getByNameCommandType<T extends CommandType>(name: string, commandType: T) {
         const id = this.get(Id.create(name, commandType));

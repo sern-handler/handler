@@ -12,7 +12,7 @@ import { createResultResolver } from './event-utils';
 import { BaseInteraction, Message } from 'discord.js';
 import { CommandType, Context } from '../core';
 import type { AnyFunction, Args } from '../types/utility';
-import type { CommandModule, Module, OnError, Processed } from '../types/core-modules';
+import type { CommandModule, Module, Processed } from '../types/core-modules';
 
 //TODO: refactor dispatchers so that it implements a strategy for each different type of payload?
 export function dispatchMessage(module: Processed<CommandModule>, args: [Context, Args]) {
@@ -32,16 +32,16 @@ function interactionArg<T extends BaseInteraction>(interaction: T) {
     return [interaction] as [T];
 }
 
-function intoPayload(module: Processed<Module>, onError: AnyFunction|undefined) {
+function intoPayload(module: Processed<Module>, ) {
     return pipe(
         arrayifySource,
-        map(args => ({ module, args, onError })),
+        map(args => ({ module, args, })),
     );
 }
 
 const createResult = createResultResolver<
     Processed<Module>,
-    { module: Processed<Module>; args: unknown[], onError: AnyFunction|undefined },
+    { module: Processed<Module>; args: unknown[]  },
     unknown[]
 >({
     createStream: ({ module, args }) => from(module.onEvent).pipe(callPlugin(args)),
@@ -52,14 +52,14 @@ const createResult = createResultResolver<
  * @param module
  * @param source
  */
-export function eventDispatcher(module: Processed<Module>, onError: OnError, source: unknown) {
+export function eventDispatcher(module: Processed<Module>,  source: unknown) {
     assert.ok(source instanceof EventEmitter, `${source} is not an EventEmitter`);
 
     const execute: OperatorFunction<unknown[], unknown> = concatMap(async args =>
         module.execute(...args),
     );
     return fromEvent(source, module.name).pipe(
-        intoPayload(module, onError?.default),
+        intoPayload(module),
         concatMap(createResult),
         execute,
     );
@@ -68,7 +68,6 @@ export function eventDispatcher(module: Processed<Module>, onError: OnError, sou
 export function createDispatcher(payload: {
     module: Processed<CommandModule>;
     event: BaseInteraction;
-    onError:  OnError
 }) {
     assert.ok(
         CommandType.Text !== payload.module.type,
@@ -84,27 +83,22 @@ export function createDispatcher(payload: {
                     Error(SernError.NotSupportedInteraction + ` There is no autocomplete tag for this option`),
                 );
                 const { command, name, parent } = option;
-                const resolvedErrorHandler = parent 
-                    ? 'option:'+parent+':'+name
-                    : 'option:'+name
+            
              	return {
                     ...payload,
              	    module: command as Processed<Module>, //autocomplete is not a true "module" warning cast!
              	    args: [payload.event],
-                    onError: payload.onError?.[resolvedErrorHandler]
              	};
             }
             return { 
                 args: contextArgs(payload.event),
                 ...payload,
-                onError: payload.onError?.default
             }; 
         }
         default:
             return {
                 args: interactionArg(payload.event),
                 ...payload,
-                onError: payload.onError?.default
             }
     }
 }

@@ -3,7 +3,6 @@ import type {
     CommandModule,
     CommandModuleDefs,
     Module,
-    OnError,
 } from '../../types/core-modules';
 import { CommandType } from '../structures';
 
@@ -12,15 +11,11 @@ interface MetadataAccess {
     setMetadata(m: Module, c: CommandMeta): void;
 }
 
-interface OnErrorAccess {
-    getErrorCallback(m: Module): OnError;
-    setErrorCallback(m: Module, c: NonNullable<OnError>): void;
-}
 /**
  * @since 2.0.0
  * @internal - direct access to the module manager will be removed in version 4
  */
-export interface ModuleManager extends MetadataAccess, OnErrorAccess {
+export interface ModuleManager extends MetadataAccess {
     get(id: string): string | undefined;
 
     set(id: string, path: string): void;

@@ -1,9 +1,7 @@
-import { OnError } from "./core-modules";
 
 export interface ImportPayload<T> {
     module: T;
     absPath: string;
-    onError:  OnError
     [key: string]: unknown;
 }
 
