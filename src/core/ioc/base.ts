@@ -4,6 +4,7 @@ import type { DependencyConfiguration } from '../../types/ioc';
 import { CoreContainer } from './container';
 import { Result } from 'ts-results-es'
 import { DefaultServices } from '../_internal';
+import { AnyFunction } from '../../types/utility';
 //SIDE EFFECT: GLOBAL DI
 let containerSubject: CoreContainer<Partial<Dependencies>>;
 
@@ -23,8 +24,8 @@ export function useContainerRaw() {
 
 const dependencyBuilder = (container: any, excluded: string[]) => {
     type Insertable = 
-        | ((container: CoreContainer<Dependencies>) => { new(): unknown })
-        | { new (): unknown }
+        | ((container: CoreContainer<Dependencies>) => unknown )
+        | Record<PropertyKey, unknown>
     return {
         /**
           * Insert a dependency into your container.
@@ -47,11 +48,25 @@ const dependencyBuilder = (container: any, excluded: string[]) => {
           * @param v The dependency to swap out.
           * Swap out a preexisting dependency.
           */
-        switch(key: keyof Dependencies, v: Insertable) {
+        swap(key: keyof Dependencies, v: Insertable) {
             Result
                 .wrap(() => container.upsert({ [key]: v }))
                 .expect("Failed to update " + key);
         },
+        /**
+          * @param key the key of the dependency
+          * @param cleanup Provide cleanup for the dependency at key. First parameter is the dependency itself 
+          * @example
+          * ```ts 
+          * addDisposer('dbConnection', (dbConnection) => dbConnection.end())
+          * ```
+          * Swap out a preexisting dependency.
+          */
+        addDisposer(key: keyof Dependencies, cleanup: AnyFunction) {
+            Result
+                .wrap(() => container.addDisposer({ [key] : cleanup }))
+                .expect("Failed to addDisposer for" + key);
+        }
    };
 };
 
@@ -63,11 +78,10 @@ type ValidDependencyConfig =
     
 export const insertLogger = (containerSubject: CoreContainer<any>) => {
     containerSubject
-        .upsert({'@sern/logger': () => DefaultServices.DefaultLogging});
+        .upsert({'@sern/logger': () => new DefaultServices.DefaultLogging});
 }
-export async function makeDependencies<const T extends Dependencies>(
-    conf: ValidDependencyConfig
-) {
+export async function makeDependencies<const T extends Dependencies>
+(conf: ValidDependencyConfig) {
     //Until there are more optional dependencies, just check if the logger exists
     //SIDE EFFECT
     containerSubject = new CoreContainer();
@@ -79,8 +93,6 @@ export async function makeDependencies<const T extends Dependencies>(
             insertLogger(containerSubject);
         }
         containerSubject.ready();
-        return useContainer<T>();
-        // todo
     } else {
         composeRoot(containerSubject, conf);
     }

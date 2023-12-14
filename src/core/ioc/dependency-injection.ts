@@ -1,5 +1,4 @@
 import type { CoreDependencies, DependencyConfiguration, IntoDependencies } from '../../types/ioc';
-import { DefaultServices } from '../_internal';
 import { insertLogger, useContainerRaw } from './base';
 import { CoreContainer } from './container';
 

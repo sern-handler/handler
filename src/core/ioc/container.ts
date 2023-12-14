@@ -12,7 +12,6 @@ import * as Hooks from './hooks'
  */
 export class CoreContainer<T extends Partial<Dependencies>> extends Container<T, {}> {
     private ready$ = new Subject<void>();
-    private excluded = new Set();
     constructor() {
         super();
         assert.ok(!this.isReady(), 'Listening for dispose & init should occur prior to sern being ready.');
@@ -46,9 +45,7 @@ export class CoreContainer<T extends Partial<Dependencies>> extends Container<T,
         const otherDisposables = Object
             .entries(this._context)
             .flatMap(([key, value]) => 
-                'dispose' in value
-                    ? [key]
-                    : []);
+                'dispose' in value ? [key] : []);
 
         for(const key of otherDisposables) {
             this.addDisposer({ [key]: (dep: Disposable) => dep.dispose() } as never);
