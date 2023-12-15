@@ -3,18 +3,18 @@ import { ErrorHandling } from '../../contracts';
 /**
  * @internal
  * @since 2.0.0
- * Version 4.0.0 will internalize this api. Please refrain from using ModuleStore!
+ * Version 4.0.0 will internalize this api. Please refrain from using the defaults!
  */
 export class DefaultErrorHandling implements ErrorHandling {
     crash(err: Error): never {
         throw err;
     }
 
-    keepAlive = 5;
+    #keepAlive = 5;
 
     updateAlive(err: Error) {
-        this.keepAlive--;
-        if (this.keepAlive === 0) {
+        this.#keepAlive--;
+        if (this.#keepAlive === 0) {
             throw err;
         }
     }

@@ -13,7 +13,7 @@ import {
 import { createInteractionHandler, executeModule, makeModuleExecutor } from './_internal';
 import type { DependencyList } from '../types/ioc';
 
-export function interactionHandler([emitter, , , modules, client]: DependencyList) {
+export function interactionHandler([emitter, err, log, modules, client]: DependencyList) {
     const interactionStream$ = sharedEventStream<Interaction>(client, 'interactionCreate');
     const handle = createInteractionHandler(interactionStream$, modules);
 
@@ -28,6 +28,6 @@ export function interactionHandler([emitter, , , modules, client]: DependencyLis
             filterTap(e => emitter.emit('warning', SernEmitter.warning(e))),
             makeModuleExecutor(module => 
                 emitter.emit('module.activate', SernEmitter.failure(module, SernError.PluginFailure))),
-            mergeMap(payload => executeModule(emitter, payload)),
+            mergeMap(payload => executeModule(emitter, log, err, payload)),
     );
 }

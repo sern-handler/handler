@@ -1,6 +1,5 @@
 import type { CoreDependencies, DependencyConfiguration, IntoDependencies } from '../../types/ioc';
-import { DefaultServices } from '../_internal';
-import { useContainerRaw } from './base';
+import { insertLogger, useContainerRaw } from './base';
 import { CoreContainer } from './container';
 
 /**
@@ -53,16 +52,14 @@ export function Services<const T extends (keyof Dependencies)[]>(...keys: [...T]
  * Finally, update the containerSubject with the new container state
  * @param conf
  */
-export async function composeRoot(
+export function composeRoot(
     container: CoreContainer<Partial<Dependencies>>,
     conf: DependencyConfiguration,
 ) {
     //container should have no client or logger yet.
     const hasLogger = conf.exclude?.has('@sern/logger');
     if (!hasLogger) {
-        container.upsert({
-            '@sern/logger': () => new DefaultServices.DefaultLogging(),
-        });
+        insertLogger(container);
     }
     //Build the container based on the callback provided by the user
     conf.build(container as CoreContainer<Omit<CoreDependencies, '@sern/client'>>);

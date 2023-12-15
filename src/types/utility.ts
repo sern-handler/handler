@@ -1,6 +1,6 @@
-import { CommandInteractionOptionResolver } from 'discord.js';
-import { PayloadType } from '../core';
-import { AnyModule } from './core-modules';
+import type { CommandInteractionOptionResolver, InteractionReplyOptions, MessageReplyOptions } from 'discord.js';
+import type { PayloadType } from '../core';
+import type { AnyModule } from './core-modules';
 
 export type Awaitable<T> = PromiseLike<T> | T;
 
@@ -27,3 +27,7 @@ export type Payload =
     | { type: PayloadType.Success; module: AnyModule }
     | { type: PayloadType.Failure; module?: AnyModule; reason: string | Error }
     | { type: PayloadType.Warning; reason: string };
+
+
+
+export type ReplyOptions = string | Omit<InteractionReplyOptions, 'fetchReply'> | MessageReplyOptions;

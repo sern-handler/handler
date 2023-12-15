@@ -23,19 +23,21 @@ export type ModuleResult<T> = Promise<ImportPayload<T>>;
  * export default commandModule({})
  */
 export async function importModule<T>(absPath: string) {
-    let module = await import(absPath).then(esm => esm.default);
+    let fileModule = await import(absPath);
 
-    assert(module, `Found no export for module at ${absPath}. Forgot to ignore with "!"? (!${basename(absPath)})?`);
-    if ('default' in module) {
-        module = module.default;
+    let commandModule = fileModule.default;
+
+    assert(commandModule , `Found no export @ ${absPath}. Forgot to ignore with "!"? (!${basename(absPath)})?`);
+    if ('default' in commandModule ) {
+        commandModule = commandModule.default;
     }
     return Result
-        .wrap(() => module.getInstance())
-        .unwrapOr(module) as T;
+        .wrap(() => ({ module: commandModule.getInstance()  }))
+        .unwrapOr({ module: commandModule }) as T;
 }
 
 export async function defaultModuleLoader<T extends Module>(absPath: string): ModuleResult<T> {
-    let module = await importModule<T>(absPath);
+    let { module } = await importModule<{ module: T }>(absPath);
     assert(module, `Found an undefined module: ${absPath}`);
     return { module, absPath };
 }
@@ -51,7 +53,8 @@ export const fmtFileName = (fileName: string) => parse(fileName).name;
 export function buildModuleStream<T extends Module>(
     input: ObservableInput<string>,
 ): Observable<ImportPayload<T>> {
-    return from(input).pipe(mergeMap(defaultModuleLoader<T>));
+    return from(input)
+        .pipe(mergeMap(defaultModuleLoader<T>));
 }
 
 export const getFullPathTree = (dir: string) => readPaths(resolve(dir));

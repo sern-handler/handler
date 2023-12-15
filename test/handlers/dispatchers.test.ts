@@ -29,14 +29,14 @@ describe('eventDispatcher standard', () => {
     });
 
     it('should throw', () => {
-        expect(() => eventDispatcher(m, 'not event emitter')).toThrowError();
+        expect(() => eventDispatcher(m,  'not event emitter')).toThrowError();
     });
     it("Shouldn't throw", () => {
         expect(() => eventDispatcher(m, ee)).not.toThrowError();
     });
 
     it('Should be called once', () => {
-        const s = eventDispatcher(m, ee);
+        const s = eventDispatcher(m,  ee);
         s.subscribe();
         ee.emit(m.name, faker.string.alpha());
 

@@ -9,23 +9,16 @@ import {
     SernError,
 } from '../core/_internal';
 import { createResultResolver } from './event-utils';
-import { AutocompleteInteraction, BaseInteraction, Message } from 'discord.js';
+import { BaseInteraction, Message } from 'discord.js';
 import { CommandType, Context } from '../core';
-import type { Args } from '../types/utility';
-import type { BothCommand, CommandModule, Module, Processed } from '../types/core-modules';
+import type { AnyFunction, Args } from '../types/utility';
+import type { CommandModule, Module, Processed } from '../types/core-modules';
 
-function dispatchAutocomplete(payload: {
-    module: Processed<BothCommand>;
-    event: AutocompleteInteraction;
-}) {
-    const option = treeSearch(payload.event, payload.module.options);
-    assert.ok(
-        option,
-        Error(SernError.NotSupportedInteraction + ` There is no autocomplete tag for this option`),
-    );
+//TODO: refactor dispatchers so that it implements a strategy for each different type of payload?
+export function dispatchMessage(module: Processed<CommandModule>, args: [Context, Args]) {
     return {
-        module: option.command as Processed<Module>, //autocomplete is not a true "module" warning cast!
-        args: [payload.event],
+        module,
+        args,
     };
 }
 
@@ -36,16 +29,16 @@ export function contextArgs(wrappable: Message | BaseInteraction, messageArgs?: 
 }
 
 
-function intoPayload(module: Processed<Module>) {
+function intoPayload(module: Processed<Module>, ) {
     return pipe(
         arrayifySource,
-        map(args => ({ module, args })),
+        map(args => ({ module, args, })),
     );
 }
 
 const createResult = createResultResolver<
     Processed<Module>,
-    { module: Processed<Module>; args: unknown[] },
+    { module: Processed<Module>; args: unknown[]  },
     unknown[]
 >({
     createStream: ({ module, args }) => from(module.onEvent).pipe(callPlugin(args)),
@@ -56,7 +49,7 @@ const createResult = createResultResolver<
  * @param module
  * @param source
  */
-export function eventDispatcher(module: Processed<Module>, source: unknown) {
+export function eventDispatcher(module: Processed<Module>,  source: unknown) {
     assert.ok(source instanceof EventEmitter, `${source} is not an EventEmitter`);
 
     const execute: OperatorFunction<unknown[], unknown> = concatMap(async args =>
@@ -81,13 +74,18 @@ export function createDispatcher(payload: {
         case CommandType.Slash:
         case CommandType.Both: {
             if (isAutocomplete(payload.event)) {
-                /**
-                 * Autocomplete is a special case that
-                 * must be handled separately, since it's
-                 * too different from regular command modules
-                 * CAST SAFETY: payload is already guaranteed to be a slash command or both command
-                 */
-                return dispatchAutocomplete(payload as never);
+                const option = treeSearch(payload.event, payload.module.options);
+                assert.ok(
+                    option,
+                    Error(SernError.NotSupportedInteraction + ` There is no autocomplete tag for this option`),
+                );
+                const { command, name, parent } = option;
+            
+             	return {
+                    ...payload,
+             	    module: command as Processed<Module>, //autocomplete is not a true "module" warning cast!
+             	    args: [payload.event],
+             	};
             }
             return {
                 module: payload.module,

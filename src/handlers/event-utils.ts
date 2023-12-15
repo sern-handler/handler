@@ -28,7 +28,7 @@ import { contextArgs, createDispatcher } from './dispatchers';
 import { ObservableInput, pipe } from 'rxjs';
 import { SernEmitter } from '../core';
 import { Err, Ok, Result } from 'ts-results-es';
-import type { Awaitable } from '../types/utility';
+import type { AnyFunction, Awaitable } from '../types/utility';
 import type { ControlPlugin } from '../types/core-plugin';
 import type { AnyModule, CommandModule, Module, Processed } from '../types/core-modules';
 import type { ImportPayload } from '../types/core';
@@ -78,7 +78,10 @@ export function createInteractionHandler<T extends Interaction>(
             return Files
                 .defaultModuleLoader<Processed<CommandModule>>(fullPath)
                 .then(payload =>
-                   Ok(createDispatcher({ module: payload.module, event })));
+                   Ok(createDispatcher({ 
+                       module: payload.module,
+                       event,
+                      })));
         },
     );
 }
@@ -93,13 +96,14 @@ export function createMessageHandler(
         const fullPath = mg.get(`${prefix}_A1`);
 
         if(!fullPath) {
-            return Err('Possibly undefined behavior: could not find a static id to resolve  ')
+            return Err('Possibly undefined behavior: could not find a static id to resolve')
         }
         return Files
             .defaultModuleLoader<Processed<CommandModule>>(fullPath)
-            .then(({ module })=> {
+            .then((payload)=> {
                 const args = contextArgs(event, rest);
-                return Ok({ module, args });
+                return Ok({ args, ...payload });
+
             });
     });
 }
@@ -130,6 +134,12 @@ export function buildModules<T extends AnyModule>(
         .pipe(assignDefaults(moduleManager));
 }
 
+
+interface ExecutePayload {
+    module: Processed<Module>;
+    task: () => Awaitable<unknown>;
+    args: unknown[]
+}
 /**
  * Wraps the task in a Result as a try / catch.
  * if the task is ok, an event is emitted and the stream becomes empty
@@ -140,13 +150,13 @@ export function buildModules<T extends AnyModule>(
  */
 export function executeModule(
     emitter: Emitter,
+    logger: Logging|undefined,
+    errHandler: ErrorHandling,
     {
         module,
         task,
-    }: {
-        module: Processed<Module>;
-        task: () => Awaitable<unknown>;
-    },
+        args
+    }: ExecutePayload,
 ) {
     return of(module).pipe(
         //converting the task into a promise so rxjs can resolve the Awaitable properly
@@ -155,9 +165,9 @@ export function executeModule(
             if (result.isOk()) {
                 emitter.emit('module.activate', SernEmitter.success(module));
                 return EMPTY;
-            } else {
-                return throwError(() => SernEmitter.failure(module, result.error));
-            }
+            } 
+            return throwError(() => SernEmitter.failure(module, result.error));
+            
         }),
     );
 }
@@ -208,7 +218,7 @@ export function callInitPlugins<T extends Processed<AnyModule>>(sernEmitter: Emi
             },
             onNext: ({ module }) => {
                 sernEmitter.emit('module.register', SernEmitter.success(module));
-                return module;
+                return { module };
             },
         }),
     );
@@ -220,16 +230,22 @@ export function callInitPlugins<T extends Processed<AnyModule>>(sernEmitter: Emi
  */
 export function makeModuleExecutor<
     M extends Processed<Module>,
-    Args extends { module: M; args: unknown[] },
+    Args extends { 
+        module: M;
+        args: unknown[];
+    },
 >(onStop: (m: M) => unknown) {
     const onNext = ({ args, module }: Args) => ({
         task: () => module.execute(...args),
         module,
+        args
     });
     return concatMap(
         createResultResolver({
             onStop,
-            createStream: ({ args, module }) => from(module.onEvent).pipe(callPlugin(args)),
+            createStream: ({ args, module }) => 
+                from(module.onEvent)
+                    .pipe(callPlugin(args)),
             onNext,
         }),
     );
