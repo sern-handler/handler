@@ -4,32 +4,33 @@ import { SernError } from '../core/_internal';
 import { buildModules, callInitPlugins, handleCrash, eventDispatcher } from './_internal';
 import { Service } from '../core/ioc';
 import type { DependencyList } from '../types/ioc';
-import type { CommandModule, EventModule, Processed } from '../types/core-modules';
+import type { EventModule,  Processed } from '../types/core-modules';
 
 export function eventsHandler(
     [emitter, err, log, moduleManager, client]: DependencyList,
     allPaths: ObservableInput<string>,
 ) {
     //code smell
-    const intoDispatcher = (e: Processed<EventModule | CommandModule>) => {
-        switch (e.type) {
+    const intoDispatcher = (e: { module: Processed<EventModule> }) => {
+        switch (e.module.type) {
             case EventType.Sern:
-                return eventDispatcher(e, emitter);
+                return eventDispatcher(e.module,  emitter);
             case EventType.Discord:
-                return eventDispatcher(e, client);
+                return eventDispatcher(e.module,  client);
             case EventType.External:
-                return eventDispatcher(e, Service(e.emitter));
+                return eventDispatcher(e.module,  Service(e.module.emitter));
             default:
                 throw Error(SernError.InvalidModuleType + ' while creating event handler');
         }
     };
     buildModules<EventModule>(allPaths, moduleManager)
-        .pipe(callInitPlugins(emitter),
-              map(intoDispatcher),
-              /**
-                * Where all events are turned on
-               */
-              mergeAll(),
-              handleCrash(err, log))
+        .pipe(
+            callInitPlugins(emitter),
+            map(intoDispatcher),
+            /**
+             * Where all events are turned on
+             */
+            mergeAll(),
+            handleCrash(err, log))
         .subscribe();
 }
