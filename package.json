@@ -1,7 +1,7 @@
 {
     "name": "@sern/handler",
     "packageManager": "yarn@3.5.0",
-    "version": "3.1.0",
+    "version": "3.2.0",
     "description": "A complete, customizable, typesafe, & reactive framework for discord bots.",
     "main": "./dist/index.js",
     "module": "./dist/index.mjs",

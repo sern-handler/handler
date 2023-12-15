@@ -23,7 +23,7 @@ import {
     VoidResult,
     useContainerRaw,
 } from '../core/_internal';
-import { CommandError, Emitter, ErrorHandling, Logging, ModuleManager } from '../core';
+import { Emitter, ErrorHandling, Logging, ModuleManager } from '../core';
 import { contextArgs, createDispatcher } from './dispatchers';
 import { ObservableInput, pipe } from 'rxjs';
 import { SernEmitter } from '../core';
@@ -32,7 +32,6 @@ import type { AnyFunction, Awaitable } from '../types/utility';
 import type { ControlPlugin } from '../types/core-plugin';
 import type { AnyModule, CommandModule, Module, Processed } from '../types/core-modules';
 import type { ImportPayload } from '../types/core';
-import assert from 'node:assert';
 
 function createGenericHandler<Source, Narrowed extends Source, Output>(
     source: Observable<Source>,

@@ -17,7 +17,7 @@ import type {
 } from 'discord.js';
 import { CommandType, Context, EventType } from '../../src/core';
 import { AnyCommandPlugin, AnyEventPlugin, ControlPlugin, InitPlugin } from './core-plugin';
-import { Awaitable, Args, SlashOptions, SernEventsMapping, AnyFunction } from './utility';
+import { Awaitable, Args, SlashOptions, SernEventsMapping } from './utility';
 
 
 
