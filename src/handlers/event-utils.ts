@@ -100,9 +100,10 @@ export function createMessageHandler(
         }
         return Files
             .defaultModuleLoader<Processed<CommandModule>>(fullPath)
-            .then(payload => {
+            .then((payload)=> {
                 const args = contextArgs(event, rest);
                 return Ok({ args, ...payload });
+
             });
     });
 }
@@ -128,7 +129,9 @@ export function buildModules<T extends AnyModule>(
     input: ObservableInput<string>,
     moduleManager: ModuleManager,
 ) {
-    return Files.buildModuleStream<Processed<T>>(input).pipe(assignDefaults(moduleManager));
+    return Files
+        .buildModuleStream<Processed<T>>(input)
+        .pipe(assignDefaults(moduleManager));
 }
 
 

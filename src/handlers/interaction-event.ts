@@ -1,5 +1,5 @@
 import { Interaction } from 'discord.js';
-import { concatMap, merge } from 'rxjs';
+import { mergeMap, merge } from 'rxjs';
 import { SernEmitter } from '../core';
 import {
     isAutocomplete,
@@ -28,6 +28,6 @@ export function interactionHandler([emitter, err, log, modules, client]: Depende
             filterTap(e => emitter.emit('warning', SernEmitter.warning(e))),
             makeModuleExecutor(module => 
                 emitter.emit('module.activate', SernEmitter.failure(module, SernError.PluginFailure))),
-            concatMap(payload => executeModule(emitter, log, err, payload)),
+            mergeMap(payload => executeModule(emitter, log, err, payload)),
     );
 }

@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.1.1](https://github.com/sern-handler/handler/compare/v3.1.0...v3.1.1) (2023-11-06)
+
+
+### Bug Fixes
+
+* queuing events ([fd39858](https://github.com/sern-handler/handler/commit/fd39858636d3038abb6d91021b65c99c488a3d6e))
+* queuing events ([#332](https://github.com/sern-handler/handler/issues/332)) @Benzo-Fury ([#333](https://github.com/sern-handler/handler/issues/333)) ([fd39858](https://github.com/sern-handler/handler/commit/fd39858636d3038abb6d91021b65c99c488a3d6e))
+
 ## [3.1.0](https://github.com/sern-handler/handler/compare/v3.0.2...v3.1.0) (2023-09-04)
 
 

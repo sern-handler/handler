@@ -28,9 +28,6 @@ export function contextArgs(wrappable: Message | BaseInteraction, messageArgs?: 
     return [ctx, args] as [Context, Args];
 }
 
-function interactionArg<T extends BaseInteraction>(interaction: T) {
-    return [interaction] as [T];
-}
 
 function intoPayload(module: Processed<Module>, ) {
     return pipe(
@@ -90,15 +87,14 @@ export function createDispatcher(payload: {
              	    args: [payload.event],
              	};
             }
-            return { 
-                args: contextArgs(payload.event),
-                ...payload,
-            }; 
-        }
-        default:
             return {
-                args: interactionArg(payload.event),
-                ...payload,
-            }
+                module: payload.module,
+                args: contextArgs(payload.event),
+            };
+        }
+        default: return { 
+            module: payload.module,
+            args: [payload.event],
+        };
     }
 }

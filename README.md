@@ -18,10 +18,9 @@
 - For you. A framework that's tailored to your exact needs.
 - Lightweight. Does a lot while being small.
 - Latest features. Support for discord.js v14 and all of its interactions.
-- Hybrid, customizable and composable commands. Create them just how you like.
 - Start quickly. Plug and play or customize to your liking.
-- Embraces reactive programming. For consistent and reliable backend.
 - Switch and customize how errors are handled, logging, and more.
+- works with [bun](https://bun.sh/) and [node](https://nodejs.org/en) out the box!
 - Use it with TypeScript or JavaScript. CommonJS and ESM supported.
 - Active and growing community, always here to help. [Join us](https://sern.dev/discord)
 - Unleash its full potential with a powerful CLI and awesome plugins.
