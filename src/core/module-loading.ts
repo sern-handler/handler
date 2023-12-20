@@ -6,9 +6,19 @@ import assert from 'assert';
 import { createRequire } from 'node:module';
 import type { ImportPayload, Wrapper } from '../types/core';
 import type { Module } from '../types/core-modules';
+import { existsSync } from 'fs';
+import { fileURLToPath } from 'node:url';
+
+export const shouldHandle = (path: string, fpath: string) => {
+    const newPath = new URL(fpath+extname(path), path).href;
+    return {
+        exists: existsSync(fileURLToPath(newPath)),
+        path: newPath
+    }
+}
+
 
 export type ModuleResult<T> = Promise<ImportPayload<T>>;
-
 /**
  * Import any module based on the absolute path.
  * This can accept four types of exported modules
@@ -66,6 +76,7 @@ const isSkippable = (filename: string) => {
     const validExtensions = ['.js', '.cjs', '.mts', '.mjs', '.cts', '.ts', ''];
     return filename[0] === '!' || !validExtensions.includes(extname(filename));
 };
+
 async function deriveFileInfo(dir: string, file: string) {
     const fullPath = join(dir, file);
     return {
@@ -74,6 +85,7 @@ async function deriveFileInfo(dir: string, file: string) {
         base: basename(file),
     };
 }
+
 async function* readPaths(dir: string): AsyncGenerator<string> {
     try {
         const files = await readdir(dir);
@@ -118,6 +130,8 @@ export function loadConfig(wrapper: Wrapper | 'file'): Wrapper {
         eventsPath = makePath('events');
         console.log('Events path is set to', eventsPath);
     }
+    
+
     return {
         defaultPrefix: config.defaultPrefix,
         commands: commandsPath,

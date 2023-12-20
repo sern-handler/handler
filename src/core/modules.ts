@@ -61,18 +61,19 @@ export function discordEvent<T extends keyof ClientEvents>(mod: {
     });
 }
 
+
+/**
+ * @deprecated
+ */
 function prepareClassPlugins(c: Module) {
     const [onEvent, initPlugins] = partitionPlugins(c.plugins);
     c.plugins = initPlugins as InitPlugin[];
     c.onEvent = onEvent as ControlPlugin[];
 }
-//
-// Class modules:
-// Can be refactored.
-// Both implement singleton, could I make them inherit a singleton parent class?
+
 /**
- * @Experimental
- * Will be refactored / changed in future
+ * @deprecated
+ * Will be removed in future
  */
 export abstract class CommandExecutable<const Type extends CommandType = CommandType> {
     abstract type: Type;
@@ -92,8 +93,8 @@ export abstract class CommandExecutable<const Type extends CommandType = Command
 }
 
 /**
- * @Experimental
- * Will be refactored in future
+ * @deprecated
+ * Will be removed in future
  */
 export abstract class EventExecutable<Type extends EventType> {
     abstract type: Type;

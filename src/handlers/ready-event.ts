@@ -25,8 +25,7 @@ export function startReadyEvent(
 
 const once = () => pipe(
     first(),
-    ignoreElements()
-)
+    ignoreElements())
 
 
 function register<T extends Processed<AnyModule>>(
