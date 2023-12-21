@@ -1,4 +1,4 @@
-import { concatMap, from, interval, of, map, scan, startWith } from "rxjs"
+import { concatMap, from, interval, of, map, scan, startWith, fromEvent } from "rxjs"
 import { Files } from "../core/_internal";
 import * as Presence from "../core/presences";
 import { Services } from "../core/ioc";
@@ -10,10 +10,13 @@ const parseConfig = async (conf: Promise<Presence.Result>) => {
         .then(s => {
             if('repeated' in s) {
                 const { create, onInterval } = s.repeated;
-                return interval(create).pipe(
-                    scan(onInterval, s),
-                    startWith(s));
-            }
+                const src$ = typeof create === 'number' 
+                    ? interval(create)
+                    : fromEvent(...create);
+                    return src$
+                        .pipe(scan(onInterval, s), 
+                              startWith(s));
+                }
             //take 1?
             return of(s);
         })

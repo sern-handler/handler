@@ -1,5 +1,6 @@
-import { ActivitiesOptions } from "discord.js";
-import { IntoDependencies } from "../types/ioc";
+import type { ActivitiesOptions } from "discord.js";
+import type { IntoDependencies } from "../types/ioc";
+import type { Emitter } from "./contracts/emitter";
 
 type Status = 'online' | 'idle' | 'invisible' | 'dnd'
 
@@ -24,7 +25,8 @@ export function create<T extends (keyof Dependencies)[]>
 export type Result =
     | {
         repeated: { 
-            create: | number //interval
+            create: | number 
+                    | [Emitter, string];
             onInterval: (previous: Result) => Once 
         }
       }
