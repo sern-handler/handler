@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.2.1](https://github.com/sern-handler/handler/compare/v3.2.0...v3.2.1) (2023-12-21)
+
+
+### Bug Fixes
+
+* logger swap failing ([daac37c](https://github.com/sern-handler/handler/commit/daac37c28858c42b21042bdcb8141239db634e7d))
+
 ## [3.2.0](https://github.com/sern-handler/handler/compare/v3.1.1...v3.2.0) (2023-12-15)
 
 
