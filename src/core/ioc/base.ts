@@ -88,8 +88,8 @@ export async function makeDependencies<const T extends Dependencies>
     if(typeof conf === 'function') {
         const excluded: string[] = [];
         conf(dependencyBuilder(containerSubject, excluded));
-        if(!excluded.includes('@sern/logger')) {
-            assert.ok(!containerSubject.getTokens()['@sern/logger'])
+        if(!excluded.includes('@sern/logger') 
+           && !containerSubject.getTokens()['@sern/logger']) {
             insertLogger(containerSubject);
         }
         containerSubject.ready();
