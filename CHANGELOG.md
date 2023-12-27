@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.3.0](https://github.com/sern-handler/handler/compare/v3.2.1...v3.3.0) (2023-12-27)
+
+
+### Features
+
+* presence ([#345](https://github.com/sern-handler/handler/issues/345)) ([7458bef](https://github.com/sern-handler/handler/commit/7458befe8a5900480cd71900df02a8364837dc00))
+
 ## [3.2.1](https://github.com/sern-handler/handler/compare/v3.2.0...v3.2.1) (2023-12-21)
 
 
