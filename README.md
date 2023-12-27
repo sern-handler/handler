@@ -83,9 +83,8 @@ import { Sern, single } from '@sern/handler';
 
 //client has been declared previously
 //Version 3
-await makeDependencies({
-    build: root => root
-        .add({ '@sern/client': single(() => client)  })
+await makeDependencies(({ add }) => {
+    .add('@sern/client', single(() => client) )
 });
 
 //View docs for all options
