@@ -3,6 +3,7 @@ import type { IntoDependencies } from "../types/ioc";
 import type { Emitter } from "./contracts/emitter";
 
 type Status = 'online' | 'idle' | 'invisible' | 'dnd'
+type PresenceReduce = (previous: Result) => Result;
 
 export interface Result { 
     status?: Status;
@@ -21,7 +22,7 @@ export type Config <T extends (keyof Dependencies)[]> =
 
 /**
   * A small wrapper to provide type inference.
-  * Create a Presence module which **MUST** be put in a file called presence.<file-ending> 
+  * Create a Presence module which **MUST** be put in a file called presence.<language-extension> 
   * adjacent to the file where **Sern.init** is CALLED.
   */
 export function module<T extends (keyof Dependencies)[]>
@@ -29,7 +30,6 @@ export function module<T extends (keyof Dependencies)[]>
     return conf;
 }
 
-type PresenceReduce = (previous: Result) => Result;
 
 /**
   * Create a Presence body which can be either: 
