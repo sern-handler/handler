@@ -28,16 +28,15 @@ export function filterMapTo<V>(item: () => V): OperatorFunction<boolean, V> {
     return concatMap(shouldKeep => (shouldKeep ? of(item()) : EMPTY));
 }
 
+interface PluginExecutable {
+    execute: (...args: unknown[]) => PluginResult;
+};
 /**
  * Calls any plugin with {args}.
  * @param args if an array, its spread and plugin called.
  */
-export function callPlugin(args: unknown): OperatorFunction<
-    {
-        execute: (...args: unknown[]) => PluginResult;
-    },
-    VoidResult
-> {
+export function callPlugin(args: unknown): OperatorFunction<PluginExecutable, VoidResult> 
+{
     return concatMap(async plugin => {
         if (Array.isArray(args)) {
             return plugin.execute(...args);
@@ -79,8 +78,6 @@ export const filterTap = <K, R>(onErr: (e: R) => void): OperatorFunction<Result<
             }
             onErr(result.error);
             return EMPTY
-
-        })
-    )
+        }))
 
 

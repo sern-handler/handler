@@ -5,6 +5,7 @@ import { CoreContainer } from './container';
 import { Result } from 'ts-results-es'
 import { DefaultServices } from '../_internal';
 import { AnyFunction } from '../../types/utility';
+import type { Logging } from '../contracts/logging';
 //SIDE EFFECT: GLOBAL DI
 let containerSubject: CoreContainer<Partial<Dependencies>>;
 
@@ -20,6 +21,12 @@ export function useContainerRaw() {
         "Could not find container or container wasn't ready. Did you call makeDependencies?",
     );
     return containerSubject;
+}
+
+export function disposeAll(logger: Logging|undefined) {
+    containerSubject
+        ?.disposeAll()
+        .then(() => logger?.info({ message: 'Cleaning container and crashing' }));
 }
 
 const dependencyBuilder = (container: any, excluded: string[]) => {
