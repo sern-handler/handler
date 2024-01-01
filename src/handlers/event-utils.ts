@@ -11,6 +11,7 @@ import {
     MonoTypeOperatorFunction,
     catchError,
     finalize,
+    reduce
 } from 'rxjs';
 import {
     Files,
@@ -27,8 +28,8 @@ import { contextArgs, createDispatcher } from './dispatchers';
 import { ObservableInput, pipe } from 'rxjs';
 import { SernEmitter } from '../core';
 import { Err, Ok, Result } from 'ts-results-es';
-import type { AnyFunction, Awaitable } from '../types/utility';
-import type { ControlPlugin } from '../types/core-plugin';
+import type { Awaitable } from '../types/utility';
+import type { ControlPlugin, InitPlugin } from '../types/core-plugin';
 import type { AnyModule, CommandModule, Module, Processed } from '../types/core-modules';
 import type { ImportPayload } from '../types/core';
 import { disposeAll } from '../core/ioc/base';
@@ -170,6 +171,8 @@ export function executeModule(
         }),
     );
 }
+
+
 
 /**
  * A higher order function that

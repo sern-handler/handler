@@ -22,13 +22,11 @@ export class CoreContainer<T extends Partial<Dependencies>> extends Container<T,
 
         (this as Container<{}, {}>)
             .add({ '@sern/errors': () => new DefaultServices.DefaultErrorHandling(),
-                   '@sern/emitter': () => new SernEmitter(),
-                   '@sern/store': () => new ModuleStore() })
+                   '@sern/emitter': () => new SernEmitter,
+                   '@sern/store': () => new ModuleStore })
             .add(ctx => {
-                return {
-                    '@sern/modules': () =>
-                        new DefaultServices.DefaultModuleManager(ctx['@sern/store']),
-                };
+                return { '@sern/modules': () =>
+                        new DefaultServices.DefaultModuleManager(ctx['@sern/store']) };
             });
     }
 
