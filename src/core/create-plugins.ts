@@ -1,6 +1,7 @@
 import { CommandType, EventType, PluginType } from './structures';
 import type { Plugin, PluginResult, EventArgs, CommandArgs } from '../types/core-plugin';
 import type { ClientEvents } from 'discord.js';
+import { err, ok } from './functions';
 
 export function makePlugin<V extends unknown[]>(
     type: PluginType,
@@ -60,3 +61,12 @@ export function DiscordEventControlPlugin<T extends keyof ClientEvents>(
 ) {
     return makePlugin(PluginType.Control, execute);
 }
+
+/**
+ * @since 1.0.0
+ * The object passed into every plugin to control a command's behavior
+ */
+export const controller = {
+    next: ok,
+    stop: err,
+};

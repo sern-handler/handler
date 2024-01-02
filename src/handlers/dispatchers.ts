@@ -11,7 +11,7 @@ import {
 import { createResultResolver } from './event-utils';
 import { BaseInteraction, Message } from 'discord.js';
 import { CommandType, Context } from '../core';
-import type { Args } from '../types/utility';
+import type { AnyFunction, Args } from '../types/utility';
 import { inspect } from 'node:util'
 import type { CommandModule, Module, Processed } from '../types/core-modules';
 
