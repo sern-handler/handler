@@ -5,6 +5,7 @@ import { CoreContainer } from './container';
 import { Result } from 'ts-results-es'
 import { DefaultServices } from '../_internal';
 import { AnyFunction } from '../../types/utility';
+import type { Logging } from '../contracts/logging';
 //SIDE EFFECT: GLOBAL DI
 let containerSubject: CoreContainer<Partial<Dependencies>>;
 
@@ -20,6 +21,12 @@ export function useContainerRaw() {
         "Could not find container or container wasn't ready. Did you call makeDependencies?",
     );
     return containerSubject;
+}
+
+export function disposeAll(logger: Logging|undefined) {
+    containerSubject
+        ?.disposeAll()
+        .then(() => logger?.info({ message: 'Cleaning container and crashing' }));
 }
 
 const dependencyBuilder = (container: any, excluded: string[]) => {
@@ -82,16 +89,16 @@ export const insertLogger = (containerSubject: CoreContainer<any>) => {
 }
 export async function makeDependencies<const T extends Dependencies>
 (conf: ValidDependencyConfig) {
-    //Until there are more optional dependencies, just check if the logger exists
-    //SIDE EFFECT
     containerSubject = new CoreContainer();
     if(typeof conf === 'function') {
         const excluded: string[] = [];
         conf(dependencyBuilder(containerSubject, excluded));
+
         if(!excluded.includes('@sern/logger') 
            && !containerSubject.getTokens()['@sern/logger']) {
             insertLogger(containerSubject);
         }
+
         containerSubject.ready();
     } else {
         composeRoot(containerSubject, conf);

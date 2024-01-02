@@ -114,7 +114,7 @@ export class Context extends CoreContext<Message, ChatInputCommandInteraction> {
         if ('interaction' in wrappable) {
             return new Context(Ok(wrappable));
         }
-        assert.ok(wrappable.isChatInputCommand());
+        assert.ok(wrappable.isChatInputCommand(), "Context created with bad interaction.");
         return new Context(Err(wrappable));
     }
 }

@@ -55,4 +55,3 @@ export * as Presence from './core/presences'
 export {
     useContainerRaw
 } from './core/_internal'
-export { controller } from './sern';

@@ -21,17 +21,17 @@ import {
     handleError,
     SernError,
     VoidResult,
-    useContainerRaw,
 } from '../core/_internal';
 import { Emitter, ErrorHandling, Logging, ModuleManager } from '../core';
 import { contextArgs, createDispatcher } from './dispatchers';
 import { ObservableInput, pipe } from 'rxjs';
 import { SernEmitter } from '../core';
 import { Err, Ok, Result } from 'ts-results-es';
-import type { AnyFunction, Awaitable } from '../types/utility';
+import type { Awaitable } from '../types/utility';
 import type { ControlPlugin } from '../types/core-plugin';
 import type { AnyModule, CommandModule, Module, Processed } from '../types/core-modules';
 import type { ImportPayload } from '../types/core';
+import { disposeAll } from '../core/ioc/base';
 
 function createGenericHandler<Source, Narrowed extends Source, Output>(
     source: Observable<Source>,
@@ -77,11 +77,10 @@ export function createInteractionHandler<T extends Interaction>(
             }
             return Files
                 .defaultModuleLoader<Processed<CommandModule>>(fullPath)
-                .then(payload =>
-                   Ok(createDispatcher({ 
-                       module: payload.module,
-                       event,
-                      })));
+                .then(payload => Ok(createDispatcher({ 
+                                        module: payload.module, 
+                                        event,
+                                    })));
         },
     );
 }
@@ -100,10 +99,9 @@ export function createMessageHandler(
         }
         return Files
             .defaultModuleLoader<Processed<CommandModule>>(fullPath)
-            .then((payload)=> {
+            .then(payload => {
                 const args = contextArgs(event, rest);
                 return Ok({ args, ...payload });
-
             });
     });
 }
@@ -171,6 +169,8 @@ export function executeModule(
         }),
     );
 }
+
+
 
 /**
  * A higher order function that
@@ -258,8 +258,5 @@ export const handleCrash = (err: ErrorHandling, log?: Logging) =>
             log?.info({
                 message: 'A stream closed or reached end of lifetime',
             });
-            useContainerRaw()
-                ?.disposeAll()
-                .then(() => log?.info({ message: 'Cleaning container and crashing' }));
-        }),
-    );
+            disposeAll(log);
+        }));

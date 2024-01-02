@@ -12,6 +12,7 @@ import { createResultResolver } from './event-utils';
 import { BaseInteraction, Message } from 'discord.js';
 import { CommandType, Context } from '../core';
 import type { AnyFunction, Args } from '../types/utility';
+import { inspect } from 'node:util'
 import type { CommandModule, Module, Processed } from '../types/core-modules';
 
 //TODO: refactor dispatchers so that it implements a strategy for each different type of payload?
@@ -75,10 +76,7 @@ export function createDispatcher(payload: {
         case CommandType.Both: {
             if (isAutocomplete(payload.event)) {
                 const option = treeSearch(payload.event, payload.module.options);
-                assert.ok(
-                    option,
-                    Error(SernError.NotSupportedInteraction + ` There is no autocomplete tag for this option`),
-                );
+                assert.ok(option, SernError.NotSupportedInteraction + ` There is no autocomplete tag for ` + inspect(payload.module));
                 const { command, name, parent } = option;
             
              	return {

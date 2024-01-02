@@ -42,5 +42,5 @@ export const presenceHandler = (path: string, setPresence: SetPresence) => {
         //concatMap resolves the promise, and passes it to the next concatMap.
         concatMap(fn => parseConfig(fn())),
         // subscribe to the observable parseConfig yields, and set the presence.
-        concatMap(conf => conf.pipe(map(setPresence))))
+        concatMap(conf => conf.pipe(map(setPresence))));
 }

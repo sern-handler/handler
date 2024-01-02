@@ -66,11 +66,4 @@ function useDependencies() {
     );
 }
 
-/**
- * @since 1.0.0
- * The object passed into every plugin to control a command's behavior
- */
-export const controller = {
-    next: ok,
-    stop: err,
-};
+

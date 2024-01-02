@@ -93,9 +93,9 @@ export abstract class CommandExecutable<const Type extends CommandType = Command
 }
 
 /**
- * @deprecated
- * Will be removed in future
- */
+  * @deprecated
+  * Will be removed in future
+  */
 export abstract class EventExecutable<Type extends EventType> {
     abstract type: Type;
     plugins: AnyEventPlugin[] = [];
