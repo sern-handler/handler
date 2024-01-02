@@ -42,6 +42,7 @@ export const CommandTypeDiscordApi = [
     ComponentType.MentionableSelect,
     ComponentType.ChannelSelect,
 ];
+
 /*
  * Generates a number based on CommandType.
  * This corresponds to an ApplicationCommandType or ComponentType

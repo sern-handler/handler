@@ -130,7 +130,6 @@ export function loadConfig(wrapper: Wrapper | 'file'): Wrapper {
         eventsPath = makePath('events');
         console.log('Events path is set to', eventsPath);
     }
-    
 
     return {
         defaultPrefix: config.defaultPrefix,

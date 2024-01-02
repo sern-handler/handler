@@ -89,16 +89,16 @@ export const insertLogger = (containerSubject: CoreContainer<any>) => {
 }
 export async function makeDependencies<const T extends Dependencies>
 (conf: ValidDependencyConfig) {
-    //Until there are more optional dependencies, just check if the logger exists
-    //SIDE EFFECT
     containerSubject = new CoreContainer();
     if(typeof conf === 'function') {
         const excluded: string[] = [];
         conf(dependencyBuilder(containerSubject, excluded));
+
         if(!excluded.includes('@sern/logger') 
            && !containerSubject.getTokens()['@sern/logger']) {
             insertLogger(containerSubject);
         }
+
         containerSubject.ready();
     } else {
         composeRoot(containerSubject, conf);
