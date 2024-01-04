@@ -6,6 +6,8 @@ import { Result } from 'ts-results-es';
 import { DefaultServices } from '../_internal';
 import { AnyFunction } from '../../types/utility';
 import type { Logging } from '../contracts/logging';
+import { requir } from '../module-loading';
+
 //SIDE EFFECT: GLOBAL DI
 let containerSubject: CoreContainer<Partial<Dependencies>>;
 
@@ -107,9 +109,12 @@ export async function makeDependencies<const T extends Dependencies>
         // well damn i have to go sorry, rip okay dsoo you want me to commit?
         //push draft pr okok
         const validIncludes = '@sern/localizer';
-        if(included.includes(validIncludes)) {
 
+        if(included.includes(validIncludes)) {
+            //Would be preferred if we can get away without awaiting
+            containerSubject.add({ '@sern/localizer': requir('shrimple-locales') });
         }
+
         containerSubject.ready();
     } else {
         composeRoot(containerSubject, conf);

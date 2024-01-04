@@ -107,7 +107,7 @@ async function* readPaths(dir: string): AsyncGenerator<string> {
     }
 }
 
-const requir = createRequire(import.meta.url);
+export const requir = createRequire(import.meta.url);
 
 export function loadConfig(wrapper: Wrapper | 'file'): Wrapper {
     if (wrapper !== 'file') {

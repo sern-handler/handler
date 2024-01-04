@@ -1,4 +1,5 @@
 import type { CoreDependencies, DependencyConfiguration, IntoDependencies } from '../../types/ioc';
+import { requir } from '../module-loading';
 import { insertLogger, useContainerRaw } from './base';
 import { CoreContainer } from './container';
 
@@ -60,6 +61,9 @@ export function composeRoot(
     const hasLogger = conf.exclude?.has('@sern/logger');
     if (!hasLogger) {
         insertLogger(container);
+    }
+    if(conf.include?.includes('@sern/localizer')) {
+        container.add({ '@sern/localizer': requir('shrimple-locales') });
     }
     //Build the container based on the callback provided by the user
     conf.build(container as CoreContainer<Omit<CoreDependencies, '@sern/client'>>);
