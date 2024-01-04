@@ -3,7 +3,7 @@ import { Disposable, SernEmitter } from '../';
 import * as assert from 'node:assert';
 import { Subject } from 'rxjs';
 import { DefaultServices, ModuleStore } from '../_internal';
-import * as Hooks from './hooks'
+import * as Hooks from './hooks';
 
 
 /**
@@ -44,7 +44,7 @@ export class CoreContainer<T extends Partial<Dependencies>> extends Container<T,
         for(const key of otherDisposables) {
             this.addDisposer({ [key]: (dep: Disposable) => dep.dispose() } as never);
         }
-        await super.disposeAll() 
+        await super.disposeAll();
     }
     ready() {
         this.ready$.complete();

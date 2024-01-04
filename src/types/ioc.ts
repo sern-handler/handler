@@ -42,6 +42,10 @@ export type IntoDependencies<Tuple extends [...any[]]> = {
 export interface DependencyConfiguration {
     //@deprecated. Loggers will always be included in the future
     exclude?: Set<'@sern/logger'>;
+
+    //Extra modules that are preconfigured and ready to use! @sern/localizer is an example
+    include?: string[]
+    
     build: (
         root: Container<Omit<CoreDependencies, '@sern/client'>, {}>,
     ) => Container<Dependencies, {}>;

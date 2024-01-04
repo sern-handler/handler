@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import { composeRoot, useContainer } from './dependency-injection';
 import type { DependencyConfiguration } from '../../types/ioc';
 import { CoreContainer } from './container';
-import { Result } from 'ts-results-es'
+import { Result } from 'ts-results-es';
 import { DefaultServices } from '../_internal';
 import { AnyFunction } from '../../types/utility';
 import type { Logging } from '../contracts/logging';
@@ -29,7 +29,7 @@ export function disposeAll(logger: Logging|undefined) {
         .then(() => logger?.info({ message: 'Cleaning container and crashing' }));
 }
 
-const dependencyBuilder = (container: any, excluded: string[]) => {
+const dependencyBuilder = (container: any, excluded: string[], included: string[]) => {
     type Insertable = 
         | ((container: CoreContainer<Dependencies>) => unknown )
         | Record<PropertyKey, unknown>
@@ -49,6 +49,9 @@ const dependencyBuilder = (container: any, excluded: string[]) => {
           */
         exclude(...keys: (keyof Dependencies)[]) {
             keys.forEach(key => excluded.push(key));
+        },
+        include(...keys: string[]) {
+            included.push(...keys);
         },
         /**
           * @param key the key of the dependency
@@ -92,13 +95,21 @@ export async function makeDependencies<const T extends Dependencies>
     containerSubject = new CoreContainer();
     if(typeof conf === 'function') {
         const excluded: string[] = [];
-        conf(dependencyBuilder(containerSubject, excluded));
-
-        if(!excluded.includes('@sern/logger') 
-           && !containerSubject.getTokens()['@sern/logger']) {
+        const included: string[] = [];
+        conf(dependencyBuilder(containerSubject, excluded, included));
+        
+        const includeLogger = 
+            !excluded.includes('@sern/logger') 
+            && !containerSubject.getTokens()['@sern/logger'];
+        if(includeLogger) {
             insertLogger(containerSubject);
         }
+        // well damn i have to go sorry, rip okay dsoo you want me to commit?
+        //push draft pr okok
+        const validIncludes = '@sern/localizer';
+        if(included.includes(validIncludes)) {
 
+        }
         containerSubject.ready();
     } else {
         composeRoot(containerSubject, conf);
