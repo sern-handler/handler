@@ -17,11 +17,12 @@ export class CoreContainer<T extends Partial<Dependencies>> extends Container<T,
         assert.ok(!this.isReady(), 'Listening for dispose & init should occur prior to sern being ready.');
 
         const { unsubscribe } = Hooks.createInitListener(this);
+
         this.ready$
             .subscribe({ complete: unsubscribe });
 
         (this as Container<{}, {}>)
-            .add({ '@sern/errors': () => new DefaultServices.DefaultErrorHandling(),
+            .add({ '@sern/errors': () => new DefaultServices.DefaultErrorHandling,
                    '@sern/emitter': () => new SernEmitter,
                    '@sern/store': () => new ModuleStore })
             .add(ctx => {
@@ -46,6 +47,9 @@ export class CoreContainer<T extends Partial<Dependencies>> extends Container<T,
         }
         await super.disposeAll();
     }
+    
+    
+    
     ready() {
         this.ready$.complete();
         this.ready$.unsubscribe();

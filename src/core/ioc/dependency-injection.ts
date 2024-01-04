@@ -48,7 +48,7 @@ export function Services<const T extends (keyof Dependencies)[]>(...keys: [...T]
 }
 
 /**
- * Given the user's conf, check for any excluded dependency keys.
+ * Given the user's conf, check for any excluded/included dependency keys.
  * Then, call conf.build to get the rest of the users' dependencies.
  * Finally, update the containerSubject with the new container state
  * @param conf
