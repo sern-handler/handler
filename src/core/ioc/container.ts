@@ -34,6 +34,10 @@ export class CoreContainer<T extends Partial<Dependencies>> extends Container<T,
     isReady() {
         return this.ready$.closed;
     }
+    
+    hasKey(key: string): boolean {
+        return Boolean((this as Container<any,any>)._context[key]);
+    }
 
     override async disposeAll() {
         

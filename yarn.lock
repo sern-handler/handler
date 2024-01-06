@@ -634,11 +634,14 @@ __metadata:
     iti: ^0.6.0
     prettier: 2.8.8
     rxjs: ^7.8.0
-    shrimple-locales: ^0.1.1
+    shrimple-locales: ^0.1.2
     ts-results-es: ^4.0.0
     tsup: ^6.7.0
     typescript: 5.0.2
     vitest: latest
+  dependenciesMeta:
+    shrimple-locales:
+      optional: true
   languageName: unknown
   linkType: soft
 
@@ -3115,10 +3118,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"shrimple-locales@npm:^0.1.1":
-  version: 0.1.1
-  resolution: "shrimple-locales@npm:0.1.1"
-  checksum: 78db184b1f3a1a6f00b6f6a1de1a283668ac8f2497673a1a1592ac245983923ea0089c4590a2dd2cd256a2977873c284278ec14067173e51e758d632bd025b78
+"shrimple-locales@npm:^0.1.2":
+  version: 0.1.2
+  resolution: "shrimple-locales@npm:0.1.2"
+  checksum: 3e30c4a6aff792e5ef51495f37e45704526a3b42d58fb21d5219fd7ae81007e7ca9b651d0551d2e89ab00c28457284d8f1fad2f2295095a22cd6b272172d55d1
   languageName: node
   linkType: hard
 

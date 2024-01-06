@@ -40,7 +40,6 @@
         "callsites": "^3.1.0",
         "iti": "^0.6.0",
         "rxjs": "^7.8.0",
-        "shrimple-locales": "^0.1.1",
         "ts-results-es": "^4.0.0"
     },
     "devDependencies": {
@@ -96,5 +95,8 @@
         "type": "git",
         "url": "git+https://github.com/sern-handler/handler.git"
     },
-    "homepage": "https://sern.dev"
+    "homepage": "https://sern.dev",
+    "optionalDependencies": {
+        "shrimple-locales": "^0.1.2"
+    }
 }

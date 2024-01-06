@@ -92,6 +92,15 @@ export const insertLogger = (containerSubject: CoreContainer<any>) => {
     containerSubject
         .upsert({'@sern/logger': () => new DefaultServices.DefaultLogging});
 }
+
+export const insertLocalizer = async (containerSubject: CoreContainer<any>) => {
+    const { ShrimpleLocalizer } = requir('../structures/services/localizer');
+    containerSubject
+        .add({'@sern/localizer':  new ShrimpleLocalizer() });
+}
+
+
+
 export async function makeDependencies<const T extends Dependencies>
 (conf: ValidDependencyConfig) {
     containerSubject = new CoreContainer();
@@ -103,16 +112,13 @@ export async function makeDependencies<const T extends Dependencies>
         const includeLogger = 
             !excluded.includes('@sern/logger') 
             && !containerSubject.getTokens()['@sern/logger'];
+
         if(includeLogger) {
             insertLogger(containerSubject);
         }
-        // well damn i have to go sorry, rip okay dsoo you want me to commit?
-        //push draft pr okok
-        const validIncludes = '@sern/localizer';
 
-        if(included.includes(validIncludes)) {
-            //Would be preferred if we can get away without awaiting
-            containerSubject.add({ '@sern/localizer': requir('shrimple-locales') });
+        if(included.includes('@sern/localizer')) {
+            await insertLocalizer(containerSubject);
         }
 
         containerSubject.ready();
@@ -122,6 +128,4 @@ export async function makeDependencies<const T extends Dependencies>
 
     return useContainer<T>();
 }
-
-
 
