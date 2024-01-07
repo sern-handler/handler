@@ -71,9 +71,9 @@ export function createInteractionHandler<T extends Interaction>(
     return createGenericHandler<Interaction, T, Result<ReturnType<typeof createDispatcher>, void>>(
         source,
         async event => {
-            const fullPath = mg.get(Id.reconstruct(event));
+            let fullPath = mg.get(Id.reconstruct(event));
             if(!fullPath) {
-                return Err.EMPTY
+                return Err.EMPTY;
             }
             return Files
                 .defaultModuleLoader<Processed<CommandModule>>(fullPath)
@@ -92,10 +92,12 @@ export function createMessageHandler(
 ) {
     return createGenericHandler(source, async event => {
         const [prefix, ...rest] = fmt(event.content, defaultPrefix);
-        const fullPath = mg.get(`${prefix}_A1`);
-
+        let fullPath = mg.get(`${prefix}_T`);
         if(!fullPath) {
-            return Err('Possibly undefined behavior: could not find a static id to resolve')
+            fullPath = mg.get(`${prefix}_B`);
+            if(!fullPath) {
+                return Err('Possibly undefined behavior: could not find a static id to resolve');
+            }
         }
         return Files
             .defaultModuleLoader<Processed<CommandModule>>(fullPath)

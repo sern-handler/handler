@@ -25,6 +25,7 @@ export function dispatchMessage(module: Processed<CommandModule>, args: [Context
 
 export function contextArgs(wrappable: Message | BaseInteraction, messageArgs?: string[]) {
     const ctx = Context.wrap(wrappable);
+    console.log(ctx);
     const args = ctx.isMessage() ? ['text', messageArgs!] : ['slash', ctx.options];
     return [ctx, args] as [Context, Args];
 }
@@ -77,7 +78,7 @@ export function createDispatcher(payload: {
             if (isAutocomplete(payload.event)) {
                 const option = treeSearch(payload.event, payload.module.options);
                 assert.ok(option, SernError.NotSupportedInteraction + ` There is no autocomplete tag for ` + inspect(payload.module));
-                const { command, name, parent } = option;
+                const { command } = option;
             
              	return {
                     ...payload,
