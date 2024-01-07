@@ -71,18 +71,23 @@ export function createInteractionHandler<T extends Interaction>(
     return createGenericHandler<Interaction, T, Result<ReturnType<typeof createDispatcher>, void>>(
         source,
         async event => {
-            let fullPath = mg.get(Id.reconstruct(event));
-            if(!fullPath) {
+            const possibleIds = Id.reconstruct(event);
+            let fullPaths= possibleIds
+                .map(id => mg.get(id))
+                .filter((id): id is string => id !== undefined);
+
+            if(fullPaths.length == 0) {
                 return Err.EMPTY;
             }
+            const [ path ] = fullPaths;
             return Files
-                .defaultModuleLoader<Processed<CommandModule>>(fullPath)
-                .then(payload => Ok(createDispatcher({ 
-                                        module: payload.module, 
-                                        event,
-                                    })));
-        },
-    );
+            .defaultModuleLoader<Processed<CommandModule>>(path)
+            .then(payload => Ok(createDispatcher({ 
+                                    module: payload.module, 
+                                    event,
+                                })));
+    },
+);
 }
 
 export function createMessageHandler(

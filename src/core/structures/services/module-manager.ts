@@ -44,7 +44,10 @@ export class DefaultModuleManager implements ModuleManager {
         const publishable = 0b000000110;
         return Promise.all(
             Array.from(entries)
-                .filter(([id]) => !(Number.parseInt(id.at(-1)!) & publishable))
+                .filter(([id]) => {
+                    const last_entry = id.at(-1);
+                    return last_entry == 'B' ||  !(publishable & Number.parseInt(last_entry!));
+                })
                 .map(([, path]) => Files.importModule<CommandModule>(path)),
         );
     }

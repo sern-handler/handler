@@ -11,7 +11,7 @@ import {
 import { createResultResolver } from './event-utils';
 import { BaseInteraction, Message } from 'discord.js';
 import { CommandType, Context } from '../core';
-import type { AnyFunction, Args } from '../types/utility';
+import type { Args } from '../types/utility';
 import { inspect } from 'node:util'
 import type { CommandModule, Module, Processed } from '../types/core-modules';
 
@@ -25,7 +25,6 @@ export function dispatchMessage(module: Processed<CommandModule>, args: [Context
 
 export function contextArgs(wrappable: Message | BaseInteraction, messageArgs?: string[]) {
     const ctx = Context.wrap(wrappable);
-    console.log(ctx);
     const args = ctx.isMessage() ? ['text', messageArgs!] : ['slash', ctx.options];
     return [ctx, args] as [Context, Args];
 }

@@ -4,20 +4,20 @@ import { CommandType, EventType } from './structures';
 /**
  * Construct unique ID for a given interaction object.
  * @param event The interaction object for which to create an ID.
- * @returns A unique string ID based on the type and properties of the interaction object.
+ * @returns An array of unique string IDs based on the type and properties of the interaction object.
  */
 export function reconstruct<T extends Interaction>(event: T) {
     switch (event.type) {
         case InteractionType.MessageComponent: {
-            return `${event.customId}_C${event.componentType}`;
+            return [`${event.customId}_C${event.componentType}`];
         }
         case InteractionType.ApplicationCommand:
         case InteractionType.ApplicationCommandAutocomplete: {
-            return `${event.commandName}_A${event.commandType}`;
+            return [`${event.commandName}_A${event.commandType}`, `${event.commandName}_B`];
         }
         //Modal interactions are classified as components for sern
         case InteractionType.ModalSubmit: {
-            return `${event.customId}_M`;
+            return [`${event.customId}_M`];
         }
     }
 }
@@ -39,6 +39,7 @@ const TypeMap = new Map<number, number>([
     [CommandType.StringSelect, ComponentType.StringSelect],
     [CommandType.UserSelect, ComponentType.UserSelect],
     [CommandType.MentionableSelect, ComponentType.MentionableSelect],
+    [CommandType.RoleSelect, ComponentType.RoleSelect],
     [CommandType.ChannelSelect, ComponentType.ChannelSelect]]);
 
 /*
