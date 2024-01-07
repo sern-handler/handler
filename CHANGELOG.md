@@ -1,5 +1,17 @@
 # Changelog
 
+## [3.3.1](https://github.com/sern-handler/handler/compare/v3.3.0...v3.3.1) (2024-01-07)
+
+
+### Bug Fixes
+
+* crashing when slash command is used as text command ([#349](https://github.com/sern-handler/handler/issues/349)) ([a359f73](https://github.com/sern-handler/handler/commit/a359f73fa24127a4964d411c8c1c0dfea5edc0f1))
+
+
+### Reverts
+
+* the last commit ([655bb8d](https://github.com/sern-handler/handler/commit/655bb8d35815fe0ce9797d8b169310a07b284ae0))
+
 ## [3.3.0](https://github.com/sern-handler/handler/compare/v3.2.1...v3.3.0) (2023-12-27)
 
 
