@@ -34,6 +34,7 @@ export function init(maybeWrapper: Wrapper | 'file') {
     if (wrapper.events !== undefined) {
         eventsHandler(dependencies, Files.getFullPathTree(wrapper.events));
     }
+
     const initCallsite = callsites()[1].getFileName();
     const presencePath = Files.shouldHandle(initCallsite!, "presence");
     //Ready event: load all modules and when finished, time should be taken and logged
@@ -42,6 +43,7 @@ export function init(maybeWrapper: Wrapper | 'file') {
             const time = ((performance.now() - startTime) / 1000).toFixed(2);
             dependencies[0].emit('modulesLoaded');
             logger?.info({ message: `sern: registered all modules in ${time} s`, });
+            console.log(presencePath.exists)
             if(presencePath.exists) {
                 const setPresence = async (p: any) => {
                     return (dependencies[4] as Client).user?.setPresence(p);

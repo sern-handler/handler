@@ -1,19 +1,22 @@
 import { Result } from 'ts-results-es';
 import { type Observable, from, mergeMap, ObservableInput } from 'rxjs';
 import { readdir, stat } from 'fs/promises';
-import { basename, extname, join, resolve, parse } from 'path';
+import { basename, extname, join, resolve, parse, dirname, normalize } from 'path';
 import assert from 'assert';
 import { createRequire } from 'node:module';
 import type { ImportPayload, Wrapper } from '../types/core';
 import type { Module } from '../types/core-modules';
 import { existsSync } from 'fs';
-import { fileURLToPath } from 'node:url';
-
+import { fileURLToPath } from 'node:url'
 export const shouldHandle = (path: string, fpath: string) => {
-    const newPath = new URL(fpath+extname(path), path).href;
+    const file_name = fpath+extname(path);
+    let newPath = join(dirname(path), file_name);
+    if(newPath.startsWith('file:')) {
+        newPath = newPath.substring(6);
+    }
     return {
-        exists: existsSync(fileURLToPath(newPath)),
-        path: newPath
+        exists: existsSync(newPath),
+        path: 'file:///'+newPath
     }
 }
 
