@@ -1,20 +1,19 @@
 import { Result } from 'ts-results-es';
 import { type Observable, from, mergeMap, ObservableInput } from 'rxjs';
 import { readdir, stat } from 'fs/promises';
-import { basename, extname, join, resolve, parse } from 'path';
+import { basename, extname, join, resolve, parse, dirname } from 'path';
 import assert from 'assert';
 import { createRequire } from 'node:module';
 import type { ImportPayload, Wrapper } from '../types/core';
 import type { Module } from '../types/core-modules';
 import { existsSync } from 'fs';
-import { fileURLToPath } from 'node:url';
 
 export const shouldHandle = (path: string, fpath: string) => {
-    const newPath = new URL(fpath+extname(path), path).href;
-    return {
-        exists: existsSync(fileURLToPath(newPath)),
-        path: newPath
-    }
+    const file_name = fpath+extname(path);
+    let newPath = join(dirname(path), file_name)
+                    .replace(/file:\\?/, "");
+    return { exists: existsSync(newPath),
+             path: 'file:///'+newPath };
 }
 
 
@@ -79,11 +78,9 @@ const isSkippable = (filename: string) => {
 
 async function deriveFileInfo(dir: string, file: string) {
     const fullPath = join(dir, file);
-    return {
-        fullPath,
-        fileStats: await stat(fullPath),
-        base: basename(file),
-    };
+    return { fullPath,
+             fileStats: await stat(fullPath),
+             base: basename(file) };
 }
 
 async function* readPaths(dir: string): AsyncGenerator<string> {
@@ -131,10 +128,8 @@ export function loadConfig(wrapper: Wrapper | 'file'): Wrapper {
         console.log('Events path is set to', eventsPath);
     }
 
-    return {
-        defaultPrefix: config.defaultPrefix,
-        commands: commandsPath,
-        events: eventsPath,
-    };
+    return { defaultPrefix: config.defaultPrefix,
+             commands: commandsPath,
+             events: eventsPath };
     
 }

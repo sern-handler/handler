@@ -71,18 +71,23 @@ export function createInteractionHandler<T extends Interaction>(
     return createGenericHandler<Interaction, T, Result<ReturnType<typeof createDispatcher>, void>>(
         source,
         async event => {
-            const fullPath = mg.get(Id.reconstruct(event));
-            if(!fullPath) {
-                return Err.EMPTY
+            const possibleIds = Id.reconstruct(event);
+            let fullPaths= possibleIds
+                .map(id => mg.get(id))
+                .filter((id): id is string => id !== undefined);
+
+            if(fullPaths.length == 0) {
+                return Err.EMPTY;
             }
+            const [ path ] = fullPaths;
             return Files
-                .defaultModuleLoader<Processed<CommandModule>>(fullPath)
-                .then(payload => Ok(createDispatcher({ 
-                                        module: payload.module, 
-                                        event,
-                                    })));
-        },
-    );
+            .defaultModuleLoader<Processed<CommandModule>>(path)
+            .then(payload => Ok(createDispatcher({ 
+                                    module: payload.module, 
+                                    event,
+                                })));
+    },
+);
 }
 
 export function createMessageHandler(
@@ -92,10 +97,12 @@ export function createMessageHandler(
 ) {
     return createGenericHandler(source, async event => {
         const [prefix, ...rest] = fmt(event.content, defaultPrefix);
-        const fullPath = mg.get(`${prefix}_A1`);
-
+        let fullPath = mg.get(`${prefix}_T`);
         if(!fullPath) {
-            return Err('Possibly undefined behavior: could not find a static id to resolve')
+            fullPath = mg.get(`${prefix}_B`);
+            if(!fullPath) {
+                return Err('Possibly undefined behavior: could not find a static id to resolve');
+            }
         }
         return Files
             .defaultModuleLoader<Processed<CommandModule>>(fullPath)

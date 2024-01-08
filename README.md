@@ -42,26 +42,6 @@ export default commandModule({
 });
 ```
 </details>
-<details><summary>modal.ts</summary>
-
-```ts
-export default commandModule({
-    type: CommandType.Modal,
-    //Installed a plugin to make sure modal fields pass a validation.
-    plugins : [
-        assertFields({
-            fields: { 
-                name: /^([^0-9]*)$/ 
-            },
-            failure: (errors, modal) => modal.reply('your submission did not pass the validations')
-        })
-    ],
-    execute : (modal) => {
-        modal.reply('thanks for the submission!');
-    }
-})
-```
-</details>
 
 
 ## 🤖 Bots Using sern 
@@ -72,7 +52,8 @@ export default commandModule({
 - [Murayama](https://github.com/murayamabot/murayama), :pepega:
 - [Protector (WIP)](https://github.com/needhamgary/Protector), Just a simple bot to help enhance a private minecraft server.
 - [SmokinWeed 💨](https://github.com/Peter-MJ-Parker/sern-bud), A fun bot for a small - but growing - server.
-
+- [Man Nomic](https://github.com/jacoobes/man-nomic), A simple information bot to provide information to the nomic-ai discord community.
+- [Linear-Discord](https://github.com/sern-handler/linear-discord) Display and manage a linear dashboard.
 ## 💻 CLI
 
 It is **highly encouraged** to use the [command line interface](https://github.com/sern-handler/cli) for your project. Don't forget to view it.
