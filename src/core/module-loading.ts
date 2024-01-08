@@ -12,8 +12,10 @@ export const shouldHandle = (path: string, fpath: string) => {
     const file_name = fpath+extname(path);
     let newPath = join(dirname(path), file_name);
     if(newPath.startsWith('file:')) {
-        newPath = newPath.substring(6);
+        newPath = newPath.substring(5);
     }
+
+    console.log(newPath)
     return {
         exists: existsSync(newPath),
         path: 'file:///'+newPath
