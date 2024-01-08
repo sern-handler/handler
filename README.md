@@ -72,6 +72,7 @@ export default commandModule({
 - [Murayama](https://github.com/murayamabot/murayama), :pepega:
 - [Protector (WIP)](https://github.com/needhamgary/Protector), Just a simple bot to help enhance a private minecraft server.
 - [SmokinWeed 💨](https://github.com/Peter-MJ-Parker/sern-bud), A fun bot for a small - but growing - server.
+- [Man Nomic](https://github.com/jacoobes/man-nomic), A simple information bot to provide information to the nomic-ai discord community.
 
 ## 💻 CLI
 
