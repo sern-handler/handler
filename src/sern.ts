@@ -34,6 +34,7 @@ export function init(maybeWrapper: Wrapper | 'file') {
     if (wrapper.events !== undefined) {
         eventsHandler(dependencies, Files.getFullPathTree(wrapper.events));
     }
+
     const initCallsite = callsites()[1].getFileName();
     const presencePath = Files.shouldHandle(initCallsite!, "presence");
     //Ready event: load all modules and when finished, time should be taken and logged
