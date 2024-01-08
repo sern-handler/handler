@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.3.2](https://github.com/sern-handler/handler/compare/v3.3.1...v3.3.2) (2024-01-08)
+
+
+### Bug Fixes
+
+* presence feature not working on cjs applications ([#351](https://github.com/sern-handler/handler/issues/351)) ([4f23871](https://github.com/sern-handler/handler/commit/4f2387119acfde036d0d1626553e9050f55627d1))
+
 ## [3.3.1](https://github.com/sern-handler/handler/compare/v3.3.0...v3.3.1) (2024-01-07)
 
 
