@@ -1,7 +1,5 @@
-import type { CoreDependencies, DependencyConfiguration, IntoDependencies } from '../../types/ioc';
-import { requir } from '../module-loading';
-import { insertLogger, useContainerRaw } from './base';
-import { CoreContainer } from './container';
+import type { IntoDependencies } from '../../types/ioc';
+import { useContainerRaw } from './base';
 
 /**
  * @__PURE__
@@ -47,33 +45,7 @@ export function Services<const T extends (keyof Dependencies)[]>(...keys: [...T]
     return keys.map(k => container.get(k)!) as IntoDependencies<T>;
 }
 
-/**
- * Given the user's conf, check for any excluded/included dependency keys.
- * Then, call conf.build to get the rest of the users' dependencies.
- * Finally, update the containerSubject with the new container state
- * @param conf
- */
-export function composeRoot(
-    container: CoreContainer<Partial<Dependencies>>,
-    conf: DependencyConfiguration,
-) {
-    //container should have no client or logger yet.
-    const hasLogger = conf.exclude?.has('@sern/logger');
-    if (!hasLogger) {
-        insertLogger(container);
-    }
-    if(conf.include?.includes('@sern/localizer')) {
-        container.add({ '@sern/localizer': requir('shrimple-locales') });
-    }
-    //Build the container based on the callback provided by the user
-    conf.build(container as CoreContainer<Omit<CoreDependencies, '@sern/client'>>);
-    
-    if (!hasLogger) {
-        container.get('@sern/logger')?.info({ message: 'All dependencies loaded successfully.' });
-    }
 
-    container.ready();
-}
 
 export function useContainer<const T extends Dependencies>() {
     return <V extends (keyof T)[]>(...keys: [...V]) =>

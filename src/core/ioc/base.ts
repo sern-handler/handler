@@ -1,12 +1,14 @@
 import * as assert from 'assert';
-import { composeRoot, useContainer } from './dependency-injection';
-import type { DependencyConfiguration } from '../../types/ioc';
+import { useContainer } from './dependency-injection';
+import type { CoreDependencies, DependencyConfiguration } from '../../types/ioc';
 import { CoreContainer } from './container';
 import { Result } from 'ts-results-es';
 import { DefaultServices } from '../_internal';
 import { AnyFunction } from '../../types/utility';
 import type { Logging } from '../contracts/logging';
 import { requir } from '../module-loading';
+import { fileURLToPath } from 'node:url';
+import path from 'path';
 
 //SIDE EFFECT: GLOBAL DI
 let containerSubject: CoreContainer<Partial<Dependencies>>;
@@ -93,13 +95,41 @@ export const insertLogger = (containerSubject: CoreContainer<any>) => {
         .upsert({'@sern/logger': () => new DefaultServices.DefaultLogging});
 }
 
-export const insertLocalizer = async (containerSubject: CoreContainer<any>) => {
-    const { ShrimpleLocalizer } = requir('../structures/services/localizer');
+const insertLocalizer = async (containerSubject: CoreContainer<any>) => {
+    const packageDirectory = fileURLToPath(import.meta.url);
+    const pathToLocalizer= path.resolve(packageDirectory, "../", "optional", "localizer");
+    const { ShrimpleLocalizer } = requir(pathToLocalizer);
     containerSubject
-        .add({'@sern/localizer':  new ShrimpleLocalizer() });
+        .upsert({'@sern/localizer':  new ShrimpleLocalizer() });
 }
 
+/**
+ * Given the user's conf, check for any excluded/included dependency keys.
+ * Then, call conf.build to get the rest of the users' dependencies.
+ * Finally, update the containerSubject with the new container state
+ * @param conf
+ */
+function composeRoot(
+    container: CoreContainer<Partial<Dependencies>>,
+    conf: DependencyConfiguration,
+) {
+    //container should have no client or logger yet.
+    const hasLogger = conf.exclude?.has('@sern/logger');
+    if (!hasLogger) {
+        insertLogger(container);
+    }
+    if(conf.include?.includes('@sern/localizer')) {
+        insertLocalizer(container);
+    }
+    //Build the container based on the callback provided by the user
+    conf.build(container as CoreContainer<Omit<CoreDependencies, '@sern/client'>>);
+    
+    if (!hasLogger) {
+        container.get('@sern/logger')?.info({ message: 'All dependencies loaded successfully.' });
+    }
 
+    container.ready();
+}
 
 export async function makeDependencies<const T extends Dependencies>
 (conf: ValidDependencyConfig) {
@@ -118,7 +148,7 @@ export async function makeDependencies<const T extends Dependencies>
         }
 
         if(included.includes('@sern/localizer')) {
-            await insertLocalizer(containerSubject);
+            insertLocalizer(containerSubject);
         }
 
         containerSubject.ready();
