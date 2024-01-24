@@ -20,7 +20,6 @@ import { AnyCommandPlugin, AnyEventPlugin, ControlPlugin, InitPlugin } from './c
 import { Awaitable, Args, SlashOptions, SernEventsMapping } from './utility';
 
 
-
 export interface CommandMeta {
     fullPath: string;
     id: string;

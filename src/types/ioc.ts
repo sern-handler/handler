@@ -26,11 +26,12 @@ export type DependencyList = [
 
 export interface CoreDependencies {
     '@sern/client': () => Contracts.Emitter;
-    '@sern/logger'?: () => Contracts.Logging;
     '@sern/emitter': () => Contracts.Emitter;
     '@sern/store': () => Contracts.CoreModuleStore;
     '@sern/modules': () => Contracts.ModuleManager;
     '@sern/errors': () => Contracts.ErrorHandling;
+    '@sern/logger'?: () => Contracts.Logging;
+    '@sern/localizer'?: () => Contracts.Localizer
 }
 
 export type DependencyFromKey<T extends keyof Dependencies> = Dependencies[T];
@@ -45,7 +46,6 @@ export interface DependencyConfiguration {
 
     //Extra modules that are preconfigured and ready to use! @sern/localizer is an example
     include?: string[]
-    
     build: (
         root: Container<Omit<CoreDependencies, '@sern/client'>, {}>,
     ) => Container<Dependencies, {}>;

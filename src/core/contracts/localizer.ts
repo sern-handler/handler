@@ -1,4 +1,4 @@
 
 export interface Localizer {
-    translate(text: string) : string;
+    translate(text: string, local: string) : string;
 }

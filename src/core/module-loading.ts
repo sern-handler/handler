@@ -18,6 +18,7 @@ export const shouldHandle = (path: string, fpath: string) => {
 
 
 export type ModuleResult<T> = Promise<ImportPayload<T>>;
+
 /**
  * Import any module based on the absolute path.
  * This can accept four types of exported modules

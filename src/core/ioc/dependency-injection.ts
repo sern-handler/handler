@@ -1,3 +1,4 @@
+import assert from 'node:assert';
 import type { IntoDependencies } from '../../types/ioc';
 import { useContainerRaw } from './base';
 
@@ -33,7 +34,9 @@ export function transient<T>(cb: () => () => T) {
  *
  */
 export function Service<const T extends keyof Dependencies>(key: T) {
-    return useContainerRaw().get(key)!;
+    const dep = useContainerRaw().get(key)!;
+    assert(dep, "Requested key " + key + " returned undefined");
+    return dep;
 }
 /**
  * @since 3.0.0
@@ -51,3 +54,9 @@ export function useContainer<const T extends Dependencies>() {
     return <V extends (keyof T)[]>(...keys: [...V]) =>
         keys.map(key => useContainerRaw().get(key as keyof Dependencies)) as IntoDependencies<V>;
 }
+
+
+export function $local(i: string, local: string) {
+    return Service('@sern/localizer').translate(i, local)
+}
+
