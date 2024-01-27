@@ -49,14 +49,16 @@ export function Services<const T extends (keyof Dependencies)[]>(...keys: [...T]
 }
 
 
-
 export function useContainer<const T extends Dependencies>() {
     return <V extends (keyof T)[]>(...keys: [...V]) =>
         keys.map(key => useContainerRaw().get(key as keyof Dependencies)) as IntoDependencies<V>;
 }
 
 
-export function $local(i: string, local: string) {
+export const local  = (i: string, local: string) => {
     return Service('@sern/localizer').translate(i, local)
 }
 
+export const localsFor = (path: string) => {
+    return Service('@sern/localizer').translationsFor(path) 
+}

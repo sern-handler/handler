@@ -7,14 +7,15 @@ import { filename } from '../core/module-loading'
 import assert from 'node:assert';
 
 /**
- * @internal
- * @since 2.0.0
- * Version 4.0.0 will internalize this api. Please refrain from using ModuleStore!
+ * @since 3.4.0
  */
 export class ShrimpleLocalizer implements Localizer, Init {
     private __localization!: Localization;
-    private __localization_map!: Record<string, any>
     constructor(){}
+
+    translationsFor(path: string): Record<string, any> {
+        return this.__localization.localizationFor(path);
+    }
 
     translate(text: string, local: string): string {
         this.__localization.changeLanguage(local);
@@ -28,13 +29,12 @@ export class ShrimpleLocalizer implements Localizer, Init {
             fallbackLocale: "en",
             locales: map
         });
-        this.__localization_map = map
     }
 
     private async readLocalizationDirectory() {
         const translationFiles = [];
         const localPath = resolve('locals');
-        assert(existsSync(localPath), "You need to create a directory called \"locals\" for the localizer")
+        assert(existsSync(localPath), "No directory \"locals\" found for the localizer")
         for(const json of await fs.readdir(localPath)) {
            translationFiles.push({ [filename(json)]: 
                                    JSON.parse(await fs.readFile(join(localPath, json), 'utf8')) })
