@@ -97,6 +97,6 @@
     },
     "homepage": "https://sern.dev",
     "peerDependencies": {
-        "shrimple-locales": "^0.1.2"
+        "shrimple-locales": "^0.2.0"
     }
 }

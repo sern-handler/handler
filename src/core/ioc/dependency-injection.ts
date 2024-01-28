@@ -1,6 +1,10 @@
 import assert from 'node:assert';
 import type { IntoDependencies } from '../../types/ioc';
 import { useContainerRaw } from './base';
+import { fileURLToPath } from 'node:url';
+import path from 'node:path';
+import { requir } from '../module-loading';
+import type { Localizer } from '../contracts';
 
 /**
  * @__PURE__
@@ -54,11 +58,31 @@ export function useContainer<const T extends Dependencies>() {
         keys.map(key => useContainerRaw().get(key as keyof Dependencies)) as IntoDependencies<V>;
 }
 
-
+/**
+  * Translates a string to its respective local
+  * @example
+  * ```ts
+  * assert.deepEqual(locals("salute.hello", "es"), "hola")
+  * ```
+  */
 export const local  = (i: string, local: string) => {
     return Service('@sern/localizer').translate(i, local)
 }
 
+/**
+  * Returns a record of locales to their respective translations.
+  * @example
+  * ```ts
+  * assert.deepEqual(localsFor("salute.hello"), { "en-US": "hello", "es": "hola" })
+  * ```
+  */
 export const localsFor = (path: string) => {
     return Service('@sern/localizer').translationsFor(path) 
+}
+
+export const Localization = () => {
+    const packageDirectory = fileURLToPath(import.meta.url);
+    const pathToLocalizer= path.resolve(packageDirectory, "../", "optional", "localizer");
+    const { ShrimpleLocalizer } = requir(pathToLocalizer);
+    return new ShrimpleLocalizer() as Localizer; 
 }

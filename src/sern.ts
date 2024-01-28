@@ -23,7 +23,6 @@ import { Client } from 'discord.js';
  * })
  * ```
  */
-
 export function init(maybeWrapper: Wrapper | 'file') {
     const startTime = performance.now();
     const wrapper = Files.loadConfig(maybeWrapper);

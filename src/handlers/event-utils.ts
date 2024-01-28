@@ -21,11 +21,11 @@ import {
     handleError,
     SernError,
     VoidResult,
+    resultPayload,
 } from '../core/_internal';
-import { Emitter, ErrorHandling, Logging, ModuleManager } from '../core';
+import { Emitter, ErrorHandling, Logging, ModuleManager, PayloadType } from '../core';
 import { contextArgs, createDispatcher } from './dispatchers';
 import { ObservableInput, pipe } from 'rxjs';
-import { SernEmitter } from '../core';
 import { Err, Ok, Result } from 'ts-results-es';
 import type { Awaitable } from '../types/utility';
 import type { ControlPlugin } from '../types/core-plugin';
@@ -168,10 +168,10 @@ export function executeModule(
         concatMap(() => Result.wrapAsync(async () => task())),
         concatMap(result => {
             if (result.isOk()) {
-                emitter.emit('module.activate', SernEmitter.success(module));
+                emitter.emit('module.activate', resultPayload(PayloadType.Success, module));
                 return EMPTY;
             } 
-            return throwError(() => SernEmitter.failure(module, result.error));
+            return throwError(() => resultPayload(PayloadType.Failure, module, result.error));
             
         }),
     );
@@ -218,13 +218,10 @@ export function callInitPlugins<T extends Processed<AnyModule>>(sernEmitter: Emi
         createResultResolver({
             createStream: args => from(args.module.plugins).pipe(callPlugin(args)),
             onStop: (module: T) => {
-                sernEmitter.emit(
-                    'module.register',
-                    SernEmitter.failure(module, SernError.PluginFailure),
-                );
+                sernEmitter.emit('module.register', resultPayload(PayloadType.Failure, module, SernError.PluginFailure));
             },
             onNext: ({ module }) => {
-                sernEmitter.emit('module.register', SernEmitter.success(module));
+                sernEmitter.emit('module.register', resultPayload(PayloadType.Success, module));
                 return { module };
             },
         }),

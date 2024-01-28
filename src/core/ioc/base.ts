@@ -6,9 +6,6 @@ import { Result } from 'ts-results-es';
 import { DefaultServices } from '../_internal';
 import { AnyFunction } from '../../types/utility';
 import type { Logging } from '../contracts/logging';
-import { requir } from '../module-loading';
-import { fileURLToPath } from 'node:url';
-import path from 'path';
 
 //SIDE EFFECT: GLOBAL DI
 let containerSubject: CoreContainer<Partial<Dependencies>>;
@@ -95,13 +92,6 @@ export const insertLogger = (containerSubject: CoreContainer<any>) => {
         .upsert({'@sern/logger': () => new DefaultServices.DefaultLogging});
 }
 
-const insertLocalizer = async (containerSubject: CoreContainer<any>) => {
-    const packageDirectory = fileURLToPath(import.meta.url);
-    const pathToLocalizer= path.resolve(packageDirectory, "../", "optional", "localizer");
-    const { ShrimpleLocalizer } = requir(pathToLocalizer);
-    containerSubject
-        .upsert({'@sern/localizer':  new ShrimpleLocalizer() });
-}
 
 /**
  * Given the user's conf, check for any excluded/included dependency keys.
@@ -118,9 +108,9 @@ function composeRoot(
     if (!hasLogger) {
         insertLogger(container);
     }
-    if(conf.include?.includes('@sern/localizer')) {
-        insertLocalizer(container);
-    }
+//    if(conf.include?.includes('@sern/localizer')) {
+//        insertLocalizer(container);
+//    }
     //Build the container based on the callback provided by the user
     conf.build(container as CoreContainer<Omit<CoreDependencies, '@sern/client'>>);
     
@@ -145,10 +135,6 @@ export async function makeDependencies<const T extends Dependencies>
 
         if(includeLogger) {
             insertLogger(containerSubject);
-        }
-
-        if(included.includes('@sern/localizer')) {
-            insertLocalizer(containerSubject);
         }
 
         containerSubject.ready();

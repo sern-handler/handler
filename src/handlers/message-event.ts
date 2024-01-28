@@ -1,7 +1,7 @@
 import { mergeMap, EMPTY } from 'rxjs';
 import type { Message } from 'discord.js';
-import { SernEmitter } from '../core';
-import { sharedEventStream, SernError, filterTap } from '../core/_internal';
+import { PayloadType, SernEmitter } from '../core';
+import { sharedEventStream, SernError, filterTap, resultPayload } from '../core/_internal';
 import { createMessageHandler, executeModule, makeModuleExecutor } from './_internal';
 import type { DependencyList } from '../types/ioc';
 
@@ -38,9 +38,10 @@ export function messageHandler(
     const msgCommands$ = handle(isNonBot(defaultPrefix));
 
     return msgCommands$.pipe(
-        filterTap((e) => emitter.emit('warning', SernEmitter.warning(e))),
+        filterTap((e) => emitter.emit('warning', resultPayload(PayloadType.Warning, undefined, e))),
         makeModuleExecutor(module => {
-            emitter.emit('module.activate', SernEmitter.failure(module, SernError.PluginFailure));
+            const result = resultPayload(PayloadType.Failure, module, SernError.PluginFailure);
+            emitter.emit('module.activate', result);
         }),
         mergeMap(payload => executeModule(emitter, log, err, payload)));
 }

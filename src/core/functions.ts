@@ -1,6 +1,5 @@
 import { Err, Ok } from 'ts-results-es';
-import { ApplicationCommandOptionType, AutocompleteInteraction } from 'discord.js';
-import type { SernAutocompleteData, SernOptionsData } from '../types/core-modules';
+import type { Module, SernAutocompleteData, SernOptionsData } from '../types/core-modules';
 import type { AnyCommandPlugin, AnyEventPlugin, Plugin } from '../types/core-plugin';
 import type {
     AnySelectMenuInteraction,
@@ -9,12 +8,12 @@ import type {
     MessageContextMenuCommandInteraction,
     ModalSubmitInteraction,
     UserContextMenuCommandInteraction,
+    AutocompleteInteraction
 } from 'discord.js';
-import { InteractionType } from 'discord.js';
-
-
-import { PluginType } from './structures';
+import { ApplicationCommandOptionType, InteractionType } from 'discord.js'
+import { PayloadType, PluginType } from './structures';
 import assert from 'assert';
+import { Payload } from '../types/utility';
 
 //function wrappers for empty ok / err
 export const ok = /* @__PURE__*/ () => Ok.EMPTY;
@@ -116,4 +115,9 @@ export function isAutocomplete(i: InteractionTypable): i is AutocompleteInteract
 
 export function isModal(i: InteractionTypable): i is ModalSubmitInteraction {
     return i.type === InteractionType.ModalSubmit;
+}
+
+export function resultPayload<T extends PayloadType>
+(type: T, module?: Module, reason?: unknown) {
+    return { type, module, reason } as Payload & { type : T };
 }
