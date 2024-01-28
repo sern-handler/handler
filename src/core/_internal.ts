@@ -1,6 +1,5 @@
 export * as Id from './id';
 export * from './operators';
-export * from './predicates';
 export * as Files from './module-loading';
 export * from './functions';
 export type { VoidResult } from '../types/core-plugin';
