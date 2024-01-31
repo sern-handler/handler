@@ -25,7 +25,6 @@ import { Client } from 'discord.js';
  */
 export function init(maybeWrapper: Wrapper | 'file') {
     const startTime = performance.now();
-    const wrapper = Files.loadConfig(maybeWrapper);
     const dependencies = Services('@sern/emitter', 
                                   '@sern/errors',
                                   '@sern/logger',
@@ -34,6 +33,7 @@ export function init(maybeWrapper: Wrapper | 'file') {
     const logger = dependencies[2],
         errorHandler = dependencies[1];
 
+    const wrapper = Files.loadConfig(maybeWrapper, logger);
     if (wrapper.events !== undefined) {
         eventsHandler(dependencies, Files.getFullPathTree(wrapper.events));
     }
