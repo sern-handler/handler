@@ -8,10 +8,12 @@ import assert from 'node:assert';
 
 /**
  * @since 3.4.0
+ *  @internal
  */
 export class ShrimpleLocalizer implements Localizer, Init {
     private __localization!: Localization;
     constructor(){}
+    currentLocale: string = "en-US";
 
     translationsFor(path: string): Record<string, any> {
         return this.__localization.localizationFor(path);
@@ -25,8 +27,8 @@ export class ShrimpleLocalizer implements Localizer, Init {
     async init() {
         const map = await this.readLocalizationDirectory();
         this.__localization = new Localization({
-            defaultLocale: "en",
-            fallbackLocale: "en",
+            defaultLocale: this.currentLocale,
+            fallbackLocale: "en-US",
             locales: map
         });
     }

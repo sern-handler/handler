@@ -80,9 +80,13 @@ export const localsFor = (path: string) => {
     return Service('@sern/localizer').translationsFor(path) 
 }
 
-export const Localization = () => {
+export const Localization = (defaultLocale?: string) => {
     const packageDirectory = fileURLToPath(import.meta.url);
     const pathToLocalizer= path.resolve(packageDirectory, "../", "optional", "localizer");
     const { ShrimpleLocalizer } = requir(pathToLocalizer);
-    return new ShrimpleLocalizer() as Localizer; 
+    const localizer = new ShrimpleLocalizer as Localizer;
+    if (defaultLocale) {
+        localizer.currentLocale = defaultLocale;
+    }
+    return localizer; 
 }

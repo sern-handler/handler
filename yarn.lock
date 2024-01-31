@@ -639,7 +639,7 @@ __metadata:
     typescript: 5.0.2
     vitest: latest
   peerDependencies:
-    shrimple-locales: ^0.1.2
+    shrimple-locales: ^0.2.0
   languageName: unknown
   linkType: soft
 
