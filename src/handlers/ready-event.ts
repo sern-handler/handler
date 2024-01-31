@@ -9,7 +9,7 @@ import * as util from 'node:util';
 import type { DependencyList } from '../types/ioc';
 import type { AnyModule, Processed } from '../types/core-modules';
 
-export function startReadyEvent(
+export function readyHandler(
     [sEmitter, , , moduleManager, client]: DependencyList,
     allPaths: ObservableInput<string>,
 ) {

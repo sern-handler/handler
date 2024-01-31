@@ -8,7 +8,7 @@ import assert from 'node:assert';
 
 /**
  * @since 3.4.0
- *  @internal
+ * @internal
  */
 export class ShrimpleLocalizer implements Localizer, Init {
     private __localization!: Localization;
