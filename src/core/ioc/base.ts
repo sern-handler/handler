@@ -33,7 +33,7 @@ export function disposeAll(logger: Logging|undefined) {
 const dependencyBuilder = (container: any, excluded: string[], included: string[]) => {
     type Insertable = 
         | ((container: CoreContainer<Dependencies>) => unknown )
-        | Record<PropertyKey, unknown>
+        | object
     return {
         /**
           * Insert a dependency into your container.
