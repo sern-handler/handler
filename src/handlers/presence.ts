@@ -19,7 +19,6 @@ const parseConfig = async (conf: Promise<Presence.Result>) => {
                     .pipe(scan(onRepeat, s), 
                           startWith(s));
         }
-        //take 1?
         return of(s).pipe(take(1));
     })
 };
@@ -37,7 +36,7 @@ export const presenceHandler = (path: string, setPresence: SetPresence) => {
         })
     const module$ = from(presence);
     return module$.pipe(
-        //compose:.
+        //compose:
         //call the execute function, passing that result into parseConfig.
         //concatMap resolves the promise, and passes it to the next concatMap.
         concatMap(fn => parseConfig(fn())),

@@ -85,10 +85,7 @@ export function createDispatcher(payload: {
              	    args: [payload.event],
              	};
             }
-            return {
-                module: payload.module,
-                args: contextArgs(payload.event),
-            };
+            return { module: payload.module, args: contextArgs(payload.event) };
         }
         default: return { 
             module: payload.module,

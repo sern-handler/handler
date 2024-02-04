@@ -26,7 +26,7 @@ import {
 import { Emitter, ErrorHandling, Logging, ModuleManager, PayloadType } from '../core';
 import { contextArgs, createDispatcher } from './dispatchers';
 import { ObservableInput, pipe } from 'rxjs';
-import { Err, Ok, Result, Option } from 'ts-results-es';
+import { Err, Ok, Result } from 'ts-results-es';
 import type { Awaitable } from '../types/utility';
 import type { ControlPlugin } from '../types/core-plugin';
 import type { AnyModule, CommandModule, Module, Processed } from '../types/core-modules';
