@@ -106,9 +106,6 @@ function composeRoot(
     if (!hasLogger) {
         insertLogger(container);
     }
-//    if(conf.include?.includes('@sern/localizer')) {
-//        insertLocalizer(container);
-//    }
     //Build the container based on the callback provided by the user
     conf.build(container as CoreContainer<Omit<CoreDependencies, '@sern/client'>>);
     

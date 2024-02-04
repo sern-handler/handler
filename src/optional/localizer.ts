@@ -1,5 +1,5 @@
-import type { Localizer, Init } from '../core/contracts'
-import { Localization } from 'shrimple-locales'
+import type { Localization, Init } from '../core/contracts'
+import { Localization as LocalsProvider } from 'shrimple-locales'
 import fs from 'node:fs/promises'
 import { existsSync } from 'node:fs'
 import { join, resolve } from 'node:path';
@@ -10,8 +10,8 @@ import assert from 'node:assert';
  * @since 3.4.0
  * @internal
  */
-export class ShrimpleLocalizer implements Localizer, Init {
-    private __localization!: Localization;
+export class ShrimpleLocalizer implements Localization, Init {
+    private __localization!: LocalsProvider;
     constructor(){}
     currentLocale: string = "en-US";
 
@@ -26,7 +26,7 @@ export class ShrimpleLocalizer implements Localizer, Init {
 
     async init() {
         const map = await this.readLocalizationDirectory();
-        this.__localization = new Localization({
+        this.__localization = new LocalsProvider({
             defaultLocale: this.currentLocale,
             fallbackLocale: "en-US",
             locales: map

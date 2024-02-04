@@ -5,4 +5,4 @@ export * from './module-store';
 export * from './init';
 export * from './emitter';
 export * from './disposable'
-export * from './localizer'
+export * from './localization'

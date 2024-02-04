@@ -48,6 +48,7 @@ export class CoreContainer<T extends Partial<Dependencies>> extends Container<T,
                 'dispose' in value ? [key] : []);
 
         for(const key of otherDisposables) {
+            //possible source of bug: dispose is a property.
             this.addDisposer({ [key]: (dep: Disposable) => dep.dispose() } as never);
         }
         await super.disposeAll();

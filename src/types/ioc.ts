@@ -31,7 +31,7 @@ export interface CoreDependencies {
     '@sern/modules': () => Contracts.ModuleManager;
     '@sern/errors': () => Contracts.ErrorHandling;
     '@sern/logger'?: () => Contracts.Logging;
-    '@sern/localizer'?: () => Contracts.Localizer
+    '@sern/localizer'?: () => Contracts.Localization
 }
 
 export type DependencyFromKey<T extends keyof Dependencies> = Dependencies[T];

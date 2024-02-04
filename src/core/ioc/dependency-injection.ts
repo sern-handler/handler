@@ -4,7 +4,7 @@ import { useContainerRaw } from './base';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { requir } from '../module-loading';
-import type { Localizer } from '../contracts';
+import type { Localization } from '../contracts';
 
 /**
  * @__PURE__
@@ -79,12 +79,20 @@ export const local  = (i: string, local: string) => {
 export const localsFor = (path: string) => {
     return Service('@sern/localizer').translationsFor(path) 
 }
-
-export const Localization = (defaultLocale?: string) => {
+/**
+ * A service which provides simple file based localization. Add this while making dependencies.
+ * @example 
+ *  ```ts
+ *  await makeDependencies(({ add }) => {
+ *      add('@sern/localizer', DefaultLocalization()); 
+ *  });
+ * ```
+ **/
+export const DefaultLocalization = (defaultLocale?: string) => {
     const packageDirectory = fileURLToPath(import.meta.url);
     const pathToLocalizer= path.resolve(packageDirectory, "../", "optional", "localizer");
     const { ShrimpleLocalizer } = requir(pathToLocalizer);
-    const localizer = new ShrimpleLocalizer as Localizer;
+    const localizer = new ShrimpleLocalizer as Localization;
     if (defaultLocale) {
         localizer.currentLocale = defaultLocale;
     }
