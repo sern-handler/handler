@@ -29,6 +29,7 @@ export function transient<T>(cb: () => () => T) {
  * The new Service api, a cleaner alternative to useContainer
  * To obtain intellisense, ensure a .d.ts file exists in the root of compilation.
  * Usually our scaffolding tool takes care of this.
+ * Note: this method only works AFTER your container has been initiated
  * @since 3.0.0
  * @example
  * ```ts
@@ -60,6 +61,7 @@ export function useContainer<const T extends Dependencies>() {
 
 /**
   * Translates a string to its respective local
+  * Note: this method only works AFTER your container has been initiated
   * @example
   * ```ts
   * assert.deepEqual(locals("salute.hello", "es"), "hola")
@@ -71,6 +73,7 @@ export const local  = (i: string, local: string) => {
 
 /**
   * Returns a record of locales to their respective translations.
+  * Note: this method only works AFTER your container has been initiated
   * @example
   * ```ts
   * assert.deepEqual(localsFor("salute.hello"), { "en-US": "hello", "es": "hola" })

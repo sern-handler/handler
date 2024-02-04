@@ -35,8 +35,8 @@ export class ShrimpleLocalizer implements Localization, Init {
 
     private async readLocalizationDirectory() {
         const translationFiles = [];
-        const localPath = resolve('locals');
-        assert(existsSync(localPath), "No directory \"locals\" found for the localizer")
+        const localPath = resolve('resources', 'locals');
+        assert(existsSync(localPath), "No directory \"resources/locals\" found for the localizer")
         for(const json of await fs.readdir(localPath)) {
            translationFiles.push({ [filename(json)]: 
                                    JSON.parse(await fs.readFile(join(localPath, json), 'utf8')) })
