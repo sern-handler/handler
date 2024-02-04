@@ -30,7 +30,7 @@ export function disposeAll(logger: Logging|undefined) {
         .then(() => logger?.info({ message: 'Cleaning container and crashing' }));
 }
 
-const dependencyBuilder = (container: any, excluded: string[], included: string[]) => {
+const dependencyBuilder = (container: any, excluded: string[] ) => {
     type Insertable = 
         | ((container: CoreContainer<Dependencies>) => unknown )
         | object
@@ -51,9 +51,7 @@ const dependencyBuilder = (container: any, excluded: string[], included: string[
         exclude(...keys: (keyof Dependencies)[]) {
             keys.forEach(key => excluded.push(key));
         },
-        include(...keys: string[]) {
-            included.push(...keys);
-        },
+        
         /**
           * @param key the key of the dependency
           * @param v The dependency to swap out.
@@ -126,8 +124,7 @@ export async function makeDependencies<const T extends Dependencies>
     containerSubject = new CoreContainer();
     if(typeof conf === 'function') {
         const excluded: string[] = [];
-        const included: string[] = [];
-        conf(dependencyBuilder(containerSubject, excluded, included));
+        conf(dependencyBuilder(containerSubject, excluded));
         
         const includeLogger = 
             !excluded.includes('@sern/logger') 

@@ -41,7 +41,9 @@ export type IntoDependencies<Tuple extends [...any[]]> = {
 } & { length: Tuple['length'] };
 
 export interface DependencyConfiguration {
-    //@deprecated. Loggers will always be included in the future
+    /*
+     * @deprecated. Loggers will be opt-in the future
+     */
     exclude?: Set<'@sern/logger'>;
     build: (
         root: Container<Omit<CoreDependencies, '@sern/client'>, {}>,
