@@ -50,7 +50,6 @@
         "discord.js": "^14.11.0",
         "eslint": "8.39.0",
         "prettier": "2.8.8",
-        "shrimple-locales": "^0.2.0",
         "tsup": "^6.7.0",
         "typescript": "5.0.2",
         "vitest": "latest"
@@ -95,8 +94,5 @@
         "type": "git",
         "url": "git+https://github.com/sern-handler/handler.git"
     },
-    "homepage": "https://sern.dev",
-    "peerDependencies": {
-        "shrimple-locales": "^0.2.0"
-    }
+    "homepage": "https://sern.dev"
 }

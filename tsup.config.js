@@ -1,7 +1,7 @@
 import { defineConfig } from 'tsup';
 const shared = {
-    entry: ['src/index.ts', 'src/optional/localizer.ts'],
-    external: ['discord.js', 'iti', 'shrimple-locales'],
+    entry: ['src/index.ts'],
+    external: ['discord.js', 'iti'],
     platform: 'node',
     clean: true,
     sourcemap: true,
