@@ -633,13 +633,10 @@ __metadata:
     iti: ^0.6.0
     prettier: 2.8.8
     rxjs: ^7.8.0
-    shrimple-locales: ^0.2.0
     ts-results-es: ^4.0.0
     tsup: ^6.7.0
     typescript: 5.0.2
     vitest: latest
-  peerDependencies:
-    shrimple-locales: ^0.2.0
   languageName: unknown
   linkType: soft
 
@@ -3113,13 +3110,6 @@ __metadata:
   version: 3.0.0
   resolution: "shebang-regex@npm:3.0.0"
   checksum: 1a2bcae50de99034fcd92ad4212d8e01eedf52c7ec7830eedcf886622804fe36884278f2be8be0ea5fde3fd1c23911643a4e0f726c8685b61871c8908af01222
-  languageName: node
-  linkType: hard
-
-"shrimple-locales@npm:^0.2.0":
-  version: 0.2.0
-  resolution: "shrimple-locales@npm:0.2.0"
-  checksum: 9b5360e6ca5b2e75fdbaaeee0286015294b64773950924088f6088184f010837a89e84101eddfedcda5dd660a97df84fee6e1e95345e01f7e1edfff6b4ff2341
   languageName: node
   linkType: hard
 
