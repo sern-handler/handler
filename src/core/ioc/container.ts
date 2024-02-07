@@ -41,16 +41,14 @@ export class CoreContainer<T extends Partial<Dependencies>> extends Container<T,
     }
 
     override async disposeAll() {
-        
         const otherDisposables = Object
             .entries(this._context)
             .flatMap(([key, value]) => 
                 'dispose' in value ? [key] : []);
-
-        for(const key of otherDisposables) {
+        otherDisposables.forEach(key => { 
             //possible source of bug: dispose is a property.
             this.addDisposer({ [key]: (dep: Disposable) => dep.dispose() } as never);
-        }
+        })
         await super.disposeAll();
     }
     

@@ -40,9 +40,8 @@ const dependencyBuilder = (container: any, excluded: string[] ) => {
           * Supply the correct key and dependency
           */
         add(key: keyof Dependencies, v: Insertable) {
-            Result
-                .wrap(() => container.add({ [key]: v}))
-                .expect("Failed to add " + key);
+            Result.wrap(() => container.add({ [key]: v}))
+                  .expect("Failed to add " + key);
         },
         /**
           * Exclude any dependencies from being added.
@@ -58,9 +57,8 @@ const dependencyBuilder = (container: any, excluded: string[] ) => {
           * Swap out a preexisting dependency.
           */
         swap(key: keyof Dependencies, v: Insertable) {
-            Result
-                .wrap(() => container.upsert({ [key]: v }))
-                .expect("Failed to update " + key);
+            Result.wrap(() => container.upsert({ [key]: v }))
+                  .expect("Failed to update " + key);
         },
         /**
           * @param key the key of the dependency
@@ -72,9 +70,8 @@ const dependencyBuilder = (container: any, excluded: string[] ) => {
           * Swap out a preexisting dependency.
           */
         addDisposer(key: keyof Dependencies, cleanup: AnyFunction) {
-            Result
-                .wrap(() => container.addDisposer({ [key] : cleanup }))
-                .expect("Failed to addDisposer for" + key);
+            Result.wrap(() => container.addDisposer({ [key] : cleanup }))
+                  .expect("Failed to addDisposer for" + key);
         }
    };
 };

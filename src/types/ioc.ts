@@ -27,6 +27,10 @@ export type DependencyList = [
 export interface CoreDependencies {
     '@sern/client': () => Contracts.Emitter;
     '@sern/emitter': () => Contracts.Emitter;
+    /**
+      * @deprecated
+      * Will be removed and turned internal
+      */
     '@sern/store': () => Contracts.CoreModuleStore;
     '@sern/modules': () => Contracts.ModuleManager;
     '@sern/errors': () => Contracts.ErrorHandling;

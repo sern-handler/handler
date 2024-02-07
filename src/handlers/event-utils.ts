@@ -86,8 +86,7 @@ export function createInteractionHandler<T extends Interaction>(
                                     module: payload.module, 
                                     event,
                                 })));
-    },
-);
+    });
 }
 
 export function createMessageHandler(

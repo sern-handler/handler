@@ -94,5 +94,8 @@
         "type": "git",
         "url": "git+https://github.com/sern-handler/handler.git"
     },
+    "engines": {
+        "node": ">= 18.16.x"
+    },
     "homepage": "https://sern.dev"
 }
