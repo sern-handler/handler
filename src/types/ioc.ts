@@ -26,11 +26,15 @@ export type DependencyList = [
 
 export interface CoreDependencies {
     '@sern/client': () => Contracts.Emitter;
-    '@sern/logger'?: () => Contracts.Logging;
     '@sern/emitter': () => Contracts.Emitter;
+    /**
+      * @deprecated
+      * Will be removed and turned internal
+      */
     '@sern/store': () => Contracts.CoreModuleStore;
     '@sern/modules': () => Contracts.ModuleManager;
     '@sern/errors': () => Contracts.ErrorHandling;
+    '@sern/logger'?: () => Contracts.Logging;
 }
 
 export type DependencyFromKey<T extends keyof Dependencies> = Dependencies[T];
@@ -39,8 +43,13 @@ export type IntoDependencies<Tuple extends [...any[]]> = {
     [Index in keyof Tuple]: UnpackFunction<NonNullable<DependencyFromKey<Tuple[Index]>>>; //Unpack and make NonNullable
 } & { length: Tuple['length'] };
 
+/**
+  * @deprecated This old signature will be incompatible with future versions of sern.
+  */
 export interface DependencyConfiguration {
-    //@deprecated. Loggers will always be included in the future
+    /*
+     * @deprecated. Loggers will be opt-in the future
+     */
     exclude?: Set<'@sern/logger'>;
     build: (
         root: Container<Omit<CoreDependencies, '@sern/client'>, {}>,

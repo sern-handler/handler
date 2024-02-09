@@ -9,7 +9,7 @@ type HookName = 'init';
 export const createInitListener = (coreContainer : CoreContainer<any>) => {
     const initCalled = new Set<PropertyKey>();
     const hasCallableMethod = createPredicate(initCalled);
-    const unsubscribe = coreContainer.on('containerUpserted', async (event) => {
+    const unsubscribe = coreContainer.on('containerUpserted', async event => {
        
         if(isNotHookable(event)) {
             return;
@@ -21,6 +21,7 @@ export const createInitListener = (coreContainer : CoreContainer<any>) => {
         }
 
     });
+
     return { unsubscribe };
 }
 

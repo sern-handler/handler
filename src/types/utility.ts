@@ -29,5 +29,4 @@ export type Payload =
     | { type: PayloadType.Warning; reason: string };
 
 
-
 export type ReplyOptions = string | Omit<InteractionReplyOptions, 'fetchReply'> | MessageReplyOptions;

@@ -1,12 +1,11 @@
 import { CommandMeta, Module } from '../../types/core-modules';
-import { CoreModuleStore } from '../contracts';
 
 /*
- * @internal
+ * @deprecated
  * Version 4.0.0 will internalize this api. Please refrain from using ModuleStore!
  * For interacting with modules, use the ModuleManager instead.
  */
-export class ModuleStore implements CoreModuleStore {
+export class ModuleStore {
     metadata = new WeakMap<Module, CommandMeta>();
     commands = new Map<string, string>();
 }

@@ -1,12 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { CoreContainer } from '../../src/core/ioc/container';
 import { EventEmitter } from 'events';
-import { DefaultLogging, Disposable, Init, Logging } from '../../src/core';
+import { DefaultLogging, Disposable, Emitter, Init, Logging } from '../../src/core';
 import { CoreDependencies } from '../../src/types/ioc';
 
 describe('ioc container', () => {
     let container: CoreContainer<{}> = new CoreContainer();
     let dependency: Logging & Init & Disposable;
+    let dependency2: Emitter
     beforeEach(() => {
         dependency = {
             init: vi.fn(),
@@ -15,6 +16,11 @@ describe('ioc container', () => {
             info(): void {},
             debug(): void {},
             dispose: vi.fn()
+        };
+        dependency2 = {
+            addListener: vi.fn(),
+            removeListener: vi.fn(),
+            emit: vi.fn()
         };
         container = new CoreContainer();
     });
@@ -83,4 +89,13 @@ describe('ioc container', () => {
         container.ready();
         expect(dependency.init).toHaveBeenCalledTimes(0);
     });
+
+    it('should init dependency depending on something else', () => {
+        container.add({ '@sern/client': dependency2 });
+        container.upsert((cntr) => ({
+            '@sern/logger': dependency 
+        }));
+        container.ready();
+        expect(dependency.init).toHaveBeenCalledTimes(1);
+    })
 });

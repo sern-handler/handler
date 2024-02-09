@@ -1,3 +1,5 @@
+//i deleted it, hmm so how should we allow users to enable localization?
+// a
 import type { AnyFunction } from '../../types/utility';
 
 export interface Emitter {

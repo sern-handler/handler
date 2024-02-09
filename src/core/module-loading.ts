@@ -7,6 +7,7 @@ import { createRequire } from 'node:module';
 import type { ImportPayload, Wrapper } from '../types/core';
 import type { Module } from '../types/core-modules';
 import { existsSync } from 'fs';
+import type { Logging } from './contracts/logging';
 
 export const shouldHandle = (path: string, fpath: string) => {
     const file_name = fpath+extname(path);
@@ -18,6 +19,7 @@ export const shouldHandle = (path: string, fpath: string) => {
 
 
 export type ModuleResult<T> = Promise<ImportPayload<T>>;
+
 /**
  * Import any module based on the absolute path.
  * This can accept four types of exported modules
@@ -104,13 +106,13 @@ async function* readPaths(dir: string): AsyncGenerator<string> {
     }
 }
 
-const requir = createRequire(import.meta.url);
+export const requir = createRequire(import.meta.url);
 
-export function loadConfig(wrapper: Wrapper | 'file'): Wrapper {
+export function loadConfig(wrapper: Wrapper | 'file', log: Logging | undefined): Wrapper {
     if (wrapper !== 'file') {
         return wrapper;
     }
-    console.log('Experimental loading of sern.config.json');
+    log?.info({ message: 'Experimental loading of sern.config.json'});
     const config = requir(resolve('sern.config.json')); 
 
     const makePath = (dir: PropertyKey) =>
@@ -118,14 +120,14 @@ export function loadConfig(wrapper: Wrapper | 'file'): Wrapper {
             ? join('dist', config.paths[dir]!)
             : join(config.paths[dir]!);
  
-    console.log('Loading config: ', config);
+    log?.info({ message: 'Loading config: ' + JSON.stringify(config, null, 4) });
     const commandsPath = makePath('commands');
  
-    console.log('Commands path is set to', commandsPath);
+    log?.info({ message: `Commands path is set to ${commandsPath}` });
     let eventsPath: string | undefined;
     if (config.paths.events) {
         eventsPath = makePath('events');
-        console.log('Events path is set to', eventsPath);
+        log?.info({ message: `Events path is set to ${eventsPath} `});
     }
 
     return { defaultPrefix: config.defaultPrefix,

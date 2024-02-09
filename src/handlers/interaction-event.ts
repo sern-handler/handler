@@ -1,6 +1,6 @@
 import { Interaction } from 'discord.js';
 import { mergeMap, merge } from 'rxjs';
-import { SernEmitter } from '../core';
+import { PayloadType } from '../core';
 import {
     isAutocomplete,
     isCommand,
@@ -9,6 +9,7 @@ import {
     sharedEventStream,
     SernError,
     filterTap,
+    resultPayload,
 } from '../core/_internal';
 import { createInteractionHandler, executeModule, makeModuleExecutor } from './_internal';
 import type { DependencyList } from '../types/ioc';
@@ -25,8 +26,8 @@ export function interactionHandler([emitter, err, log, modules, client]: Depende
     );
     return interactionHandler$
         .pipe(
-            filterTap(e => emitter.emit('warning', SernEmitter.warning(e))),
+            filterTap(e => emitter.emit('warning', resultPayload(PayloadType.Warning, undefined, e))),
             makeModuleExecutor(module => 
-                emitter.emit('module.activate', SernEmitter.failure(module, SernError.PluginFailure))),
+                emitter.emit('module.activate', resultPayload(PayloadType.Failure, module, SernError.PluginFailure))),
             mergeMap(payload => executeModule(emitter, log, err, payload)));
 }

@@ -33,9 +33,9 @@ import type {
     TextCommand,
     UserSelectCommand,
 } from './core-modules';
-import { Args, Awaitable, Payload, SlashOptions } from './utility';
-import { CommandType, Context, EventType, PluginType } from '../core';
-import {
+import type { Args, Awaitable, Payload, SlashOptions } from './utility';
+import type { CommandType, Context, EventType, PluginType } from '../core';
+import type {
     ButtonInteraction,
     ChannelSelectMenuInteraction,
     ClientEvents,

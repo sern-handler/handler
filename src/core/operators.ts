@@ -71,8 +71,7 @@ export function handleError<C>(crashHandler: ErrorHandling, logging?: Logging) {
 }
 // Temporary until i get rxjs operators working on ts-results-es
 export const filterTap = <K, R>(onErr: (e: R) => void): OperatorFunction<Result<K, R>, K> => 
-    pipe(
-        concatMap(result => {
+    pipe(concatMap(result => {
             if(result.isOk()) {
                 return of(result.value)
             }

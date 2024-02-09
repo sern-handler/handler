@@ -1,9 +1,10 @@
 import { Container } from 'iti';
-import { Disposable, SernEmitter } from '../';
+import { Disposable } from '../';
 import * as assert from 'node:assert';
 import { Subject } from 'rxjs';
 import { DefaultServices, ModuleStore } from '../_internal';
-import * as Hooks from './hooks'
+import * as Hooks from './hooks';
+import { EventEmitter } from 'node:events';
 
 
 /**
@@ -17,12 +18,13 @@ export class CoreContainer<T extends Partial<Dependencies>> extends Container<T,
         assert.ok(!this.isReady(), 'Listening for dispose & init should occur prior to sern being ready.');
 
         const { unsubscribe } = Hooks.createInitListener(this);
+
         this.ready$
             .subscribe({ complete: unsubscribe });
 
         (this as Container<{}, {}>)
-            .add({ '@sern/errors': () => new DefaultServices.DefaultErrorHandling(),
-                   '@sern/emitter': () => new SernEmitter,
+            .add({ '@sern/errors': () => new DefaultServices.DefaultErrorHandling,
+                   '@sern/emitter': () => new EventEmitter({ captureRejections: true }),
                    '@sern/store': () => new ModuleStore })
             .add(ctx => {
                 return { '@sern/modules': () =>
@@ -33,19 +35,25 @@ export class CoreContainer<T extends Partial<Dependencies>> extends Container<T,
     isReady() {
         return this.ready$.closed;
     }
+    
+    hasKey(key: string): boolean {
+        return Boolean((this as Container<any,any>)._context[key]);
+    }
 
     override async disposeAll() {
-        
         const otherDisposables = Object
             .entries(this._context)
             .flatMap(([key, value]) => 
                 'dispose' in value ? [key] : []);
-
-        for(const key of otherDisposables) {
+        otherDisposables.forEach(key => { 
+            //possible source of bug: dispose is a property.
             this.addDisposer({ [key]: (dep: Disposable) => dep.dispose() } as never);
-        }
-        await super.disposeAll() 
+        })
+        await super.disposeAll();
     }
+    
+    
+    
     ready() {
         this.ready$.complete();
         this.ready$.unsubscribe();

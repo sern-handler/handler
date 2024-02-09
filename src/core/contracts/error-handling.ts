@@ -1,5 +1,3 @@
-import type { CommandModule,Processed, EventModule } from "../../types/core-modules";
-
 /**
  * @since 2.0.0
  */

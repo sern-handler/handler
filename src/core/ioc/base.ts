@@ -1,11 +1,12 @@
 import * as assert from 'assert';
-import { composeRoot, useContainer } from './dependency-injection';
-import type { DependencyConfiguration } from '../../types/ioc';
+import { useContainer } from './dependency-injection';
+import type { CoreDependencies, DependencyConfiguration } from '../../types/ioc';
 import { CoreContainer } from './container';
-import { Result } from 'ts-results-es'
+import { Result } from 'ts-results-es';
 import { DefaultServices } from '../_internal';
 import { AnyFunction } from '../../types/utility';
 import type { Logging } from '../contracts/logging';
+
 //SIDE EFFECT: GLOBAL DI
 let containerSubject: CoreContainer<Partial<Dependencies>>;
 
@@ -29,19 +30,18 @@ export function disposeAll(logger: Logging|undefined) {
         .then(() => logger?.info({ message: 'Cleaning container and crashing' }));
 }
 
-const dependencyBuilder = (container: any, excluded: string[]) => {
+const dependencyBuilder = (container: any, excluded: string[] ) => {
     type Insertable = 
         | ((container: CoreContainer<Dependencies>) => unknown )
-        | Record<PropertyKey, unknown>
+        | object
     return {
         /**
           * Insert a dependency into your container.
           * Supply the correct key and dependency
           */
         add(key: keyof Dependencies, v: Insertable) {
-            Result
-                .wrap(() => container.add({ [key]: v}))
-                .expect("Failed to add " + key);
+            Result.wrap(() => container.add({ [key]: v}))
+                  .expect("Failed to add " + key);
         },
         /**
           * Exclude any dependencies from being added.
@@ -50,15 +50,15 @@ const dependencyBuilder = (container: any, excluded: string[]) => {
         exclude(...keys: (keyof Dependencies)[]) {
             keys.forEach(key => excluded.push(key));
         },
+        
         /**
           * @param key the key of the dependency
           * @param v The dependency to swap out.
           * Swap out a preexisting dependency.
           */
         swap(key: keyof Dependencies, v: Insertable) {
-            Result
-                .wrap(() => container.upsert({ [key]: v }))
-                .expect("Failed to update " + key);
+            Result.wrap(() => container.upsert({ [key]: v }))
+                  .expect("Failed to update " + key);
         },
         /**
           * @param key the key of the dependency
@@ -70,9 +70,8 @@ const dependencyBuilder = (container: any, excluded: string[]) => {
           * Swap out a preexisting dependency.
           */
         addDisposer(key: keyof Dependencies, cleanup: AnyFunction) {
-            Result
-                .wrap(() => container.addDisposer({ [key] : cleanup }))
-                .expect("Failed to addDisposer for" + key);
+            Result.wrap(() => container.addDisposer({ [key] : cleanup }))
+                  .expect("Failed to addDisposer for" + key);
         }
    };
 };
@@ -87,15 +86,45 @@ export const insertLogger = (containerSubject: CoreContainer<any>) => {
     containerSubject
         .upsert({'@sern/logger': () => new DefaultServices.DefaultLogging});
 }
+
+
+/**
+ * Given the user's conf, check for any excluded/included dependency keys.
+ * Then, call conf.build to get the rest of the users' dependencies.
+ * Finally, update the containerSubject with the new container state
+ * @param conf
+ */
+function composeRoot(
+    container: CoreContainer<Partial<Dependencies>>,
+    conf: DependencyConfiguration,
+) {
+    //container should have no client or logger yet.
+    const hasLogger = conf.exclude?.has('@sern/logger');
+    if (!hasLogger) {
+        insertLogger(container);
+    }
+    //Build the container based on the callback provided by the user
+    conf.build(container as CoreContainer<Omit<CoreDependencies, '@sern/client'>>);
+    
+    if (!hasLogger) {
+        container.get('@sern/logger')?.info({ message: 'All dependencies loaded successfully.' });
+    }
+
+    container.ready();
+}
+
 export async function makeDependencies<const T extends Dependencies>
 (conf: ValidDependencyConfig) {
     containerSubject = new CoreContainer();
     if(typeof conf === 'function') {
         const excluded: string[] = [];
         conf(dependencyBuilder(containerSubject, excluded));
+        
+        const includeLogger = 
+            !excluded.includes('@sern/logger') 
+            && !containerSubject.getTokens()['@sern/logger'];
 
-        if(!excluded.includes('@sern/logger') 
-           && !containerSubject.getTokens()['@sern/logger']) {
+        if(includeLogger) {
             insertLogger(containerSubject);
         }
 
@@ -106,6 +135,4 @@ export async function makeDependencies<const T extends Dependencies>
 
     return useContainer<T>();
 }
-
-
 

@@ -629,7 +629,6 @@ __metadata:
     "@typescript-eslint/parser": 5.59.1
     callsites: ^3.1.0
     discord.js: ^14.11.0
-    esbuild: ^0.17.0
     eslint: 8.39.0
     iti: ^0.6.0
     prettier: 2.8.8
@@ -1449,7 +1448,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"esbuild@npm:^0.17.0, esbuild@npm:^0.17.6":
+"esbuild@npm:^0.17.6":
   version: 0.17.19
   resolution: "esbuild@npm:0.17.19"
   dependencies:
