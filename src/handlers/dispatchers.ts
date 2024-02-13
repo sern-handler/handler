@@ -17,10 +17,7 @@ import type { CommandModule, Module, Processed } from '../types/core-modules';
 
 //TODO: refactor dispatchers so that it implements a strategy for each different type of payload?
 export function dispatchMessage(module: Processed<CommandModule>, args: [Context, Args]) {
-    return {
-        module,
-        args,
-    };
+    return { module, args };
 }
 
 export function contextArgs(wrappable: Message | BaseInteraction, messageArgs?: string[]) {

@@ -27,8 +27,7 @@ export class CoreContainer<T extends Partial<Dependencies>> extends Container<T,
                    '@sern/emitter': () => new EventEmitter({ captureRejections: true }),
                    '@sern/store': () => new ModuleStore })
             .add(ctx => {
-                return { '@sern/modules': () =>
-                        new DefaultServices.DefaultModuleManager(ctx['@sern/store']) };
+                return { '@sern/modules': new DefaultServices.DefaultModuleManager(ctx['@sern/store'])};
             });
     }
 

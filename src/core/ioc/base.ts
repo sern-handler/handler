@@ -11,6 +11,17 @@ import type { Logging } from '../contracts/logging';
 let containerSubject: CoreContainer<Partial<Dependencies>>;
 
 /**
+  * @internal
+  * Don't use this unless you know what you're doing. Destroys old containerSubject if it exists and disposes everything
+  * then it will swap
+  */
+export async function __swap_container(c: CoreContainer<Partial<Dependencies>>) {
+    if(containerSubject) {
+       await containerSubject.disposeAll() 
+    }
+    containerSubject = c;
+}
+/**
  * @deprecated
  * Returns the underlying data structure holding all dependencies.
  * Exposes methods from iti

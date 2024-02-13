@@ -7,7 +7,7 @@ import { buildModules, callInitPlugins } from './_internal';
 import * as assert from 'node:assert';
 import * as util from 'node:util';
 import type { DependencyList } from '../types/ioc';
-import type { AnyModule, Processed } from '../types/core-modules';
+import type { AnyModule, CommandMeta, Processed } from '../types/core-modules';
 
 export function readyHandler(
     [sEmitter, , , moduleManager, client]: DependencyList,
@@ -17,8 +17,8 @@ export function readyHandler(
 
     return concat(ready$, buildModules<AnyModule>(allPaths, moduleManager))
         .pipe(callInitPlugins(sEmitter))
-        .subscribe(({ module }) => {
-            register(moduleManager, module)
+        .subscribe(({ module, metadata }) => {
+            register(moduleManager, module, metadata)
                 .expect(SernError.InvalidModuleType + ' ' + util.inspect(module));
         });
 }
@@ -31,20 +31,23 @@ const once = () => pipe(
 function register<T extends Processed<AnyModule>>(
     manager: ModuleManager,
     module: T,
+    metadata: unknown 
 ): Result<void, void> {
-    const { id, fullPath } = manager.getMetadata(module)!;
+    manager.setMetadata(module, metadata as CommandMeta)!;
 
     const validModuleType = module.type >= 0 && module.type <= 1 << 10;
     assert.ok(
         validModuleType,
-        `Found ${module.name} at ${fullPath}, which does not have a valid type`,
+        //@ts-ignore
+        `Found ${module.name} at ${metadata.fullPath}, which does not have a valid type`,
     );
     if (module.type === CommandType.Both) {
-        module.alias?.forEach(a => manager.set(`${a}_B`, fullPath));
+        module.alias?.forEach(a => manager.set(`${a}_B`, module));
     } else {
         if(module.type === CommandType.Text){ 
-            module.alias?.forEach(a => manager.set(`${a}_T`, fullPath));
+            module.alias?.forEach(a => manager.set(`${a}_T`, module));
         }
     }
-    return Result.wrap(() => manager.set(id, fullPath));
+    //@ts-ignore
+    return Result.wrap(() => manager.set(metadata.id, module));
 }
