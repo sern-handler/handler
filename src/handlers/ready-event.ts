@@ -1,8 +1,8 @@
-import { ObservableInput, concat, first, fromEvent, ignoreElements, pipe } from 'rxjs';
+import { ObservableInput, concat, first, fromEvent, ignoreElements, pipe, tap } from 'rxjs';
 import { CommandType } from '../core/structures';
 import { SernError } from '../core/_internal';
 import { Result } from 'ts-results-es';
-import { ModuleManager } from '../core/contracts';
+import { Logging, ModuleManager } from '../core/contracts';
 import { buildModules, callInitPlugins } from './_internal';
 import * as assert from 'node:assert';
 import * as util from 'node:util';
@@ -10,20 +10,23 @@ import type { DependencyList } from '../types/ioc';
 import type { AnyModule, CommandMeta, Processed } from '../types/core-modules';
 
 export function readyHandler(
-    [sEmitter, , , moduleManager, client]: DependencyList,
+    [sEmitter, , log , moduleManager, client]: DependencyList,
     allPaths: ObservableInput<string>,
 ) {
-    const ready$ = fromEvent(client!, 'ready').pipe(once());
+    const ready$ = fromEvent(client!, 'ready').pipe(once(log));
 
-    return concat(ready$, buildModules<AnyModule>(allPaths, moduleManager))
+    return concat(ready$, buildModules<AnyModule>(allPaths))
         .pipe(callInitPlugins(sEmitter))
         .subscribe(({ module, metadata }) => {
             register(moduleManager, module, metadata)
                 .expect(SernError.InvalidModuleType + ' ' + util.inspect(module));
+            //TODO: TEST ALL MODULES AGAIN
+            console.log(module)
         });
 }
 
-const once = () => pipe(
+const once = (log: Logging | undefined) => pipe(
+    tap(() => { log?.info({ message: "Waiting on discord client to be ready..." }) }),
     first(),
     ignoreElements())
 
@@ -31,9 +34,9 @@ const once = () => pipe(
 function register<T extends Processed<AnyModule>>(
     manager: ModuleManager,
     module: T,
-    metadata: unknown 
+    metadata:CommandMeta 
 ): Result<void, void> {
-    manager.setMetadata(module, metadata as CommandMeta)!;
+    manager.setMetadata(module, metadata)!;
 
     const validModuleType = module.type >= 0 && module.type <= 1 << 10;
     assert.ok(
@@ -48,6 +51,5 @@ function register<T extends Processed<AnyModule>>(
             module.alias?.forEach(a => manager.set(`${a}_T`, module));
         }
     }
-    //@ts-ignore
     return Result.wrap(() => manager.set(metadata.id, module));
 }

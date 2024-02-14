@@ -1,19 +1,13 @@
 import { ClientEvents } from 'discord.js';
-import { CommandType, EventType, PluginType } from '../core/structures';
+import { EventType } from '../core/structures';
 import type {
-    AnyCommandPlugin,
     AnyEventPlugin,
-    CommandArgs,
-    ControlPlugin,
-    EventArgs,
-    InitPlugin,
 } from '../types/core-plugin';
 import type {
     CommandModule,
     EventModule,
     InputCommand,
     InputEvent,
-    Module,
 } from '../types/core-modules';
 import { partitionPlugins } from './_internal';
 import type { Awaitable } from '../types/utility';

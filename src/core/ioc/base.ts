@@ -22,7 +22,6 @@ export async function __swap_container(c: CoreContainer<Partial<Dependencies>>) 
     containerSubject = c;
 }
 /**
- * @deprecated
  * Returns the underlying data structure holding all dependencies.
  * Exposes methods from iti
  * Use the Service API. The container should be readonly
@@ -51,8 +50,14 @@ const dependencyBuilder = (container: any, excluded: string[] ) => {
           * Supply the correct key and dependency
           */
         add(key: keyof Dependencies, v: Insertable) {
-            Result.wrap(() => container.add({ [key]: v}))
-                  .expect("Failed to add " + key);
+            if(typeof v !== 'function') {
+                Result.wrap(() => container.add({ [key]: v}))
+                      .expect("Failed to add " + key);
+            } else {
+                Result.wrap(() => 
+                       container.add((cntr: CoreContainer<Dependencies>) => ({ [key]: v(cntr)} )))
+                      .expect("Failed to add " + key);
+            }
         },
         /**
           * Exclude any dependencies from being added.
@@ -68,8 +73,14 @@ const dependencyBuilder = (container: any, excluded: string[] ) => {
           * Swap out a preexisting dependency.
           */
         swap(key: keyof Dependencies, v: Insertable) {
-            Result.wrap(() => container.upsert({ [key]: v }))
-                  .expect("Failed to update " + key);
+            if(typeof v !== 'function') {
+                Result.wrap(() => container.upsert({ [key]: v}))
+                      .expect("Failed to update " + key);
+            } else {
+                Result.wrap(() => 
+                       container.upsert((cntr: CoreContainer<Dependencies>) => ({ [key]: v(cntr)})))
+                      .expect("Failed to update " + key);
+            }
         },
         /**
           * @param key the key of the dependency

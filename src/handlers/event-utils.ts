@@ -30,7 +30,7 @@ import { ObservableInput, pipe } from 'rxjs';
 import { Err, Ok, Result } from 'ts-results-es';
 import type { Awaitable } from '../types/utility';
 import type { ControlPlugin } from '../types/core-plugin';
-import type { AnyModule, CommandModule, Module, Processed } from '../types/core-modules';
+import type { AnyModule, CommandMeta, CommandModule, Module, Processed } from '../types/core-modules';
 import type { ImportPayload } from '../types/core';
 import { disposeAll } from '../core/ioc/base';
 
@@ -105,7 +105,7 @@ export function createMessageHandler(
 /**
  * This function assigns remaining, incomplete data to each imported module.
  */
-function assignDefaults<T extends Module>() {
+function assignDefaults() {
     return map(({ module, absPath }) => {
         const processed = {
             name: module.name ?? Files.filename(absPath),
@@ -126,7 +126,6 @@ function assignDefaults<T extends Module>() {
 
 export function buildModules<T extends AnyModule>(
     input: ObservableInput<string>,
-    moduleManager: ModuleManager,
 ) {
     return Files
         .buildModuleStream<Processed<T>>(input)
@@ -216,7 +215,7 @@ export function callInitPlugins<T extends Processed<AnyModule>>(sernEmitter: Emi
             },
             onNext: (payload) => {
                 sernEmitter.emit('module.register', resultPayload(PayloadType.Success, payload.module));
-                return payload;
+                return payload as { module: T; metadata: CommandMeta };
             },
         }),
     );
