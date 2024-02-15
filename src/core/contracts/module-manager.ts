@@ -19,7 +19,14 @@ export interface ModuleManager extends MetadataAccess {
     get(id: string): Module | undefined;
 
     set(id: string, path: Module): void;
+    /**
+     * @deprecated
+     */
     getPublishableCommands(): CommandModule[];
+
+    /*
+     * @deprecated
+     */
     getByNameCommandType<T extends CommandType>(
         name: string,
         commandType: T,
