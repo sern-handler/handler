@@ -13,15 +13,14 @@ export function readyHandler(
     [sEmitter, , log , moduleManager, client]: DependencyList,
     allPaths: ObservableInput<string>,
 ) {
+    //Todo: add module manager on on ready
     const ready$ = fromEvent(client!, 'ready').pipe(once(log));
-
+    
     return concat(ready$, buildModules<AnyModule>(allPaths))
         .pipe(callInitPlugins(sEmitter))
         .subscribe(({ module, metadata }) => {
             register(moduleManager, module, metadata)
                 .expect(SernError.InvalidModuleType + ' ' + util.inspect(module));
-            //TODO: TEST ALL MODULES AGAIN
-            console.log(module)
         });
 }
 

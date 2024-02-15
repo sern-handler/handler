@@ -98,4 +98,16 @@ describe('ioc container', () => {
         container.ready();
         expect(dependency.init).toHaveBeenCalledTimes(1);
     })
+
+    it('should detect a key already exists', () => {
+        container.add({ '@sern/client': dependency2 });
+        expect(container.hasKey('@sern/client')).toBeTruthy()
+    })
+
+
+    it('should detect a key already exists', () => {
+        container.add({ '@sern/client': () => dependency2 });
+        expect(container.hasKey('@sern/client')).toBeTruthy()
+    })
+
 });
