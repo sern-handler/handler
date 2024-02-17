@@ -11,7 +11,27 @@ import type { Logging } from '../contracts/logging';
 let containerSubject: CoreContainer<Partial<Dependencies>>;
 
 /**
- * @deprecated
+  * @internal
+  * Don't use this unless you know what you're doing. Destroys old containerSubject if it exists and disposes everything
+  * then it will swap
+  */
+export async function __swap_container(c: CoreContainer<Partial<Dependencies>>) {
+    if(containerSubject) {
+       await containerSubject.disposeAll() 
+    }
+    containerSubject = c;
+}
+
+/**
+  * @internal
+  * Don't use this unless you know what you're doing. Destroys old containerSubject if it exists and disposes everything
+  * then it will swap
+  */
+export function __add_container(key: string,v : Insertable) {
+    containerSubject.add({ [key]: v });
+}
+
+/**
  * Returns the underlying data structure holding all dependencies.
  * Exposes methods from iti
  * Use the Service API. The container should be readonly
@@ -29,19 +49,24 @@ export function disposeAll(logger: Logging|undefined) {
         ?.disposeAll()
         .then(() => logger?.info({ message: 'Cleaning container and crashing' }));
 }
-
-const dependencyBuilder = (container: any, excluded: string[] ) => {
-    type Insertable = 
-        | ((container: CoreContainer<Dependencies>) => unknown )
+type Insertable = 
+        | ((container: CoreContainer<Dependencies>) => unknown)
         | object
+const dependencyBuilder = (container: any, excluded: string[] ) => {
     return {
         /**
           * Insert a dependency into your container.
           * Supply the correct key and dependency
           */
         add(key: keyof Dependencies, v: Insertable) {
-            Result.wrap(() => container.add({ [key]: v}))
-                  .expect("Failed to add " + key);
+            if(typeof v !== 'function') {
+                Result.wrap(() => container.add({ [key]: v}))
+                      .expect("Failed to add " + key);
+            } else {
+                Result.wrap(() => 
+                       container.add((cntr: CoreContainer<Dependencies>) => ({ [key]: v(cntr)} )))
+                      .expect("Failed to add " + key);
+            }
         },
         /**
           * Exclude any dependencies from being added.
@@ -57,8 +82,14 @@ const dependencyBuilder = (container: any, excluded: string[] ) => {
           * Swap out a preexisting dependency.
           */
         swap(key: keyof Dependencies, v: Insertable) {
-            Result.wrap(() => container.upsert({ [key]: v }))
-                  .expect("Failed to update " + key);
+            if(typeof v !== 'function') {
+                Result.wrap(() => container.upsert({ [key]: v}))
+                      .expect("Failed to update " + key);
+            } else {
+                Result.wrap(() => 
+                       container.upsert((cntr: CoreContainer<Dependencies>) => ({ [key]: v(cntr)})))
+                      .expect("Failed to update " + key);
+            }
         },
         /**
           * @param key the key of the dependency
@@ -82,11 +113,6 @@ type ValidDependencyConfig =
     | CallbackBuilder
     | DependencyConfiguration;
     
-export const insertLogger = (containerSubject: CoreContainer<any>) => {
-    containerSubject
-        .upsert({'@sern/logger': () => new DefaultServices.DefaultLogging});
-}
-
 
 /**
  * Given the user's conf, check for any excluded/included dependency keys.
@@ -101,7 +127,7 @@ function composeRoot(
     //container should have no client or logger yet.
     const hasLogger = conf.exclude?.has('@sern/logger');
     if (!hasLogger) {
-        insertLogger(container);
+        __add_container('@sern/logger', new DefaultServices.DefaultLogging);
     }
     //Build the container based on the callback provided by the user
     conf.build(container as CoreContainer<Omit<CoreDependencies, '@sern/client'>>);
@@ -119,13 +145,13 @@ export async function makeDependencies<const T extends Dependencies>
     if(typeof conf === 'function') {
         const excluded: string[] = [];
         conf(dependencyBuilder(containerSubject, excluded));
-        
+        //We only include logger if it does not exist 
         const includeLogger = 
             !excluded.includes('@sern/logger') 
-            && !containerSubject.getTokens()['@sern/logger'];
+            && !containerSubject.hasKey('@sern/logger');
 
         if(includeLogger) {
-            insertLogger(containerSubject);
+            __add_container('@sern/logger', new DefaultServices.DefaultLogging);
         }
 
         containerSubject.ready();

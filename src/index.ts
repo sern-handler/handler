@@ -46,12 +46,8 @@ export {
     commandModule,
     eventModule,
     discordEvent,
-    EventExecutable,
-    CommandExecutable,
 } from './core/modules';
 
 export * as Presence from './core/presences'
 
-export {
-    useContainerRaw
-} from './core/_internal'
+

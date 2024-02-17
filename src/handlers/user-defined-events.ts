@@ -23,7 +23,7 @@ export function eventsHandler(
                 throw Error(SernError.InvalidModuleType + ' while creating event handler');
         }
     };
-    buildModules<EventModule>(allPaths, moduleManager)
+    buildModules<EventModule>(allPaths)
         .pipe(
             callInitPlugins(emitter),
             map(intoDispatcher),
