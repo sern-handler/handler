@@ -3,7 +3,7 @@ import { useContainer } from './dependency-injection';
 import type { CoreDependencies, DependencyConfiguration } from '../../types/ioc';
 import { CoreContainer } from './container';
 import { Result } from 'ts-results-es';
-import { DefaultServices } from '../_internal';
+import { __Services } from '../_internal';
 import { AnyFunction } from '../../types/utility';
 import type { Logging } from '../contracts/logging';
 
@@ -127,7 +127,7 @@ function composeRoot(
     //container should have no client or logger yet.
     const hasLogger = conf.exclude?.has('@sern/logger');
     if (!hasLogger) {
-        __add_container('@sern/logger', new DefaultServices.DefaultLogging);
+        __add_container('@sern/logger', new __Services.DefaultLogging);
     }
     //Build the container based on the callback provided by the user
     conf.build(container as CoreContainer<Omit<CoreDependencies, '@sern/client'>>);
@@ -151,7 +151,7 @@ export async function makeDependencies<const T extends Dependencies>
             && !containerSubject.hasKey('@sern/logger');
 
         if(includeLogger) {
-            __add_container('@sern/logger', new DefaultServices.DefaultLogging);
+            __add_container('@sern/logger', new __Services.DefaultLogging);
         }
 
         containerSubject.ready();
