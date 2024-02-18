@@ -6,7 +6,7 @@ import { Result } from 'ts-results-es';
 import { __Services } from '../_internal';
 import { AnyFunction } from '../../types/utility';
 import type { Logging } from '../contracts/logging';
-import { UnpackFunction } from 'iti';
+import type { UnpackFunction } from 'iti';
 //SIDE EFFECT: GLOBAL DI
 let containerSubject: CoreContainer<Partial<Dependencies>>;
 
