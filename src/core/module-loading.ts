@@ -1,4 +1,3 @@
-import { Result } from 'ts-results-es';
 import { type Observable, from, mergeMap, ObservableInput } from 'rxjs';
 import { readdir, stat } from 'fs/promises';
 import { basename, extname, join, resolve, parse, dirname } from 'path';
