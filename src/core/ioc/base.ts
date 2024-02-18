@@ -6,7 +6,7 @@ import { Result } from 'ts-results-es';
 import { __Services } from '../_internal';
 import { AnyFunction } from '../../types/utility';
 import type { Logging } from '../contracts/logging';
-
+import { UnpackFunction } from 'iti';
 //SIDE EFFECT: GLOBAL DI
 let containerSubject: CoreContainer<Partial<Dependencies>>;
 
@@ -34,7 +34,7 @@ export function __add_container(key: string,v : Insertable) {
 /**
  * Returns the underlying data structure holding all dependencies.
  * Exposes methods from iti
- * Use the Service API. The container should be readonly
+ * Use the Service API. The container should be readonly from the consumer side
  */
 export function useContainerRaw() {
     assert.ok(
@@ -49,8 +49,11 @@ export function disposeAll(logger: Logging|undefined) {
         ?.disposeAll()
         .then(() => logger?.info({ message: 'Cleaning container and crashing' }));
 }
+type UnpackedDependencies = {
+    [K in keyof Dependencies]: UnpackFunction<Dependencies[K]>
+}
 type Insertable = 
-        | ((container: CoreContainer<Dependencies>) => unknown)
+        | ((container: UnpackedDependencies) => unknown)
         | object
 const dependencyBuilder = (container: any, excluded: string[] ) => {
     return {
@@ -64,7 +67,7 @@ const dependencyBuilder = (container: any, excluded: string[] ) => {
                       .expect("Failed to add " + key);
             } else {
                 Result.wrap(() => 
-                       container.add((cntr: CoreContainer<Dependencies>) => ({ [key]: v(cntr)} )))
+                       container.add((cntr: UnpackedDependencies) => ({ [key]: v(cntr)} )))
                       .expect("Failed to add " + key);
             }
         },
@@ -87,7 +90,7 @@ const dependencyBuilder = (container: any, excluded: string[] ) => {
                       .expect("Failed to update " + key);
             } else {
                 Result.wrap(() => 
-                       container.upsert((cntr: CoreContainer<Dependencies>) => ({ [key]: v(cntr)})))
+                       container.upsert((cntr: UnpackedDependencies) => ({ [key]: v(cntr)})))
                       .expect("Failed to update " + key);
             }
         },
@@ -107,10 +110,9 @@ const dependencyBuilder = (container: any, excluded: string[] ) => {
    };
 };
 
-type CallbackBuilder = (c: ReturnType<typeof dependencyBuilder>) => any
 
 type ValidDependencyConfig =
-    | CallbackBuilder
+    | ((c: ReturnType<typeof dependencyBuilder>) => any)
     | DependencyConfiguration;
     
 
