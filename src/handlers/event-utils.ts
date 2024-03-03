@@ -31,6 +31,7 @@ import type { Awaitable } from '../types/utility';
 import type { ControlPlugin } from '../types/core-plugin';
 import type { AnyModule, CommandMeta, CommandModule, Module, Processed } from '../types/core-modules';
 import { disposeAll } from '../core/ioc/base';
+import { EventEmitter } from 'node:events';
 
 function createGenericHandler<Source, Narrowed extends Source, Output>(
     source: Observable<Source>,
@@ -246,9 +247,9 @@ export function makeModuleExecutor<
     );
 }
 
-export const handleCrash = (err: ErrorHandling, log?: Logging) =>
+export const handleCrash = (err: ErrorHandling,sernemitter: Emitter, log?: Logging) =>
     pipe(
-        catchError(handleError(err, log)),
+        catchError(handleError(err, sernemitter, log)),
         finalize(() => {
             log?.info({
                 message: 'A stream closed or reached end of lifetime',

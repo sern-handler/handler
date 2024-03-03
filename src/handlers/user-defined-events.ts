@@ -31,6 +31,6 @@ export function eventsHandler(
              * Where all events are turned on
              */
             mergeAll(),
-            handleCrash(err, log))
+            handleCrash(err, emitter, log))
         .subscribe();
 }

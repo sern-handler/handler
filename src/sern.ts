@@ -58,5 +58,5 @@ export function init(maybeWrapper: Wrapper | 'file') {
     const messages$ = messageHandler(dependencies, wrapper.defaultPrefix);
     const interactions$ = interactionHandler(dependencies);
     // listening to the message stream and interaction stream
-    merge(messages$, interactions$).pipe(handleCrash(errorHandler, logger)).subscribe();
+    merge(messages$, interactions$).pipe(handleCrash(errorHandler, dependencies[0], logger)).subscribe();
 }
