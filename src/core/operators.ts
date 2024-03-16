@@ -63,10 +63,10 @@ export function handleError<C>(crashHandler: ErrorHandling, emitter: Emitter, lo
     return (pload: unknown, caught: Observable<C>) => {
         // This is done to fit the ErrorHandling contract
         const err = pload instanceof Error ? pload : Error(util.inspect(pload, { colors: true }));
-        emitter.emit('error', err);
-        //formatted payload
-        logging?.error({ message: util.inspect(pload) });
-        crashHandler.updateAlive(err);
+        if(!emitter.emit('error', err)) {
+            logging?.error({ message: util.inspect(pload) });
+            crashHandler.updateAlive(err);
+        } 
         return caught;
     };
 }
