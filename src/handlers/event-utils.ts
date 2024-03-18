@@ -246,9 +246,9 @@ export function makeModuleExecutor<
     );
 }
 
-export const handleCrash = (err: ErrorHandling, log?: Logging) =>
+export const handleCrash = (err: ErrorHandling,sernemitter: Emitter, log?: Logging) =>
     pipe(
-        catchError(handleError(err, log)),
+        catchError(handleError(err, sernemitter, log)),
         finalize(() => {
             log?.info({
                 message: 'A stream closed or reached end of lifetime',

@@ -59,13 +59,14 @@ export const sharedEventStream = <T>(e: Emitter, eventName: string) => {
     return (fromEvent(e, eventName) as Observable<T>).pipe(share());
 };
 
-export function handleError<C>(crashHandler: ErrorHandling, logging?: Logging) {
+export function handleError<C>(crashHandler: ErrorHandling, emitter: Emitter, logging?: Logging) {
     return (pload: unknown, caught: Observable<C>) => {
         // This is done to fit the ErrorHandling contract
-        const err = pload instanceof Error ? pload : Error(util.inspect(pload, { colors: true }));
-        //formatted payload
-        logging?.error({ message: util.inspect(pload) });
-        crashHandler.updateAlive(err);
+        if(!emitter.emit('error', pload)) {
+            const err = pload instanceof Error ? pload : Error(util.inspect(pload, { colors: true }));
+            logging?.error({ message: util.inspect(pload) });
+            crashHandler.updateAlive(err);
+        }
         return caught;
     };
 }
