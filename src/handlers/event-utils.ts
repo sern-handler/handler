@@ -31,7 +31,6 @@ import type { Awaitable } from '../types/utility';
 import type { ControlPlugin } from '../types/core-plugin';
 import type { AnyModule, CommandMeta, CommandModule, Module, Processed } from '../types/core-modules';
 import { disposeAll } from '../core/ioc/base';
-import { EventEmitter } from 'node:events';
 
 function createGenericHandler<Source, Narrowed extends Source, Output>(
     source: Observable<Source>,
