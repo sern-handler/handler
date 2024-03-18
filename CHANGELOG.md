@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.3.4](https://github.com/sern-handler/handler/compare/v3.3.3...v3.3.4) (2024-03-18)
+
+
+### Bug Fixes
+
+* sern emitter err ([#358](https://github.com/sern-handler/handler/issues/358)) ([90e55df](https://github.com/sern-handler/handler/commit/90e55dfa1466c91e5da48922251309331921b1ef))
+
 ## [3.3.3](https://github.com/sern-handler/handler/compare/v3.3.2...v3.3.3) (2024-02-25)
 
 
