@@ -16,12 +16,19 @@ interface MetadataAccess {
  * @internal - direct access to the module manager will be removed in version 4
  */
 export interface ModuleManager extends MetadataAccess {
-    get(id: string): string | undefined;
+    get(id: string): Module | undefined;
 
-    set(id: string, path: string): void;
-    getPublishableCommands(): Promise<CommandModule[]>;
+    set(id: string, path: Module): void;
+    /**
+     * @deprecated
+     */
+    getPublishableCommands(): CommandModule[];
+
+    /*
+     * @deprecated
+     */
     getByNameCommandType<T extends CommandType>(
         name: string,
         commandType: T,
-    ): Promise<CommandModuleDefs[T]> | undefined;
+    ): CommandModuleDefs[T] | undefined;
 }

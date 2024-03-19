@@ -1,4 +1,3 @@
-import { Result } from 'ts-results-es';
 import { type Observable, from, mergeMap, ObservableInput } from 'rxjs';
 import { readdir, stat } from 'fs/promises';
 import { basename, extname, join, resolve, parse, dirname } from 'path';
@@ -42,9 +41,7 @@ export async function importModule<T>(absPath: string) {
     if ('default' in commandModule ) {
         commandModule = commandModule.default;
     }
-    return Result
-        .wrap(() => ({ module: commandModule.getInstance()  }))
-        .unwrapOr({ module: commandModule }) as T;
+    return { module: commandModule } as T;
 }
 
 export async function defaultModuleLoader<T extends Module>(absPath: string): ModuleResult<T> {
@@ -106,7 +103,7 @@ async function* readPaths(dir: string): AsyncGenerator<string> {
     }
 }
 
-export const requir = createRequire(import.meta.url);
+const requir = createRequire(import.meta.url);
 
 export function loadConfig(wrapper: Wrapper | 'file', log: Logging | undefined): Wrapper {
     if (wrapper !== 'file') {

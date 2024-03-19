@@ -7,5 +7,5 @@ import { CommandMeta, Module } from '../../types/core-modules';
  */
 export class ModuleStore {
     metadata = new WeakMap<Module, CommandMeta>();
-    commands = new Map<string, string>();
+    commands = new Map<string, Module>();
 }

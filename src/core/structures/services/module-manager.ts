@@ -1,6 +1,5 @@
 import * as Id from '../../../core/id';
 import { CoreModuleStore, ModuleManager } from '../../contracts';
-import { Files } from '../../_internal';
 import { CommandMeta, CommandModule, CommandModuleDefs, Module } from '../../../types/core-modules';
 import { CommandType } from '../enums';
 /**
@@ -13,11 +12,11 @@ export class DefaultModuleManager implements ModuleManager {
 
 
     getByNameCommandType<T extends CommandType>(name: string, commandType: T) {
-        const id = this.get(Id.create(name, commandType));
-        if (!id) {
+        const module = this.get(Id.create(name, commandType));
+        if (!module) {
             return undefined;
         }
-        return Files.importModule<CommandModuleDefs[T]>(id);
+        return module as CommandModuleDefs[T];
     }
 
     setMetadata(m: Module, c: CommandMeta): void {
@@ -35,20 +34,18 @@ export class DefaultModuleManager implements ModuleManager {
     get(id: string) {
         return this.moduleStore.commands.get(id);
     }
-    set(id: string, path: string): void {
+    set(id: string, path: CommandModule): void {
         this.moduleStore.commands.set(id, path);
     }
     //not tested
-    getPublishableCommands(): Promise<CommandModule[]> {
+    getPublishableCommands(): CommandModule[] {
         const entries = this.moduleStore.commands.entries();
         const publishable = 0b000000110;
-        return Promise.all(
-            Array.from(entries)
+        return Array.from(entries)
                 .filter(([id]) => {
                     const last_entry = id.at(-1);
                     return last_entry == 'B' ||  !(publishable & Number.parseInt(last_entry!));
                 })
-                .map(([, path]) => Files.importModule<CommandModule>(path)),
-        );
+                .map(([, path]) => path as CommandModule);
     }
 }
