@@ -633,7 +633,7 @@ __metadata:
     iti: ^0.6.0
     prettier: 2.8.8
     rxjs: ^7.8.0
-    ts-results-es: ^4.0.0
+    ts-results-es: ^4.1.0
     tsup: ^6.7.0
     typescript: 5.0.2
     vitest: latest
@@ -3408,10 +3408,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ts-results-es@npm:^4.0.0":
-  version: 4.0.0
-  resolution: "ts-results-es@npm:4.0.0"
-  checksum: 32a7059491e36d06c5a1084fe9be8021a0beb2d94a94b0c3fa85dc3e96561bf34fb8fd60ebe661064c9fc2bafcf437b6b65f119e8d7497af7f76cda9d9a2a945
+"ts-results-es@npm:^4.1.0":
+  version: 4.1.0
+  resolution: "ts-results-es@npm:4.1.0"
+  checksum: c04fd553a37930d234b7d7d31a4c3ea4396e47986a34e528f572af93d070db5cc64f6fcf0587f3c2f9b7061132427e89033572706bfdda112a29929439c5ec46
   languageName: node
   linkType: hard
 
