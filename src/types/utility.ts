@@ -18,7 +18,7 @@ export type Args = ParseType<{ text: string[]; slash: SlashOptions }>;
 export interface SernEventsMapping {
     'module.register': [Payload];
     'module.activate': [Payload];
-    error: [Payload];
+    error: [{ type: PayloadType.Failure; module?: AnyModule; reason: string | Error }];
     warning: [Payload];
     modulesLoaded: [never?];
 }
@@ -26,7 +26,7 @@ export interface SernEventsMapping {
 export type Payload =
     | { type: PayloadType.Success; module: AnyModule }
     | { type: PayloadType.Failure; module?: AnyModule; reason: string | Error }
-    | { type: PayloadType.Warning; reason: string };
+    | { type: PayloadType.Warning; module: undefined; reason: string };
 
 
 export type ReplyOptions = string | Omit<InteractionReplyOptions, 'fetchReply'> | MessageReplyOptions;

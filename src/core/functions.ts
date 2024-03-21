@@ -10,10 +10,10 @@ import type {
     UserContextMenuCommandInteraction,
     AutocompleteInteraction
 } from 'discord.js';
-import { ApplicationCommandOptionType, InteractionType } from 'discord.js'
+import { ApplicationCommandOptionType, InteractionType } from 'discord.js';
 import { PayloadType, PluginType } from './structures';
 import assert from 'assert';
-import { Payload } from '../types/utility';
+import type { Payload } from '../types/utility';
 
 //function wrappers for empty ok / err
 export const ok = /* @__PURE__*/ () => Ok.EMPTY;
@@ -50,7 +50,7 @@ export function treeSearch(
     if (options === undefined) return undefined;
     //clone to prevent mutation of original command module
     const _options = options.map(a => ({ ...a }));
-    let subcommands = new Set();
+    const subcommands = new Set();
     while (_options.length > 0) {
         const cur = _options.pop()!;
         switch (cur.type) {

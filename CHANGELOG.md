@@ -1,5 +1,21 @@
 # Changelog
 
+## [3.3.4](https://github.com/sern-handler/handler/compare/v3.3.3...v3.3.4) (2024-03-18)
+
+
+### Bug Fixes
+
+* sern emitter err ([#358](https://github.com/sern-handler/handler/issues/358)) ([90e55df](https://github.com/sern-handler/handler/commit/90e55dfa1466c91e5da48922251309331921b1ef))
+
+## [3.3.3](https://github.com/sern-handler/handler/compare/v3.3.2...v3.3.3) (2024-02-25)
+
+
+### Bug Fixes
+
+* rm deprecated class modules, clean up, rm indirection ([#355](https://github.com/sern-handler/handler/issues/355)) ([48f9f6e](https://github.com/sern-handler/handler/commit/48f9f6ec16e650d574bd24dcbb0ed176933bfe17))
+* singleton init not being fired when inserting function ([07b11b3](https://github.com/sern-handler/handler/commit/07b11b357baac0c3c7055c022bc353995c80f766))
+* typings and cleanup ([#356](https://github.com/sern-handler/handler/issues/356)) ([ce8c4bf](https://github.com/sern-handler/handler/commit/ce8c4bf6492b9680fb1c1a530d3e0028f214ad2f))
+
 ## [3.3.2](https://github.com/sern-handler/handler/compare/v3.3.1...v3.3.2) (2024-01-08)
 
 

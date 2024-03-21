@@ -10,7 +10,7 @@ export class DefaultErrorHandling implements ErrorHandling {
         throw err;
     }
 
-    #keepAlive = 5;
+    #keepAlive = 1;
 
     updateAlive(err: Error) {
         this.#keepAlive--;

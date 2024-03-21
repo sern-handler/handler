@@ -8,9 +8,9 @@ import {
     of,
     throwError,
     tap,
-    MonoTypeOperatorFunction,
     catchError,
     finalize,
+    map,
 } from 'rxjs';
 import {
     Files,
@@ -29,8 +29,7 @@ import { ObservableInput, pipe } from 'rxjs';
 import { Err, Ok, Result } from 'ts-results-es';
 import type { Awaitable } from '../types/utility';
 import type { ControlPlugin } from '../types/core-plugin';
-import type { AnyModule, CommandModule, Module, Processed } from '../types/core-modules';
-import type { ImportPayload } from '../types/core';
+import type { AnyModule, CommandMeta, CommandModule, Module, Processed } from '../types/core-modules';
 import { disposeAll } from '../core/ioc/base';
 
 function createGenericHandler<Source, Narrowed extends Source, Output>(
@@ -74,18 +73,13 @@ export function createInteractionHandler<T extends Interaction>(
             const possibleIds = Id.reconstruct(event);
             let fullPaths= possibleIds
                 .map(id => mg.get(id))
-                .filter((id): id is string => id !== undefined);
+                .filter((id): id is Module => id !== undefined);
 
             if(fullPaths.length == 0) {
                 return Err.EMPTY;
             }
             const [ path ] = fullPaths;
-            return Files
-            .defaultModuleLoader<Processed<CommandModule>>(path)
-            .then(payload => Ok(createDispatcher({ 
-                                    module: payload.module, 
-                                    event,
-                                })));
+            return Ok(createDispatcher({ module: path as Processed<CommandModule>, event }));
     });
 }
 
@@ -103,39 +97,37 @@ export function createMessageHandler(
                 return Err('Possibly undefined behavior: could not find a static id to resolve');
             }
         }
-        return Files
-            .defaultModuleLoader<Processed<CommandModule>>(fullPath)
-            .then(payload => {
-                const args = contextArgs(event, rest);
-                return Ok({ args, ...payload });
-            });
+        return Ok({ args: contextArgs(event, rest), module: fullPath as Processed<CommandModule>  })
     });
 }
 /**
- * IMPURE SIDE EFFECT
  * This function assigns remaining, incomplete data to each imported module.
  */
-function assignDefaults<T extends Module>(
-    moduleManager: ModuleManager,
-): MonoTypeOperatorFunction<ImportPayload<T>> {
-    return tap(({ module, absPath }) => {
-        module.name ??= Files.filename(absPath);
-        module.description ??= '...';
-        moduleManager.setMetadata(module, {
-            isClass: module.constructor.name === 'Function',
-            fullPath: absPath,
-            id: Id.create(module.name, module.type),
-        });
+function assignDefaults() {
+    return map(({ module, absPath }) => {
+        const processed = {
+            name: module.name ?? Files.filename(absPath),
+            description: module.description ?? '...',
+            ...module
+        }
+        return {
+            module: processed,
+            absPath,
+            metadata: {
+                isClass: module.constructor.name === 'Function',
+                fullPath: absPath,
+                id: Id.create(processed.name, module.type),
+            }
+        }
     });
 }
 
 export function buildModules<T extends AnyModule>(
     input: ObservableInput<string>,
-    moduleManager: ModuleManager,
 ) {
     return Files
         .buildModuleStream<Processed<T>>(input)
-        .pipe(assignDefaults(moduleManager));
+        .pipe(assignDefaults());
 }
 
 
@@ -219,9 +211,9 @@ export function callInitPlugins<T extends Processed<AnyModule>>(sernEmitter: Emi
             onStop: (module: T) => {
                 sernEmitter.emit('module.register', resultPayload(PayloadType.Failure, module, SernError.PluginFailure));
             },
-            onNext: ({ module }) => {
-                sernEmitter.emit('module.register', resultPayload(PayloadType.Success, module));
-                return { module };
+            onNext: (payload) => {
+                sernEmitter.emit('module.register', resultPayload(PayloadType.Success, payload.module));
+                return payload as { module: T; metadata: CommandMeta };
             },
         }),
     );
@@ -254,9 +246,9 @@ export function makeModuleExecutor<
     );
 }
 
-export const handleCrash = (err: ErrorHandling, log?: Logging) =>
+export const handleCrash = (err: ErrorHandling,sernemitter: Emitter, log?: Logging) =>
     pipe(
-        catchError(handleError(err, log)),
+        catchError(handleError(err, sernemitter, log)),
         finalize(() => {
             log?.info({
                 message: 'A stream closed or reached end of lifetime',

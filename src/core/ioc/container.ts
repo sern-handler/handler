@@ -2,7 +2,7 @@ import { Container } from 'iti';
 import { Disposable } from '../';
 import * as assert from 'node:assert';
 import { Subject } from 'rxjs';
-import { DefaultServices, ModuleStore } from '../_internal';
+import { __Services, ModuleStore } from '../_internal';
 import * as Hooks from './hooks';
 import { EventEmitter } from 'node:events';
 
@@ -23,12 +23,11 @@ export class CoreContainer<T extends Partial<Dependencies>> extends Container<T,
             .subscribe({ complete: unsubscribe });
 
         (this as Container<{}, {}>)
-            .add({ '@sern/errors': () => new DefaultServices.DefaultErrorHandling,
+            .add({ '@sern/errors': () => new __Services.DefaultErrorHandling,
                    '@sern/emitter': () => new EventEmitter({ captureRejections: true }),
                    '@sern/store': () => new ModuleStore })
             .add(ctx => {
-                return { '@sern/modules': () =>
-                        new DefaultServices.DefaultModuleManager(ctx['@sern/store']) };
+                return { '@sern/modules': new __Services.DefaultModuleManager(ctx['@sern/store'])};
             });
     }
 
@@ -51,8 +50,6 @@ export class CoreContainer<T extends Partial<Dependencies>> extends Container<T,
         })
         await super.disposeAll();
     }
-    
-    
     
     ready() {
         this.ready$.complete();

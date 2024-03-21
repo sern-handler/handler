@@ -43,9 +43,10 @@ export function init(maybeWrapper: Wrapper | 'file') {
     //Ready event: load all modules and when finished, time should be taken and logged
     readyHandler(dependencies, Files.getFullPathTree(wrapper.commands))
         .add(() => {
+            logger?.info({ message: "Client signaled ready, registering modules" });
             const time = ((performance.now() - startTime) / 1000).toFixed(2);
             dependencies[0].emit('modulesLoaded');
-            logger?.info({ message: `sern: registered all modules in ${time} s`, });
+            logger?.info({ message: `sern: registered in ${time} s`, });
             if(presencePath.exists) {
                 const setPresence = async (p: any) => {
                     return (dependencies[4] as Client).user?.setPresence(p);
@@ -57,5 +58,5 @@ export function init(maybeWrapper: Wrapper | 'file') {
     const messages$ = messageHandler(dependencies, wrapper.defaultPrefix);
     const interactions$ = interactionHandler(dependencies);
     // listening to the message stream and interaction stream
-    merge(messages$, interactions$).pipe(handleCrash(errorHandler, logger)).subscribe();
+    merge(messages$, interactions$).pipe(handleCrash(errorHandler, dependencies[0], logger)).subscribe();
 }
