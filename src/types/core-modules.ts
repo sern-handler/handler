@@ -109,7 +109,6 @@ export interface DiscordEventCommand<T extends keyof ClientEvents = keyof Client
 }
 export interface TextCommand extends Module {
     type: CommandType.Text;
-    alias?: string[];
     execute: (ctx: Context, args: ['text', string[]]) => Awaitable<unknown>;
 }
 
@@ -122,7 +121,6 @@ export interface SlashCommand extends Module {
 
 export interface BothCommand extends Module {
     type: CommandType.Both;
-    alias?: string[];
     description: string;
     options?: SernOptionsData[];
     execute: (ctx: Context, args: Args) => Awaitable<unknown>;

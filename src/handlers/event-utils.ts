@@ -103,31 +103,11 @@ export function createMessageHandler(
 /**
  * This function assigns remaining, incomplete data to each imported module.
  */
-function assignDefaults() {
-    return map(({ module, absPath }) => {
-        const processed = {
-            name: module.name ?? Files.filename(absPath),
-            description: module.description ?? '...',
-            ...module
-        }
-        return {
-            module: processed,
-            absPath,
-            metadata: {
-                isClass: module.constructor.name === 'Function',
-                fullPath: absPath,
-                id: Id.create(processed.name, module.type),
-            }
-        }
-    });
-}
 
 export function buildModules<T extends AnyModule>(
     input: ObservableInput<string>,
 ) {
-    return Files
-        .buildModuleStream<Processed<T>>(input)
-        .pipe(assignDefaults());
+    return Files.buildModuleStream<Processed<T>>(input);
 }
 
 

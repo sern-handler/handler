@@ -18,8 +18,9 @@ import {
 } from 'rxjs';
 import { Emitter, ErrorHandling, Logging } from './contracts';
 import util from 'node:util';
-import type { PluginResult, VoidResult } from '../types/core-plugin';
+import type { PluginResult } from '../types/core-plugin';
 import type { Result } from 'ts-results-es'
+import type { VoidResult } from './_internal';
 /**
  * if {src} is true, mapTo V, else ignore
  * @param item

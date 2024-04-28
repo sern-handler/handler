@@ -9,7 +9,8 @@ import { readyHandler } from './handlers/ready-event';
 import { messageHandler } from './handlers/message-event';
 import { interactionHandler } from './handlers/interaction-event';
 import { presenceHandler } from './handlers/presence';
-import { Client } from 'discord.js';
+import type { Client } from 'discord.js';
+
 
 /**
  * @since 1.0.0
@@ -31,8 +32,8 @@ export function init(maybeWrapper: Wrapper | 'file') {
                                   '@sern/modules',
                                   '@sern/client');
     const logger = dependencies[2],
-        errorHandler = dependencies[1];
-
+          errorHandler = dependencies[1];
+    
     const wrapper = Files.loadConfig(maybeWrapper, logger);
     if (wrapper.events !== undefined) {
         eventsHandler(dependencies, Files.getFullPathTree(wrapper.events));
@@ -40,6 +41,7 @@ export function init(maybeWrapper: Wrapper | 'file') {
 
     const initCallsite = callsites()[1].getFileName();
     const presencePath = Files.shouldHandle(initCallsite!, "presence");
+    
     //Ready event: load all modules and when finished, time should be taken and logged
     readyHandler(dependencies, Files.getFullPathTree(wrapper.commands))
         .add(() => {

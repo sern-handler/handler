@@ -30,8 +30,7 @@ export function contextArgs(wrappable: Message | BaseInteraction, messageArgs?: 
 function intoPayload(module: Processed<Module>, ) {
     return pipe(
         arrayifySource,
-        map(args => ({ module, args, })),
-    );
+        map(args => ({ module, args, })));
 }
 
 const createResult = createResultResolver<

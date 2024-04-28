@@ -10,17 +10,14 @@ import type { Logging } from './contracts/logging';
 
 
 export const parseCallsite = (fpath: string) => {
-    const pathobj = 
-        path.parse(fpath.replace(/file:\\?/, "")
-                        .split(path.sep)
-                        .join(path.posix.sep))
-    return {
-        name: pathobj.name,
-        absPath : path.posix.format(pathobj)
-    }
+    const pathobj = path.parse(fpath.replace(/file:\\?/, "")
+                                    .split(path.sep)
+                                    .join(path.posix.sep))
+    return { name: pathobj.name,
+             absPath : path.posix.format(pathobj) }
 }
-export const shouldHandle = (pth: string, fpath: string) => {
-    const file_name = fpath+path.extname(pth);
+export const shouldHandle = (pth: string, filenam: string) => {
+    const file_name = filenam+path.extname(pth);
     let newPath = path.join(path.dirname(pth), file_name)
                     .replace(/file:\\?/, "");
     return { exists: existsSync(newPath),
@@ -49,7 +46,7 @@ export async function importModule<T>(absPath: string) {
     let commandModule = fileModule.default;
 
     assert(commandModule , `Found no export @ ${absPath}. Forgot to ignore with "!"? (!${path.basename(absPath)})?`);
-    if ('default' in commandModule ) {
+    if ('default' in commandModule) {
         commandModule = commandModule.default;
     }
     return { module: commandModule } as T;
@@ -72,8 +69,7 @@ export const fmtFileName = (fileName: string) => path.parse(fileName).name;
 export function buildModuleStream<T extends Module>(
     input: ObservableInput<string>,
 ): Observable<ImportPayload<T>> {
-    return from(input)
-        .pipe(mergeMap(defaultModuleLoader<T>));
+    return from(input).pipe(mergeMap(defaultModuleLoader<T>));
 }
 
 export const getFullPathTree = (dir: string) => readPaths(path.resolve(dir));
