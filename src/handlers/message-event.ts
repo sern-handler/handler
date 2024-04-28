@@ -1,4 +1,4 @@
-import { mergeMap, EMPTY } from 'rxjs';
+import { mergeMap, EMPTY, concatMap } from 'rxjs';
 import type { Message } from 'discord.js';
 import { PayloadType } from '../core';
 import { sharedEventStream, SernError, filterTap, resultPayload } from '../core/_internal';
@@ -39,9 +39,9 @@ export function messageHandler(
 
     return msgCommands$.pipe(
         filterTap((e) => emitter.emit('warning', resultPayload(PayloadType.Warning, undefined, e))),
-        makeModuleExecutor(module => {
+        concatMap(makeModuleExecutor(module => {
             const result = resultPayload(PayloadType.Failure, module, SernError.PluginFailure);
             emitter.emit('module.activate', result);
-        }),
+        })),
         mergeMap(payload => executeModule(emitter, log, err, payload)));
 }

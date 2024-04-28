@@ -1,5 +1,5 @@
 import { Interaction } from 'discord.js';
-import { mergeMap, merge } from 'rxjs';
+import { mergeMap, merge, concatMap } from 'rxjs';
 import { PayloadType } from '../core';
 import {
     isAutocomplete,
@@ -27,7 +27,7 @@ export function interactionHandler([emitter, err, log, modules, client]: Depende
     return interactionHandler$
         .pipe(
             filterTap(e => emitter.emit('warning', resultPayload(PayloadType.Warning, undefined, e))),
-            makeModuleExecutor(module => 
-                emitter.emit('module.activate', resultPayload(PayloadType.Failure, module, SernError.PluginFailure))),
+            concatMap(makeModuleExecutor(module => 
+                emitter.emit('module.activate', resultPayload(PayloadType.Failure, module, SernError.PluginFailure)))),
             mergeMap(payload => executeModule(emitter, log, err, payload)));
 }

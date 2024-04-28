@@ -14,7 +14,6 @@ export function makePlugin<V extends unknown[]>(
 }
 /**
  * @since 2.5.0
- * @__PURE__
  */
 export function EventInitPlugin<I extends EventType>(
     execute: (...args: EventArgs<I, PluginType.Init>) => PluginResult,
@@ -23,7 +22,6 @@ export function EventInitPlugin<I extends EventType>(
 }
 /**
  * @since 2.5.0
- * @__PURE__
  */
 export function CommandInitPlugin<I extends CommandType>(
     execute: (...args: CommandArgs<I, PluginType.Init>) => PluginResult,
@@ -32,7 +30,6 @@ export function CommandInitPlugin<I extends CommandType>(
 }
 /**
  * @since 2.5.0
- * @__PURE__
  */
 export function CommandControlPlugin<I extends CommandType>(
     execute: (...args: CommandArgs<I, PluginType.Control>) => PluginResult,
@@ -41,7 +38,6 @@ export function CommandControlPlugin<I extends CommandType>(
 }
 /**
  * @since 2.5.0
- * @__PURE__
  */
 export function EventControlPlugin<I extends EventType>(
     execute: (...args: EventArgs<I, PluginType.Control>) => PluginResult,

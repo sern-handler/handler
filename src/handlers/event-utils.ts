@@ -169,7 +169,6 @@ export function executeModule(
 }
 
 
-
 /**
  * A higher order function that
  * - creates a stream of {@link VoidResult} { config.createStream }
@@ -235,15 +234,13 @@ export function makeModuleExecutor<
         module,
         args
     });
-    return concatMap(
-        createResultResolver({
+    return createResultResolver({
             onStop,
             createStream: ({ args, module }) => 
                 from(module.onEvent)
                     .pipe(callPlugin(args)),
             onNext,
-        }),
-    );
+        })
 }
 
 export const handleCrash = (err: ErrorHandling,sernemitter: Emitter, log?: Logging) =>

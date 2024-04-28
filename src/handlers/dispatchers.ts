@@ -50,14 +50,12 @@ const createResult = createResultResolver<
 export function eventDispatcher(module: Processed<Module>,  source: unknown) {
     assert.ok(source instanceof EventEmitter, `${source} is not an EventEmitter`);
 
-    const execute: OperatorFunction<unknown[], unknown> = concatMap(async args =>
-        module.execute(...args),
-    );
-    return fromEvent(source, module.name).pipe(
-        intoPayload(module),
-        concatMap(createResult),
-        execute,
-    );
+    const execute: OperatorFunction<unknown[], unknown> =
+        concatMap(async args => module.execute(...args));
+    return fromEvent(source, module.name)
+        .pipe(intoPayload(module),
+              concatMap(createResult),
+              execute);
 }
 
 export function createDispatcher(payload: {
