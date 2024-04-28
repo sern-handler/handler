@@ -7,45 +7,55 @@ import type {
     InputCommand,
     InputEvent,
 } from '../types/core-modules';
-import { partitionPlugins } from './_internal';
+import { _Module, partitionPlugins } from './_internal';
 import type { Awaitable } from '../types/utility';
 import callsites from 'callsites';
 import * as Files from './module-loading'
-import path, { basename } from 'path';
 import * as Id from './id'
 /**
  * @since 1.0.0 The wrapper function to define command modules for sern
  * @param mod
  */
-export function commandModule(mod: InputCommand): CommandModule {
+export function commandModule(mod: InputCommand): _Module {
     const [onEvent, plugins] = partitionPlugins(mod.plugins);
-    const initCallsite = callsites()[1].getFileName()?.replace(/file:\\?/, "");
+    const initCallsite = callsites()[1].getFileName();
     if(!initCallsite) throw Error("initCallsite is null");
-    const filename = Files.parseCallsite(initCallsite);
-    mod.name ??= filename;
-    const id = Id.create(mod.name, mod.type)
+
+    const { name, absPath } = Files.parseCallsite(initCallsite);
+    mod.name ??= name;
+    //@ts-ignore
     return {
         ...mod,
-        __id: id,
+        meta: {
+            id: Id.create(mod.name, mod.type),
+            absPath
+        },
         onEvent,
         plugins,
-    } as unknown as CommandModule;
+    };
 }
 /**
  * @since 1.0.0
  * The wrapper function to define event modules for sern
  * @param mod
  */
-export function eventModule(mod: InputEvent): EventModule {
+export function eventModule(mod: InputEvent): _Module {
     const [onEvent, plugins] = partitionPlugins(mod.plugins);
     const initCallsite = callsites()[1].getFileName();
-    console.log(initCallsite?.replace(/file:\\?/, ""))
-
+    console.log(initCallsite);
+    if(!initCallsite) throw Error("initCallsite is null");
+    const { name, absPath } = Files.parseCallsite(initCallsite);
+    mod.name ??= name;
+    //@ts-ignore
     return {
         ...mod,
+        meta: {
+            id: Id.create(mod.name, mod.type),
+            absPath
+        },
         plugins,
         onEvent,
-    } as EventModule;
+    };
 }
 
 /** Create event modules from discord.js client events,

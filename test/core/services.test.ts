@@ -5,6 +5,14 @@ import { faker } from '@faker-js/faker';
 import { commandModule, CommandType } from '../../src';
 import * as Id from '../../src/core/id';
 import { CommandMeta } from '../../src/types/core-modules';
+function createRandomCommandModules() {
+    return commandModule({
+        type: CommandType.Slash,
+        description: faker.string.alpha(),
+        name: faker.string.alpha({ length: { min: 5, max: 10 }}),
+        execute: vi.fn(),
+    });
+}
 describe('services', () => {
     //@ts-ignore
     let container: CoreContainer<Dependencies>;
@@ -20,15 +28,6 @@ describe('services', () => {
         consoleMock.mockReset();
     });
     it('module-store.ts', async () => {
-        function createRandomCommandModules() {
-            return commandModule({
-                type: CommandType.Slash,
-                description: faker.string.alpha(),
-                name: faker.string.alpha({ length: { min: 5, max: 10 }}),
-                execute: () => {},
-            });
-        }
-
         const modules = faker.helpers.multiple(createRandomCommandModules, {
             count: 40,
         });

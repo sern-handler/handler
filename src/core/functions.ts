@@ -118,3 +118,11 @@ export function resultPayload<T extends PayloadType>
 (type: T, module?: Module, reason?: unknown) {
     return { type, module, reason } as Payload & { type : T };
 }
+
+export function pipe<T>(arg: unknown, firstFn: Function, ...fns: Function[]): T {
+  let result = firstFn(arg);
+  for (let fn of fns) {
+    result = fn(result);
+  }
+  return result;
+}

@@ -47,9 +47,9 @@ import type {
     UserContextMenuCommandInteraction,
     UserSelectMenuInteraction,
 } from 'discord.js';
+import { VoidResult } from '../core/_internal';
 
 export type PluginResult = Awaitable<VoidResult>;
-export type VoidResult = Result<void, void>;
 
 export interface InitArgs<T extends Processed<Module>> {
     module: T;
