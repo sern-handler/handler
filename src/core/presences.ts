@@ -25,8 +25,7 @@ export type Config <T extends (keyof Dependencies)[]> =
   * Create a Presence module which **MUST** be put in a file called presence.(language-extension)
   * adjacent to the file where **Sern.init** is CALLED.
   */
-export function module<T extends (keyof Dependencies)[]>(conf: Config<T>) 
-{ return conf; }
+export const module = <T extends (keyof Dependencies)[]>(conf: Config<T>) => conf;
 
 
 /**

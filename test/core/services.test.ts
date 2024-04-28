@@ -2,10 +2,9 @@ import { SpyInstance, afterAll, beforeEach, describe, expect, it, vi } from 'vit
 import { CoreContainer } from '../../src/core/ioc/container';
 import { DefaultLogging } from '../../src/core';
 import { faker } from '@faker-js/faker';
-import { commandModule } from '../../src';
+import { commandModule, CommandType } from '../../src';
 import * as Id from '../../src/core/id';
 import { CommandMeta } from '../../src/types/core-modules';
-
 describe('services', () => {
     //@ts-ignore
     let container: CoreContainer<Dependencies>;
@@ -23,9 +22,9 @@ describe('services', () => {
     it('module-store.ts', async () => {
         function createRandomCommandModules() {
             return commandModule({
-                type: faker.number.int({ min: 1 << 0, max: 1 << 10 }),
+                type: CommandType.Slash,
                 description: faker.string.alpha(),
-                name: faker.string.alpha(),
+                name: faker.string.alpha({ length: { min: 5, max: 10 }}),
                 execute: () => {},
             });
         }

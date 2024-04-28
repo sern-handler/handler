@@ -8,6 +8,10 @@ import type { Module } from '../types/core-modules';
 import { existsSync } from 'fs';
 import type { Logging } from './contracts/logging';
 
+
+export const parseCallsite = (fpath: string) => {
+   return parse(fpath.replace(/file:\\?/, "")).name;
+}
 export const shouldHandle = (path: string, fpath: string) => {
     const file_name = fpath+extname(path);
     let newPath = join(dirname(path), file_name)

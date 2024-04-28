@@ -15,13 +15,10 @@ import { PayloadType, PluginType } from './structures';
 import assert from 'assert';
 import type { Payload } from '../types/utility';
 
-//function wrappers for empty ok / err
-export const ok = /* @__PURE__*/ () => Ok.EMPTY;
-export const err = /* @__PURE__*/ () => Err.EMPTY;
+export const ok =  () => Ok.EMPTY;
+export const err =  () => Err.EMPTY;
 
-export function partitionPlugins(
-    arr: (AnyEventPlugin | AnyCommandPlugin)[] = [],
-): [Plugin[], Plugin[]] {
+export function partitionPlugins(arr: (AnyEventPlugin | AnyCommandPlugin)[] = []): [Plugin[], Plugin[]] {
     const controlPlugins = [];
     const initPlugins = [];
 
