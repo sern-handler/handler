@@ -1,5 +1,5 @@
 import { Container } from 'iti';
-import { Disposable } from '../';
+import type { Disposable } from '../interfaces';
 import * as assert from 'node:assert';
 import { Subject } from 'rxjs';
 import { __Services } from '../_internal';

@@ -1,5 +1,5 @@
 import type { CommandInteractionOptionResolver, InteractionReplyOptions, MessageReplyOptions } from 'discord.js';
-import type { PayloadType } from '../core';
+import type { PayloadType } from '../core/structures/enums';
 import type { AnyModule } from './core-modules';
 
 export type Awaitable<T> = PromiseLike<T> | T;

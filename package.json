@@ -5,18 +5,14 @@
     "description": "A complete, customizable, typesafe, & reactive framework for discord bots.",
     "main": "./dist/index.js",
     "module": "./dist/index.js",
-    "types": "./dist/index.d.ts",
     "exports": {
         ".": {
             "import": "./dist/index.js",
-            "require": "./dist/index.js",
-            "types": "./dist/index.d.ts"
+            "require": "./dist/index.js"
         },
         "./internal": {
             "import": "./dist/_internal.js",
-            "require": "./dist/_internal.js",
-            "types": "./dist/_internal.d.ts"
-
+            "require": "./dist/_internal.js"
         }
     },
     "scripts": {
@@ -25,7 +21,7 @@
         "format": "eslint src/**/*.ts --fix",
         "build:dev": "tsup --metafile",
         "build:prod": "tsup ",
-        "prepare": "npm run build:prod",
+        "prepare": "tsc",
         "pretty": "prettier --write .",
         "tdd": "vitest",
         "test": "vitest --run",

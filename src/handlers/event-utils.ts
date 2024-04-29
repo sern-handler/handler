@@ -22,7 +22,8 @@ import {
     VoidResult,
     resultPayload,
 } from '../core/_internal';
-import { Emitter, ErrorHandling, Logging, PayloadType } from '../core';
+import { Emitter, ErrorHandling, Logging } from '../core/interfaces';
+import { PayloadType } from '../core/structures/enums'
 import { contextArgs, createDispatcher } from './dispatchers';
 import { ObservableInput, pipe } from 'rxjs';
 import { Err, Ok, Result } from 'ts-results-es';

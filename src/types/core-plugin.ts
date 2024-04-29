@@ -34,7 +34,8 @@ import type {
     UserSelectCommand,
 } from './core-modules';
 import type { Args, Awaitable, Payload, SlashOptions } from './utility';
-import type { CommandType, Context, EventType, PluginType } from '../core';
+import type { CommandType, EventType, PluginType } from '../core/structures/enums'
+import type { Context } from '../core/structures/context'
 import type {
     ButtonInteraction,
     ChannelSelectMenuInteraction,

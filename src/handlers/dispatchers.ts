@@ -10,7 +10,7 @@ import {
 } from '../core/_internal';
 import { createResultResolver } from './event-utils';
 import { BaseInteraction, Message } from 'discord.js';
-import { CommandType, Context } from '../core';
+import { CommandType, Context } from '../core/structures';
 import type { Args } from '../types/utility';
 import { inspect } from 'node:util'
 import type { CommandModule, Module, Processed } from '../types/core-modules';

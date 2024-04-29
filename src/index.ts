@@ -1,5 +1,4 @@
 export * as Sern from './sern';
-export * from './core';
 export type {
     CommandModule,
     EventModule,
@@ -51,4 +50,7 @@ export {
 } from './core/modules';
 
 export * from './core/presences'
-
+export * from './core/interfaces'
+export * from './core/create-plugins';
+export * from './core/structures';
+export * from './core/ioc';

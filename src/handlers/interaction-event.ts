@@ -1,6 +1,6 @@
 import { Interaction } from 'discord.js';
 import { mergeMap, merge, concatMap } from 'rxjs';
-import { PayloadType } from '../core';
+import { PayloadType } from '../core/structures/enums';
 import {
     isAutocomplete,
     isCommand,
