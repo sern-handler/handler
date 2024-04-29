@@ -51,14 +51,13 @@ export const arrayifySource = map(src => (Array.isArray(src) ? (src as unknown[]
 /**
  * Checks if the stream of results is all ok.
  */
-export const everyPluginOk: OperatorFunction<VoidResult, boolean> = pipe(
-    every(result => result.isOk()),
-    defaultIfEmpty(true),
-);
+export const everyPluginOk: OperatorFunction<VoidResult, boolean> = 
+    pipe(every(result => result.isOk()),
+         defaultIfEmpty(true));
 
-export const sharedEventStream = <T>(e: Emitter, eventName: string) => {
-    return (fromEvent(e, eventName) as Observable<T>).pipe(share());
-};
+export const sharedEventStream = <T>(e: Emitter, eventName: string) => 
+    (fromEvent(e, eventName) as Observable<T>).pipe(share());
+
 
 export function handleError<C>(crashHandler: ErrorHandling, emitter: Emitter, logging?: Logging) {
     return (pload: unknown, caught: Observable<C>) => {
@@ -80,5 +79,3 @@ export const filterTap = <K, R>(onErr: (e: R) => void): OperatorFunction<Result<
             onErr(result.error);
             return EMPTY
         }))
-
-

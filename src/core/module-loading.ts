@@ -13,6 +13,7 @@ export const parseCallsite = (fpath: string) => {
     return { name: pathobj.name,
              absPath : path.posix.format(pathobj) }
 }
+
 export const shouldHandle = (pth: string, filenam: string) => {
     const file_name = filenam+path.extname(pth);
     let newPath = path.join(path.dirname(pth), file_name)
@@ -22,7 +23,6 @@ export const shouldHandle = (pth: string, filenam: string) => {
 }
 
 
-export type ModuleResult<T> = Promise<ImportPayload<T>>;
 
 /**
  * Import any module based on the absolute path.

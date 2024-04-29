@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, vi, it } from 'vitest';
-import { createResultResolver, eventDispatcher } from '../../src/handlers/_internal';
+import { eventDispatcher } from '../../src/handlers/dispatchers';
 import { faker } from '@faker-js/faker';
 import { Module } from '../../src/core/types/modules';
 import { Processed } from '../../src/handlers/types';
