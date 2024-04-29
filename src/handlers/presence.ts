@@ -1,12 +1,12 @@
 import { concatMap, from, interval, of, map, scan, startWith, fromEvent, take } from "rxjs"
 import { Files } from "../core/_internal";
-import * as Presence from "../core/presences";
+import { PresenceConfig, PresenceResult } from "../core/presences";
 import { Services } from "../core/ioc";
 import assert from "node:assert";
 
-type SetPresence = (conf: Presence.Result) => Promise<unknown>
+type SetPresence = (conf: PresenceResult) => Promise<unknown>
 
-const parseConfig = async (conf: Promise<Presence.Result>) => {
+const parseConfig = async (conf: Promise<PresenceResult>) => {
     return conf.then(s => {
         if('repeat' in s) {
             const { onRepeat, repeat } = s;
@@ -25,7 +25,7 @@ const parseConfig = async (conf: Promise<Presence.Result>) => {
 
 export const presenceHandler = (path: string, setPresence: SetPresence) => {
     interface PresenceModule  {
-        module: Presence.Config<(keyof Dependencies)[]>
+        module: PresenceConfig<(keyof Dependencies)[]>
     }
     const presence = Files
         .importModule<PresenceModule>(path)

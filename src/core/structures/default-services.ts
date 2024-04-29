@@ -8,12 +8,10 @@ export class DefaultErrorHandling implements ErrorHandling {
     crash(err: Error): never {
         throw err;
     }
-
-    #keepAlive = 1;
-
+    keepAlive = 1;
     updateAlive(err: Error) {
-        this.#keepAlive--;
-        if (this.#keepAlive === 0) {
+        this.keepAlive--;
+        if (this.keepAlive === 0) {
             throw err;
         }
     }

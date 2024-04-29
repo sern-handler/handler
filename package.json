@@ -4,13 +4,19 @@
     "version": "3.3.4",
     "description": "A complete, customizable, typesafe, & reactive framework for discord bots.",
     "main": "./dist/index.js",
-    "module": "./dist/index.mjs",
+    "module": "./dist/index.js",
     "types": "./dist/index.d.ts",
     "exports": {
         ".": {
-            "import": "./dist/index.mjs",
+            "import": "./dist/index.js",
             "require": "./dist/index.js",
             "types": "./dist/index.d.ts"
+        },
+        "./internal": {
+            "import": "./dist/_internal.js",
+            "require": "./dist/_internal.js",
+            "types": "./dist/_internal.d.ts"
+
         }
     },
     "scripts": {

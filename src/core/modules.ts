@@ -67,9 +67,6 @@ export function discordEvent<T extends keyof ClientEvents>(mod: {
     plugins?: AnyEventPlugin[];
     execute: (...args: ClientEvents[T]) => Awaitable<unknown>;
 }) {
-    return eventModule({
-        type: EventType.Discord,
-        ...mod,
-    });
+    return eventModule({ type: EventType.Discord, ...mod, });
 }
 

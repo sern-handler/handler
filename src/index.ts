@@ -50,6 +50,5 @@ export {
     discordEvent,
 } from './core/modules';
 
-export * as Presence from './core/presences'
-
+export * from './core/presences'
 

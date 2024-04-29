@@ -1,4 +1,5 @@
 import { defineConfig } from 'tsup';
+
 const shared = {
     entry: ['src/index.ts'],
     external: ['discord.js', 'iti'],
@@ -12,6 +13,16 @@ const shared = {
     },
 };
 export default defineConfig([
+    {
+        ...shared,
+        format: ['esm', 'cjs'],
+        target: 'node18',
+        tsconfig: './tsconfig.json',
+        outDir: './dist',
+        minify: false,
+        dts: true,
+        entry: ['src/_internal.ts'],
+    },
     {
         format: ['esm', 'cjs'],
         target: 'node18',

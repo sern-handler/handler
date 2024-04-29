@@ -1,17 +1,6 @@
-import { handleCrash } from './handlers/event-utils';
 import callsites from 'callsites';
 import { Files } from './core/_internal';
-import path from 'node:path'
-import { merge } from 'rxjs';
 import { Services } from './core/ioc';
-import { eventsHandler } from './handlers/user-defined-events';
-import { readyHandler } from './handlers/ready-event';
-import { messageHandler } from './handlers/message-event';
-import { interactionHandler } from './handlers/interaction-event';
-import { presenceHandler } from './handlers/presence';
-import type { Client } from 'discord.js';
-import { type Wrapper } from './';
-
 
 /**
  * @since 1.0.0
