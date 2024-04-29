@@ -11,7 +11,7 @@
  * Plugins are reminiscent of middleware in express.
  */
 
-import type { Err, Ok, Result } from 'ts-results-es';
+import type { Err, Ok } from 'ts-results-es';
 import type {
     BothCommand,
     ButtonCommand,
