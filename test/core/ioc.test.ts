@@ -1,7 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { CoreContainer } from '../../src/core/ioc/container';
 import { EventEmitter } from 'events';
-import { Disposable, Emitter, Init, Logging, __Services } from '../../src/core';
+import { Disposable, Emitter, Init, Logging } from '../../src/core/interfaces';
+import { __Services } from '../../src/core/structures'
 import { CoreDependencies } from '../../src/types/ioc';
 
 describe('ioc container', () => {

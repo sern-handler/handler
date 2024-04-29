@@ -1,4 +1,4 @@
-import { CommandType } from '../../src/core';
+import { CommandType } from '../../src/core/structures/enums';
 import * as Id from '../../src/core/id'
 import { expect, test } from 'vitest'
 

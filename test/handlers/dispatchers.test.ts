@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, vi, it } from 'vitest';
 import { eventDispatcher } from '../../src/handlers/dispatchers';
 import { faker } from '@faker-js/faker';
-import { Module } from '../../src/core/types/modules';
+import { Module } from '../../src/types/core-modules';
 import { Processed } from '../../src/handlers/types';
-import { CommandType } from '../../src/core';
+import { CommandType } from '../../src/core/structures/enums';
 import { EventEmitter } from 'events';
 
 function createRandomModule(): Processed<Module> {
