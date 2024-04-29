@@ -10,7 +10,6 @@ import {
     tap,
     catchError,
     finalize,
-    map,
 } from 'rxjs';
 import {
     Files,
@@ -23,7 +22,7 @@ import {
     VoidResult,
     resultPayload,
 } from '../core/_internal';
-import { Emitter, ErrorHandling, Logging, ModuleManager, PayloadType } from '../core';
+import { Emitter, ErrorHandling, Logging, PayloadType } from '../core';
 import { contextArgs, createDispatcher } from './dispatchers';
 import { ObservableInput, pipe } from 'rxjs';
 import { Err, Ok, Result } from 'ts-results-es';
@@ -65,7 +64,7 @@ export function fmt(msg: string, prefix: string): string[] {
  */
 export function createInteractionHandler<T extends Interaction>(
     source: Observable<Interaction>,
-    mg: ModuleManager,
+    mg: any, //TODO
 ) {
     return createGenericHandler<Interaction, T, Result<ReturnType<typeof createDispatcher>, void>>(
         source,
@@ -86,7 +85,7 @@ export function createInteractionHandler<T extends Interaction>(
 export function createMessageHandler(
     source: Observable<Message>,
     defaultPrefix: string,
-    mg: ModuleManager,
+    mg: any, //TODO
 ) {
     return createGenericHandler(source, async event => {
         const [prefix, ...rest] = fmt(event.content, defaultPrefix);

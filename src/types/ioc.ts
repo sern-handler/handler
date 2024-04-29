@@ -10,29 +10,18 @@ export type Singleton<T> = () => T;
   * Every time this is called, a new object is created
   */
 export type Transient<T> = () => () => T;
-/**
-  * Type to annotate that something is initializable. 
-  * If T has an init method, this will be called.
-  */
-export type Initializable<T extends Contracts.Init> = T
 
 export type DependencyList = [
     Contracts.Emitter,
     Contracts.ErrorHandling,
     Contracts.Logging | undefined,
-    Contracts.ModuleManager,
+    null,
     Contracts.Emitter,
 ];
 
 export interface CoreDependencies {
     '@sern/client': () => Contracts.Emitter;
     '@sern/emitter': () => Contracts.Emitter;
-    /**
-      * @deprecated
-      * Will be removed and turned internal
-      */
-    '@sern/store': () => Contracts.CoreModuleStore;
-    '@sern/modules': () => Contracts.ModuleManager;
     '@sern/errors': () => Contracts.ErrorHandling;
     '@sern/logger'?: () => Contracts.Logging;
 }

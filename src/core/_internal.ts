@@ -5,7 +5,6 @@ export * from './operators';
 export * as Files from './module-loading';
 export * from './functions';
 export { SernError } from './structures/enums';
-export { ModuleStore } from './structures/module-store';
 export * as __Services from './structures/services';
 export { useContainerRaw } from './ioc/base';
 

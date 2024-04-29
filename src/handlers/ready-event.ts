@@ -1,15 +1,10 @@
 import { ObservableInput, concat, first, fromEvent, ignoreElements, pipe, tap } from 'rxjs';
-import { SernError, _Module } from '../core/_internal';
-import { Result } from 'ts-results-es';
-import { Logging, ModuleManager } from '../core/contracts';
-import { buildModules, callInitPlugins } from './_internal';
-import * as assert from 'node:assert';
-import * as util from 'node:util';
+import { _Module } from '../core/_internal';
+import { Logging, } from '../core/contracts';
 import type { DependencyList } from '../types/ioc';
-import type { AnyModule, CommandMeta, Processed } from '../types/core-modules';
 
 export function readyHandler(
-    [sEmitter, , log , moduleManager, client]: DependencyList,
+    [sEmitter, , log ,, client]: DependencyList,
     allPaths: ObservableInput<string>,
 ) {
     //Todo: add module manager on on ready

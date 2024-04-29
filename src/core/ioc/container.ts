@@ -2,7 +2,7 @@ import { Container } from 'iti';
 import { Disposable } from '../';
 import * as assert from 'node:assert';
 import { Subject } from 'rxjs';
-import { __Services, ModuleStore } from '../_internal';
+import { __Services } from '../_internal';
 import * as Hooks from './hooks';
 import { EventEmitter } from 'node:events';
 
@@ -24,11 +24,7 @@ export class CoreContainer<T extends Partial<Dependencies>> extends Container<T,
 
         (this as Container<{}, {}>)
             .add({ '@sern/errors': () => new __Services.DefaultErrorHandling,
-                   '@sern/emitter': () => new EventEmitter({ captureRejections: true }),
-                   '@sern/store': () => new ModuleStore })
-            .add(ctx => {
-                return { '@sern/modules': new __Services.DefaultModuleManager(ctx['@sern/store'])};
-            });
+                   '@sern/emitter': () => new EventEmitter({ captureRejections: true }) })
     }
 
     isReady() {
