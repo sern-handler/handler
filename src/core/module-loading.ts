@@ -1,10 +1,7 @@
-import { type Observable, from, mergeMap, ObservableInput } from 'rxjs';
-import { readdir, stat } from 'fs/promises';
 import path from 'node:path';
 import assert from 'assert';
 import { createRequire } from 'node:module';
 import type { ImportPayload, Wrapper } from '../types/core';
-import type { Module } from '../types/core-modules';
 import { existsSync } from 'fs';
 import type { Logging } from './interfaces';
 
@@ -52,59 +49,10 @@ export async function importModule<T>(absPath: string) {
     return { module: commandModule } as T;
 }
 
-export async function defaultModuleLoader<T extends Module>(absPath: string): ModuleResult<T> {
-    let { module } = await importModule<{ module: T }>(absPath);
-    assert(module, `Found an undefined module: ${absPath}`);
-    return { module, absPath };
-}
 
 export const fmtFileName = (fileName: string) => path.parse(fileName).name;
 
-/**
- * a directory string is converted into a stream of modules.
- * starts the stream of modules that sern needs to process on init
- * @returns {Observable<{ mod: Module; absPath: string; }[]>} data from command files
- * @param commandDir
- */
-export function buildModuleStream<T extends Module>(
-    input: ObservableInput<string>,
-): Observable<ImportPayload<T>> {
-    return from(input).pipe(mergeMap(defaultModuleLoader<T>));
-}
-
-export const getFullPathTree = (dir: string) => readPaths(path.resolve(dir));
-
 export const filename = (p: string) => fmtFileName(path.basename(p));
-
-const validExtensions = ['.js', '.ts', ''];
-const isSkippable = (filename: string) => {
-    //empty string is for non extension files (directories)
-    return filename[0] === '!' || !validExtensions.includes(path.extname(filename));
-};
-
-async function deriveFileInfo(dir: string, file: string) {
-    const fullPath = path.join(dir, file);
-    return { fullPath,
-             fileStats: await stat(fullPath),
-             base: path.basename(file) };
-}
-
-async function* readPaths(dir: string): AsyncGenerator<string> {
-    const files = await readdir(dir);
-    for (const file of files) {
-        const { fullPath, fileStats, base } = await deriveFileInfo(dir, file);
-        if (fileStats.isDirectory()) {
-            //Todo: refactor so that i dont repeat myself for files (line 71)
-            if (!isSkippable(base)) {
-                yield* readPaths(fullPath);
-            }
-        } else {
-            if (!isSkippable(base)) {
-                yield 'file:///' + fullPath;
-            }
-        }
-    }
-}
 
 const requir = createRequire(import.meta.url);
 

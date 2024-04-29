@@ -1,7 +1,8 @@
 import { ObservableInput, map, mergeAll } from 'rxjs';
 import { EventType } from '../core/structures';
 import { SernError } from '../core/_internal';
-import { buildModules, callInitPlugins, handleCrash, eventDispatcher } from './_internal';
+import { callInitPlugins, handleCrash } from './event-utils';
+import { eventDispatcher } from './dispatchers'
 import { Service } from '../core/ioc';
 import type { DependencyList } from '../types/ioc';
 import type { EventModule,  Processed } from '../types/core-modules';
@@ -23,14 +24,14 @@ export function eventsHandler(
                 throw Error(SernError.InvalidModuleType + ' while creating event handler');
         }
     };
-    buildModules<EventModule>(allPaths)
-        .pipe(
-            callInitPlugins(emitter),
-            map(intoDispatcher),
-            /**
-             * Where all events are turned on
-             */
-            mergeAll(),
-            handleCrash(err, emitter, log))
-        .subscribe();
+//    buildModules<EventModule>(allPaths)
+//        .pipe(
+//            callInitPlugins(emitter),
+//            map(intoDispatcher),
+//            /**
+//             * Where all events are turned on
+//             */
+//            mergeAll(),
+//            handleCrash(err, emitter, log))
+//        .subscribe();
 }

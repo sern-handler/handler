@@ -1,6 +1,6 @@
 import { ObservableInput, concat, first, fromEvent, ignoreElements, pipe, tap } from 'rxjs';
 import { _Module } from '../core/_internal';
-import { Logging, } from '../core/interfaces';
+import { Logging } from '../core/interfaces';
 import type { DependencyList } from '../types/ioc';
 
 const once = (log: Logging | undefined) => pipe(

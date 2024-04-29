@@ -1,4 +1,4 @@
-import { handleCrash } from './handlers/_internal';
+import { handleCrash } from './handlers/event-utils';
 import callsites from 'callsites';
 import { Files } from './core/_internal';
 import { merge } from 'rxjs';

@@ -99,15 +99,7 @@ export function createMessageHandler(
         return Ok({ args: contextArgs(event, rest), module: fullPath as Processed<CommandModule>  })
     });
 }
-/**
- * This function assigns remaining, incomplete data to each imported module.
- */
 
-export function buildModules<T extends AnyModule>(
-    input: ObservableInput<string>,
-) {
-    return Files.buildModuleStream<Processed<T>>(input);
-}
 
 
 interface ExecutePayload {

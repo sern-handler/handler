@@ -2,7 +2,7 @@ import { mergeMap, EMPTY, concatMap } from 'rxjs';
 import type { Message } from 'discord.js';
 import { PayloadType } from '../core';
 import { sharedEventStream, SernError, filterTap, resultPayload } from '../core/_internal';
-import { createMessageHandler, executeModule, makeModuleExecutor } from './_internal';
+import { createMessageHandler, executeModule, makeModuleExecutor } from './event-utils';
 import type { DependencyList } from '../types/ioc';
 
 /**

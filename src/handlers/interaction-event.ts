@@ -11,7 +11,7 @@ import {
     filterTap,
     resultPayload,
 } from '../core/_internal';
-import { createInteractionHandler, executeModule, makeModuleExecutor } from './_internal';
+import { createInteractionHandler, executeModule, makeModuleExecutor } from './event-utils';
 import type { DependencyList } from '../types/ioc';
 
 export function interactionHandler([emitter, err, log, modules, client]: DependencyList) {
