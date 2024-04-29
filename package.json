@@ -23,8 +23,8 @@
         "build:prod": "tsup ",
         "prepare": "tsc",
         "pretty": "prettier --write .",
-        "tdd": "vitest",
-        "test": "vitest --run",
+        "tdd": "npx vitest",
+        "test": "npx vitest --run",
         "analyze-imports": "npx depcruise src --include-only \"^src\" --output-type dot | dot -T svg > dependency-graph.svg"
     },
     "keywords": [
@@ -52,9 +52,7 @@
         "discord.js": "^14.11.0",
         "eslint": "8.39.0",
         "prettier": "2.8.8",
-        "tsup": "^6.7.0",
-        "typescript": "5.0.2",
-        "vitest": "latest"
+        "typescript": "5.0.2"
     },
     "prettier": {
         "semi": true,
