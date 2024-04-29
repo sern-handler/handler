@@ -1,4 +1,4 @@
-import { Interaction, Message } from 'discord.js';
+import type { Interaction, Message, BaseInteraction } from 'discord.js';
 import {
     EMPTY,
     Observable,
@@ -8,30 +8,100 @@ import {
     of,
     throwError,
     tap,
+    fromEvent, map, OperatorFunction,
     catchError,
     finalize,
+    pipe
 } from 'rxjs';
 import {
-    Files,
     Id,
     callPlugin,
     everyPluginOk,
     filterMapTo,
     handleError,
     SernError,
-    VoidResult,
+    type VoidResult,
     resultPayload,
+    arrayifySource,
+    isAutocomplete,
+    treeSearch,
 } from '../core/_internal';
-import { Emitter, ErrorHandling, Logging } from '../core/interfaces';
+import type { Emitter, ErrorHandling, Logging } from '../core/interfaces';
 import { PayloadType } from '../core/structures/enums'
-import { contextArgs, createDispatcher } from './dispatchers';
-import { ObservableInput, pipe } from 'rxjs';
 import { Err, Ok, Result } from 'ts-results-es';
 import type { Awaitable } from '../types/utility';
 import type { ControlPlugin } from '../types/core-plugin';
 import type { AnyModule, CommandMeta, CommandModule, Module, Processed } from '../types/core-modules';
+import { EventEmitter } from 'node:events';
+import * as assert from 'node:assert';
+import { CommandType, Context } from '../core/structures';
+import type { Args } from '../types/utility';
+import { inspect } from 'node:util'
 import { disposeAll } from '../core/ioc/base';
 
+
+function contextArgs(wrappable: Message | BaseInteraction, messageArgs?: string[]) {
+    const ctx = Context.wrap(wrappable);
+    const args = ctx.isMessage() ? ['text', messageArgs!] : ['slash', ctx.options];
+    return [ctx, args] as [Context, Args];
+}
+
+
+function intoPayload(module: Processed<Module>, ) {
+    return pipe(
+        arrayifySource,
+        map(args => ({ module, args, })));
+}
+
+const createResult = createResultResolver<
+    Processed<Module>,
+    { module: Processed<Module>; args: unknown[]  },
+    unknown[]
+>({
+    createStream: ({ module, args }) => from(module.onEvent).pipe(callPlugin(args)),
+    onNext: ({ args }) => args,
+});
+/**
+ * Creates an observable from { source }
+ * @param module
+ * @param source
+ */
+export function eventDispatcher(module: Processed<Module>,  source: unknown) {
+    assert.ok(source instanceof EventEmitter, `${source} is not an EventEmitter`);
+
+    const execute: OperatorFunction<unknown[], unknown> =
+        concatMap(async args => module.execute(...args));
+    return fromEvent(source, module.name)
+        .pipe(intoPayload(module),
+              concatMap(createResult),
+              execute);
+}
+
+export function createDispatcher(payload: {
+    module: Processed<CommandModule>;
+    event: BaseInteraction;
+}) {
+    assert.ok(CommandType.Text !== payload.module.type,
+        SernError.MismatchEvent + 'Found text command in interaction stream');
+    switch (payload.module.type) {
+        case CommandType.Slash:
+        case CommandType.Both: {
+            if (isAutocomplete(payload.event)) {
+                const option = treeSearch(payload.event, payload.module.options);
+                assert.ok(option, SernError.NotSupportedInteraction + ` There is no autocomplete tag for ` + inspect(payload.module));
+                const { command } = option;
+            
+             	return {
+                    ...payload,
+             	    module: command as Processed<Module>, //autocomplete is not a true "module" warning cast!
+             	    args: [payload.event],
+             	};
+            }
+            return { module: payload.module, args: contextArgs(payload.event) };
+        }
+        default: return { module: payload.module, args: [payload.event] };
+    }
+}
 function createGenericHandler<Source, Narrowed extends Source, Output>(
     source: Observable<Source>,
     makeModule: (event: Narrowed) => Promise<Output>,
@@ -138,7 +208,7 @@ export function executeModule(
             
         }),
     );
-}
+};
 
 
 /**
@@ -169,7 +239,7 @@ export function createResultResolver<
             filterMapTo(() => config.onNext(args)),
         );
     };
-}
+};
 
 /**
  * Calls a module's init plugins and checks for Err. If so, call { onStop } and

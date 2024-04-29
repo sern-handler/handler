@@ -20,7 +20,7 @@
         "lint": "eslint src/**/*.ts",
         "format": "eslint src/**/*.ts --fix",
         "build:dev": "tsup --metafile",
-        "build:prod": "tsup ",
+        "build:prod": "tsc",
         "prepare": "tsc",
         "pretty": "prettier --write .",
         "tdd": "npx --yes vitest",
