@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import { useContainer } from './dependency-injection';
 import type { CoreDependencies, DependencyConfiguration } from '../../types/ioc';
 import { CoreContainer } from './container';
 import { Result } from 'ts-results-es';
@@ -141,7 +140,7 @@ function composeRoot(
     container.ready();
 }
 
-export async function makeDependencies<const T extends Dependencies>
+export async function makeDependencies
 (conf: ValidDependencyConfig) {
     containerSubject = new CoreContainer();
     if(typeof conf === 'function') {
@@ -160,7 +159,5 @@ export async function makeDependencies<const T extends Dependencies>
     } else {
         composeRoot(containerSubject, conf);
     }
-
-    return useContainer<T>();
 }
 

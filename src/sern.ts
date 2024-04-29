@@ -1,15 +1,16 @@
 import { handleCrash } from './handlers/event-utils';
 import callsites from 'callsites';
 import { Files } from './core/_internal';
+import path from 'node:path'
 import { merge } from 'rxjs';
 import { Services } from './core/ioc';
-import { Wrapper } from './types/core';
 import { eventsHandler } from './handlers/user-defined-events';
 import { readyHandler } from './handlers/ready-event';
 import { messageHandler } from './handlers/message-event';
 import { interactionHandler } from './handlers/interaction-event';
 import { presenceHandler } from './handlers/presence';
 import type { Client } from 'discord.js';
+import { type Wrapper } from './';
 
 
 /**
@@ -24,7 +25,7 @@ import type { Client } from 'discord.js';
  * })
  * ```
  */
-export function init(maybeWrapper: Wrapper | 'file') {
+export function init() {
     const startTime = performance.now();
     const dependencies = Services('@sern/emitter', 
                                   '@sern/errors',
@@ -33,14 +34,15 @@ export function init(maybeWrapper: Wrapper | 'file') {
     const logger = dependencies[2],
           errorHandler = dependencies[1];
     
-    const wrapper = Files.loadConfig(maybeWrapper, logger);
-    if (wrapper.events !== undefined) {
+    //const wrapper = Files.loadConfig(maybeWrapper, logger);
+    //if (wrapper.events !== undefined) {
         //eventsHandler(dependencies, Files.getFullPathTree(wrapper.events));
-    }
-
+   // }
+    //import(path.resolve("commands.js"))
+        //.then(({ commands }) => { })
+        //.catch(message => logger?.error({ message }))
     const initCallsite = callsites()[1].getFileName();
     const presencePath = Files.shouldHandle(initCallsite!, "presence");
-    
     //Ready event: load all modules and when finished, time should be taken and logged
 //    readyHandler(dependencies, Files.getFullPathTree(wrapper.commands))
 //        .add(() => {
@@ -55,7 +57,6 @@ export function init(maybeWrapper: Wrapper | 'file') {
 //                presenceHandler(presencePath.path, setPresence).subscribe();
 //            }
 //        });
-
     //const messages$ = messageHandler(dependencies, wrapper.defaultPrefix);
     //const interactions$ = interactionHandler(dependencies);
     // listening to the message stream and interaction stream

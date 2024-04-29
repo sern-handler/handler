@@ -36,10 +36,12 @@ export type {
     AnyCommandPlugin,
 } from './types/core-plugin';
 
-export type { Wrapper } from './types/core';
-
+export interface Wrapper {
+    commands: string;
+    defaultPrefix?: string;
+    events?: string;
+}
 export type { Args, SlashOptions, Payload, SernEventsMapping } from './types/utility';
-
 export type { Singleton, Transient, CoreDependencies } from './types/ioc';
 
 export {

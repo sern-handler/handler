@@ -48,10 +48,3 @@ export function Services<const T extends (keyof Dependencies)[]>(...keys: [...T]
     const container = useContainerRaw();
     return keys.map(k => container.get(k)!) as IntoDependencies<T>;
 }
-
-
-export function useContainer<const T extends Dependencies>() {
-    return <V extends (keyof T)[]>(...keys: [...V]) =>
-        keys.map(key => useContainerRaw().get(key as keyof Dependencies)) as IntoDependencies<V>;
-}
-

@@ -1,7 +1,7 @@
 import path from 'node:path';
 import assert from 'assert';
 import { createRequire } from 'node:module';
-import type { ImportPayload, Wrapper } from '../types/core';
+import type { Wrapper } from '../types/core';
 import { existsSync } from 'fs';
 import type { Logging } from './interfaces';
 
@@ -17,7 +17,7 @@ export const parseCallsite = (fpath: string) => {
 export const shouldHandle = (pth: string, filenam: string) => {
     const file_name = filenam+path.extname(pth);
     let newPath = path.join(path.dirname(pth), file_name)
-                    .replace(/file:\\?/, "");
+                      .replace(/file:\\?/, "");
     return { exists: existsSync(newPath),
              path: 'file:///'+newPath };
 }
@@ -42,7 +42,7 @@ export async function importModule<T>(absPath: string) {
 
     let commandModule = fileModule.default;
 
-    assert(commandModule , `Found no export @ ${absPath}. Forgot to ignore with "!"? (!${path.basename(absPath)})?`);
+    assert(commandModule , `No export @ ${absPath}. Forgot to ignore with "!"? (!${path.basename(absPath)})?`);
     if ('default' in commandModule) {
         commandModule = commandModule.default;
     }

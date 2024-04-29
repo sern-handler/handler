@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { CoreContainer } from '../../src/core/ioc/container';
 import { EventEmitter } from 'events';
-import { DefaultLogging, Disposable, Emitter, Init, Logging } from '../../src/core';
+import { Disposable, Emitter, Init, Logging, __Services } from '../../src/core';
 import { CoreDependencies } from '../../src/types/ioc';
 
 describe('ioc container', () => {
@@ -43,13 +43,12 @@ describe('ioc container', () => {
     });
     it('should container all core dependencies', async () => {
         const keys = [
-            '@sern/modules',
             '@sern/emitter',
             '@sern/logger',
             '@sern/errors',
         ] satisfies (keyof CoreDependencies)[];
         container.add({
-            '@sern/logger': () => new DefaultLogging(),
+            '@sern/logger': () => new __Services.DefaultLogging(),
             '@sern/client': () => new EventEmitter(),
         });
         for (const k of keys) {
@@ -92,9 +91,7 @@ describe('ioc container', () => {
 
     it('should init dependency depending on something else', () => {
         container.add({ '@sern/client': dependency2 });
-        container.upsert((cntr) => ({
-            '@sern/logger': dependency 
-        }));
+        container.upsert((cntr) => ({ '@sern/logger': dependency }));
         container.ready();
         expect(dependency.init).toHaveBeenCalledTimes(1);
     })
