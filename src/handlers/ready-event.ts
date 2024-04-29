@@ -1,7 +1,12 @@
 import { ObservableInput, concat, first, fromEvent, ignoreElements, pipe, tap } from 'rxjs';
 import { _Module } from '../core/_internal';
-import { Logging, } from '../core/contracts';
+import { Logging, } from '../core/interfaces';
 import type { DependencyList } from '../types/ioc';
+
+const once = (log: Logging | undefined) => pipe(
+    tap(() => { log?.info({ message: "Waiting on discord client to be ready..." }) }),
+    first(),
+    ignoreElements())
 
 export function readyHandler(
     [sEmitter, , log ,, client]: DependencyList,
@@ -17,7 +22,4 @@ export function readyHandler(
 //      `Found ${module.name} at ${module.meta.fullPath}, which does not have a valid type`);
 }
 
-const once = (log: Logging | undefined) => pipe(
-    tap(() => { log?.info({ message: "Waiting on discord client to be ready..." }) }),
-    first(),
-    ignoreElements())
+

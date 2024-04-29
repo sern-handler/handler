@@ -16,7 +16,7 @@ import {
     pipe,
     share,
 } from 'rxjs';
-import { Emitter, ErrorHandling, Logging } from './contracts';
+import { Emitter, ErrorHandling, Logging } from './interfaces';
 import util from 'node:util';
 import type { PluginResult } from '../types/core-plugin';
 import type { Result } from 'ts-results-es'

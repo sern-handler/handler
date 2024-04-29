@@ -85,7 +85,7 @@ export function createInteractionHandler<T extends Interaction>(
 export function createMessageHandler(
     source: Observable<Message>,
     defaultPrefix: string,
-    mg: any, //TODO
+    mg: any,
 ) {
     return createGenericHandler(source, async event => {
         const [prefix, ...rest] = fmt(event.content, defaultPrefix);

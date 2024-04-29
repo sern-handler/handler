@@ -6,7 +6,7 @@ import { createRequire } from 'node:module';
 import type { ImportPayload, Wrapper } from '../types/core';
 import type { Module } from '../types/core-modules';
 import { existsSync } from 'fs';
-import type { Logging } from './contracts/logging';
+import type { Logging } from './interfaces';
 
 
 export const parseCallsite = (fpath: string) => {
@@ -76,7 +76,7 @@ export const getFullPathTree = (dir: string) => readPaths(path.resolve(dir));
 
 export const filename = (p: string) => fmtFileName(path.basename(p));
 
-const validExtensions = ['.js', '.cjs', '.mts', '.mjs', '.cts', '.ts', ''];
+const validExtensions = ['.js', '.ts', ''];
 const isSkippable = (filename: string) => {
     //empty string is for non extension files (directories)
     return filename[0] === '!' || !validExtensions.includes(path.extname(filename));
@@ -90,23 +90,19 @@ async function deriveFileInfo(dir: string, file: string) {
 }
 
 async function* readPaths(dir: string): AsyncGenerator<string> {
-    try {
-        const files = await readdir(dir);
-        for (const file of files) {
-            const { fullPath, fileStats, base } = await deriveFileInfo(dir, file);
-            if (fileStats.isDirectory()) {
-                //Todo: refactor so that i dont repeat myself for files (line 71)
-                if (!isSkippable(base)) {
-                    yield* readPaths(fullPath);
-                }
-            } else {
-                if (!isSkippable(base)) {
-                    yield 'file:///' + fullPath;
-                }
+    const files = await readdir(dir);
+    for (const file of files) {
+        const { fullPath, fileStats, base } = await deriveFileInfo(dir, file);
+        if (fileStats.isDirectory()) {
+            //Todo: refactor so that i dont repeat myself for files (line 71)
+            if (!isSkippable(base)) {
+                yield* readPaths(fullPath);
+            }
+        } else {
+            if (!isSkippable(base)) {
+                yield 'file:///' + fullPath;
             }
         }
-    } catch (err) {
-        throw err;
     }
 }
 

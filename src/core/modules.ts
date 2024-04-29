@@ -2,8 +2,6 @@ import { ClientEvents } from 'discord.js';
 import { EventType } from '../core/structures';
 import type { AnyEventPlugin, } from '../types/core-plugin';
 import type {
-    CommandModule,
-    EventModule,
     InputCommand,
     InputEvent,
 } from '../types/core-modules';

@@ -5,7 +5,7 @@ import { CoreContainer } from './container';
 import { Result } from 'ts-results-es';
 import { __Services } from '../_internal';
 import { AnyFunction } from '../../types/utility';
-import type { Logging } from '../contracts/logging';
+import type { Logging } from '../interfaces';
 import type { UnpackFunction } from 'iti';
 //SIDE EFFECT: GLOBAL DI
 let containerSubject: CoreContainer<Partial<Dependencies>>;

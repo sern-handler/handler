@@ -61,10 +61,8 @@ export function createDispatcher(payload: {
     module: Processed<CommandModule>;
     event: BaseInteraction;
 }) {
-    assert.ok(
-        CommandType.Text !== payload.module.type,
-        SernError.MismatchEvent + 'Found text command in interaction stream',
-    );
+    assert.ok(CommandType.Text !== payload.module.type,
+        SernError.MismatchEvent + 'Found text command in interaction stream');
     switch (payload.module.type) {
         case CommandType.Slash:
         case CommandType.Both: {

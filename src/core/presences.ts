@@ -1,6 +1,6 @@
 import type { ActivitiesOptions } from "discord.js";
 import type { IntoDependencies } from "../types/ioc";
-import type { Emitter } from "./contracts/emitter";
+import type { Emitter } from "./interfaces";
 
 type Status = 'online' | 'idle' | 'invisible' | 'dnd'
 type PresenceReduce = (previous: Result) => Result;

@@ -8,17 +8,12 @@ import { CommandType, EventType } from './structures';
  */
 export function reconstruct<T extends Interaction>(event: T) {
     switch (event.type) {
-        case InteractionType.MessageComponent: {
-            return [`${event.customId}_C${event.componentType}`];
-        }
+        case InteractionType.MessageComponent: return [`${event.customId}_C${event.componentType}`];
         case InteractionType.ApplicationCommand:
-        case InteractionType.ApplicationCommandAutocomplete: {
+        case InteractionType.ApplicationCommandAutocomplete: 
             return [`${event.commandName}_A${event.commandType}`, `${event.commandName}_B`];
-        }
         //Modal interactions are classified as components for sern
-        case InteractionType.ModalSubmit: {
-            return [`${event.customId}_M`];
-        }
+        case InteractionType.ModalSubmit: return [`${event.customId}_M`];
     }
 }
 /**

@@ -1,5 +1,5 @@
 import { Container, UnpackFunction } from 'iti';
-import * as Contracts from '../core/contracts';
+import * as Contracts from '../core/interfaces';
 /**
   * Type to annotate that something is a singleton. 
   * T is created once and lazily.

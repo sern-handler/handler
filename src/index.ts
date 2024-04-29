@@ -40,7 +40,7 @@ export type { Wrapper } from './types/core';
 
 export type { Args, SlashOptions, Payload, SernEventsMapping } from './types/utility';
 
-export type { Singleton, Transient, CoreDependencies, Initializable } from './types/ioc';
+export type { Singleton, Transient, CoreDependencies } from './types/ioc';
 
 export {
     commandModule,
