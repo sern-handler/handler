@@ -1,4 +1,5 @@
 export * as Sern from './sern';
+
 export type {
     CommandModule,
     EventModule,

@@ -25,6 +25,7 @@ import {
     arrayifySource,
     isAutocomplete,
     treeSearch,
+    _Module,
 } from '../core/_internal';
 import type { Emitter, ErrorHandling, Logging } from '../core/interfaces';
 import { PayloadType } from '../core/structures/enums'
@@ -77,10 +78,7 @@ export function eventDispatcher(module: Processed<Module>,  source: unknown) {
               execute);
 }
 
-export function createDispatcher(payload: {
-    module: Processed<CommandModule>;
-    event: BaseInteraction;
-}) {
+export function createDispatcher(payload: { module: Processed<CommandModule>; event: BaseInteraction; }) {
     assert.ok(CommandType.Text !== payload.module.type,
         SernError.MismatchEvent + 'Found text command in interaction stream');
     switch (payload.module.type) {
@@ -135,7 +133,7 @@ export function fmt(msg: string, prefix: string): string[] {
  */
 export function createInteractionHandler<T extends Interaction>(
     source: Observable<Interaction>,
-    mg: any, //TODO
+    mg: Map<string, _Module>, //TODO
 ) {
     return createGenericHandler<Interaction, T, Result<ReturnType<typeof createDispatcher>, void>>(
         source,
@@ -143,12 +141,13 @@ export function createInteractionHandler<T extends Interaction>(
             const possibleIds = Id.reconstruct(event);
             let fullPaths= possibleIds
                 .map(id => mg.get(id))
-                .filter((id): id is Module => id !== undefined);
+                .filter((id): id is _Module => id !== undefined);
 
             if(fullPaths.length == 0) {
                 return Err.EMPTY;
             }
             const [ path ] = fullPaths;
+            //@ts-ignore TODO fixme
             return Ok(createDispatcher({ module: path as Processed<CommandModule>, event }));
     });
 }

@@ -140,8 +140,7 @@ function composeRoot(
     container.ready();
 }
 
-export async function makeDependencies
-(conf: ValidDependencyConfig) {
+export async function makeDependencies (conf: ValidDependencyConfig) {
     containerSubject = new CoreContainer();
     if(typeof conf === 'function') {
         const excluded: string[] = [];
