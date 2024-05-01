@@ -25,9 +25,7 @@ export function messageHandler(
     defaultPrefix: string | undefined,
 ) {
     if (!defaultPrefix) {
-        log?.debug({
-            message: 'No prefix found. message handler shutting down',
-        });
+        log?.debug({ message: 'No prefix found. message handler shutting down' });
         return EMPTY;
     }
     const messageStream$ = sharedEventStream<Message>(client, 'messageCreate');

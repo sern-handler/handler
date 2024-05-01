@@ -45,7 +45,8 @@ export function callPlugin(args: unknown): OperatorFunction<PluginExecutable, Vo
     });
 }
 
-export const arrayifySource = <T>(src: T) => (Array.isArray(src) ? (src as unknown[]) : [src]);
+export const arrayifySource = <T>(src: T) => 
+    Array.isArray(src) ? src : [src];
 
 /**
  * Checks if the stream of results is all ok.

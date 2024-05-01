@@ -1,5 +1,5 @@
 import callsites from 'callsites';
-import { Files } from './core/_internal';
+import * as Files from './core/module-loading';
 import { Services } from './core/ioc';
 
 /**

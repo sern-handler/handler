@@ -48,7 +48,7 @@ import type {
     UserContextMenuCommandInteraction,
     UserSelectMenuInteraction,
 } from 'discord.js';
-import type { VoidResult } from '../core/_internal';
+import { VoidResult } from '../core/_internal';
 
 export type PluginResult = Awaitable<VoidResult>;
 
@@ -82,8 +82,7 @@ export type CommandArgs<
     J extends PluginType = PluginType,
 > = CommandArgsMatrix[I][J];
 
-export type EventArgs<
-    I extends EventType = EventType,
+export type EventArgs< I extends EventType = EventType,
     J extends PluginType = PluginType,
 > = EventArgsMatrix[I][J];
 

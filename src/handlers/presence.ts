@@ -1,5 +1,5 @@
 import { concatMap, from, interval, of, map, scan, startWith, fromEvent, take } from "rxjs"
-import { Files } from "../core/_internal";
+import * as Files from "../core/module-loading";
 import { PresenceConfig, PresenceResult } from "../core/presences";
 import { Services } from "../core/ioc";
 import assert from "node:assert";
