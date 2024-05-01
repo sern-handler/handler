@@ -3,14 +3,11 @@ import type { IntoDependencies } from '../../types/ioc';
 import { useContainerRaw } from './base';
 
 /**
- * @__PURE__
  * @since 2.0.0.
  * Creates a singleton object.
  * @param cb
  */
-export function single<T>(cb: () => T) {
-    return cb;
-}
+export function single<T>(cb: () => T) { return cb; }
 
 /**
  * @__PURE__
@@ -18,9 +15,7 @@ export function single<T>(cb: () => T) {
  * Creates a transient object
  * @param cb
  */
-export function transient<T>(cb: () => () => T) {
-    return cb;
-}
+export function transient<T>(cb: () => () => T) { return cb; }
 /**
  * The new Service api, a cleaner alternative to useContainer
  * To obtain intellisense, ensure a .d.ts file exists in the root of compilation.

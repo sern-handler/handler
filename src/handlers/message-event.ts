@@ -21,7 +21,7 @@ function hasPrefix(prefix: string, content: string) {
 }
 
 export function messageHandler(
-    [emitter, err, log, modules, client]: DependencyList,
+    [emitter, err, log, client]: DependencyList,
     defaultPrefix: string | undefined,
 ) {
     if (!defaultPrefix) {
@@ -31,15 +31,15 @@ export function messageHandler(
         return EMPTY;
     }
     const messageStream$ = sharedEventStream<Message>(client, 'messageCreate');
-    const handle = createMessageHandler(messageStream$, defaultPrefix, modules);
-
-    const msgCommands$ = handle(isNonBot(defaultPrefix));
-
-    return msgCommands$.pipe(
-        filterTap((e) => emitter.emit('warning', resultPayload(PayloadType.Warning, undefined, e))),
-        concatMap(makeModuleExecutor(module => {
-            const result = resultPayload(PayloadType.Failure, module, SernError.PluginFailure);
-            emitter.emit('module.activate', result);
-        })),
-        mergeMap(payload => executeModule(emitter, log, err, payload)));
+//    const handle = createMessageHandler(messageStream$, defaultPrefix, modules);
+//
+//    const msgCommands$ = handle(isNonBot(defaultPrefix));
+//
+//    return msgCommands$.pipe(
+//        filterTap((e) => emitter.emit('warning', resultPayload(PayloadType.Warning, undefined, e))),
+//        concatMap(makeModuleExecutor(module => {
+//            const result = resultPayload(PayloadType.Failure, module, SernError.PluginFailure);
+//            emitter.emit('module.activate', result);
+//        })),
+//        mergeMap(payload => executeModule(emitter, log, err, payload)));
 }

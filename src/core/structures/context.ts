@@ -105,8 +105,7 @@ export class Context extends CoreContext<Message, ChatInputCommandInteraction> {
             this.ctx
                 .map(m => m.reply(content as MessageReplyOptions))
                 .mapErr(i =>
-                    i.reply(content as InteractionReplyOptions).then(() => i.fetchReply()),
-                ),
+                    i.reply(content as InteractionReplyOptions).then(() => i.fetchReply())),
         );
     }
 

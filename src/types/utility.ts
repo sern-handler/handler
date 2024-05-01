@@ -1,6 +1,6 @@
 import type { CommandInteractionOptionResolver, InteractionReplyOptions, MessageReplyOptions } from 'discord.js';
 import type { PayloadType } from '../core/structures/enums';
-import type { AnyModule } from './core-modules';
+import type { Module } from './core-modules';
 
 export type Awaitable<T> = PromiseLike<T> | T;
 
@@ -18,14 +18,14 @@ export type Args = ParseType<{ text: string[]; slash: SlashOptions }>;
 export interface SernEventsMapping {
     'module.register': [Payload];
     'module.activate': [Payload];
-    error: [{ type: PayloadType.Failure; module?: AnyModule; reason: string | Error }];
+    error: [{ type: PayloadType.Failure; module?: Module; reason: string | Error }];
     warning: [Payload];
     modulesLoaded: [never?];
 }
 
 export type Payload =
-    | { type: PayloadType.Success; module: AnyModule }
-    | { type: PayloadType.Failure; module?: AnyModule; reason: string | Error }
+    | { type: PayloadType.Success; module: Module }
+    | { type: PayloadType.Failure; module?: Module; reason: string | Error }
     | { type: PayloadType.Warning; module: undefined; reason: string };
 
 

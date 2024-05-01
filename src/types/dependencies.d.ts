@@ -10,3 +10,7 @@ declare global {
     interface Dependencies extends CoreDependencies {}
 
 }
+
+declare module './handler.js' {
+    declare const commands : Map<string, any>
+}

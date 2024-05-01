@@ -7,7 +7,7 @@ import type { DependencyList } from '../types/ioc';
 import type { EventModule,  Processed } from '../types/core-modules';
 
 export function eventsHandler(
-    [emitter, err, log, moduleManager, client]: DependencyList,
+    [emitter, err, log, client]: DependencyList,
     allPaths: ObservableInput<string>,
 ) {
     //code smell

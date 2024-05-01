@@ -9,7 +9,7 @@ const once = (log: Logging | undefined) => pipe(
     ignoreElements())
 
 export function readyHandler(
-    [sEmitter, , log ,, client]: DependencyList,
+    [sEmitter, , log, client]: DependencyList,
     allPaths: ObservableInput<string>,
 ) {
     //Todo: add module manager on on ready

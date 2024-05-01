@@ -32,7 +32,7 @@ import { PayloadType } from '../core/structures/enums'
 import { Err, Ok, Result } from 'ts-results-es';
 import type { Awaitable } from '../types/utility';
 import type { ControlPlugin } from '../types/core-plugin';
-import type { AnyModule, CommandMeta, CommandModule, Module, Processed } from '../types/core-modules';
+import type { CommandMeta, CommandModule, Module, Processed } from '../types/core-modules';
 import { EventEmitter } from 'node:events';
 import * as assert from 'node:assert';
 import { Context } from '../core/structures/context';
@@ -50,7 +50,7 @@ function contextArgs(wrappable: Message | BaseInteraction, messageArgs?: string[
 
 
 function intoPayload(module: Processed<Module>, ) {
-    return pipe(arrayifySource,
+    return pipe(map(arrayifySource),
                 map(args => ({ module, args })));
 }
 
@@ -244,7 +244,7 @@ export function createResultResolver<
  * Calls a module's init plugins and checks for Err. If so, call { onStop } and
  * ignore the module
  */
-export function callInitPlugins<T extends Processed<AnyModule>>(sernEmitter: Emitter) {
+export function callInitPlugins<T extends Processed<Module>>(sernEmitter: Emitter) {
     return concatMap(
         createResultResolver({
             createStream: args => from(args.module.plugins).pipe(callPlugin(args)),

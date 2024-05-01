@@ -9,7 +9,6 @@ import {
     EMPTY,
     every,
     fromEvent,
-    map,
     Observable,
     of,
     OperatorFunction,
@@ -46,7 +45,7 @@ export function callPlugin(args: unknown): OperatorFunction<PluginExecutable, Vo
     });
 }
 
-export const arrayifySource = map(src => (Array.isArray(src) ? (src as unknown[]) : [src]));
+export const arrayifySource = <T>(src: T) => (Array.isArray(src) ? (src as unknown[]) : [src]);
 
 /**
  * Checks if the stream of results is all ok.

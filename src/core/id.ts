@@ -20,22 +20,21 @@ export function reconstruct<T extends Interaction>(event: T) {
  *
  * A magic number to represent any commandtype that is an ApplicationCommand.
  */
-const appBitField = 0b000000001111;
+const PUBLISHABLE = 0b000000001111;
 
 
-const TypeMap = new Map<number, number>([
-    [CommandType.Text, 0],
-    [CommandType.Both, 0],
-    [CommandType.Slash, ApplicationCommandType.ChatInput],
-    [CommandType.CtxUser, ApplicationCommandType.User],
-    [CommandType.CtxMsg, ApplicationCommandType.Message],
-    [CommandType.Button, ComponentType.Button],
-    [CommandType.Modal, InteractionType.ModalSubmit],
-    [CommandType.StringSelect, ComponentType.StringSelect],
-    [CommandType.UserSelect, ComponentType.UserSelect],
-    [CommandType.MentionableSelect, ComponentType.MentionableSelect],
-    [CommandType.RoleSelect, ComponentType.RoleSelect],
-    [CommandType.ChannelSelect, ComponentType.ChannelSelect]]);
+const TypeMap = new Map<number, number>([[CommandType.Text, 0],
+                                        [CommandType.Both, 0],
+                                        [CommandType.Slash, ApplicationCommandType.ChatInput],
+                                        [CommandType.CtxUser, ApplicationCommandType.User],
+                                        [CommandType.CtxMsg, ApplicationCommandType.Message],
+                                        [CommandType.Button, ComponentType.Button],
+                                        [CommandType.Modal, InteractionType.ModalSubmit],
+                                        [CommandType.StringSelect, ComponentType.StringSelect],
+                                        [CommandType.UserSelect, ComponentType.UserSelect],
+                                        [CommandType.MentionableSelect, ComponentType.MentionableSelect],
+                                        [CommandType.RoleSelect, ComponentType.RoleSelect],
+                                        [CommandType.ChannelSelect, ComponentType.ChannelSelect]]);
 
 /*
  * Generates an id based on name and CommandType.
@@ -52,7 +51,7 @@ export function create(name: string, type: CommandType | EventType) {
     if(type == CommandType.Modal) {
         return `${name}_M`;
     }
-    const am = (appBitField & type) !== 0 ? 'A' : 'C';
+    const am = (PUBLISHABLE & type) !== 0 ? 'A' : 'C';
     return `${name}_${am}${TypeMap.get(type)!}`
 }
 

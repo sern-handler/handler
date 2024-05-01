@@ -15,7 +15,6 @@ export type DependencyList = [
     Contracts.Emitter,
     Contracts.ErrorHandling,
     Contracts.Logging | undefined,
-    null,
     Contracts.Emitter,
 ];
 

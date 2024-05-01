@@ -142,7 +142,6 @@ export type CommandModule =
     | RoleSelectCommand
     | ModalSubmitCommand;
 
-export type AnyModule = CommandModule | EventModule;
 //https://stackoverflow.com/questions/64092736/alternative-to-switch-statement-for-typescript-discriminated-union
 // Explicit Module Definitions for mapping
 export interface CommandModuleDefs {
