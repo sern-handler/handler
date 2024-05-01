@@ -50,9 +50,8 @@ function contextArgs(wrappable: Message | BaseInteraction, messageArgs?: string[
 
 
 function intoPayload(module: Processed<Module>, ) {
-    return pipe(
-        arrayifySource,
-        map(args => ({ module, args, })));
+    return pipe(arrayifySource,
+                map(args => ({ module, args })));
 }
 
 const createResult = createResultResolver<
