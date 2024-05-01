@@ -15,7 +15,8 @@ import type {
     UserContextMenuCommandInteraction,
     UserSelectMenuInteraction,
 } from 'discord.js';
-import type { CommandType, Context, EventType } from '../core/structures';
+import type { CommandType, EventType } from '../core/structures/enums';
+import { Context } from '../core/structures/context'
 import { AnyCommandPlugin, AnyEventPlugin, ControlPlugin, InitPlugin } from './core-plugin';
 import { Awaitable, Args, SlashOptions, SernEventsMapping } from './utility';
 

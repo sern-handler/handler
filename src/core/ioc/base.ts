@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import type { CoreDependencies, DependencyConfiguration } from '../../types/ioc';
 import { CoreContainer } from './container';
 import { Result } from 'ts-results-es';
-import { __Services } from '../_internal';
+import * as  __Services from '../structures/default-services';
 import { AnyFunction } from '../../types/utility';
 import type { Logging } from '../interfaces';
 import type { UnpackFunction } from 'iti';

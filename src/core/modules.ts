@@ -1,15 +1,16 @@
-import { ClientEvents } from 'discord.js';
-import { EventType } from '../core/structures';
+import type { ClientEvents } from 'discord.js';
+import { EventType } from '../core/structures/enums';
 import type { AnyEventPlugin, } from '../types/core-plugin';
 import type {
     InputCommand,
     InputEvent,
 } from '../types/core-modules';
-import { _Module, partitionPlugins } from './_internal';
+import { type _Module, partitionPlugins } from './_internal';
 import type { Awaitable } from '../types/utility';
 import callsites from 'callsites';
 import * as Files from './module-loading'
 import * as Id from './id'
+
 /**
  * @since 1.0.0 The wrapper function to define command modules for sern
  * @param mod
@@ -40,7 +41,6 @@ export function commandModule(mod: InputCommand): _Module {
 export function eventModule(mod: InputEvent): _Module {
     const [onEvent, plugins] = partitionPlugins(mod.plugins);
     const initCallsite = callsites()[1].getFileName();
-    console.log(initCallsite);
     if(!initCallsite) throw Error("initCallsite is null");
     const { name, absPath } = Files.parseCallsite(initCallsite);
     mod.name ??= name;

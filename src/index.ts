@@ -53,5 +53,6 @@ export {
 export * from './core/presences'
 export * from './core/interfaces'
 export * from './core/create-plugins';
-export * from './core/structures';
+export { CommandType, PluginType, PayloadType, EventType } from './core/structures/enums';
+export { Context } from './core/structures/context';
 export * from './core/ioc';

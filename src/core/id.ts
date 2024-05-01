@@ -1,5 +1,5 @@
 import { ApplicationCommandType, ComponentType, Interaction, InteractionType } from 'discord.js';
-import { CommandType, EventType } from './structures';
+import { CommandType, EventType } from './structures/enums';
 
 /**
  * Construct unique ID for a given interaction object.

@@ -13,9 +13,14 @@ import {
     type _Module,
 } from './core/_internal';
 import { createInteractionHandler, executeModule, makeModuleExecutor } from './handlers/event-utils';
-import type { Emitter } from './core/interfaces'
+import type { Emitter, ErrorHandling, Logging } from './core/interfaces'
+import { Services } from './core/ioc/dependency-injection';
 
-export function interactionHandler(client: Emitter, emitter: Emitter, modules: Map<string, _Module>) {
+export function interactionHandler(client: Emitter,
+                                   emitter: Emitter,
+                                   log: Logging,
+                                   err: ErrorHandling,
+                                   modules: Map<string, _Module>) {
     const interactionStream$ = sharedEventStream<Interaction>(client, 'interactionCreate');
     const handle = createInteractionHandler(interactionStream$, modules);
 
@@ -29,3 +34,9 @@ export function interactionHandler(client: Emitter, emitter: Emitter, modules: M
                 emitter.emit('module.activate', resultPayload(PayloadType.Failure, module, SernError.PluginFailure)))),
               mergeMap(payload => executeModule(emitter, log, err, payload)));
 }
+
+export const __dependencies = () => 
+    Services('@sern/emitter', 
+             '@sern/errors',
+             '@sern/logger',
+             '@sern/client');

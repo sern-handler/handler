@@ -11,7 +11,7 @@ import type {
     AutocompleteInteraction
 } from 'discord.js';
 import { ApplicationCommandOptionType, InteractionType } from 'discord.js';
-import { PayloadType, PluginType } from './structures';
+import { PayloadType, PluginType } from './structures/enums';
 import assert from 'assert';
 import type { Payload } from '../types/utility';
 

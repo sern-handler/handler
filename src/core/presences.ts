@@ -46,8 +46,7 @@ export const Presence = {
             },
             /**
              * @example
-             * Presence
-             *     .of({
+             * Presence.of({
              *          activities: [
              *              { name: "Chilling out" }
              *          ]

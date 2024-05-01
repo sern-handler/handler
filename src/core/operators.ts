@@ -26,7 +26,7 @@ import type { VoidResult } from './_internal';
  * @param item
  */
 export function filterMapTo<V>(item: () => V): OperatorFunction<boolean, V> {
-    return concatMap(shouldKeep => (shouldKeep ? of(item()) : EMPTY));
+    return concatMap(keep => keep ? of(item()) : EMPTY);
 }
 
 interface PluginExecutable {

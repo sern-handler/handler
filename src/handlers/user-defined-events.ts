@@ -1,5 +1,5 @@
 import { ObservableInput } from 'rxjs';
-import { EventType } from '../core/structures';
+import { EventType } from '../core/structures/enums';
 import { SernError } from '../core/_internal';
 import { eventDispatcher } from './event-utils'
 import { Service } from '../core/ioc';

@@ -35,7 +35,8 @@ import type { ControlPlugin } from '../types/core-plugin';
 import type { AnyModule, CommandMeta, CommandModule, Module, Processed } from '../types/core-modules';
 import { EventEmitter } from 'node:events';
 import * as assert from 'node:assert';
-import { CommandType, Context } from '../core/structures';
+import { Context } from '../core/structures/context';
+import { CommandType } from '../core/structures/enums'
 import type { Args } from '../types/utility';
 import { inspect } from 'node:util'
 import { disposeAll } from '../core/ioc/base';

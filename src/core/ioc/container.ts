@@ -2,7 +2,7 @@ import { Container } from 'iti';
 import type { Disposable } from '../interfaces';
 import * as assert from 'node:assert';
 import { Subject } from 'rxjs';
-import { __Services } from '../_internal';
+import * as  __Services  from '../structures/default-services';
 import * as Hooks from './hooks';
 import { EventEmitter } from 'node:events';
 
