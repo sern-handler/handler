@@ -22,6 +22,7 @@ export function commandModule(mod: InputCommand): _Module {
 
     const { name, absPath } = Files.parseCallsite(initCallsite);
     mod.name ??= name;
+    mod.description ??= '...'
     //@ts-ignore
     return {
         ...mod,
@@ -44,6 +45,7 @@ export function eventModule(mod: InputEvent): _Module {
     if(!initCallsite) throw Error("initCallsite is null");
     const { name, absPath } = Files.parseCallsite(initCallsite);
     mod.name ??= name;
+    mod.description ??= '...'
     //@ts-ignore
     return {
         ...mod,

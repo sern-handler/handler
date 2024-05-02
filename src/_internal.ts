@@ -1,6 +1,7 @@
 import type { Interaction } from 'discord.js';
 import { mergeMap, merge, concatMap } from 'rxjs';
 import { PayloadType } from './core/structures/enums';
+import { shouldHandle } from './core/module-loading'
 import {
     isAutocomplete,
     isCommand,
@@ -14,9 +15,8 @@ import {
 } from './core/_internal';
 import { createInteractionHandler, executeModule, makeModuleExecutor } from './handlers/event-utils';
 import type { Emitter, ErrorHandling, Logging } from './core/interfaces'
-import { Services } from './core/ioc/dependency-injection';
 
-export function interactionHandler(client: Emitter,
+function interactionHandler(client: Emitter,
                                    emitter: Emitter,
                                    log: Logging,
                                    err: ErrorHandling,
@@ -35,8 +35,6 @@ export function interactionHandler(client: Emitter,
               mergeMap(payload => executeModule(emitter, log, err, payload)));
 }
 
-export const __dependencies = () => 
-    Services('@sern/emitter', 
-             '@sern/errors',
-             '@sern/logger',
-             '@sern/client');
+export const __start = (entryPoint: string, wrapper: { defaultPrefix?: string }) => {
+
+}
