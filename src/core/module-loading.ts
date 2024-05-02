@@ -3,10 +3,10 @@ import assert from 'assert';
 import { existsSync } from 'fs';
 
 
-export const parseCallsite = (fpath: string) => {
-    const pathobj = path.parse(fpath.replace(/file:\\?/, "")
-                                    .split(path.sep)
-                                    .join(path.posix.sep))
+export const parseCallsite = (site: string) => {
+    const pathobj = path.parse(site.replace(/file:\\?/, "")
+                                   .split(path.sep)
+                                   .join(path.posix.sep))
     return { name: pathobj.name,
              absPath : path.posix.format(pathobj) }
 }
@@ -16,7 +16,7 @@ export const shouldHandle = (pth: string, filenam: string) => {
     let newPath = path.join(path.dirname(pth), file_name)
                       .replace(/file:\\?/, "");
     return { exists: existsSync(newPath),
-             path: 'file:///'+newPath };
+             path: 'file://'+newPath };
 }
 
 

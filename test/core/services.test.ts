@@ -1,6 +1,6 @@
 import { SpyInstance, afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { CoreContainer } from '../../src/core/ioc/container';
-import { __Services } from '../../src/core/structures/';
+import  * as __Services  from '../../src/core/structures/default-services';
 import { faker } from '@faker-js/faker';
 import { commandModule, CommandType } from '../../src';
 

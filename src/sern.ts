@@ -1,8 +1,7 @@
 import callsites from 'callsites';
 import * as Files from './core/module-loading';
 import { Services } from './core/ioc';
-
-
+import type { DependencyList } from './types/ioc';
 
 interface Wrapper {
     commands?: string;
@@ -10,6 +9,16 @@ interface Wrapper {
     events?: string;
 }
 
+const __start = (entryPoint: string,
+                 wrapper: { defaultPrefix?: string },
+                 dependencies: DependencyList) => {
+    console.log(entryPoint)
+    import(entryPoint)
+        .then(({ __commands, __events=new Map() }) => { 
+            console.log(__commands, __events) 
+        })
+        .catch(err => dependencies[2]?.error({ message: err }));
+}
 /**
  * @since 1.0.0
  * @param wrapper Options to pass into sern.
@@ -28,10 +37,10 @@ export function init(wrapper: Wrapper) {
 
     const initCallsite = callsites()[1].getFileName();
     const handlerModule = Files.shouldHandle(initCallsite!, "handler");
+    console.log(handlerModule)
     if(!handlerModule.exists) {
-        throw Error("Cannot locate handler file. Did you run sern build?");
+        throw Error("Could not find handler module, did you run sern build?")
     }
-    import(handlerModule.path)
-        .then(({ start }) => start(initCallsite, wrapper))
-        .catch(err => dependencies[2].error({ message: err }))
+    __start(handlerModule.path, wrapper, dependencies);
 }
+

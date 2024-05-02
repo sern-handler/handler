@@ -1,6 +1,6 @@
 import { assertType, describe, it } from 'vitest';
 
-import { __Services } from '../../src/core/structures';
+import * as  __Services  from '../../src/core/structures/default-services';
 import * as Contracts from '../../src/core/interfaces';
 
 describe('default contracts', () => {

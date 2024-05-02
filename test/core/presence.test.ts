@@ -5,7 +5,7 @@ import { Presence } from '../../src';
 // Example test suite for the module function
 describe('module function', () => {
   it('should return a valid configuration', () => {
-    const config: Presence.Config<['dependency1', 'dependency2']> = Presence.module({
+    const config = Presence.module({
       inject: ['dependency1', 'dependency2'],
       execute: vi.fn(),
     });
