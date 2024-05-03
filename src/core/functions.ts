@@ -1,6 +1,5 @@
 import { Err, Ok } from 'ts-results-es';
 import type { Module, SernAutocompleteData, SernOptionsData } from '../types/core-modules';
-import type { AnyCommandPlugin, AnyEventPlugin, Plugin } from '../types/core-plugin';
 import type {
     AnySelectMenuInteraction,
     ButtonInteraction,
@@ -18,21 +17,17 @@ import type { Payload } from '../types/utility';
 export const ok =  () => Ok.EMPTY;
 export const err =  () => Err.EMPTY;
 
-export function partitionPlugins(arr: (AnyEventPlugin | AnyCommandPlugin)[] = []): [Plugin[], Plugin[]] {
+export function partitionPlugins<T,V>
+(arr: Array<{ type: PluginType }> = []): [T[], V[]] {
     const controlPlugins = [];
     const initPlugins = [];
-
     for (const el of arr) {
         switch (el.type) {
-            case PluginType.Control:
-                controlPlugins.push(el);
-                break;
-            case PluginType.Init:
-                initPlugins.push(el);
-                break;
+            case PluginType.Control: controlPlugins.push(el); break;
+            case PluginType.Init: initPlugins.push(el); break;
         }
     }
-    return [controlPlugins, initPlugins];
+    return [controlPlugins, initPlugins] as [T[], V[]];
 }
 
 /**

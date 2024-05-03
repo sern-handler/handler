@@ -11,6 +11,3 @@ declare global {
 
 }
 
-declare module './handler.js' {
-    declare const commands : Map<string, any>
-}
