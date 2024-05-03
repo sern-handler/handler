@@ -189,11 +189,7 @@ export function executeModule(
     emitter: Emitter,
     logger: Logging|undefined,
     errHandler: ErrorHandling,
-    {
-        module,
-        task,
-        args
-    }: ExecutePayload,
+    { module, task, args }: ExecutePayload,
 ) {
     return of(module).pipe(
         //converting the task into a promise so rxjs can resolve the Awaitable properly
