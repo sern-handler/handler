@@ -1,6 +1,4 @@
-import type { Disposable } from '../interfaces';
 import * as  __Services  from '../structures/default-services';
-
 
 /**
  * A semi-generic container that provides error handling, emitter, and module store. 
@@ -19,6 +17,7 @@ export class Container {
     private finished_init = false;
     constructor(options: { autowire: boolean; path?: string }) {
         if(options.autowire) { /* noop */ }
+
     }
     
     addHook(name: string, callback: Function) {
@@ -31,14 +30,14 @@ export class Container {
         if(hasCallableMethod(insert, hookname)) {
             console.log(hookname)
             //@ts-ignore
-            this.addHook(hookname, async () => await insert[hookname]())
+            this.addHook(hookname, () => insert[hookname]())
         }
     }
     addSingleton(key: string, insert: object) {
         if(typeof insert !== 'object') {
             throw Error("Inserted object must be an object");
         }
-        if(!this.__singletons.has(key)){
+        if(!this.__singletons.has(key)) {
             this.registerHooks('init', insert)
             this.registerHooks('dispose', insert)
             this.__singletons.set(key, insert);

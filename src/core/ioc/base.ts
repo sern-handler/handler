@@ -1,8 +1,7 @@
 import type { DependencyConfiguration } from '../../types/ioc';
 import { Container } from './container';
-import { Result } from 'ts-results-es';
 import * as  __Services from '../structures/default-services';
-import { AnyFunction, UnpackFunction } from '../../types/utility';
+import { UnpackFunction } from '../../types/utility';
 import type { Logging } from '../interfaces';
 import { __add_container, __swap_container, useContainerRaw } from './global';
 
@@ -19,7 +18,7 @@ type UnpackedDependencies = {
 type Insertable = 
         | ((container: UnpackedDependencies) => unknown)
         | object
-const dependencyBuilder = (container: any, excluded: string[] ) => {
+const dependencyBuilder = (container: Container, excluded: string[] ) => {
     return {
         /**
           * Insert a dependency into your container.
@@ -27,12 +26,9 @@ const dependencyBuilder = (container: any, excluded: string[] ) => {
           */
         add(key: keyof Dependencies, v: Insertable) {
             if(typeof v !== 'function') {
-                Result.wrap(() => container.add({ [key]: v}))
-                      .expect("Failed to add " + key);
+                container.addSingleton(key, v)
             } else {
-                Result.wrap(() => 
-                       container.add((cntr: UnpackedDependencies) => ({ [key]: v(cntr)} )))
-                      .expect("Failed to add " + key);
+                container.addWiredSingleton(key, (cntr: UnpackedDependencies) => v(cntr))
             }
         },
         /**
@@ -49,28 +45,9 @@ const dependencyBuilder = (container: any, excluded: string[] ) => {
           * Swap out a preexisting dependency.
           */
         swap(key: keyof Dependencies, v: Insertable) {
-            if(typeof v !== 'function') {
-                Result.wrap(() => container.upsert({ [key]: v}))
-                      .expect("Failed to update " + key);
-            } else {
-                Result.wrap(() => 
-                       container.upsert((cntr: UnpackedDependencies) => ({ [key]: v(cntr)})))
-                      .expect("Failed to update " + key);
-            }
+            //todo in container
+            this.add(key, v);
         },
-        /**
-          * @param key the key of the dependency
-          * @param cleanup Provide cleanup for the dependency at key. First parameter is the dependency itself 
-          * @example
-          * ```ts 
-          * addDisposer('dbConnection', (dbConnection) => dbConnection.end())
-          * ```
-          * Swap out a preexisting dependency.
-          */
-        addDisposer(key: keyof Dependencies, cleanup: AnyFunction) {
-            Result.wrap(() => container.addDisposer({ [key] : cleanup }))
-                  .expect("Failed to addDisposer for" + key);
-        }
    };
 };
 
@@ -99,9 +76,8 @@ async function composeRoot(
     conf.build(container as Container);
     
     if (!hasLogger) {
-        container
-            .get<Logging>('@sern/logger')
-            ?.info({ message: 'All dependencies loaded successfully.' });
+        container.get<Logging>('@sern/logger')
+                 ?.info({ message: 'All dependencies loaded successfully.' });
     }
     container.ready();
 }

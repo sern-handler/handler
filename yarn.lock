@@ -241,7 +241,6 @@ __metadata:
     callsites: ^3.1.0
     discord.js: ^14.11.0
     eslint: 8.39.0
-    iti: ^0.6.0
     prettier: 2.8.8
     rxjs: ^7.8.0
     ts-results-es: ^4.1.0
@@ -1048,15 +1047,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"iti@npm:^0.6.0":
-  version: 0.6.0
-  resolution: "iti@npm:0.6.0"
-  dependencies:
-    utility-types: ^3.10.0
-  checksum: 19e484aa8b00bf57642c73c56b658d06d70d7b5acf5725a6aca9948c6b3c8d1fab18d71fb25f482a13d8c6acac137799fa80e7dbdc97cc24ed5afc94f03811e3
-  languageName: node
-  linkType: hard
-
 "js-sdsl@npm:^4.1.4":
   version: 4.4.2
   resolution: "js-sdsl@npm:4.4.2"
@@ -1531,13 +1521,6 @@ __metadata:
   dependencies:
     punycode: ^2.1.0
   checksum: 7167432de6817fe8e9e0c9684f1d2de2bb688c94388f7569f7dbdb1587c9f4ca2a77962f134ec90be0cc4d004c939ff0d05acc9f34a0db39a3c797dada262633
-  languageName: node
-  linkType: hard
-
-"utility-types@npm:^3.10.0":
-  version: 3.10.0
-  resolution: "utility-types@npm:3.10.0"
-  checksum: 8f274415c6196ab62883b8bd98c9d2f8829b58016e4269aaa1ebd84184ac5dda7dc2ca45800c0d5e0e0650966ba063bf9a412aaeaea6850ca4440a391283d5c8
   languageName: node
   linkType: hard
 
