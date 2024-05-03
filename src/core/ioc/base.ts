@@ -1,53 +1,18 @@
-import * as assert from 'assert';
-import type { CoreDependencies, DependencyConfiguration } from '../../types/ioc';
-import { CoreContainer } from './container';
+import type { DependencyConfiguration } from '../../types/ioc';
+import { Container } from './container';
 import { Result } from 'ts-results-es';
 import * as  __Services from '../structures/default-services';
-import { AnyFunction } from '../../types/utility';
+import { AnyFunction, UnpackFunction } from '../../types/utility';
 import type { Logging } from '../interfaces';
-import type { UnpackFunction } from 'iti';
-//SIDE EFFECT: GLOBAL DI
-let containerSubject: CoreContainer<Partial<Dependencies>>;
-
-/**
-  * @internal
-  * Don't use this unless you know what you're doing. Destroys old containerSubject if it exists and disposes everything
-  * then it will swap
-  */
-export async function __swap_container(c: CoreContainer<Partial<Dependencies>>) {
-    if(containerSubject) {
-       await containerSubject.disposeAll() 
-    }
-    containerSubject = c;
-}
-
-/**
-  * @internal
-  * Don't use this unless you know what you're doing. Destroys old containerSubject if it exists and disposes everything
-  * then it will swap
-  */
-export function __add_container(key: string,v : Insertable) {
-    containerSubject.add({ [key]: v });
-}
-
-/**
- * Returns the underlying data structure holding all dependencies.
- * Exposes methods from iti
- * Use the Service API. The container should be readonly from the consumer side
- */
-export function useContainerRaw() {
-    assert.ok(
-        containerSubject && containerSubject.isReady(),
-        "Could not find container or container wasn't ready. Did you call makeDependencies?",
-    );
-    return containerSubject;
-}
+import { __add_container, __swap_container, useContainerRaw } from './global';
 
 export function disposeAll(logger: Logging|undefined) {
-    containerSubject
+   useContainerRaw() 
         ?.disposeAll()
         .then(() => logger?.info({ message: 'Cleaning container and crashing' }));
 }
+
+
 type UnpackedDependencies = {
     [K in keyof Dependencies]: UnpackFunction<Dependencies[K]>
 }
@@ -121,8 +86,8 @@ type ValidDependencyConfig =
  * Finally, update the containerSubject with the new container state
  * @param conf
  */
-function composeRoot(
-    container: CoreContainer<Partial<Dependencies>>,
+async function composeRoot(
+    container: Container,
     conf: DependencyConfiguration,
 ) {
     //container should have no client or logger yet.
@@ -131,32 +96,32 @@ function composeRoot(
         __add_container('@sern/logger', new __Services.DefaultLogging);
     }
     //Build the container based on the callback provided by the user
-    conf.build(container as CoreContainer<Omit<CoreDependencies, '@sern/client'>>);
+    conf.build(container as Container);
     
     if (!hasLogger) {
-        container.get('@sern/logger')?.info({ message: 'All dependencies loaded successfully.' });
+        container
+            .get<Logging>('@sern/logger')
+            ?.info({ message: 'All dependencies loaded successfully.' });
     }
-
     container.ready();
 }
 
 export async function makeDependencies (conf: ValidDependencyConfig) {
-    containerSubject = new CoreContainer();
+    __swap_container(new Container({ autowire: false }));
     if(typeof conf === 'function') {
         const excluded: string[] = [];
-        conf(dependencyBuilder(containerSubject, excluded));
+        conf(dependencyBuilder(useContainerRaw(), excluded));
         //We only include logger if it does not exist 
         const includeLogger = 
             !excluded.includes('@sern/logger') 
-            && !containerSubject.hasKey('@sern/logger');
+            && !useContainerRaw().hasKey('@sern/logger');
 
         if(includeLogger) {
             __add_container('@sern/logger', new __Services.DefaultLogging);
         }
-
-        containerSubject.ready();
+        await useContainerRaw().ready();
     } else {
-        composeRoot(containerSubject, conf);
+        await composeRoot(useContainerRaw(), conf);
     }
 }
 

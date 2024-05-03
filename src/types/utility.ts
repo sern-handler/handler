@@ -28,5 +28,6 @@ export type Payload =
     | { type: PayloadType.Failure; module?: Module; reason: string | Error }
     | { type: PayloadType.Warning; module: undefined; reason: string };
 
-
+//https://github.com/molszanski/iti/blob/0a3a006113b4176316c308805314a135c0f47902/iti/src/_utils.ts#L29C1-L29C76
+export type UnpackFunction<T> = T extends (...args: any) => infer U ? U : T
 export type ReplyOptions = string | Omit<InteractionReplyOptions, 'fetchReply'> | MessageReplyOptions;

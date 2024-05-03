@@ -37,7 +37,6 @@ export function init(wrapper: Wrapper) {
 
     const initCallsite = callsites()[1].getFileName();
     const handlerModule = Files.shouldHandle(initCallsite!, "handler");
-    console.log(handlerModule)
     if(!handlerModule.exists) {
         throw Error("Could not find handler module, did you run sern build?")
     }

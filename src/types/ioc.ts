@@ -1,5 +1,6 @@
-import { Container, UnpackFunction } from 'iti';
+import type { Container } from '../core/ioc/container';
 import * as Contracts from '../core/interfaces';
+import type { UnpackFunction  } from './utility'
 /**
   * Type to annotate that something is a singleton. 
   * T is created once and lazily.
@@ -39,7 +40,5 @@ export interface DependencyConfiguration {
      * @deprecated. Loggers will be opt-in the future
      */
     exclude?: Set<'@sern/logger'>;
-    build: (
-        root: Container<Omit<CoreDependencies, '@sern/client'>, {}>,
-    ) => Container<Dependencies, {}>;
+    build: (root: Container) => Container;
 }

@@ -1,54 +1,76 @@
-import { Container } from 'iti';
 import type { Disposable } from '../interfaces';
-import * as assert from 'node:assert';
-import { Subject } from 'rxjs';
 import * as  __Services  from '../structures/default-services';
-import * as Hooks from './hooks';
-import { EventEmitter } from 'node:events';
 
 
 /**
  * A semi-generic container that provides error handling, emitter, and module store. 
  * For the handler to operate correctly, The only user provided dependency needs to be @sern/client
  */
-export class CoreContainer<T extends Partial<Dependencies>> extends Container<T, {}> {
-    private ready$ = new Subject<void>();
-    constructor() {
-        super();
-        assert.ok(!this.isReady(), 'Listening for dispose & init should occur prior to sern being ready.');
-
-        const { unsubscribe } = Hooks.createInitListener(this);
-
-        this.ready$
-            .subscribe({ complete: unsubscribe });
-
-        (this as Container<{}, {}>)
-            .add({ '@sern/errors': () => new __Services.DefaultErrorHandling,
-                   '@sern/emitter': () => new EventEmitter({ captureRejections: true }) })
-    }
-
-    isReady() {
-        return this.ready$.closed;
+export function hasCallableMethod(obj: object, name: PropertyKey) {
+    //@ts-ignore
+    return Object.hasOwn(obj, name) && typeof obj[name] == 'function';
+}
+/**
+ * A Depedency injection container capable of adding singletons, firing hooks, and managing IOC within an application
+ */
+export class Container {
+    private __singletons = new Map<PropertyKey, any>();
+    private hooks= new Map<string, Function[]>();
+    private finished_init = false;
+    constructor(options: { autowire: boolean; path?: string }) {
+        if(options.autowire) { /* noop */ }
     }
     
-    hasKey(key: string): boolean {
-        return Boolean((this as Container<any,any>)._context[key]);
+    addHook(name: string, callback: Function) {
+        if (!this.hooks.has(name)) {
+            this.hooks.set(name, []);
+        }
+        this.hooks.get(name)!.push(callback);
+    }
+    private registerHooks(hookname: string, insert: object) {
+        if(hasCallableMethod(insert, hookname)) {
+            console.log(hookname)
+            //@ts-ignore
+            this.addHook(hookname, async () => await insert[hookname]())
+        }
+    }
+    addSingleton(key: string, insert: object) {
+        if(typeof insert !== 'object') {
+            throw Error("Inserted object must be an object");
+        }
+        if(!this.__singletons.has(key)){
+            this.registerHooks('init', insert)
+            this.registerHooks('dispose', insert)
+            this.__singletons.set(key, insert);
+            return true;    
+        }
+        return false;
     }
 
-    override async disposeAll() {
-        const otherDisposables = Object
-            .entries(this._context)
-            .flatMap(([key, value]) => 
-                'dispose' in value ? [key] : []);
-        otherDisposables.forEach(key => { 
-            //possible source of bug: dispose is a property.
-            this.addDisposer({ [key]: (dep: Disposable) => dep.dispose() } as never);
-        })
-        await super.disposeAll();
+    addWiredSingleton(key: string, fn: (c: Container) => object) {
+        const insert = fn(this);
+        return this.addSingleton(key, insert);
     }
-    
-    ready() {
-        this.ready$.complete();
-        this.ready$.unsubscribe();
+
+    async disposeAll() {
+        await this.executeHooks('dispose');
+        this.hooks.delete('dispose');
+    }
+
+    isReady() { return this.finished_init; }
+    hasKey(key: string) { return this.__singletons.has(key); }
+    get<T>(key: PropertyKey) : T|undefined { return this.__singletons.get(key); }
+
+    async ready() {
+        await this.executeHooks('init');
+        this.hooks.delete('init');
+        this.finished_init = true;
+    }
+
+    async executeHooks(name: string) {
+        const hookFunctions = this.hooks.get(name) || [];
+        for (const hookFunction of hookFunctions) {
+            await hookFunction();
+        }
     }
 }
