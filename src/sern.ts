@@ -2,7 +2,6 @@ import callsites from 'callsites';
 import * as Files from './core/module-loading';
 import { Services } from './core/ioc';
 import type { DependencyList } from './types/ioc';
-
 interface Wrapper {
     commands?: string;
     defaultPrefix?: string;

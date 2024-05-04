@@ -20,11 +20,7 @@ const parseConfig = async (conf: Promise<PresenceResult>) => {
         return of(s).pipe(take(1));
     })
 };
-interface PresenceModule  {
-    module: PresenceConfig<(keyof Dependencies)[]>
-}
-export const presenceHandler = (path: string, setPresence: SetPresence) => {
-    
+
 //    const presence = Files
 //        .importModule<PresenceModule>(path)
 //        .then(({ module }) => {
@@ -40,4 +36,4 @@ export const presenceHandler = (path: string, setPresence: SetPresence) => {
 //        concatMap(fn => parseConfig(fn())),
 //        // subscribe to the observable parseConfig yields, and set the presence.
 //        concatMap(conf => conf.pipe(map(setPresence))));
-}
+

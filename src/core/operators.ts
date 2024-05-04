@@ -18,7 +18,6 @@ import {
 import type { Emitter, ErrorHandling, Logging } from './interfaces';
 import util from 'node:util';
 import type { PluginResult } from '../types/core-plugin';
-import type { Result } from 'ts-results-es'
 import type { VoidResult } from './_internal';
 /**
  * if {src} is true, mapTo V, else ignore
@@ -70,12 +69,12 @@ export function handleError<C>(crashHandler: ErrorHandling, emitter: Emitter, lo
         return caught;
     };
 }
-// Temporary until i get rxjs operators working on ts-results-es
-export const filterTap = <K, R>(onErr: (e: R) => void): OperatorFunction<Result<K, R>, K> => 
-    pipe(concatMap(result => {
-            if(result.isOk()) {
-                return of(result.value)
-            }
-            onErr(result.error);
-            return EMPTY
-        }))
+//// Temporary until i get rxjs operators working on ts-results-es
+//const filterTap = <K, R>(onErr: (e: R) => void): OperatorFunction<Result<K, R>, K> => 
+//    pipe(concatMap(result => {
+//            if(result.isOk()) {
+//                return of(result.value)
+//            }
+//            onErr(result.error);
+//            return EMPTY
+//        }))

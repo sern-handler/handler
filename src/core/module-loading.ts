@@ -1,5 +1,4 @@
 import path from 'node:path';
-import assert from 'assert';
 import { existsSync } from 'fs';
 
 
