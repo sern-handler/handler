@@ -17,7 +17,7 @@ import * as Id from './id'
  */
 export function commandModule(mod: InputCommand): _Module {
     const [onEvent, plugins] = partitionPlugins(mod.plugins);
-    const initCallsite = callsites()[1].getFileName();
+    const initCallsite = callsites().at(-2)?.getFileName();
     if(!initCallsite) throw Error("initCallsite is null");
 
     const { name, absPath } = Files.parseCallsite(initCallsite);
@@ -41,7 +41,7 @@ export function commandModule(mod: InputCommand): _Module {
  */
 export function eventModule(mod: InputEvent): _Module {
     const [onEvent, plugins] = partitionPlugins(mod.plugins);
-    const initCallsite = callsites()[1].getFileName();
+    const initCallsite = callsites().at(-2)?.getFileName();
     if(!initCallsite) throw Error("initCallsite is null");
     const { name, absPath } = Files.parseCallsite(initCallsite);
     mod.name ??= name;

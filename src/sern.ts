@@ -11,9 +11,10 @@ interface Wrapper {
 const __start = (entryPoint: string,
                  wrapper: { defaultPrefix?: string },
                  dependencies: DependencyList) => {
+    //@ts-ignore sern handler generates handler.js
     import(entryPoint)
-        .then(({ __commands, __events=new Map() }) => { 
-            console.log(__commands, __events) 
+        .then(({ commands=new Map(), events=new Map() }) => { 
+            console.log(commands, events) 
         })
         .catch(err => dependencies[2]?.error({ message: err }));
 }
