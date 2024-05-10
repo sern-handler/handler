@@ -26,11 +26,12 @@ export function __add_container(key: string, v: object) {
   * Initiates the global api.
   * Once this is finished, the Service api and the other global api is available
   */
-export function __init_container(options: {
+export async function __init_container(options: {
     autowire: boolean;
     path?: string | undefined;
 }) {
     containerSubject = new Container(options);
+    await containerSubject.ready()
 }
 
 /**

@@ -11,7 +11,6 @@ interface Wrapper {
 const __start = (entryPoint: string,
                  wrapper: { defaultPrefix?: string },
                  dependencies: DependencyList) => {
-    console.log(entryPoint)
     import(entryPoint)
         .then(({ __commands, __events=new Map() }) => { 
             console.log(__commands, __events) 

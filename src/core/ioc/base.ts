@@ -3,7 +3,7 @@ import { Container } from './container';
 import * as  __Services from '../structures/default-services';
 import { UnpackFunction } from '../../types/utility';
 import type { Logging } from '../interfaces';
-import { __add_container, __swap_container, useContainerRaw } from './global';
+import { __add_container, __init_container, __swap_container, useContainerRaw } from './global';
 
 export function disposeAll(logger: Logging|undefined) {
    useContainerRaw() 
@@ -28,6 +28,8 @@ const dependencyBuilder = (container: Container, excluded: string[] ) => {
             if(typeof v !== 'function') {
                 container.addSingleton(key, v)
             } else {
+                //TODO fixme
+                //@ts-ignore
                 container.addWiredSingleton(key, (cntr: UnpackedDependencies) => v(cntr))
             }
         },
@@ -83,7 +85,7 @@ async function composeRoot(
 }
 
 export async function makeDependencies (conf: ValidDependencyConfig) {
-    __swap_container(new Container({ autowire: false }));
+    await __init_container({ autowire: false });
     if(typeof conf === 'function') {
         const excluded: string[] = [];
         conf(dependencyBuilder(useContainerRaw(), excluded));

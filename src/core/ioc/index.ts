@@ -29,17 +29,17 @@ export function Services<const T extends (keyof Dependencies)[]>(...keys: [...T]
 }
 
 /**
- * @since 2.0.0.
+ * @deprecated
  * Creates a singleton object.
  * @param cb
  */
-export function single<T>(cb: () => T) { return cb; }
+export function single<T>(cb: () => T) { return cb(); }
 
 /**
- * @__PURE__
+ * @deprecated
  * @since 2.0.0
  * Creates a transient object
  * @param cb
  */
-export function transient<T>(cb: () => () => T) { return cb; }
+export function transient<T>(cb: () => () => T) { return cb()(); }
 
