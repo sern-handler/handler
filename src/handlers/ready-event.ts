@@ -11,12 +11,11 @@ const once = (log: Logging | undefined) => pipe(
 
 export function readyHandler(
     [sEmitter, , log, client]: DependencyList,
-    allPaths: ObservableInput<string>,
 ) {
     //Todo: add module manager on on ready
     const ready$ = fromEvent(client!, 'ready').pipe(once(log));
     
-    return concat(ready$).pipe(callInitPlugins(sEmitter))
+    return concat(ready$).pipe(callInitPlugins(sEmitter)).subscribe()
 //  const validModuleType = module.type >= 0 && module.type <= 1 << 10;
 //  assert.ok(validModuleType, 
 //      `Found ${module.name} at ${module.meta.fullPath}, which does not have a valid type`);

@@ -38,13 +38,13 @@ export function init(wrapper?: Wrapper) {
           errorHandler = dependencies[1];
 
     if (wrapper.events !== undefined) {
-        eventsHandler(dependencies, Files.getFullPathTree(wrapper.events));
+        eventsHandler(dependencies);
     }
 
     const initCallsite = callsites()[1].getFileName();
     const presencePath = Files.shouldHandle(initCallsite!, "presence");
     //Ready event: load all modules and when finished, time should be taken and logged
-    readyHandler(dependencies, Files.getFullPathTree(wrapper.commands))
+    readyHandler(dependencies)
         .add(() => {
             logger?.info({ message: "Client signaled ready, registering modules" });
             const time = ((performance.now() - startTime) / 1000).toFixed(2);
