@@ -1,5 +1,6 @@
 import path from 'node:path';
 import { existsSync } from 'fs';
+import assert from 'node:assert';
 
 
 export const parseCallsite = (site: string) => {
@@ -33,17 +34,17 @@ export const shouldHandle = (pth: string, filenam: string) => {
  * esm javascript, typescript, and commonjs typescript
  * export default commandModule({})
  */
-//async function importModule<T>(absPath: string) {
-//    let fileModule = await import(absPath);
-//
-//    let commandModule = fileModule.default;
-//
-//    assert(commandModule , `No export @ ${absPath}. Forgot to ignore with "!"? (!${path.basename(absPath)})?`);
-//    if ('default' in commandModule) {
-//        commandModule = commandModule.default;
-//    }
-//    return { module: commandModule } as T;
-//}
+export async function importModule<T>(absPath: string) {
+    let fileModule = await import(absPath);
+
+    let commandModule = fileModule.default;
+
+    assert(commandModule , `No export @ ${absPath}. Forgot to ignore with "!"? (!${path.basename(absPath)})?`);
+    if ('default' in commandModule) {
+        commandModule = commandModule.default;
+    }
+    return { module: commandModule } as T;
+}
 
 
 export const fmtFileName = (fileName: string) => path.parse(fileName).name;

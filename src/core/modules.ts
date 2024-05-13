@@ -21,7 +21,6 @@ export function commandModule(mod: InputCommand): _Module {
     const [onEvent, plugins] = partitionPlugins(mod.plugins);
     const initCallsite = get_callsite(callsites()).at(-2);
     if(!initCallsite) throw Error("initCallsite is null");
-
     const { name, absPath } = Files.parseCallsite(initCallsite);
     mod.name ??= name; mod.description ??= '...'
     //@ts-ignore

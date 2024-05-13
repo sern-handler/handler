@@ -1,7 +1,8 @@
-import { interval, scan, startWith, fromEvent, take, of } from "rxjs"
+import { concatMap, from, interval, of, map, scan, startWith, fromEvent, take } from "rxjs"
 import { PresenceConfig, PresenceResult } from "../core/presences";
+import { Services } from "../core/ioc";
 import assert from "node:assert";
-
+import * as Files from "../core/module-loading";
 type SetPresence = (conf: PresenceResult) => Promise<unknown>
 
 const parseConfig = async (conf: Promise<PresenceResult>) => {
@@ -21,19 +22,23 @@ const parseConfig = async (conf: Promise<PresenceResult>) => {
     })
 };
 
-//    const presence = Files
-//        .importModule<PresenceModule>(path)
-//        .then(({ module }) => {
-//            //fetch services with the order preserved, passing it to the execute fn 
-//            const fetchedServices = Services(...module.inject ?? []);
-//            return async () => module.execute(...fetchedServices);
-//        })
-//    const module$ = from(presence);
-//    return module$.pipe(
-//        //compose:
-//        //call the execute function, passing that result into parseConfig.
-//        //concatMap resolves the promise, and passes it to the next concatMap.
-//        concatMap(fn => parseConfig(fn())),
-//        // subscribe to the observable parseConfig yields, and set the presence.
-//        concatMap(conf => conf.pipe(map(setPresence))));
-
+export const presenceHandler = (path: string, setPresence: SetPresence) => {
+    interface PresenceModule {
+        module: PresenceConfig<(keyof Dependencies)[]>
+    }
+    const presence = Files
+        .importModule<PresenceModule>(path)
+        .then(({ module }) => {
+            //fetch services with the order preserved, passing it to the execute fn 
+            const fetchedServices = Services(...module.inject ?? []);
+            return async () => module.execute(...fetchedServices);
+        })
+    const module$ = from(presence);
+    return module$.pipe(
+        //compose:
+        //call the execute function, passing that result into parseConfig.
+        //concatMap resolves the promise, and passes it to the next concatMap.
+        concatMap(fn => parseConfig(fn())),
+        // subscribe to the observable parseConfig yields, and set the presence.
+        concatMap(conf => conf.pipe(map(setPresence))));
+}

@@ -1,5 +1,5 @@
 import { Result as Either } from 'ts-results-es';
-import { SernError } from '../_internal';
+import { SernError } from './enums';
 import * as assert from 'node:assert';
 
 /**

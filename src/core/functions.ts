@@ -61,10 +61,7 @@ export function treeSearch(
                 {
                     if ('autocomplete' in cur && cur.autocomplete) {
                         const choice = iAutocomplete.options.getFocused(true);
-                        assert(
-                            'command' in cur,
-                            'No `command` property found for autocomplete option',
-                        );
+                        assert( 'command' in cur, 'No `command` property found for option ' + cur.name);
                         if (subcommands.size > 0) {
                             const parent = iAutocomplete.options.getSubcommand();
                             const parentAndOptionMatches =

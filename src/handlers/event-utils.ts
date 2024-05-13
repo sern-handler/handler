@@ -18,7 +18,6 @@ import {
     everyPluginOk,
     filterMapTo,
     handleError,
-    SernError,
     type VoidResult,
     resultPayload,
     arrayifySource,
@@ -28,7 +27,7 @@ import {
 } from '../core/_internal';
 import * as Id from '../core/id'
 import type { Emitter, ErrorHandling, Logging } from '../core/interfaces';
-import { PayloadType } from '../core/structures/enums'
+import { PayloadType, SernError } from '../core/structures/enums'
 import { Err, Ok, Result } from 'ts-results-es';
 import type { Awaitable } from '../types/utility';
 import type { ControlPlugin } from '../types/core-plugin';
@@ -90,7 +89,6 @@ export function createDispatcher(payload: { module: Processed<CommandModule>; ev
                 const { command } = option;
             
              	return {
-                    ...payload,
              	    module: command as Processed<Module>, //autocomplete is not a true "module" warning cast!
              	    args: [payload.event],
              	};
@@ -256,16 +254,13 @@ export function callInitPlugins<T extends Processed<Module>>(sernEmitter: Emitte
 }
 
 /**
- * Creates an executable task ( execute the command ) if  all control plugins are successful
+ * Creates an executable task ( execute the command ) if all control plugins are successful
  * @param onStop emits a failure response to the SernEmitter
  */
 export function makeModuleExecutor<
     M extends Processed<Module>,
-    Args extends { 
-        module: M;
-        args: unknown[];
-    },
->(onStop: (m: M) => unknown) {
+    Args extends { module: M; args: unknown[]; }>
+(onStop: (m: M) => unknown) {
     const onNext = ({ args, module }: Args) => ({
         task: () => module.execute(...args),
         module,

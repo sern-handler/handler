@@ -2,7 +2,6 @@ import type { Result } from 'ts-results-es'
 
 export * from './operators';
 export * from './functions';
-export { SernError } from './structures/enums';
 
 export type _Module = {
     meta: {

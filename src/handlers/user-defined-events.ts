@@ -1,6 +1,5 @@
 import { ObservableInput } from 'rxjs';
-import { EventType } from '../core/structures/enums';
-import { SernError } from '../core/_internal';
+import { EventType, SernError } from '../core/structures/enums';
 import { eventDispatcher } from './event-utils'
 import { Service } from '../core/ioc';
 import type { DependencyList } from '../types/ioc';
@@ -23,14 +22,14 @@ export function eventsHandler(
                 throw Error(SernError.InvalidModuleType + ' while creating event handler');
         }
     };
-//    buildModules<EventModule>(allPaths)
-//        .pipe(
-//            callInitPlugins(emitter),
-//            map(intoDispatcher),
-//            /**
-//             * Where all events are turned on
-//             */
-//            mergeAll(),
-//            handleCrash(err, emitter, log))
-//        .subscribe();
+   buildModules<EventModule>(allPaths)
+       .pipe(
+            callInitPlugins(emitter),
+            map(intoDispatcher),
+            /**
+             * Where all events are turned on
+             */
+            mergeAll(),
+            handleCrash(err, emitter, log))
+        .subscribe();
 }
