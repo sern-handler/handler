@@ -27,8 +27,7 @@ interface Wrapper {
  * })
  * ```
  */
-export function init(wrapper?: Wrapper) {
-    wrapper ??= { commands: "./dist/commands", events: "./dist/events" };
+export function init(wrapper: Wrapper = { commands: "./dist/commands", events: "./dist/events" }) {
     const startTime = performance.now();
     const dependencies = Services('@sern/emitter', 
                                   '@sern/errors',
@@ -52,7 +51,7 @@ export function init(wrapper?: Wrapper) {
             logger?.info({ message: `sern: registered in ${time} s`, });
             if(presencePath.exists) {
                 const setPresence = async (p: any) => {
-                    return (dependencies[4] as Client).user?.setPresence(p);
+                    return (dependencies[3] as Client).user?.setPresence(p);
                 }
                 presenceHandler(presencePath.path, setPresence).subscribe();
             }

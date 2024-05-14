@@ -1,13 +1,12 @@
 import type { Interaction } from 'discord.js';
 import { mergeMap, merge, concatMap } from 'rxjs';
 import { PayloadType } from '../core/structures/enums';
-import { filterTap } from '../core/operators'
+import { filterTap, sharedEventStream } from '../core/operators'
 import {
     isAutocomplete,
     isCommand,
     isMessageComponent,
     isModal,
-    sharedEventStream,
     resultPayload,
 } from '../core/_internal';
 import { createInteractionHandler, executeModule, makeModuleExecutor } from './event-utils';
@@ -19,7 +18,7 @@ export function interactionHandler([emitter, err, log, client]: DependencyList) 
     const handle = createInteractionHandler(interactionStream$, modules);
 
     const interactionHandler$ = merge(handle(isMessageComponent),
-                                      handle(isAutocomplete), 
+                                      handle(isAutocomplete),
                                       handle(isCommand),
                                       handle(isModal));
     return interactionHandler$

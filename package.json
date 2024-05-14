@@ -9,10 +9,6 @@
         ".": {
             "import": "./dist/index.js",
             "require": "./dist/index.js"
-        },
-        "./internal": {
-            "import": "./dist/_internal.js",
-            "require": "./dist/_internal.js"
         }
     },
     "scripts": {
@@ -45,7 +41,7 @@
     },
     "devDependencies": {
         "@faker-js/faker": "^8.0.1",
-        "@types/node": "^18.15.11",
+        "@types/node": "~18.17.11",
         "@typescript-eslint/eslint-plugin": "5.58.0",
         "@typescript-eslint/parser": "5.59.1",
         "discord.js": "^14.11.0",
@@ -80,10 +76,7 @@
                     "allowTemplateLiterals": true
                 }
             ],
-            "semi": [
-                "error",
-                "always"
-            ],
+            "semi": [ "error", "always" ],
             "@typescript-eslint/no-empty-interface": 0,
             "@typescript-eslint/ban-types": 0,
             "@typescript-eslint/no-explicit-any": "off"
@@ -94,7 +87,7 @@
         "url": "git+https://github.com/sern-handler/handler.git"
     },
     "engines": {
-        "node": ">= 18.16.x"
+        "node": ">= 18.17.x"
     },
     "homepage": "https://sern.dev"
 }

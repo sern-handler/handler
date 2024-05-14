@@ -48,16 +48,17 @@ export enum EventType {
     /**
      * The EventType for handling discord events
      */
-    Discord = 1,
+    Discord,
     /**
      * The EventType for handling sern events
      */
-    Sern = 2,
+    Sern,
     /**
      * The EventType for handling external events.
      * Could be for example, `process` events, database events
      */
-    External = 3,
+    External,
+    Cron
 }
 
 /**

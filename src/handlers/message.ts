@@ -1,11 +1,11 @@
 import { EMPTY, mergeMap, concatMap } from 'rxjs';
 import type { Message } from 'discord.js';
-import { sharedEventStream } from '../core/_internal';
 import type { DependencyList } from '../types/ioc';
 import { createMessageHandler, executeModule, makeModuleExecutor } from './event-utils';
 import { PayloadType, SernError } from '../core/structures/enums'
 import { resultPayload } from '../core/functions'
-import {  filterTap } from '../core/operators'
+import {  filterTap, sharedEventStream } from '../core/operators'
+
 /**
  * Ignores messages from any person / bot except itself
  * @param prefix
@@ -16,7 +16,7 @@ function isNonBot(prefix: string) {
 
 function hasPrefix(prefix: string, content: string) {
     const prefixInContent = content.slice(0, prefix.length);
-    return (prefixInContent.localeCompare(prefix, undefined, { sensitivity: 'accent', }) === 0);
+    return (prefixInContent.localeCompare(prefix, undefined, { sensitivity: 'accent' }) === 0);
 }
 
 export function messageHandler(

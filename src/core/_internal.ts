@@ -1,6 +1,5 @@
 import type { Result } from 'ts-results-es'
 
-export * from './operators';
 export * from './functions';
 
 export type _Module = {

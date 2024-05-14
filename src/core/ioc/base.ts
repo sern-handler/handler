@@ -72,8 +72,9 @@ async function composeRoot(
     //container should have no client or logger yet.
     const hasLogger = conf.exclude?.has('@sern/logger');
     if (!hasLogger) {
-        __add_container('@sern/logger', new __Services.DefaultLogging);
+        __add_container('@sern/logger', new __Services.DefaultLogging());
     }
+    __add_container('@sern/errors', new __Services.DefaultErrorHandling());
     //Build the container based on the callback provided by the user
     conf.build(container as Container);
     
@@ -97,6 +98,7 @@ export async function makeDependencies (conf: ValidDependencyConfig) {
         if(includeLogger) {
             __add_container('@sern/logger', new __Services.DefaultLogging);
         }
+        __add_container('@sern/errors', new __Services.DefaultErrorHandling());
         await useContainerRaw().ready();
     } else {
         await composeRoot(useContainerRaw(), conf);

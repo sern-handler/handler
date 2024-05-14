@@ -150,4 +150,8 @@ interface EventArgsMatrix {
         [PluginType.Control]: unknown[];
         [PluginType.Init]: [InitArgs<Processed<ExternalEventCommand>>];
     };
+    [EventType.Cron]: {
+        [PluginType.Control]: unknown[];
+        [PluginType.Init]: [InitArgs<Processed<ExternalEventCommand>>];
+    };
 }

@@ -163,6 +163,8 @@ export interface EventModuleDefs {
     [EventType.Sern]: SernEventCommand;
     [EventType.Discord]: DiscordEventCommand;
     [EventType.External]: ExternalEventCommand;
+    //TODO
+    [EventType.Cron]: ExternalEventCommand;
 }
 
 export interface SernAutocompleteData
