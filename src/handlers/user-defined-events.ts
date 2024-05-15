@@ -1,14 +1,10 @@
-import { ObservableInput, map, mergeAll } from 'rxjs';
 import { EventType, SernError } from '../core/structures/enums';
-import { callInitPlugins, eventDispatcher, handleCrash } from './event-utils'
+import { eventDispatcher } from './event-utils'
 import { Service } from '../core/ioc';
 import type { DependencyList } from '../types/ioc';
 import type { EventModule,  Processed } from '../types/core-modules';
 
-export function eventsHandler(
-    [emitter, err, log, client]: DependencyList,
-    //allPaths: ObservableInput<string>,
-) {
+export default function( [emitter, err, log, client]: DependencyList, eventDir: string) {
     //code smell
     const intoDispatcher = (e: { module: Processed<EventModule> }) => {
         switch (e.module.type) {
@@ -18,6 +14,9 @@ export function eventsHandler(
                 return eventDispatcher(e.module,  client);
             case EventType.External:
                 return eventDispatcher(e.module,  Service(e.module.emitter));
+            case EventType.Cron:
+                //@ts-ignore
+                return eventDispatcher(e.module, Service('@sern/cron'))
             default:
                 throw Error(SernError.InvalidModuleType + ' while creating event handler');
         }

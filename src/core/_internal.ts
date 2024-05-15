@@ -1,15 +1,7 @@
 import type { Result } from 'ts-results-es'
+import { CommandType, EventType, Plugin } from '..';
+import { AnyFunction } from '../types/utility';
+import { Module } from '../types/core-modules';
 
-export * from './functions';
-
-export type _Module = {
-    meta: {
-        id: string,
-        absPath: string
-    }
-    name: string,
-    execute : Function
-    [key: PropertyKey]: unknown
-}
 
 export type VoidResult = Result<void, void>;

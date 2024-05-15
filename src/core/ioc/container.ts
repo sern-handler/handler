@@ -4,7 +4,7 @@ import * as  __Services  from '../structures/default-services';
  * A semi-generic container that provides error handling, emitter, and module store. 
  * For the handler to operate correctly, The only user provided dependency needs to be @sern/client
  */
-export function hasCallableMethod(obj: object, name: PropertyKey) {
+function hasCallableMethod(obj: object, name: PropertyKey) {
     //@ts-ignore
     return Object.hasOwn(obj, name) && typeof obj[name] == 'function';
 }

@@ -4,37 +4,35 @@ import type { AnyEventPlugin, } from '../types/core-plugin';
 import type {
     InputCommand,
     InputEvent,
+    Module,
 } from '../types/core-modules';
-import { type _Module, partitionPlugins } from './_internal';
+import { partitionPlugins } from './functions'
 import type { Awaitable } from '../types/utility';
 
 /**
  * @since 1.0.0 The wrapper function to define command modules for sern
  * @param mod
  */
-export function commandModule(mod: InputCommand): _Module {
+export function commandModule(mod: InputCommand): Module {
     const [onEvent, plugins] = partitionPlugins(mod.plugins);
-    //@ts-ignore
     return {
         ...mod,
         onEvent,
         plugins,
-    };
+    } as Module;
 }
 /**
  * @since 1.0.0
  * The wrapper function to define event modules for sern
  * @param mod
  */
-export function eventModule(mod: InputEvent): _Module {
+export function eventModule(mod: InputEvent): Module {
     const [onEvent, plugins] = partitionPlugins(mod.plugins);
-    
-    //@ts-ignore
     return {
         ...mod,
         plugins,
         onEvent,
-    };
+    } as Module;
 }
 
 /** Create event modules from discord.js client events,

@@ -15,10 +15,6 @@ import {
 } from 'rxjs';
 import {
     type VoidResult,
-    resultPayload,
-    isAutocomplete,
-    treeSearch,
-    _Module,
 } from '../core/_internal';
 import * as Id from '../core/id'
 import type { Emitter, ErrorHandling, Logging } from '../core/interfaces';
@@ -42,7 +38,7 @@ function contextArgs(wrappable: Message | BaseInteraction, messageArgs?: string[
     const args = ctx.isMessage() ? ['text', messageArgs!] : ['slash', ctx.options];
     return [ctx, args] as [Context, Args];
 }
-
+import { resultPayload, isAutocomplete, treeSearch } from '../core/functions'
 
 function intoPayload(module: Processed<Module>, ) {
     return pipe(map(arrayifySource),
@@ -127,7 +123,7 @@ export function fmt(msg: string, prefix: string): string[] {
  */
 export function createInteractionHandler<T extends Interaction>(
     source: Observable<Interaction>,
-    mg: Map<string, _Module>, //TODO
+    mg: Map<string, Module>, //TODO
 ) {
     return createGenericHandler<Interaction, T, Result<ReturnType<typeof createDispatcher>, void>>(
         source,
@@ -135,7 +131,7 @@ export function createInteractionHandler<T extends Interaction>(
             const possibleIds = Id.reconstruct(event);
             let fullPaths= possibleIds
                 .map(id => mg.get(id))
-                .filter((id): id is _Module => id !== undefined);
+                .filter((id): id is Module => id !== undefined);
 
             if(fullPaths.length == 0) {
                 return Err.EMPTY;
@@ -231,25 +227,6 @@ export function createResultResolver<
 };
 
 /**
- * Calls a module's init plugins and checks for Err. If so, call { onStop } and
- * ignore the module
- */
-export function callInitPlugins<T extends Processed<Module>>(sernEmitter: Emitter) {
-    return concatMap(
-        createResultResolver({
-            createStream: args => from(args.module.plugins).pipe(callPlugin(args)),
-            onStop: (module: T) => {
-                sernEmitter.emit('module.register', resultPayload(PayloadType.Failure, module, SernError.PluginFailure));
-            },
-            onNext: (payload) => {
-                sernEmitter.emit('module.register', resultPayload(PayloadType.Success, payload.module));
-                return payload as { module: T; metadata: CommandMeta };
-            },
-        }),
-    );
-}
-
-/**
  * Creates an executable task ( execute the command ) if all control plugins are successful
  * @param onStop emits a failure response to the SernEmitter
  */
@@ -264,19 +241,16 @@ export function makeModuleExecutor<
     });
     return createResultResolver({
             onStop,
-            createStream: ({ args, module }) => 
-                from(module.onEvent)
-                    .pipe(callPlugin(args)),
+            createStream: ({ args, module }) => from(module.onEvent).pipe(callPlugin(args)),
             onNext,
         })
 }
 
 export const handleCrash = (err: ErrorHandling,sernemitter: Emitter, log?: Logging) =>
-    pipe(
-        catchError(handleError(err, sernemitter, log)),
+    pipe(catchError(handleError(err, sernemitter, log)),
         finalize(() => {
             log?.info({
                 message: 'A stream closed or reached end of lifetime',
             });
             disposeAll(log);
-        }));
+        }))

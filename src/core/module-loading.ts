@@ -3,7 +3,7 @@ import { existsSync } from 'fs';
 import { readdir } from 'fs/promises';
 import assert from 'node:assert';
 import * as Id from './id'
-import type { _Module } from './_internal';
+import { Module } from '../types/core-modules';
 
 export const parseCallsite = (site: string) => {
     const pathobj = path.parse(site.replace(/file:\\?/, "")
@@ -38,11 +38,11 @@ export const shouldHandle = (pth: string, filenam: string) => {
 export async function importModule<T>(absPath: string) {
     let fileModule = await import(absPath);
 
-    let commandModule: _Module = fileModule.default;
+    let commandModule: Module = fileModule.default;
 
     assert(commandModule , `No export @ ${absPath}. Forgot to ignore with "!"? (!${path.basename(absPath)})?`);
     if ('default' in commandModule) {
-        commandModule = commandModule.default as _Module;
+        commandModule = commandModule.default as Module;
     }
     const p = path.parse(absPath)
     commandModule.name ??= p.name; commandModule.description ??= "...";
@@ -51,21 +51,18 @@ export async function importModule<T>(absPath: string) {
         id: Id.create(commandModule.name, commandModule.type),
         absPath,
     };
-    return { module: commandModule } as T;
+    return { module: commandModule as T };
 }
 
 
 export async function* readRecursive(dir: string): AsyncGenerator<string> {
-    const files = await readdir(dir, { withFileTypes: true, recursive: true });
+    const files = await readdir(dir, { recursive: true, withFileTypes: true });
     for (const file of files) {
-        const fullPath = path.join(file.path, file.name);
+        const fullPath = path.join(file.parentPath, file.name);
         if(!file.name.startsWith('!') && !file.isDirectory()) {
             yield fullPath;
         }
     }
 }
 
-export const fmtFileName = (fileName: string) => path.parse(fileName).name;
-
-export const filename = (p: string) => fmtFileName(path.basename(p));
 

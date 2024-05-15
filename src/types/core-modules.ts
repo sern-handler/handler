@@ -35,6 +35,10 @@ export interface Module {
     onEvent: ControlPlugin[];
     plugins: InitPlugin[];
     description?: string;
+    meta: {
+        id: string;
+        absPath: string;
+    }
     execute(...args: any[]): Awaitable<any>;
 }
 
@@ -44,10 +48,16 @@ export interface SernEventCommand<T extends keyof SernEventsMapping = keyof Sern
     type: EventType.Sern;
     execute(...args: SernEventsMapping[T]): Awaitable<unknown>;
 }
+
 export interface ExternalEventCommand extends Module {
     name?: string;
     emitter: keyof Dependencies;
     type: EventType.External;
+    execute(...args: unknown[]): Awaitable<unknown>;
+}
+export interface CronEventCommand extends Module { 
+    name?: string;
+    type: EventType.Cron;
     execute(...args: unknown[]): Awaitable<unknown>;
 }
 
@@ -127,7 +137,7 @@ export interface BothCommand extends Module {
     execute: (ctx: Context, args: Args) => Awaitable<unknown>;
 }
 
-export type EventModule = DiscordEventCommand | SernEventCommand | ExternalEventCommand;
+export type EventModule = DiscordEventCommand | SernEventCommand | ExternalEventCommand  | CronEventCommand;
 export type CommandModule =
     | TextCommand
     | SlashCommand
@@ -178,10 +188,10 @@ export interface SernAutocompleteData
 }
 
 type CommandModuleNoPlugins = {
-    [T in CommandType]: Omit<CommandModuleDefs[T], 'plugins' | 'onEvent'>;
+    [T in CommandType]: Omit<CommandModuleDefs[T], 'plugins' | 'onEvent' | 'meta'>;
 };
 type EventModulesNoPlugins = {
-    [T in EventType]: Omit<EventModuleDefs[T], 'plugins' | 'onEvent'>;
+    [T in EventType]: Omit<EventModuleDefs[T], 'plugins' | 'onEvent' | 'meta'>;
 };
 
 export type InputEvent = {

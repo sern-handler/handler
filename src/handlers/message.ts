@@ -20,16 +20,15 @@ function hasPrefix(prefix: string, content: string) {
 }
 
 export function messageHandler(
-    [emitter, err, log, client]: DependencyList,
+    [emitter, err, log, client, commands]: DependencyList,
     defaultPrefix: string | undefined,
 ) {
     if (!defaultPrefix) {
         log?.debug({ message: 'No prefix found. message handler shutting down' });
         return EMPTY;
     }
-    const modules = new Map()
     const messageStream$ = sharedEventStream<Message>(client, 'messageCreate');
-    const handle = createMessageHandler(messageStream$, defaultPrefix, modules);
+    const handle = createMessageHandler(messageStream$, defaultPrefix, commands);
 
     const msgCommands$ = handle(isNonBot(defaultPrefix));
 

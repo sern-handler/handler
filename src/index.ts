@@ -38,7 +38,7 @@ export type {
 
 
 export type { Args, SlashOptions, Payload, SernEventsMapping } from './types/utility';
-export type { Singleton, Transient, CoreDependencies } from './types/ioc';
+export type { CoreDependencies } from './types/ioc';
 
 export {
     commandModule,

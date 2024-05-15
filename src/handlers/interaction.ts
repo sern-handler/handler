@@ -2,16 +2,11 @@ import type { Interaction } from 'discord.js';
 import { mergeMap, merge, concatMap } from 'rxjs';
 import { PayloadType } from '../core/structures/enums';
 import { filterTap, sharedEventStream } from '../core/operators'
-import {
-    isAutocomplete,
-    isCommand,
-    isMessageComponent,
-    isModal,
-    resultPayload,
-} from '../core/_internal';
 import { createInteractionHandler, executeModule, makeModuleExecutor } from './event-utils';
 import type { DependencyList } from '../types/ioc';
 import { SernError } from '../core/structures/enums'
+import { isAutocomplete, isCommand, isMessageComponent, isModal, resultPayload, } from '../core/functions'
+
 export function interactionHandler([emitter, err, log, client]: DependencyList) {
     const interactionStream$ = sharedEventStream<Interaction>(client, 'interactionCreate');
     const modules = new Map();
@@ -25,5 +20,5 @@ export function interactionHandler([emitter, err, log, client]: DependencyList) 
         .pipe(filterTap(e => emitter.emit('warning', resultPayload(PayloadType.Warning, undefined, e))),
               concatMap(makeModuleExecutor(module => 
                 emitter.emit('module.activate', resultPayload(PayloadType.Failure, module, SernError.PluginFailure)))),
-            mergeMap(payload => executeModule(emitter, log, err, payload)));
+              mergeMap(payload => executeModule(emitter, log, err, payload)));
 }

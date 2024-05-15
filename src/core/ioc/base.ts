@@ -75,6 +75,8 @@ async function composeRoot(
         __add_container('@sern/logger', new __Services.DefaultLogging());
     }
     __add_container('@sern/errors', new __Services.DefaultErrorHandling());
+    __add_container('@sern/cron', {})
+    __add_container('@sern/modules', new Map())
     //Build the container based on the callback provided by the user
     conf.build(container as Container);
     
@@ -99,6 +101,7 @@ export async function makeDependencies (conf: ValidDependencyConfig) {
             __add_container('@sern/logger', new __Services.DefaultLogging);
         }
         __add_container('@sern/errors', new __Services.DefaultErrorHandling());
+        __add_container('@sern/cron', {})
         await useContainerRaw().ready();
     } else {
         await composeRoot(useContainerRaw(), conf);

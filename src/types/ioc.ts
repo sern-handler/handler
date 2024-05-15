@@ -1,29 +1,22 @@
 import type { Container } from '../core/ioc/container';
 import * as Contracts from '../core/interfaces';
 import type { UnpackFunction  } from './utility'
-/**
-  * Type to annotate that something is a singleton. 
-  * T is created once and lazily.
-  */
-export type Singleton<T> = () => T;
-/**
-  * Type to annotate that something is transient. 
-  * Every time this is called, a new object is created
-  */
-export type Transient<T> = () => () => T;
-
+import type { Client } from 'discord.js'
+import { Module } from './core-modules';
 export type DependencyList = [
     Contracts.Emitter,
     Contracts.ErrorHandling,
     Contracts.Logging | undefined,
-    Contracts.Emitter,
+    Client,
+    Map<string, Module>
 ];
 
 export interface CoreDependencies {
-    '@sern/client': () => Contracts.Emitter;
+    '@sern/client': () => Client;
     '@sern/emitter': () => Contracts.Emitter;
     '@sern/errors': () => Contracts.ErrorHandling;
     '@sern/logger'?: () => Contracts.Logging;
+    '@sern/modules': () => Map<string, Module>
 }
 
 export type DependencyFromKey<T extends keyof Dependencies> = Dependencies[T];

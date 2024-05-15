@@ -4,7 +4,7 @@ import type { Module } from './core-modules';
 
 export type Awaitable<T> = PromiseLike<T> | T;
 
-export type AnyFunction = (...args: unknown[]) => unknown;
+export type AnyFunction = (...args: never[]) => unknown;
 
 // Thanks to @kelsny
 type ParseType<T> = {

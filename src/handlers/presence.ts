@@ -23,11 +23,8 @@ const parseConfig = async (conf: Promise<PresenceResult>) => {
 };
 
 export const presenceHandler = (path: string, setPresence: SetPresence) => {
-    interface PresenceModule {
-        module: PresenceConfig<(keyof Dependencies)[]>
-    }
     const presence = Files
-        .importModule<PresenceModule>(path)
+        .importModule<PresenceConfig<(keyof Dependencies)[]>>(path)
         .then(({ module }) => {
             //fetch services with the order preserved, passing it to the execute fn 
             const fetchedServices = Services(...module.inject ?? []);
