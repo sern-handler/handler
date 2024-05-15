@@ -66,6 +66,10 @@ export class Container {
         this.finished_init = true;
     }
 
+    deps<T extends Record<string,any>>(): T {
+        return Object.fromEntries(this.__singletons) as T
+    }
+
     async executeHooks(name: string) {
         const hookFunctions = this.hooks.get(name) || [];
         for (const hookFunction of hookFunctions) {

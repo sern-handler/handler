@@ -3,13 +3,18 @@ import { mergeMap, merge, concatMap } from 'rxjs';
 import { PayloadType } from '../core/structures/enums';
 import { filterTap, sharedEventStream } from '../core/operators'
 import { createInteractionHandler, executeModule, makeModuleExecutor } from './event-utils';
-import type { DependencyList } from '../types/ioc';
 import { SernError } from '../core/structures/enums'
 import { isAutocomplete, isCommand, isMessageComponent, isModal, resultPayload, } from '../core/functions'
+import { UnpackedDependencies } from '../types/utility';
 
-export function interactionHandler([emitter, err, log, client]: DependencyList) {
+export function interactionHandler(deps: UnpackedDependencies) {
+    //i wish javascript had clojure destructuring 
+    const { '@sern/modules': modules,
+            '@sern/client': client,
+            '@sern/logger': log,
+            '@sern/errors': err,
+            '@sern/emitter': emitter } = deps
     const interactionStream$ = sharedEventStream<Interaction>(client, 'interactionCreate');
-    const modules = new Map();
     const handle = createInteractionHandler(interactionStream$, modules);
 
     const interactionHandler$ = merge(handle(isMessageComponent),

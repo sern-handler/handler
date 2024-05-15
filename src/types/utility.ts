@@ -30,4 +30,7 @@ export type Payload =
 
 //https://github.com/molszanski/iti/blob/0a3a006113b4176316c308805314a135c0f47902/iti/src/_utils.ts#L29C1-L29C76
 export type UnpackFunction<T> = T extends (...args: any) => infer U ? U : T
+export type UnpackedDependencies = {
+    [K in keyof Dependencies]: UnpackFunction<Dependencies[K]>
+}
 export type ReplyOptions = string | Omit<InteractionReplyOptions, 'fetchReply'> | MessageReplyOptions;

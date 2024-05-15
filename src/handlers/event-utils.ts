@@ -20,7 +20,7 @@ import * as Id from '../core/id'
 import type { Emitter, ErrorHandling, Logging } from '../core/interfaces';
 import { PayloadType, SernError } from '../core/structures/enums'
 import { Err, Ok, Result } from 'ts-results-es';
-import type { Awaitable } from '../types/utility';
+import type { Awaitable, UnpackedDependencies } from '../types/utility';
 import type { ControlPlugin } from '../types/core-plugin';
 import type { CommandMeta, CommandModule, Module, Processed } from '../types/core-modules';
 import { EventEmitter } from 'node:events';
@@ -246,8 +246,10 @@ export function makeModuleExecutor<
         })
 }
 
-export const handleCrash = (err: ErrorHandling,sernemitter: Emitter, log?: Logging) =>
-    pipe(catchError(handleError(err, sernemitter, log)),
+export const handleCrash = ({ "@sern/errors": err,
+                              '@sern/emitter': sem,
+                              '@sern/logger': log } : UnpackedDependencies) =>
+    pipe(catchError(handleError(err, sem, log)),
         finalize(() => {
             log?.info({
                 message: 'A stream closed or reached end of lifetime',

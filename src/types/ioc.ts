@@ -3,13 +3,7 @@ import * as Contracts from '../core/interfaces';
 import type { UnpackFunction  } from './utility'
 import type { Client } from 'discord.js'
 import { Module } from './core-modules';
-export type DependencyList = [
-    Contracts.Emitter,
-    Contracts.ErrorHandling,
-    Contracts.Logging | undefined,
-    Client,
-    Map<string, Module>
-];
+
 
 export interface CoreDependencies {
     '@sern/client': () => Client;

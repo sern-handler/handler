@@ -1,10 +1,10 @@
 import { EMPTY, mergeMap, concatMap } from 'rxjs';
 import type { Message } from 'discord.js';
-import type { DependencyList } from '../types/ioc';
 import { createMessageHandler, executeModule, makeModuleExecutor } from './event-utils';
 import { PayloadType, SernError } from '../core/structures/enums'
 import { resultPayload } from '../core/functions'
 import {  filterTap, sharedEventStream } from '../core/operators'
+import { UnpackedDependencies } from '../types/utility';
 
 /**
  * Ignores messages from any person / bot except itself
@@ -19,10 +19,10 @@ function hasPrefix(prefix: string, content: string) {
     return (prefixInContent.localeCompare(prefix, undefined, { sensitivity: 'accent' }) === 0);
 }
 
-export function messageHandler(
-    [emitter, err, log, client, commands]: DependencyList,
-    defaultPrefix: string | undefined,
-) {
+export function messageHandler({"@sern/emitter": emitter, '@sern/errors':err, 
+     '@sern/logger': log, '@sern/client': client,
+     '@sern/modules': commands}: UnpackedDependencies,
+    defaultPrefix: string | undefined) {
     if (!defaultPrefix) {
         log?.debug({ message: 'No prefix found. message handler shutting down' });
         return EMPTY;

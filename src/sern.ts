@@ -9,11 +9,13 @@ import { interactionHandler } from './handlers/interaction';
 import { presenceHandler } from './handlers/presence';
 import { Client } from 'discord.js';
 import { handleCrash } from './handlers/event-utils';
+import { useContainerRaw } from './core/ioc/global';
+import { UnpackedDependencies } from './types/utility';
 
 interface Wrapper {
     commands: string;
     defaultPrefix?: string;
-    events: string;
+    events?: string;
 }
 /**
  * @since 1.0.0
@@ -27,27 +29,22 @@ interface Wrapper {
  * })
  * ```
  */
-export function init(maybeWrapper: Wrapper = { commands: "./dist/commands", events: "./dist/events" }) {
+
+export function init(maybeWrapper: Wrapper = { commands: "./dist/commands" }) {
     const startTime = performance.now();
-    const dependencies = Services('@sern/emitter', 
-                                  '@sern/errors',
-                                  '@sern/logger',
-                                  '@sern/client',
-                                  '@sern/modules');
-    const logger = dependencies[2],
-          errorHandler = dependencies[1];
+    const deps = useContainerRaw().deps<UnpackedDependencies>();
     
     if (maybeWrapper.events !== undefined) {
-        eventsHandler(dependencies, maybeWrapper.events);
+        eventsHandler(deps, maybeWrapper.events);
     }
 
     const initCallsite = callsites()[1].getFileName();
     const presencePath = Files.shouldHandle(initCallsite!, "presence");
     //Ready event: load all modules and when finished, time should be taken and logged
-    ready(maybeWrapper.commands, dependencies)
+    ready(maybeWrapper.commands, deps)
         .then(() => {
             const time = ((performance.now() - startTime) / 1000).toFixed(2);
-            logger?.info({ message: `sern: registered in ${time} s`, });
+            deps['@sern/logger']?.info({ message: `sern: registered in ${time} s` });
             if(presencePath.exists) {
                 const setPresence = async (p: any) => {
                     //@ts-ignore
@@ -58,8 +55,8 @@ export function init(maybeWrapper: Wrapper = { commands: "./dist/commands", even
         })
         .catch(err => { throw err });
 
-    const messages$ = messageHandler(dependencies, maybeWrapper.defaultPrefix);
-    const interactions$ = interactionHandler(dependencies);
+    const messages$ = messageHandler(deps, maybeWrapper.defaultPrefix);
+    const interactions$ = interactionHandler(deps);
     // listening to the message stream and interaction stream
-    merge(messages$, interactions$).pipe(handleCrash(errorHandler, dependencies[0], logger)).subscribe();
+    merge(messages$, interactions$).pipe(handleCrash(deps)).subscribe();
 }

@@ -1,7 +1,7 @@
 import type { DependencyConfiguration } from '../../types/ioc';
 import { Container } from './container';
 import * as  __Services from '../structures/default-services';
-import { UnpackFunction } from '../../types/utility';
+import { UnpackedDependencies } from '../../types/utility';
 import type { Logging } from '../interfaces';
 import { __add_container, __init_container, __swap_container, useContainerRaw } from './global';
 
@@ -12,9 +12,6 @@ export function disposeAll(logger: Logging|undefined) {
 }
 
 
-type UnpackedDependencies = {
-    [K in keyof Dependencies]: UnpackFunction<Dependencies[K]>
-}
 type Insertable = 
         | ((container: UnpackedDependencies) => unknown)
         | object
