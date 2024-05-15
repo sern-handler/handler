@@ -15,9 +15,12 @@ const intoDispatcher = (deps: UnpackedDependencies) =>
                 return eventDispatcher(module,  deps['@sern/client']);
             case EventType.External:
                 return eventDispatcher(module,  deps[module.emitter]);
-            case EventType.Cron:
-                //@ts-ignore TODO
-                return eventDispatcher(module, deps['@sern/cron'])
+            case EventType.Cron: {
+                //@ts-ignore
+                const cron = deps['@sern/cron'];
+                cron.addCronModule(module);
+                return eventDispatcher(module, cron)
+            }
             default:
                 throw Error(SernError.InvalidModuleType + ' while creating event handler');
         }

@@ -52,13 +52,16 @@ export class Cron extends EventEmitter {
     modules: Map<string, CronEventCommand> = new Map();
     private sanityCheck(eventName: string | symbol) : asserts eventName is string {
         if(typeof eventName === 'symbol') throw Error("Cron cannot add symbol based listener")
-        if(!cron.validate(eventName)) {
-            throw Error("Invalid cron expression while adding")
-        }
+        
     }
     addCronModule(module: Module) {
         if(module.type !== EventType.Cron) {
             throw Error("Can only add cron modules");
+        }
+
+        //@ts-ignore
+        if(!cron.validate(module.pattern)) {
+            throw Error("Invalid cron expression while adding")
         }
         this.modules.set(module.name!, module as CronEventCommand); 
     }

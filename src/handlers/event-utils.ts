@@ -55,7 +55,7 @@ const createResult = createResultResolver<
  * @param module
  * @param source
  */
-export function eventDispatcher(module: Module,  source: unknown) {
+export function eventDispatcher(module: Module, source: unknown) {
     assert.ok(source instanceof EventEmitter, `${source} is not an EventEmitter`);
 
     const execute: OperatorFunction<unknown[], unknown> =

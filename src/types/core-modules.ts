@@ -50,9 +50,9 @@ export interface ExternalEventCommand extends Module {
     execute(...args: unknown[]): Awaitable<unknown>;
 }
 export interface CronEventCommand extends Module { 
+    type: EventType.Cron;
     name?: string;
     pattern: string;
-    type: EventType.Cron;
     execute(...args: unknown[]): Awaitable<unknown>;
 }
 
@@ -168,8 +168,7 @@ export interface EventModuleDefs {
     [EventType.Sern]: SernEventCommand;
     [EventType.Discord]: DiscordEventCommand;
     [EventType.External]: ExternalEventCommand;
-    //TODO
-    [EventType.Cron]: ExternalEventCommand;
+    [EventType.Cron]: CronEventCommand;
 }
 
 export interface SernAutocompleteData
