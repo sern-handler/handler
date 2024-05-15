@@ -1,13 +1,11 @@
 import callsites from 'callsites';
 import * as  Files from './core/module-loading';
 import { merge } from 'rxjs';
-import { Services } from './core/ioc';
 import eventsHandler from './handlers/user-defined-events';
 import ready  from './handlers/ready';
-import { messageHandler } from './handlers/message';
-import { interactionHandler } from './handlers/interaction';
+import messageHandler from './handlers/message';
+import interactionHandler from './handlers/interaction';
 import { presenceHandler } from './handlers/presence';
-import { Client } from 'discord.js';
 import { handleCrash } from './handlers/event-utils';
 import { useContainerRaw } from './core/ioc/global';
 import { UnpackedDependencies } from './types/utility';
@@ -35,7 +33,12 @@ export function init(maybeWrapper: Wrapper = { commands: "./dist/commands" }) {
     const deps = useContainerRaw().deps<UnpackedDependencies>();
     
     if (maybeWrapper.events !== undefined) {
-        eventsHandler(deps, maybeWrapper.events);
+        eventsHandler(deps, maybeWrapper.events)
+            .then(() => {
+                deps['@sern/logger']?.info({ message: "Events registered" });
+            });
+    } else {
+        deps['@sern/logger']?.info({ message: "No events registered" });
     }
 
     const initCallsite = callsites()[1].getFileName();
@@ -47,8 +50,7 @@ export function init(maybeWrapper: Wrapper = { commands: "./dist/commands" }) {
             deps['@sern/logger']?.info({ message: `sern: registered in ${time} s` });
             if(presencePath.exists) {
                 const setPresence = async (p: any) => {
-                    //@ts-ignore
-                    return (dependencies[3] as Client).user?.setPresence(p);
+                    return deps['@sern/client'].user?.setPresence(p);
                 }
                 presenceHandler(presencePath.path, setPresence).subscribe();
             }

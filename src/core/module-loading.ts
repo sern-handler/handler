@@ -59,7 +59,7 @@ export async function* readRecursive(dir: string): AsyncGenerator<string> {
     const files = await readdir(dir, { withFileTypes: true });
 
     for (const file of files) {
-        const fullPath = path.join(dir, file.name);
+        const fullPath = path.posix.resolve(dir, file.name);
         if (file.isDirectory()) {
             if (!file.name.startsWith('!')) {
                 yield* readRecursive(fullPath);

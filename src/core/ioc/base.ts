@@ -4,6 +4,7 @@ import * as  __Services from '../structures/default-services';
 import { UnpackedDependencies } from '../../types/utility';
 import type { Logging } from '../interfaces';
 import { __add_container, __init_container, __swap_container, useContainerRaw } from './global';
+import { EventEmitter } from 'node:events';
 
 export function disposeAll(logger: Logging|undefined) {
    useContainerRaw() 
@@ -72,6 +73,7 @@ async function composeRoot(
     __add_container('@sern/errors', new __Services.DefaultErrorHandling());
     __add_container('@sern/cron', {})
     __add_container('@sern/modules', new Map())
+    __add_container('@sern/emitter', new EventEmitter())
     //Build the container based on the callback provided by the user
     conf.build(container as Container);
     
@@ -97,6 +99,8 @@ export async function makeDependencies (conf: ValidDependencyConfig) {
         }
         __add_container('@sern/errors', new __Services.DefaultErrorHandling());
         __add_container('@sern/cron', {})
+        __add_container('@sern/modules', new Map())
+        __add_container('@sern/emitter', new EventEmitter())
         await useContainerRaw().ready();
     } else {
         await composeRoot(useContainerRaw(), conf);

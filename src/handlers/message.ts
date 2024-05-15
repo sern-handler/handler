@@ -5,6 +5,7 @@ import { PayloadType, SernError } from '../core/structures/enums'
 import { resultPayload } from '../core/functions'
 import {  filterTap, sharedEventStream } from '../core/operators'
 import { UnpackedDependencies } from '../types/utility';
+import { Emitter } from '..';
 
 /**
  * Ignores messages from any person / bot except itself
@@ -19,7 +20,7 @@ function hasPrefix(prefix: string, content: string) {
     return (prefixInContent.localeCompare(prefix, undefined, { sensitivity: 'accent' }) === 0);
 }
 
-export function messageHandler({"@sern/emitter": emitter, '@sern/errors':err, 
+export default function message({"@sern/emitter": emitter, '@sern/errors':err, 
      '@sern/logger': log, '@sern/client': client,
      '@sern/modules': commands}: UnpackedDependencies,
     defaultPrefix: string | undefined) {
@@ -27,7 +28,7 @@ export function messageHandler({"@sern/emitter": emitter, '@sern/errors':err,
         log?.debug({ message: 'No prefix found. message handler shutting down' });
         return EMPTY;
     }
-    const messageStream$ = sharedEventStream<Message>(client, 'messageCreate');
+    const messageStream$ = sharedEventStream<Message>(client as unknown as Emitter, 'messageCreate');
     const handle = createMessageHandler(messageStream$, defaultPrefix, commands);
 
     const msgCommands$ = handle(isNonBot(defaultPrefix));

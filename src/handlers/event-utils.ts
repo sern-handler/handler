@@ -40,7 +40,7 @@ function contextArgs(wrappable: Message | BaseInteraction, messageArgs?: string[
     return [ctx, args] as [Context, Args];
 }
 
-function intoPayload(module: Processed<Module>, ) {
+function intoPayload(module: Module) {
     return pipe(map(arrayifySource),
                 map(args => ({ module, args })));
 }
@@ -58,12 +58,13 @@ const createResult = createResultResolver<
  * @param module
  * @param source
  */
-export function eventDispatcher(module: Processed<Module>,  source: unknown) {
+export function eventDispatcher(module: Module,  source: unknown) {
     assert.ok(source instanceof EventEmitter, `${source} is not an EventEmitter`);
 
     const execute: OperatorFunction<unknown[], unknown> =
         concatMap(async args => module.execute(...args));
-    return fromEvent(source, module.name)
+    return fromEvent(source, module.name!)
+        //@ts-ignore
         .pipe(intoPayload(module),
               concatMap(createResult),
               execute);
@@ -190,11 +191,9 @@ export function executeModule(
                 return EMPTY;
             } 
             return throwError(() => resultPayload(PayloadType.Failure, module, result.error));
-            
         }),
     );
 };
-
 
 /**
  * A higher order function that
@@ -221,8 +220,7 @@ export function createResultResolver<
                 result.isErr() && config.onStop?.(args.module);
             }),
             everyPluginOk,
-            filterMapTo(() => config.onNext(args)),
-        );
+            filterMapTo(() => config.onNext(args)));
     };
 };
 
