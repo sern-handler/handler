@@ -18,8 +18,8 @@ import {
 import type { Emitter, ErrorHandling, Logging } from './interfaces';
 import util from 'node:util';
 import type { PluginResult } from '../types/core-plugin';
-import type { VoidResult } from './_internal';
 import { Result } from 'ts-results-es';
+import { VoidResult } from '../types/utility';
 /**
  * if {src} is true, mapTo V, else ignore
  * @param item

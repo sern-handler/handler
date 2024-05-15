@@ -1,10 +1,12 @@
 import type { CommandInteractionOptionResolver, InteractionReplyOptions, MessageReplyOptions } from 'discord.js';
 import type { PayloadType } from '../core/structures/enums';
 import type { Module } from './core-modules';
+import type { Result } from 'ts-results-es';
 
 export type Awaitable<T> = PromiseLike<T> | T;
 
-export type AnyFunction = (...args: never[]) => unknown;
+export type VoidResult = Result<void, void>;
+export type AnyFunction = (...args: any[]) => unknown;
 
 // Thanks to @kelsny
 type ParseType<T> = {

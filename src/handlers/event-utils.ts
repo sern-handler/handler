@@ -13,14 +13,11 @@ import {
     finalize,
     pipe
 } from 'rxjs';
-import {
-    type VoidResult,
-} from '../core/_internal';
 import * as Id from '../core/id'
 import type { Emitter, ErrorHandling, Logging } from '../core/interfaces';
 import { PayloadType, SernError } from '../core/structures/enums'
 import { Err, Ok, Result } from 'ts-results-es';
-import type { Awaitable, UnpackedDependencies } from '../types/utility';
+import type { Awaitable, UnpackedDependencies, VoidResult } from '../types/utility';
 import type { ControlPlugin } from '../types/core-plugin';
 import type { CommandModule, Module, Processed } from '../types/core-modules';
 import { EventEmitter } from 'node:events';

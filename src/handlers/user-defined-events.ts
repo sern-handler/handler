@@ -1,6 +1,6 @@
 import { EventType, PayloadType, SernError } from '../core/structures/enums';
 import { eventDispatcher, handleCrash } from './event-utils'
-import { EventModule,  Module,  Processed } from '../types/core-modules';
+import { EventModule,  Module  } from '../types/core-modules';
 import * as Files from '../core/module-loading'
 import type { UnpackedDependencies } from '../types/utility';
 import { resultPayload } from '../core/functions';

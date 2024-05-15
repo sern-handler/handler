@@ -1,5 +1,3 @@
-import type { UnpackedDependencies } from '../../types/utility';
-
 /**
  * A semi-generic container that provides error handling, emitter, and module store. 
  * For the handler to operate correctly, The only user provided dependency needs to be @sern/client

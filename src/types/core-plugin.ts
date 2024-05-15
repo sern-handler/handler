@@ -33,7 +33,7 @@ import type {
     TextCommand,
     UserSelectCommand,
 } from './core-modules';
-import type { Args, Awaitable, Payload, SlashOptions } from './utility';
+import type { Args, Awaitable, Payload, SlashOptions, VoidResult } from './utility';
 import type { CommandType, EventType, PluginType } from '../core/structures/enums'
 import type { Context } from '../core/structures/context'
 import type {
@@ -48,7 +48,6 @@ import type {
     UserContextMenuCommandInteraction,
     UserSelectMenuInteraction,
 } from 'discord.js';
-import { VoidResult } from '../core/_internal';
 
 export type PluginResult = Awaitable<VoidResult>;
 

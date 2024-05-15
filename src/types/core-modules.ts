@@ -51,6 +51,7 @@ export interface ExternalEventCommand extends Module {
 }
 export interface CronEventCommand extends Module { 
     name?: string;
+    pattern: string;
     type: EventType.Cron;
     execute(...args: unknown[]): Awaitable<unknown>;
 }
