@@ -22,7 +22,7 @@ import { PayloadType, SernError } from '../core/structures/enums'
 import { Err, Ok, Result } from 'ts-results-es';
 import type { Awaitable, UnpackedDependencies } from '../types/utility';
 import type { ControlPlugin } from '../types/core-plugin';
-import type { CommandMeta, CommandModule, Module, Processed } from '../types/core-modules';
+import type { CommandModule, Module, Processed } from '../types/core-modules';
 import { EventEmitter } from 'node:events';
 import * as assert from 'node:assert';
 import { Context } from '../core/structures/context';
@@ -32,13 +32,13 @@ import { inspect } from 'node:util'
 import { disposeAll } from '../core/ioc/base';
 import { arrayifySource, callPlugin, everyPluginOk, filterMapTo, handleError } from '../core/operators';
 
+import { resultPayload, isAutocomplete, treeSearch } from '../core/functions'
 
 function contextArgs(wrappable: Message | BaseInteraction, messageArgs?: string[]) {
     const ctx = Context.wrap(wrappable);
     const args = ctx.isMessage() ? ['text', messageArgs!] : ['slash', ctx.options];
     return [ctx, args] as [Context, Args];
 }
-import { resultPayload, isAutocomplete, treeSearch } from '../core/functions'
 
 function intoPayload(module: Processed<Module>, ) {
     return pipe(map(arrayifySource),

@@ -13,7 +13,7 @@ export function disposeAll(logger: Logging|undefined) {
 
 
 type Insertable = 
-        | ((container: UnpackedDependencies) => unknown)
+        | ((container: UnpackedDependencies) => object)
         | object
 const dependencyBuilder = (container: Container, excluded: string[] ) => {
     return {
@@ -25,9 +25,7 @@ const dependencyBuilder = (container: Container, excluded: string[] ) => {
             if(typeof v !== 'function') {
                 container.addSingleton(key, v)
             } else {
-                //TODO fixme
-                //@ts-ignore
-                container.addWiredSingleton(key, (cntr: UnpackedDependencies) => v(cntr))
+                container.addWiredSingleton(key, (cntr) => v(cntr as UnpackedDependencies))
             }
         },
         /**

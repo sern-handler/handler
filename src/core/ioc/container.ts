@@ -1,4 +1,4 @@
-import * as  __Services  from '../structures/default-services';
+import type { UnpackedDependencies } from '../../types/utility';
 
 /**
  * A semi-generic container that provides error handling, emitter, and module store. 
@@ -46,8 +46,8 @@ export class Container {
         return false;
     }
 
-    addWiredSingleton(key: string, fn: (c: Container) => object) {
-        const insert = fn(this);
+    addWiredSingleton(key: string, fn: (c: Record<string,unknown>) => object) {
+        const insert = fn(this.deps());
         return this.addSingleton(key, insert);
     }
 

@@ -40,7 +40,7 @@ export async function importModule<T>(absPath: string) {
 
     let commandModule: Module = fileModule.default;
 
-    assert(commandModule , `No export @ ${absPath}. Forgot to ignore with "!"? (!${path.basename(absPath)})?`);
+    assert(commandModule , `No default export @ ${absPath}`);
     if ('default' in commandModule) {
         commandModule = commandModule.default as Module;
     }
@@ -56,10 +56,15 @@ export async function importModule<T>(absPath: string) {
 
 
 export async function* readRecursive(dir: string): AsyncGenerator<string> {
-    const files = await readdir(dir, { recursive: true, withFileTypes: true });
+    const files = await readdir(dir, { withFileTypes: true });
+
     for (const file of files) {
-        const fullPath = path.join(file.parentPath, file.name);
-        if(!file.name.startsWith('!') && !file.isDirectory()) {
+        const fullPath = path.join(dir, file.name);
+        if (file.isDirectory()) {
+            if (!file.name.startsWith('!')) {
+                yield* readRecursive(fullPath);
+            }
+        } else if (!file.name.startsWith('!')) {
             yield fullPath;
         }
     }

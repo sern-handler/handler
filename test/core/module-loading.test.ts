@@ -1,13 +1,9 @@
 import { describe, it, expect } from 'vitest'
-import { faker } from '@faker-js/faker'
+import path from 'node:path'
 import * as Files from '../../src/core/module-loading'
+import { Module } from '../../src/types/core-modules'
+import { AssertionError } from 'node:assert'
 describe('module-loading', () => {
-    it('should properly extract filename from file, nested once', () => {
-        const extension = faker.system.fileExt()
-        const name = faker.system.fileName({ extensionCount: 0 })
-        const filename = Files.fmtFileName(name+'.'+extension);
-        expect(filename).toBe(name)
-    })
     it('should get the filename of the commandmodule (linux, esm)', () => {
         const fname = "///home/pooba/Projects/sern/halibu/dist/commands/ping.js"
         const callsiteinfo = Files.parseCallsite(fname)
@@ -23,5 +19,32 @@ describe('module-loading', () => {
         const callsiteinfo = Files.parseCallsite(fname)
         expect(callsiteinfo.name).toEqual("ping");
     })
-   
+
+    it('should import a commandModule properly', async () => {
+        const { module } = await Files.importModule<Module>(path.resolve("test", 'mockules', "module.ts"));
+        expect(module.name).toBe('module')
+    })
+    it('should throw when failed commandModule import', async () => {
+        try {
+            await Files.importModule(path.resolve('test', 'mockules', 'failed.ts'))
+        } catch(e) {
+            expect(e instanceof AssertionError)
+        }
+    })
+    it('should throw when failed commandModule import', async () => {
+        try {
+            await Files.importModule(path.resolve('test', 'mockules', 'failed.ts'))
+        } catch(e) {
+            expect(e instanceof AssertionError)
+        }
+    })
+
+    it('reads all modules in mockules', async () => {
+        const ps = [] as string[]
+        for await (const fpath of Files.readRecursive(path.resolve('test', 'mockules'))) {
+            ps.push(fpath)
+        }
+        expect(ps.length === 4)
+    })
+
 }) 

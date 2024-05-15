@@ -17,6 +17,7 @@ export interface Disposable {
     dispose(): unknown;
 }
 
+
 export interface Emitter {
     addListener(eventName: string | symbol, listener: AnyFunction): this;
     removeListener(eventName: string | symbol, listener: AnyFunction): this;

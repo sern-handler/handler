@@ -21,12 +21,6 @@ import { AnyCommandPlugin, AnyEventPlugin, ControlPlugin, InitPlugin } from './c
 import { Awaitable, Args, SlashOptions, SernEventsMapping } from './utility';
 
 
-export interface CommandMeta {
-    fullPath: string;
-    id: string;
-    isClass: boolean;
-}
-
 export type Processed<T> = T & { name: string; description: string };
 
 export interface Module {

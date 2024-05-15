@@ -16,8 +16,8 @@ export default async function(dir: string, deps : UnpackedDependencies) {
     log?.info({ message: "Client signaled ready, registering modules" });
     for await (const path of Files.readRecursive(dir)) {
         const { module } = await Files.importModule<Module>(path);
-        const validModuleType = module.type >= 0 && module.type <= 1 << 10;
-        if(!validModuleType) {
+        const validType = module.type >= 0 && module.type <= 1 << 10;
+        if(!validType) {
             throw Error(`Found ${module.name} at ${module.meta.absPath}, which has an incorrect \`type\``);
         }
         for(const plugin of module.plugins) {
