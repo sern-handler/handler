@@ -2,7 +2,7 @@ import type { DependencyConfiguration } from '../../types/ioc';
 import { Container } from './container';
 import * as  __Services from '../structures/default-services';
 import type { Logging } from '../interfaces';
-import { __add_container, __init_container, __swap_container, useContainerRaw } from './global';
+import { __add_container, __add_wiredcontainer, __init_container, __swap_container, useContainerRaw } from './global';
 import { EventEmitter } from 'node:events';
 
 export function disposeAll(logger: Logging|undefined) {
@@ -70,9 +70,9 @@ async function composeRoot(
         __add_container('@sern/logger', new __Services.DefaultLogging());
     }
     __add_container('@sern/errors', new __Services.DefaultErrorHandling());
-    __add_container('@sern/cron', new __Services.Cron())
     __add_container('@sern/modules', new Map())
     __add_container('@sern/emitter', new EventEmitter())
+    __add_wiredcontainer('@sern/cron', deps => new __Services.Cron(deps))
     //Build the container based on the callback provided by the user
     conf.build(container as Container);
     
@@ -84,26 +84,25 @@ async function composeRoot(
 }
 
 export async function makeDependencies (conf: ValidDependencyConfig) {
-    await __init_container({ autowire: false });
-
+    const container = await __init_container({ autowire: false });
     if(typeof conf === 'function') {
         const excluded: string[] = [];
-        conf(dependencyBuilder(useContainerRaw(), excluded));
+        conf(dependencyBuilder(container, excluded));
         //We only include logger if it does not exist 
         const includeLogger = 
             !excluded.includes('@sern/logger') 
-            && !useContainerRaw().hasKey('@sern/logger');
+            && !container.hasKey('@sern/logger');
 
         if(includeLogger) {
             __add_container('@sern/logger', new __Services.DefaultLogging);
         }
         __add_container('@sern/errors', new __Services.DefaultErrorHandling());
-        __add_container('@sern/cron', new __Services.Cron())
         __add_container('@sern/modules', new Map())
         __add_container('@sern/emitter', new EventEmitter())
-        await useContainerRaw().ready();
+        __add_wiredcontainer('@sern/cron', deps => new __Services.Cron(deps))
+        await container.ready();
     } else {
-        await composeRoot(useContainerRaw(), conf);
+        await composeRoot(container, conf);
     }
 }
 

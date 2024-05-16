@@ -1,3 +1,4 @@
+import { UnpackedDependencies } from '../../types/utility';
 import { Container } from './container';
 
 //SIDE EFFECT: GLOBAL DI
@@ -23,6 +24,14 @@ export function __add_container(key: string, v: object) {
 }
 
 /**
+  * Don't use this unless you know what you're doing. Destroys old containerSubject if it exists and disposes everything
+  * then it will swap
+  */
+export function __add_wiredcontainer(key: string, depfn : (deps: UnpackedDependencies) => object) {
+    //@ts-ignore
+    containerSubject.addWiredSingleton(key, depfn);
+}
+/**
   * Initiates the global api.
   * Once this is finished, the Service api and the other global api is available
   */
@@ -32,6 +41,7 @@ export async function __init_container(options: {
 }) {
     containerSubject = new Container(options);
     await containerSubject.ready()
+    return containerSubject
 }
 
 /**

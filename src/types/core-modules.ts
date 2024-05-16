@@ -53,6 +53,8 @@ export interface CronEventCommand extends Module {
     type: EventType.Cron;
     name?: string;
     pattern: string;
+    runOnInit?: boolean
+    timezone?: string;
     execute(...args: unknown[]): Awaitable<unknown>;
 }
 

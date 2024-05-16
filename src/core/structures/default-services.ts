@@ -1,5 +1,5 @@
-import type { LogPayload, Logging, ErrorHandling } from '../interfaces';
-import { AnyFunction } from '../../types/utility';
+import type { LogPayload, Logging, ErrorHandling, Emitter } from '../interfaces';
+import { AnyFunction, UnpackedDependencies } from '../../types/utility';
 import cron from 'node-cron'
 import { EventEmitter } from 'events';
 import type { CronEventCommand, Module } from '../../types/core-modules'
@@ -13,12 +13,8 @@ export class DefaultErrorHandling implements ErrorHandling {
     crash(err: Error): never {
         throw err;
     }
-    keepAlive = 1;
     updateAlive(err: Error) {
-        this.keepAlive--;
-        if (this.keepAlive === 0) {
-            throw err;
-        }
+        throw err;
     }
 }
 
@@ -47,41 +43,51 @@ export class DefaultLogging implements Logging {
     }
 }
 
-export class Cron extends EventEmitter { 
+export class Cron implements Emitter {
     tasks: string[] = [];
     modules: Map<string, CronEventCommand> = new Map();
+    constructor(private deps: UnpackedDependencies) {}
     private sanityCheck(eventName: string | symbol) : asserts eventName is string {
         if(typeof eventName === 'symbol') throw Error("Cron cannot add symbol based listener")
-        
     }
     addCronModule(module: Module) {
         if(module.type !== EventType.Cron) {
             throw Error("Can only add cron modules");
         }
-
         //@ts-ignore
         if(!cron.validate(module.pattern)) {
             throw Error("Invalid cron expression while adding " + module.name)
         }
+        (module as CronEventCommand)
         this.modules.set(module.name!, module as CronEventCommand); 
     }
     addListener(eventName: string | symbol, listener: AnyFunction): this {
         this.sanityCheck(eventName);
         const retrievedModule = this.modules.get(eventName);
         if(!retrievedModule) throw Error("Adding task: module " +eventName +"was not found");
-        cron.schedule(retrievedModule.pattern, listener, {
-            name: retrievedModule?.name!
-        });
+        
+        cron.schedule(retrievedModule.pattern, 
+            (date) => listener({ date, deps: this.deps }),
+            { name: retrievedModule?.name!,
+              runOnInit: retrievedModule.runOnInit,
+              timezone: retrievedModule.timezone,
+            });
         return this;
     }
     removeListener(eventName: string | symbol, listener: AnyFunction) {
         this.sanityCheck(eventName);
         const retrievedModule = this.modules.get(eventName);
         if(!retrievedModule) throw Error("Removing cron: module " +eventName +"was not found");
-        const task= cron.getTasks().get(retrievedModule.name!) 
+        const task = cron.getTasks().get(retrievedModule.name!) 
         if(!task) throw Error("Finding cron task with"+ retrievedModule.name + " not found");
         task.stop();
-        super.removeListener(eventName, listener);
         return this;
+    }
+    emit(eventName: string | symbol, ...payload: any[]): boolean {
+        this.sanityCheck(eventName);
+        const retrievedModule = this.modules.get(eventName);
+        if(!retrievedModule) throw Error("Removing cron: module " +eventName +"was not found");
+        const task= cron.getTasks().get(retrievedModule.name!) 
+        return task?.emit(eventName, payload) ?? false;
     }
 }
