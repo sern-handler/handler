@@ -19,7 +19,7 @@ const intoDispatcher = (deps: UnpackedDependencies) =>
                 //@ts-ignore
                 const cron = deps['@sern/cron'];
                 cron.addCronModule(module);
-                return eventDispatcher(module, cron)
+                return eventDispatcher(module, cron);
             }
             default:
                 throw Error(SernError.InvalidModuleType + ' while creating event handler');

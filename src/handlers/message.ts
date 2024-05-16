@@ -20,7 +20,8 @@ function hasPrefix(prefix: string, content: string) {
     return (prefixInContent.localeCompare(prefix, undefined, { sensitivity: 'accent' }) === 0);
 }
 
-export default function message({"@sern/emitter": emitter, '@sern/errors':err, 
+export default function message(
+    {"@sern/emitter": emitter, '@sern/errors':err, 
      '@sern/logger': log, '@sern/client': client,
      '@sern/modules': commands}: UnpackedDependencies,
     defaultPrefix: string | undefined) {

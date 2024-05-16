@@ -61,7 +61,7 @@ export class Cron extends EventEmitter {
 
         //@ts-ignore
         if(!cron.validate(module.pattern)) {
-            throw Error("Invalid cron expression while adding")
+            throw Error("Invalid cron expression while adding " + module.name)
         }
         this.modules.set(module.name!, module as CronEventCommand); 
     }

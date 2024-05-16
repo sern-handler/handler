@@ -6,11 +6,11 @@ import { Module } from './core-modules';
 
 
 export interface CoreDependencies {
-    '@sern/client': () => Client;
-    '@sern/emitter': () => Contracts.Emitter;
-    '@sern/errors': () => Contracts.ErrorHandling;
-    '@sern/logger'?: () => Contracts.Logging;
-    '@sern/modules': () => Map<string, Module>
+    '@sern/client':  Client;
+    '@sern/emitter': Contracts.Emitter;
+    '@sern/errors':  Contracts.ErrorHandling;
+    '@sern/logger'?: Contracts.Logging;
+    '@sern/modules': Map<string, Module>;
 }
 
 export type DependencyFromKey<T extends keyof Dependencies> = Dependencies[T];

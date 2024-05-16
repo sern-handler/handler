@@ -1,7 +1,6 @@
 import type { DependencyConfiguration } from '../../types/ioc';
 import { Container } from './container';
 import * as  __Services from '../structures/default-services';
-import { UnpackedDependencies } from '../../types/utility';
 import type { Logging } from '../interfaces';
 import { __add_container, __init_container, __swap_container, useContainerRaw } from './global';
 import { EventEmitter } from 'node:events';
@@ -14,7 +13,7 @@ export function disposeAll(logger: Logging|undefined) {
 
 
 type Insertable = 
-        | ((container: UnpackedDependencies) => object)
+        | ((container: Dependencies) => object)
         | object
 const dependencyBuilder = (container: Container, excluded: string[] ) => {
     return {
@@ -26,7 +25,8 @@ const dependencyBuilder = (container: Container, excluded: string[] ) => {
             if(typeof v !== 'function') {
                 container.addSingleton(key, v)
             } else {
-                container.addWiredSingleton(key, (cntr) => v(cntr as UnpackedDependencies))
+                //@ts-ignore
+                container.addWiredSingleton(key, (cntr) => v(cntr))
             }
         },
         /**
@@ -53,7 +53,6 @@ const dependencyBuilder = (container: Container, excluded: string[] ) => {
 type ValidDependencyConfig =
     | ((c: ReturnType<typeof dependencyBuilder>) => any)
     | DependencyConfiguration;
-    
 
 /**
  * Given the user's conf, check for any excluded/included dependency keys.
@@ -79,13 +78,14 @@ async function composeRoot(
     
     if (!hasLogger) {
         container.get<Logging>('@sern/logger')
-                 ?.info({ message: 'All dependencies loaded successfully.' });
+                ?.info({ message: 'All dependencies loaded successfully.' });
     }
-    container.ready();
+    await container.ready();
 }
 
 export async function makeDependencies (conf: ValidDependencyConfig) {
     await __init_container({ autowire: false });
+
     if(typeof conf === 'function') {
         const excluded: string[] = [];
         conf(dependencyBuilder(useContainerRaw(), excluded));

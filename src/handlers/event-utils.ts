@@ -20,7 +20,6 @@ import { Err, Ok, Result } from 'ts-results-es';
 import type { Awaitable, UnpackedDependencies, VoidResult } from '../types/utility';
 import type { ControlPlugin } from '../types/core-plugin';
 import type { CommandModule, Module, Processed } from '../types/core-modules';
-import { EventEmitter } from 'node:events';
 import * as assert from 'node:assert';
 import { Context } from '../core/structures/context';
 import { CommandType } from '../core/structures/enums'
@@ -28,7 +27,6 @@ import type { Args } from '../types/utility';
 import { inspect } from 'node:util'
 import { disposeAll } from '../core/ioc/base';
 import { arrayifySource, callPlugin, everyPluginOk, filterMapTo, handleError } from '../core/operators';
-
 import { resultPayload, isAutocomplete, treeSearch } from '../core/functions'
 
 function contextArgs(wrappable: Message | BaseInteraction, messageArgs?: string[]) {
@@ -41,13 +39,17 @@ function intoPayload(module: Module) {
     return pipe(map(arrayifySource),
                 map(args => ({ module, args })));
 }
-
 const createResult = createResultResolver<
     Processed<Module>,
     { module: Processed<Module>; args: unknown[]  },
     unknown[]
 >({
-    createStream: ({ module, args }) => from(module.onEvent).pipe(callPlugin(args)),
+    createStream: async function* ({ module, args }) {
+        for(const plugin of module.onEvent) {
+
+        }
+        //from(module.onEvent).pipe(callPlugin(args))
+    },
     onNext: ({ args }) => args,
 });
 /**
@@ -56,10 +58,10 @@ const createResult = createResultResolver<
  * @param source
  */
 export function eventDispatcher(module: Module, source: unknown) {
-    assert.ok(source instanceof EventEmitter, `${source} is not an EventEmitter`);
-
+    assert.ok(source && typeof source === 'object', `${source} cannot be constructed into an event listener`);
     const execute: OperatorFunction<unknown[], unknown> =
         concatMap(async args => module.execute(...args));
+    //@ts-ignore
     return fromEvent(source, module.name!)
         //@ts-ignore
         .pipe(intoPayload(module),
@@ -67,25 +69,24 @@ export function eventDispatcher(module: Module, source: unknown) {
               execute);
 }
 
-export function createDispatcher(payload: { module: Processed<CommandModule>; event: BaseInteraction; }) {
-    assert.ok(CommandType.Text !== payload.module.type,
+export function createDispatcher({ module, event }: { module: Processed<CommandModule>; event: BaseInteraction; }) {
+    assert.ok(CommandType.Text !== module.type,
         SernError.MismatchEvent + 'Found text command in interaction stream');
-    switch (payload.module.type) {
+    if(isAutocomplete(event)) {
+        assert.ok(module.type === CommandType.Slash 
+            || module.type === CommandType.Both);
+        const option = treeSearch(event, module.options);
+        assert.ok(option, SernError.NotSupportedInteraction + ` There is no autocomplete tag for ` + inspect(module));
+        const { command } = option;
+        return { module: command as Processed<Module>, //autocomplete is not a true "module" warning cast!
+                 args: [event] };
+    }
+    switch (module.type) {
         case CommandType.Slash:
         case CommandType.Both: {
-            if (isAutocomplete(payload.event)) {
-                const option = treeSearch(payload.event, payload.module.options);
-                assert.ok(option, SernError.NotSupportedInteraction + ` There is no autocomplete tag for ` + inspect(payload.module));
-                const { command } = option;
-            
-             	return {
-             	    module: command as Processed<Module>, //autocomplete is not a true "module" warning cast!
-             	    args: [payload.event],
-             	};
-            }
-            return { module: payload.module, args: contextArgs(payload.event) };
+            return { module, args: contextArgs(event) };
         }
-        default: return { module: payload.module, args: [payload.event] };
+        default: return { module, args: [event] };
     }
 }
 function createGenericHandler<Source, Narrowed extends Source, Output>(
@@ -94,8 +95,8 @@ function createGenericHandler<Source, Narrowed extends Source, Output>(
 ) {
     return (pred: (i: Source) => i is Narrowed) => 
         source.pipe(
-            filter(pred),
-            concatMap(makeModule));
+            filter(pred), // only handle this stream if it passes pred
+            concatMap(makeModule)); // create a payload, preparing to execute
 }
 
 /**
@@ -121,7 +122,7 @@ export function fmt(msg: string, prefix: string): string[] {
  */
 export function createInteractionHandler<T extends Interaction>(
     source: Observable<Interaction>,
-    mg: Map<string, Module>, //TODO
+    mg: Map<string, Module>,
 ) {
     return createGenericHandler<Interaction, T, Result<ReturnType<typeof createDispatcher>, void>>(
         source,
@@ -135,7 +136,6 @@ export function createInteractionHandler<T extends Interaction>(
                 return Err.EMPTY;
             }
             const [ path ] = fullPaths;
-            //@ts-ignore TODO fixme
             return Ok(createDispatcher({ module: path as Processed<CommandModule>, event }));
     });
 }
@@ -147,12 +147,9 @@ export function createMessageHandler(
 ) {
     return createGenericHandler(source, async event => {
         const [prefix, ...rest] = fmt(event.content, defaultPrefix);
-        let fullPath = mg.get(`${prefix}_T`);
+        let fullPath = mg.get(`${prefix}_T`) ?? mg.get(`${prefix}_B`);
         if(!fullPath) {
-            fullPath = mg.get(`${prefix}_B`);
-            if(!fullPath) {
-                return Err('Possibly undefined behavior: could not find a static id to resolve');
-            }
+            return Err('Possibly undefined behavior: could not find a static id to resolve');
         }
         return Ok({ args: contextArgs(event, rest), module: fullPath as Processed<CommandModule>  })
     });
@@ -173,12 +170,13 @@ interface ExecutePayload {
  * @param module the module that will be executed with task
  * @param task the deferred execution which will be called
  */
-export function executeModule(
+export async function executeModule(
     emitter: Emitter,
     logger: Logging|undefined,
     errHandler: ErrorHandling,
     { module, task, args }: ExecutePayload,
 ) {
+    const wrappedTask = await Result.wrapAsync(async () => task());
     return of(module).pipe(
         //converting the task into a promise so rxjs can resolve the Awaitable properly
         concatMap(() => Result.wrapAsync(async () => task())),
@@ -208,11 +206,11 @@ export function createResultResolver<
 >(config: {
     onStop?: (module: T) => unknown;
     onNext: (args: Args) => Output;
-    createStream: (args: Args) => Observable<VoidResult>;
+    createStream: (args: Args) => AsyncGenerator<VoidResult>;
 }) {
     return (args: Args) => {
-        const task$ = config.createStream(args);
-        return task$.pipe(
+        const task = config.createStream(args);
+        return from(task).pipe(
             tap(result => {
                 result.isErr() && config.onStop?.(args.module);
             }),
@@ -225,9 +223,7 @@ export function createResultResolver<
  * Creates an executable task ( execute the command ) if all control plugins are successful
  * @param onStop emits a failure response to the SernEmitter
  */
-export function makeModuleExecutor<
-    M extends Processed<Module>,
-    Args extends { module: M; args: unknown[]; }>
+export function makeModuleExecutor< M extends Processed<Module>, Args extends { module: M; args: unknown[]; }>
 (onStop: (m: M) => unknown) {
     const onNext = ({ args, module }: Args) => ({
         task: () => module.execute(...args),
@@ -235,10 +231,17 @@ export function makeModuleExecutor<
         args
     });
     return createResultResolver({
-            onStop,
-            createStream: ({ args, module }) => from(module.onEvent).pipe(callPlugin(args)),
-            onNext,
-        })
+        onStop,
+        createStream: async function* ({ args, module }) {
+            for(const plugin of module.onEvent) {
+                const result = await callPlugin(plugin, args);
+                if(result.isErr()) {
+                    return result.error
+                }
+            }
+        },
+        onNext,
+    })
 }
 
 export const handleCrash = ({ "@sern/errors": err,

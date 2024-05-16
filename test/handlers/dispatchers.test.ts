@@ -12,6 +12,7 @@ function createRandomModule(): Processed<Module> {
             min: CommandType.Text,
             max: CommandType.ChannelSelect,
         }),
+        meta: { id:"", absPath: faker.system.directoryPath() },
         description: faker.string.alpha(),
         name: faker.string.alpha(),
         onEvent: [],

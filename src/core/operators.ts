@@ -35,14 +35,12 @@ interface PluginExecutable {
  * Calls any plugin with {args}.
  * @param args if an array, its spread and plugin called.
  */
-export function callPlugin(args: unknown): OperatorFunction<PluginExecutable, VoidResult> 
+export function callPlugin(plugin: PluginExecutable, args: unknown)
 {
-    return concatMap(async plugin => {
-        if (Array.isArray(args)) {
-            return plugin.execute(...args);
-        }
-        return plugin.execute(args);
-    });
+    if (Array.isArray(args)) {
+        return plugin.execute(...args);
+    }
+    return plugin.execute(args);
 }
 
 export const arrayifySource = <T>(src: T) => 
@@ -52,7 +50,7 @@ export const arrayifySource = <T>(src: T) =>
  * Checks if the stream of results is all ok.
  */
 export const everyPluginOk: OperatorFunction<VoidResult, boolean> = 
-    pipe(every(result => result.isOk()),
+    pipe(every(result => result.isOk()), //this shortcircuits
          defaultIfEmpty(true));
 
 export const sharedEventStream = <T>(e: Emitter, eventName: string) => 

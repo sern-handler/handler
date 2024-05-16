@@ -14,9 +14,8 @@ const parseConfig = async (conf: Promise<PresenceResult>) => {
             const src$ = typeof repeat === 'number' 
                 ? interval(repeat)
                 : fromEvent(...repeat);
-                return src$
-                    .pipe(scan(onRepeat, s), 
-                          startWith(s));
+                return src$.pipe(scan(onRepeat, s), 
+                                 startWith(s));
         }
         return of(s).pipe(take(1));
     })

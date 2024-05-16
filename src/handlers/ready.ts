@@ -7,10 +7,10 @@ import { Module } from '../types/core-modules';
 import { UnpackedDependencies } from '../types/utility';
 
 export default async function(dir: string, deps : UnpackedDependencies) {
-    const { "@sern/client": client,
+    const { '@sern/client': client,
             '@sern/logger': log,
             '@sern/emitter': sEmitter,
-            '@sern/modules': commands} = deps;
+            '@sern/modules': commands } = deps;
     log?.info({ message: "Waiting on discord client to be ready..." })
     await once(client, "ready");
     log?.info({ message: "Client signaled ready, registering modules" });
