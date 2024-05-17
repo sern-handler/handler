@@ -9,7 +9,7 @@ import {
     fromEvent, map, OperatorFunction,
     catchError,
     finalize,
-    pipe
+    pipe,
 } from 'rxjs';
 import * as Id from '../core/id'
 import type { Emitter, ErrorHandling, Logging } from '../core/interfaces';
@@ -21,16 +21,14 @@ import type { CommandModule, Module, Processed } from '../types/core-modules';
 import * as assert from 'node:assert';
 import { Context } from '../core/structures/context';
 import { CommandType } from '../core/structures/enums'
-import type { Args } from '../types/utility';
 import { inspect } from 'node:util'
 import { disposeAll } from '../core/ioc/base';
 import { arrayifySource, handleError } from '../core/operators';
 import { resultPayload, isAutocomplete, treeSearch } from '../core/functions'
 
-function contextArgs(wrappable: Message | BaseInteraction, messageArgs?: string[]) {
-    const ctx = Context.wrap(wrappable);
-    const args = ctx.isMessage() ? ['text', messageArgs!] : ['slash', ctx.options];
-    return [ctx, args] as [Context, Args];
+function contextArgs(wrappable: Message | BaseInteraction, prefix?: string) {
+    const ctx = Context.wrap(wrappable, prefix);
+    return [ctx] as [Context];
 }
 
 function intoPayload(module: Module) {
@@ -44,7 +42,7 @@ const createResult = createResultResolver<
 >({
     //@ts-ignore fix later
     callPlugins,
-    onNext: ({ args }) => args,
+    onNext: (p) => p.args,
 });
 /**
  * Creates an observable from { source }
@@ -52,19 +50,21 @@ const createResult = createResultResolver<
  * @param source
  */
 export function eventDispatcher(module: Module, source: unknown) {
-    assert.ok(source && typeof source === 'object', `${source} cannot be constructed into an event listener`);
+    assert.ok(source && typeof source === 'object',
+              `${source} cannot be constructed into an event listener`);
     const execute: OperatorFunction<unknown[], unknown> =
         concatMap(async args => module.execute(...args));
     //@ts-ignore
     return fromEvent(source, module.name!)
-
         //@ts-ignore
         .pipe(intoPayload(module),
               concatMap(createResult),
               execute);
 }
 
-export function createDispatcher({ module, event }: { module: Processed<CommandModule>; event: BaseInteraction; }) {
+export function createDispatcher(
+    { module, event }: { module: Processed<CommandModule>; event: BaseInteraction; }
+) {
     assert.ok(CommandType.Text !== module.type,
         SernError.MismatchEvent + 'Found text command in interaction stream');
     if(isAutocomplete(event)) {
@@ -118,6 +118,7 @@ export function fmt(msg: string, prefix: string): string[] {
 export function createInteractionHandler<T extends Interaction>(
     source: Observable<Interaction>,
     mg: Map<string, Module>,
+    defaultPrefix?: string
 ) {
     return createGenericHandler<Interaction, T, Result<ReturnType<typeof createDispatcher>, void>>(
         source,
@@ -141,12 +142,13 @@ export function createMessageHandler(
     mg: any,
 ) {
     return createGenericHandler(source, async event => {
-        const [prefix, ...rest] = fmt(event.content, defaultPrefix);
-        let fullPath = mg.get(`${prefix}_T`) ?? mg.get(`${prefix}_B`);
-        if(!fullPath) {
+        const [prefix] = fmt(event.content, defaultPrefix);
+        console.log(prefix)
+        let module= mg.get(`${prefix}_T`) ?? mg.get(`${prefix}_B`) as Module;
+        if(!module) {
             return Err('Possibly undefined behavior: could not find a static id to resolve');
         }
-        return Ok({ args: contextArgs(event, rest), module: fullPath as Processed<CommandModule>  })
+        return Ok({ args: [Context.wrap(event, defaultPrefix)], module })
     });
 }
 
@@ -215,9 +217,9 @@ export function createResultResolver<
 async function callPlugins({ args, module }: { args: unknown[], module: Module }) {
     let state = {};
     for(const plugin of module.onEvent) {
-        const result = await plugin.execute.apply(null, !Array.isArray(args) ? args : args);
+        const result = await plugin.execute.apply(null, arrayifySource(args));
         if(result.isErr()) {
-            return result
+            return result;
         }
         if(typeof result.value  === 'object') {
             //@ts-ignore TODO
@@ -240,13 +242,12 @@ export function makeModuleExecutor< M extends Processed<Module>, Args extends { 
     return createResultResolver({ onStop, onNext })
 }
 
-export const handleCrash = ({ "@sern/errors": err,
-                              '@sern/emitter': sem,
-                              '@sern/logger': log } : UnpackedDependencies) =>
+export const handleCrash = 
+    ({ "@sern/errors": err, '@sern/emitter': sem, '@sern/logger': log } : UnpackedDependencies) => 
     pipe(catchError(handleError(err, sem, log)),
-        finalize(() => {
+         finalize(() => {
             log?.info({
                 message: 'A stream closed or reached end of lifetime',
             });
             disposeAll(log);
-        }))
+         }))

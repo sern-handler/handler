@@ -57,7 +57,6 @@ export async function importModule<T>(absPath: string) {
 
 export async function* readRecursive(dir: string): AsyncGenerator<string> {
     const files = await readdir(dir, { withFileTypes: true });
-
     for (const file of files) {
         const fullPath = path.posix.join(dir, file.name);
         if (file.isDirectory()) {
@@ -65,7 +64,7 @@ export async function* readRecursive(dir: string): AsyncGenerator<string> {
                 yield* readRecursive(fullPath);
             }
         } else if (!file.name.startsWith('!')) {
-            yield fullPath;
+            yield "file:///"+path.resolve(fullPath);
         }
     }
 }

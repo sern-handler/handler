@@ -13,6 +13,10 @@ import { Result, Ok, Err } from 'ts-results-es';
 import * as assert from 'assert';
 import { ReplyOptions } from '../../types/utility';
 
+function fmt(msg: string, prefix?: string): string[] {
+    if(!prefix) throw Error("Unable to parse message without prefix");
+    return msg.slice(prefix.length).trim().split(/\s+/g);
+}
 
 /**
  * @since 1.0.0
@@ -20,14 +24,25 @@ import { ReplyOptions } from '../../types/utility';
  * Message and ChatInputCommandInteraction
  */
 export class Context extends CoreContext<Message, ChatInputCommandInteraction> {
-    /*
-     * @Experimental
-     */
+    prefix: string|undefined;
+
     get options() {
         return this.interaction.options;
     }
-    protected constructor(protected ctx: Result<Message, ChatInputCommandInteraction>) {
+
+    args() {
+        return {
+            message: <T = string[]>() => {
+                const [, ...rest] = fmt(this.message.content, this.prefix);
+                return rest as T;
+            },
+            interaction: () => this.interaction.options
+        }
+    }
+
+    protected constructor(protected ctx: Result<Message, ChatInputCommandInteraction>, prefix?: string) {
         super(ctx);
+        this.prefix = prefix
     }
 
     public get id(): Snowflake {
@@ -109,12 +124,12 @@ export class Context extends CoreContext<Message, ChatInputCommandInteraction> {
         );
     }
 
-    static override wrap(wrappable: BaseInteraction | Message): Context {
+    static override wrap(wrappable: BaseInteraction | Message, prefix?: string): Context {
         if ('interaction' in wrappable) {
-            return new Context(Ok(wrappable));
+            return new Context(Ok(wrappable), prefix);
         }
         assert.ok(wrappable.isChatInputCommand(), "Context created with bad interaction.");
-        return new Context(Err(wrappable));
+        return new Context(Err(wrappable), prefix);
     }
 }
 

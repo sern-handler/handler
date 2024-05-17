@@ -58,7 +58,7 @@ export function init(maybeWrapper: Wrapper = { commands: "./dist/commands" }) {
         .catch(err => { throw err });
 
     const messages$ = messageHandler(deps, maybeWrapper.defaultPrefix);
-    const interactions$ = interactionHandler(deps);
+    const interactions$ = interactionHandler(deps, maybeWrapper.defaultPrefix);
     // listening to the message stream and interaction stream
     merge(messages$, interactions$).pipe(handleCrash(deps)).subscribe();
 }

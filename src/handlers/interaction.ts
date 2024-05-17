@@ -8,7 +8,7 @@ import { isAutocomplete, isCommand, isMessageComponent, isModal, resultPayload, 
 import { UnpackedDependencies } from '../types/utility';
 import { Emitter } from '../core/interfaces';
 
-export default function interactionHandler(deps: UnpackedDependencies) {
+export default function interactionHandler(deps: UnpackedDependencies, defaultPrefix?: string) {
     //i wish javascript had clojure destructuring 
     const { '@sern/modules': modules,
             '@sern/client': client,
@@ -16,7 +16,7 @@ export default function interactionHandler(deps: UnpackedDependencies) {
             '@sern/errors': err,
             '@sern/emitter': emitter } = deps
     const interactionStream$ = sharedEventStream<Interaction>(client as unknown as Emitter, 'interactionCreate');
-    const handle = createInteractionHandler(interactionStream$, modules);
+    const handle = createInteractionHandler(interactionStream$, modules, defaultPrefix);
 
     const interactionHandler$ = merge(handle(isMessageComponent),
                                       handle(isAutocomplete),

@@ -1,7 +1,6 @@
 import type { LogPayload, Logging, ErrorHandling, Emitter } from '../interfaces';
 import { AnyFunction, UnpackedDependencies } from '../../types/utility';
 import cron from 'node-cron'
-import { EventEmitter } from 'events';
 import type { CronEventCommand, Module } from '../../types/core-modules'
 import { EventType } from './enums';
 /**

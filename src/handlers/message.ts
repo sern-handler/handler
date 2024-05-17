@@ -24,7 +24,8 @@ export default function message(
     {"@sern/emitter": emitter, '@sern/errors':err, 
      '@sern/logger': log, '@sern/client': client,
      '@sern/modules': commands}: UnpackedDependencies,
-    defaultPrefix: string | undefined) {
+    defaultPrefix: string | undefined
+) {
     if (!defaultPrefix) {
         log?.debug({ message: 'No prefix found. message handler shutting down' });
         return EMPTY;
@@ -42,7 +43,7 @@ export default function message(
         })),
         mergeMap(payload => {
             if(payload)
-                executeModule(emitter, log, err, payload)
+                return executeModule(emitter, log, err, payload)
             return EMPTY;
         }));
 }

@@ -5,21 +5,17 @@
  */
 import {
     concatMap,
-    defaultIfEmpty,
     EMPTY,
-    every,
     fromEvent,
     Observable,
     of,
     OperatorFunction,
-    pipe,
     share,
 } from 'rxjs';
 import type { Emitter, ErrorHandling, Logging } from './interfaces';
 import util from 'node:util';
-import type { PluginResult } from '../types/core-plugin';
-import { Result } from 'ts-results-es';
-import { VoidResult } from '../types/utility';
+import type { Result } from 'ts-results-es';
+
 /**
  * if {src} is true, mapTo V, else ignore
  * @param item
@@ -27,10 +23,6 @@ import { VoidResult } from '../types/utility';
 export function filterMapTo<V>(item: () => V): OperatorFunction<boolean, V> {
     return concatMap(keep => keep ? of(item()) : EMPTY);
 }
-
-interface PluginExecutable {
-    execute: (...args: unknown[]) => PluginResult;
-};
 
 
 export const arrayifySource = <T>(src: T) => 
