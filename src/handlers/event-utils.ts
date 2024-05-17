@@ -4,10 +4,8 @@ import {
     Observable,
     concatMap,
     filter,
-    from,
     of,
     throwError,
-    tap,
     fromEvent, map, OperatorFunction,
     catchError,
     finalize,
@@ -26,7 +24,7 @@ import { CommandType } from '../core/structures/enums'
 import type { Args } from '../types/utility';
 import { inspect } from 'node:util'
 import { disposeAll } from '../core/ioc/base';
-import { arrayifySource, callPlugin, everyPluginOk, filterMapTo, handleError } from '../core/operators';
+import { arrayifySource, handleError } from '../core/operators';
 import { resultPayload, isAutocomplete, treeSearch } from '../core/functions'
 
 function contextArgs(wrappable: Message | BaseInteraction, messageArgs?: string[]) {
@@ -44,12 +42,8 @@ const createResult = createResultResolver<
     { module: Processed<Module>; args: unknown[]  },
     unknown[]
 >({
-    createStream: async function* ({ module, args }) {
-        for(const plugin of module.onEvent) {
-
-        }
-        //from(module.onEvent).pipe(callPlugin(args))
-    },
+    //@ts-ignore fix later
+    callPlugins,
     onNext: ({ args }) => args,
 });
 /**
@@ -63,6 +57,7 @@ export function eventDispatcher(module: Module, source: unknown) {
         concatMap(async args => module.execute(...args));
     //@ts-ignore
     return fromEvent(source, module.name!)
+
         //@ts-ignore
         .pipe(intoPayload(module),
               concatMap(createResult),
@@ -166,17 +161,17 @@ interface ExecutePayload {
  * Wraps the task in a Result as a try / catch.
  * if the task is ok, an event is emitted and the stream becomes empty
  * if the task is an error, throw an error down the stream which will be handled by catchError
+ * thank u kingomes
  * @param emitter reference to SernEmitter that will emit a successful execution of module
  * @param module the module that will be executed with task
  * @param task the deferred execution which will be called
  */
-export async function executeModule(
+export function executeModule(
     emitter: Emitter,
     logger: Logging|undefined,
     errHandler: ErrorHandling,
     { module, task, args }: ExecutePayload,
 ) {
-    const wrappedTask = await Result.wrapAsync(async () => task());
     return of(module).pipe(
         //converting the task into a promise so rxjs can resolve the Awaitable properly
         concatMap(() => Result.wrapAsync(async () => task())),
@@ -186,8 +181,7 @@ export async function executeModule(
                 return EMPTY;
             } 
             return throwError(() => resultPayload(PayloadType.Failure, module, result.error));
-        }),
-    );
+        }));
 };
 
 /**
@@ -206,19 +200,32 @@ export function createResultResolver<
 >(config: {
     onStop?: (module: T) => unknown;
     onNext: (args: Args) => Output;
-    createStream: (args: Args) => AsyncGenerator<VoidResult>;
 }) {
-    return (args: Args) => {
-        const task = config.createStream(args);
-        return from(task).pipe(
-            tap(result => {
-                result.isErr() && config.onStop?.(args.module);
-            }),
-            everyPluginOk,
-            filterMapTo(() => config.onNext(args)));
+    return async (args: Args) => {
+        //@ts-ignore fix later
+        const task = await callPlugins(args);
+        if(task.isOk()) {
+            return config.onNext(args) as ExecutePayload;
+        } else {
+            config.onStop?.(args.module);
+        }
     };
 };
 
+async function callPlugins({ args, module }: { args: unknown[], module: Module }) {
+    let state = {};
+    for(const plugin of module.onEvent) {
+        const result = await plugin.execute.apply(null, !Array.isArray(args) ? args : args);
+        if(result.isErr()) {
+            return result
+        }
+        if(typeof result.value  === 'object') {
+            //@ts-ignore TODO
+            state = { ...result.value, ...state };
+        }
+    }
+    return Ok(state);
+}
 /**
  * Creates an executable task ( execute the command ) if all control plugins are successful
  * @param onStop emits a failure response to the SernEmitter
@@ -230,18 +237,7 @@ export function makeModuleExecutor< M extends Processed<Module>, Args extends { 
         module,
         args
     });
-    return createResultResolver({
-        onStop,
-        createStream: async function* ({ args, module }) {
-            for(const plugin of module.onEvent) {
-                const result = await callPlugin(plugin, args);
-                if(result.isErr()) {
-                    return result.error
-                }
-            }
-        },
-        onNext,
-    })
+    return createResultResolver({ onStop, onNext })
 }
 
 export const handleCrash = ({ "@sern/errors": err,

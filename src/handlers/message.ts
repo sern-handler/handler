@@ -5,7 +5,7 @@ import { PayloadType, SernError } from '../core/structures/enums'
 import { resultPayload } from '../core/functions'
 import {  filterTap, sharedEventStream } from '../core/operators'
 import { UnpackedDependencies } from '../types/utility';
-import { Emitter } from '..';
+import type { Emitter } from '../core/interfaces';
 
 /**
  * Ignores messages from any person / bot except itself
@@ -40,5 +40,9 @@ export default function message(
             const result = resultPayload(PayloadType.Failure, module, SernError.PluginFailure);
             emitter.emit('module.activate', result);
         })),
-        mergeMap(payload => executeModule(emitter, log, err, payload)));
+        mergeMap(payload => {
+            if(payload)
+                executeModule(emitter, log, err, payload)
+            return EMPTY;
+        }));
 }

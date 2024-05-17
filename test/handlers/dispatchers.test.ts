@@ -5,12 +5,13 @@ import { Module } from '../../src/types/core-modules';
 import { Processed } from '../../src/types/core-modules';
 import { CommandType } from '../../src/core/structures/enums';
 import { EventEmitter } from 'events';
+import { EventType } from '../../dist/core/structures/enums';
 
 function createRandomModule(): Processed<Module> {
     return {
         type: faker.number.int({
-            min: CommandType.Text,
-            max: CommandType.ChannelSelect,
+            min: EventType.Discord,
+            max: EventType.Cron,
         }),
         meta: { id:"", absPath: faker.system.directoryPath() },
         description: faker.string.alpha(),

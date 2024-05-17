@@ -31,27 +31,10 @@ export function filterMapTo<V>(item: () => V): OperatorFunction<boolean, V> {
 interface PluginExecutable {
     execute: (...args: unknown[]) => PluginResult;
 };
-/**
- * Calls any plugin with {args}.
- * @param args if an array, its spread and plugin called.
- */
-export function callPlugin(plugin: PluginExecutable, args: unknown)
-{
-    if (Array.isArray(args)) {
-        return plugin.execute(...args);
-    }
-    return plugin.execute(args);
-}
+
 
 export const arrayifySource = <T>(src: T) => 
     Array.isArray(src) ? src : [src];
-
-/**
- * Checks if the stream of results is all ok.
- */
-export const everyPluginOk: OperatorFunction<VoidResult, boolean> = 
-    pipe(every(result => result.isOk()), //this shortcircuits
-         defaultIfEmpty(true));
 
 export const sharedEventStream = <T>(e: Emitter, eventName: string) => 
     (fromEvent(e, eventName) as Observable<T>).pipe(share());
