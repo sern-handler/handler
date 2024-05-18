@@ -104,7 +104,7 @@ export interface ModalSubmitCommand extends Module {
 }
 
 export interface AutocompleteCommand
-    extends Omit<Module, 'name' | 'type' | 'plugins' | 'description'> {
+    extends Omit<Module, 'name' | 'type' | 'plugins' | 'description' | 'meta'> {
     onEvent: ControlPlugin[];
     execute: (ctx: AutocompleteInteraction) => Awaitable<unknown>;
 }
@@ -117,21 +117,21 @@ export interface DiscordEventCommand<T extends keyof ClientEvents = keyof Client
 }
 export interface TextCommand extends Module {
     type: CommandType.Text;
-    execute: (ctx: Context, args: ['text', string[]]) => Awaitable<unknown>;
+    execute: (ctx: Context) => Awaitable<unknown>;
 }
 
 export interface SlashCommand extends Module {
     type: CommandType.Slash;
     description: string;
     options?: SernOptionsData[];
-    execute: (ctx: Context, args: ['slash', SlashOptions]) => Awaitable<unknown>;
+    execute: (ctx: Context) => Awaitable<unknown>;
 }
 
 export interface BothCommand extends Module {
     type: CommandType.Both;
     description: string;
     options?: SernOptionsData[];
-    execute: (ctx: Context, args: Args) => Awaitable<unknown>;
+    execute: (ctx: Context) => Awaitable<unknown>;
 }
 
 export type EventModule = DiscordEventCommand | SernEventCommand | ExternalEventCommand  | CronEventCommand;

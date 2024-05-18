@@ -18,18 +18,26 @@ export default async function(dir: string, deps : UnpackedDependencies) {
     // https://observablehq.com/@ehouais/multiple-promises-as-an-async-generator
     // possibly optimize to concurrently import modules
     for await (const path of Files.readRecursive(dir)) {
-        const { module } = await Files.importModule<Module>(path);
+        let { module } = await Files.importModule<Module>(path);
         const validType = module.type >= CommandType.Text && module.type <= CommandType.ChannelSelect;
         if(!validType) {
             throw Error(`Found ${module.name} at ${module.meta.absPath}, which has an incorrect \`type\``);
         }
         for(const plugin of module.plugins) {
-            const res = await plugin.execute({ module, absPath: module.meta.absPath });
+            const res = await plugin.execute({ 
+                module,
+                absPath: module.meta.absPath ,
+                updateModule: (partial: Partial<Module>) => {
+                    module = { ...module, ...partial };
+                    return module;
+                }
+            });
             if(res.isErr()) {
                 sEmitter.emit('module.register', resultPayload(PayloadType.Failure, module, SernError.PluginFailure));
                 throw Error("Plugin failed with controller.stop()");
             }
         }
+        Object.freeze(module); // no more writing!!
         commands.set(module.meta.id, module);
         sEmitter.emit('module.register', resultPayload(PayloadType.Success, module));
     }

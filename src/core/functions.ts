@@ -14,8 +14,8 @@ import { PayloadType, PluginType } from './structures/enums';
 import assert from 'assert';
 import type { Payload } from '../types/utility';
 
-export const ok =  (val: unknown) => Ok(val);
-export const err =  (val: string) => Err(val);
+export const ok =  (val: unknown=undefined) => Ok(val);
+export const err =  (val?: string) => Err(val);
 
 export function partitionPlugins<T,V>
 (arr: Array<{ type: PluginType }> = []): [T[], V[]] {

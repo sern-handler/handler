@@ -143,7 +143,6 @@ export function createMessageHandler(
 ) {
     return createGenericHandler(source, async event => {
         const [prefix] = fmt(event.content, defaultPrefix);
-        console.log(prefix)
         let module= mg.get(`${prefix}_T`) ?? mg.get(`${prefix}_B`) as Module;
         if(!module) {
             return Err('Possibly undefined behavior: could not find a static id to resolve');
