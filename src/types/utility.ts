@@ -1,4 +1,4 @@
-import type { CommandInteractionOptionResolver, InteractionReplyOptions, MessageReplyOptions } from 'discord.js';
+import type { InteractionReplyOptions, MessageReplyOptions } from 'discord.js';
 import type { PayloadType } from '../core/structures/enums';
 import type { Module } from './core-modules';
 import type { Result } from 'ts-results-es';
@@ -7,15 +7,6 @@ export type Awaitable<T> = PromiseLike<T> | T;
 
 export type VoidResult = Result<void, void>;
 export type AnyFunction = (...args: any[]) => unknown;
-
-// Thanks to @kelsny
-type ParseType<T> = {
-    [K in keyof T]: T[K] extends unknown ? [k: K, args: T[K]] : never;
-}[keyof T];
-
-export type SlashOptions = Omit<CommandInteractionOptionResolver, 'getMessage' | 'getFocused'>;
-
-export type Args = ParseType<{ text: string[]; slash: SlashOptions }>;
 
 export interface SernEventsMapping {
     'module.register': [Payload];

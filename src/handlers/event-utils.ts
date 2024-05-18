@@ -26,11 +26,6 @@ import { disposeAll } from '../core/ioc/base';
 import { arrayifySource, handleError } from '../core/operators';
 import { resultPayload, isAutocomplete, treeSearch } from '../core/functions'
 
-function contextArgs(wrappable: Message | BaseInteraction, prefix?: string) {
-    const ctx = Context.wrap(wrappable, prefix);
-    return [ctx] as [Context];
-}
-
 function intoPayload(module: Module) {
     return pipe(map(arrayifySource),
                 map(args => ({ module, args })));
@@ -39,11 +34,7 @@ const createResult = createResultResolver<
     Processed<Module>,
     { module: Processed<Module>; args: unknown[]  },
     unknown[]
->({
-    //@ts-ignore fix later
-    callPlugins,
-    onNext: (p) => p.args,
-});
+>({ onNext: (p) => p.args, });
 /**
  * Creates an observable from { source }
  * @param module
@@ -62,9 +53,12 @@ export function eventDispatcher(module: Module, source: unknown) {
               execute);
 }
 
-export function createDispatcher(
-    { module, event }: { module: Processed<CommandModule>; event: BaseInteraction; }
-) {
+interface DispatchPayload { 
+    module: Processed<CommandModule>;
+    event: BaseInteraction; 
+    defaultPrefix?: string 
+};
+export function createDispatcher({ module, event, defaultPrefix }: DispatchPayload) {
     assert.ok(CommandType.Text !== module.type,
         SernError.MismatchEvent + 'Found text command in interaction stream');
     if(isAutocomplete(event)) {
@@ -79,7 +73,10 @@ export function createDispatcher(
     switch (module.type) {
         case CommandType.Slash:
         case CommandType.Both: {
-            return { module, args: contextArgs(event) };
+            return {
+                module, 
+                args: [Context.wrap(event, defaultPrefix)]
+            };
         }
         default: return { module, args: [event] };
     }
@@ -132,14 +129,18 @@ export function createInteractionHandler<T extends Interaction>(
                 return Err.EMPTY;
             }
             const [ path ] = fullPaths;
-            return Ok(createDispatcher({ module: path as Processed<CommandModule>, event }));
+            return Ok(createDispatcher({ 
+                module: path as Processed<CommandModule>, 
+                event, 
+                defaultPrefix 
+            }));
     });
 }
 
 export function createMessageHandler(
     source: Observable<Message>,
     defaultPrefix: string,
-    mg: any,
+    mg: Map<string, Module>,
 ) {
     return createGenericHandler(source, async event => {
         const [prefix] = fmt(event.content, defaultPrefix);
@@ -156,7 +157,6 @@ export function createMessageHandler(
 interface ExecutePayload {
     module: Processed<Module>;
     task: () => Awaitable<unknown>;
-    args: unknown[]
 }
 /**
  * Wraps the task in a Result as a try / catch.
@@ -171,7 +171,7 @@ export function executeModule(
     emitter: Emitter,
     logger: Logging|undefined,
     errHandler: ErrorHandling,
-    { module, task, args }: ExecutePayload,
+    { module, task }: ExecutePayload,
 ) {
     return of(module).pipe(
         //converting the task into a promise so rxjs can resolve the Awaitable properly
@@ -200,15 +200,15 @@ export function createResultResolver<
     Output,
 >(config: {
     onStop?: (module: T) => unknown;
-    onNext: (args: Args) => Output;
+    onNext: (args: Args, map: Record<string, unknown>) => Output;
 }) {
-    return async (args: Args) => {
+    return async (payload: Args) => {
         //@ts-ignore fix later
-        const task = await callPlugins(args);
+        const task = await callPlugins(payload);
         if(task.isOk()) {
-            return config.onNext(args) as ExecutePayload;
+            return config.onNext(payload, task.value) as ExecutePayload;
         } else {
-            config.onStop?.(args.module);
+            config.onStop?.(payload.module);
         }
     };
 };
@@ -220,8 +220,7 @@ async function callPlugins({ args, module }: { args: unknown[], module: Module }
         if(result.isErr()) {
             return result;
         }
-        if(typeof result.value  === 'object') {
-            //@ts-ignore TODO
+        if(typeof result.value  === 'object' && result.value !== null) {
             state = { ...result.value, ...state };
         }
     }
@@ -231,12 +230,11 @@ async function callPlugins({ args, module }: { args: unknown[], module: Module }
  * Creates an executable task ( execute the command ) if all control plugins are successful
  * @param onStop emits a failure response to the SernEmitter
  */
-export function makeModuleExecutor< M extends Processed<Module>, Args extends { module: M; args: unknown[]; }>
+export function makeModuleExecutor<M extends Module, Args extends { module: M; args: unknown[]; }>
 (onStop: (m: M) => unknown) {
-    const onNext = ({ args, module }: Args) => ({
-        task: () => module.execute(...args),
+    const onNext = ({ args, module }: Args, state: Record<string, unknown>) => ({
+        task: () => module.execute(...args, state),
         module,
-        args
     });
     return createResultResolver({ onStop, onNext })
 }

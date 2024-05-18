@@ -37,7 +37,7 @@ export type {
 } from './types/core-plugin';
 
 
-export type { Args, SlashOptions, Payload, SernEventsMapping } from './types/utility';
+export type { Payload, SernEventsMapping } from './types/utility';
 export type { CoreDependencies } from './types/ioc';
 
 export {

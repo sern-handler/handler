@@ -21,7 +21,7 @@ export default async function(dir: string, deps : UnpackedDependencies) {
         let { module } = await Files.importModule<Module>(path);
         const validType = module.type >= CommandType.Text && module.type <= CommandType.ChannelSelect;
         if(!validType) {
-            throw Error(`Found ${module.name} at ${module.meta.absPath}, which has an incorrect \`type\``);
+            throw Error(`Found ${module.name} at ${module.meta.absPath}, which has incorrect \`type\``);
         }
         for(const plugin of module.plugins) {
             const res = await plugin.execute({ 
@@ -37,8 +37,8 @@ export default async function(dir: string, deps : UnpackedDependencies) {
                 throw Error("Plugin failed with controller.stop()");
             }
         }
-        Object.freeze(module); // no more writing!!
-        commands.set(module.meta.id, module);
+        // FREEZE! no more writing!!
+        commands.set(module.meta.id, Object.freeze(module));
         sEmitter.emit('module.register', resultPayload(PayloadType.Success, module));
     }
     sEmitter.emit('modulesLoaded');

@@ -1,5 +1,5 @@
 import { CommandType, EventType, PluginType } from './structures/enums';
-import type { Plugin, PluginResult, EventArgs, CommandArgs } from '../types/core-plugin';
+import type { Plugin, PluginResult, EventArgs, CommandArgs, InitArgs } from '../types/core-plugin';
 import type { ClientEvents } from 'discord.js';
 import { err, ok } from './functions';
 
@@ -12,16 +12,14 @@ export function makePlugin<V extends unknown[]>(
 /**
  * @since 2.5.0
  */
-export function EventInitPlugin<I extends EventType>(
-    execute: (...args: EventArgs<I, PluginType.Init>) => PluginResult,
-) {
+export function EventInitPlugin(execute: (args: InitArgs) => PluginResult) {
     return makePlugin(PluginType.Init, execute);
 }
 /**
  * @since 2.5.0
  */
 export function CommandInitPlugin<I extends CommandType>(
-    execute: (...args: CommandArgs<I, PluginType.Init>) => PluginResult,
+    execute: (args: InitArgs) => PluginResult
 ) {
     return makePlugin(PluginType.Init, execute);
 }
@@ -29,7 +27,7 @@ export function CommandInitPlugin<I extends CommandType>(
  * @since 2.5.0
  */
 export function CommandControlPlugin<I extends CommandType>(
-    execute: (...args: CommandArgs<I, PluginType.Control>) => PluginResult,
+    execute: (...args: CommandArgs<I>) => PluginResult,
 ) {
     return makePlugin(PluginType.Control, execute);
 }
@@ -37,7 +35,7 @@ export function CommandControlPlugin<I extends CommandType>(
  * @since 2.5.0
  */
 export function EventControlPlugin<I extends EventType>(
-    execute: (...args: EventArgs<I, PluginType.Control>) => PluginResult,
+    execute: (...args: EventArgs<I>) => PluginResult,
 ) {
     return makePlugin(PluginType.Control, execute);
 }

@@ -18,9 +18,11 @@ import type {
 import type { CommandType, EventType } from '../core/structures/enums';
 import { Context } from '../core/structures/context'
 import { AnyCommandPlugin, AnyEventPlugin, ControlPlugin, InitPlugin } from './core-plugin';
-import { Awaitable, Args, SlashOptions, SernEventsMapping } from './utility';
+import { Awaitable, SernEventsMapping } from './utility';
 
-
+type ToBeDecided = {
+    result: Record<string,unknown>;
+}
 export type Processed<T> = T & { name: string; description: string };
 
 export interface Module {
@@ -70,42 +72,41 @@ export interface ContextMenuMsg extends Module {
 
 export interface ButtonCommand extends Module {
     type: CommandType.Button;
-    execute: (ctx: ButtonInteraction) => Awaitable<unknown>;
+    execute: (ctx: ButtonInteraction, tbd: ToBeDecided) => Awaitable<unknown>;
 }
 
 export interface StringSelectCommand extends Module {
     type: CommandType.StringSelect;
-    execute: (ctx: StringSelectMenuInteraction) => Awaitable<unknown>;
+    execute: (ctx: StringSelectMenuInteraction, tbd: ToBeDecided) => Awaitable<unknown>;
 }
 
 export interface ChannelSelectCommand extends Module {
     type: CommandType.ChannelSelect;
-    execute: (ctx: ChannelSelectMenuInteraction) => Awaitable<unknown>;
+    execute: (ctx: ChannelSelectMenuInteraction, tbd: ToBeDecided) => Awaitable<unknown>;
 }
 
 export interface RoleSelectCommand extends Module {
     type: CommandType.RoleSelect;
-    execute: (ctx: RoleSelectMenuInteraction) => Awaitable<unknown>;
+    execute: (ctx: RoleSelectMenuInteraction, tbd: ToBeDecided) => Awaitable<unknown>;
 }
 
 export interface MentionableSelectCommand extends Module {
     type: CommandType.MentionableSelect;
-    execute: (ctx: MentionableSelectMenuInteraction) => Awaitable<unknown>;
+    execute: (ctx: MentionableSelectMenuInteraction, tbd: ToBeDecided) => Awaitable<unknown>;
 }
 
 export interface UserSelectCommand extends Module {
     type: CommandType.UserSelect;
-    execute: (ctx: UserSelectMenuInteraction) => Awaitable<unknown>;
+    execute: (ctx: UserSelectMenuInteraction, tbd: ToBeDecided) => Awaitable<unknown>;
 }
 
 export interface ModalSubmitCommand extends Module {
     type: CommandType.Modal;
-    execute: (ctx: ModalSubmitInteraction) => Awaitable<unknown>;
+    execute: (ctx: ModalSubmitInteraction, tbd: ToBeDecided) => Awaitable<unknown>;
 }
 
-export interface AutocompleteCommand
-    extends Omit<Module, 'name' | 'type' | 'plugins' | 'description' | 'meta'> {
-    onEvent: ControlPlugin[];
+export interface AutocompleteCommand {
+    onEvent?: ControlPlugin[];
     execute: (ctx: AutocompleteInteraction) => Awaitable<unknown>;
 }
 

@@ -22,7 +22,6 @@ export const shouldHandle = (pth: string, filenam: string) => {
 }
 
 
-
 /**
  * Import any module based on the absolute path.
  * This can accept four types of exported modules
@@ -47,7 +46,6 @@ export async function importModule<T>(absPath: string) {
     const p = path.parse(absPath)
     commandModule.name ??= p.name; commandModule.description ??= "...";
     commandModule.meta = {
-        //@ts-ignore
         id: Id.create(commandModule.name, commandModule.type),
         absPath,
     };

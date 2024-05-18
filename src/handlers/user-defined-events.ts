@@ -29,9 +29,16 @@ const intoDispatcher = (deps: UnpackedDependencies) =>
 export default async function(deps: UnpackedDependencies, eventDir: string) {
     const eventModules: EventModule[] = [];
     for await (const path of Files.readRecursive(eventDir)) {
-        const { module } = await Files.importModule<Module>(path);
+        let { module } = await Files.importModule<Module>(path);
         for(const plugin of module.plugins) {
-            const res = await plugin.execute({ module, absPath: module.meta.absPath });
+            const res = await plugin.execute({ 
+                module,
+                absPath: module.meta.absPath ,
+                updateModule: (partial: Partial<Module>) => {
+                    module = { ...module, ...partial };
+                    return module;
+                }
+            });
             if(res.isErr()) {
                 deps['@sern/emitter'].emit('module.register', resultPayload(PayloadType.Failure, module, SernError.PluginFailure));
                 throw Error("Plugin failed with controller.stop()");
