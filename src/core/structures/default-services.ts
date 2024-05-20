@@ -24,7 +24,7 @@ export class DefaultErrorHandling implements ErrorHandling {
  * Version 4.0.0 will internalize this api. Please refrain from using ModuleStore!
  */
 export class DefaultLogging implements Logging {
-    private date = () => new Date();
+    private date() { return new Date() } 
     debug(payload: LogPayload): void {
         console.debug(`DEBUG: ${this.date().toISOString()} -> ${payload.message}`);
     }

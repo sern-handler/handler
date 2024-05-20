@@ -20,13 +20,13 @@ function hasPrefix(prefix: string, content: string) {
     return (prefixInContent.localeCompare(prefix, undefined, { sensitivity: 'accent' }) === 0);
 }
 
-export default function message(
+export default function (
     deps: UnpackedDependencies,
-    defaultPrefix: string | undefined
+    defaultPrefix?: string 
 ) {
     const {"@sern/emitter": emitter,  
            '@sern/logger': log, 
-           '@sern/client': client } = deps
+           '@sern/client': client} = deps
 
     if (!defaultPrefix) {
         log?.debug({ message: 'No prefix found. message handler shutting down' });

@@ -21,7 +21,8 @@ import { AnyCommandPlugin, AnyEventPlugin, ControlPlugin, InitPlugin } from './c
 import { Awaitable, SernEventsMapping } from './utility';
 
 type ToBeDecided = {
-    result: Record<string,unknown>;
+    state: Record<string,unknown>;
+    deps: Dependencies
 }
 export type Processed<T> = T & { name: string; description: string };
 
@@ -62,12 +63,12 @@ export interface CronEventCommand extends Module {
 
 export interface ContextMenuUser extends Module {
     type: CommandType.CtxUser;
-    execute: (ctx: UserContextMenuCommandInteraction) => Awaitable<unknown>;
+    execute: (ctx: UserContextMenuCommandInteraction, tbd: ToBeDecided) => Awaitable<unknown>;
 }
 
 export interface ContextMenuMsg extends Module {
     type: CommandType.CtxMsg;
-    execute: (ctx: MessageContextMenuCommandInteraction) => Awaitable<unknown>;
+    execute: (ctx: MessageContextMenuCommandInteraction, tbd: ToBeDecided) => Awaitable<unknown>;
 }
 
 export interface ButtonCommand extends Module {
@@ -118,21 +119,21 @@ export interface DiscordEventCommand<T extends keyof ClientEvents = keyof Client
 }
 export interface TextCommand extends Module {
     type: CommandType.Text;
-    execute: (ctx: Context) => Awaitable<unknown>;
+    execute: (ctx: Context, tbd: ToBeDecided) => Awaitable<unknown>;
 }
 
 export interface SlashCommand extends Module {
     type: CommandType.Slash;
     description: string;
     options?: SernOptionsData[];
-    execute: (ctx: Context) => Awaitable<unknown>;
+    execute: (ctx: Context, tbd: ToBeDecided) => Awaitable<unknown>;
 }
 
 export interface BothCommand extends Module {
     type: CommandType.Both;
     description: string;
     options?: SernOptionsData[];
-    execute: (ctx: Context) => Awaitable<unknown>;
+    execute: (ctx: Context, tbd: ToBeDecided) => Awaitable<unknown>;
 }
 
 export type EventModule = DiscordEventCommand | SernEventCommand | ExternalEventCommand  | CronEventCommand;

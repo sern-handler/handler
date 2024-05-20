@@ -55,8 +55,7 @@ export function eventDispatcher(deps: Dependencies, module: Module, source: unkn
               `${source} cannot be constructed into an event listener`);
     const execute: OperatorFunction<unknown[]|undefined, unknown> =
         concatMap(async args => {
-            if(args)
-                return module.execute.apply(null, args);
+            if(args) return module.execute.apply(null, args);
         });
     //@ts-ignore
     return fromEvent(source, module.name!)
@@ -240,7 +239,7 @@ async function callPlugins({ args, module, deps }: ExecutePayload) {
 export function intoTask(onStop: (m: Module) => unknown) {
     const onNext = ({ args, module, deps }: ExecutePayload, state: Record<string, unknown>) => ({
         module,
-        args: [...args, { state }],
+        args: [...args, { state, deps }],
         deps
     });
     return createResultResolver({ onStop, onNext })
