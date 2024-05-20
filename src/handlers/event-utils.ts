@@ -197,10 +197,10 @@ export function executeModule(
 
 /**
  * A higher order function that
- * - creates a stream of {@link VoidResult} { config.createStream }
- * - any failures results to { config.onFailure } being called
+ * - calls all control plugins.
+ * - any failures results to { config.onStop } being called
  * - if all results are ok, the stream is converted to { config.onNext }
- * emit config.onSuccess Observable
+ * config.onNext will be returned if everything is okay.
  * @param config
  * @returns receiver function for flattening a stream of data
  */

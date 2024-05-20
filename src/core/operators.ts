@@ -30,7 +30,6 @@ export const arrayifySource = <T>(src: T) =>
 export const sharedEventStream = <T>(e: Emitter, eventName: string) => 
     (fromEvent(e, eventName) as Observable<T>).pipe(share());
 
-
 export function handleError<C>(crashHandler: ErrorHandling, emitter: Emitter, logging?: Logging) {
     return (pload: unknown, caught: Observable<C>) => {
         // This is done to fit the ErrorHandling contract
