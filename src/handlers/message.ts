@@ -17,7 +17,7 @@ function isNonBot(prefix: string) {
 
 function hasPrefix(prefix: string, content: string) {
     const prefixInContent = content.slice(0, prefix.length);
-    return (prefixInContent.localeCompare(prefix, undefined, { sensitivity: 'accent' }) === 0);
+    return prefixInContent.localeCompare(prefix, undefined, { sensitivity: 'accent' }) === 0;
 }
 
 export default function (

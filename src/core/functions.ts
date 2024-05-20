@@ -46,37 +46,31 @@ export function treeSearch(
     while (_options.length > 0) {
         const cur = _options.pop()!;
         switch (cur.type) {
-            case ApplicationCommandOptionType.Subcommand:
-                {
+            case ApplicationCommandOptionType.Subcommand: {
                     subcommands.add(cur.name);
                     for (const option of cur.options ?? []) _options.push(option);
-                }
-                break;
-            case ApplicationCommandOptionType.SubcommandGroup:
-                {
+                } break;
+            case ApplicationCommandOptionType.SubcommandGroup: {
                     for (const command of cur.options ?? []) _options.push(command);
-                }
-                break;
-            default:
-                {
-                    if ('autocomplete' in cur && cur.autocomplete) {
-                        const choice = iAutocomplete.options.getFocused(true);
-                        assert( 'command' in cur, 'No `command` property found for option ' + cur.name);
-                        if (subcommands.size > 0) {
-                            const parent = iAutocomplete.options.getSubcommand();
-                            const parentAndOptionMatches =
-                                subcommands.has(parent) && cur.name === choice.name;
-                            if (parentAndOptionMatches) {
-                                return { ...cur, parent };
-                            }
-                        } else {
-                            if (cur.name === choice.name) {
-                                return { ...cur, parent: undefined };
-                            }
+                } break;
+            default: {
+                if ('autocomplete' in cur && cur.autocomplete) {
+                    const choice = iAutocomplete.options.getFocused(true);
+                    assert( 'command' in cur, 'No `command` property found for option ' + cur.name);
+                    if (subcommands.size > 0) {
+                        const parent = iAutocomplete.options.getSubcommand();
+                        const parentAndOptionMatches =
+                            subcommands.has(parent) && cur.name === choice.name;
+                        if (parentAndOptionMatches) {
+                            return { ...cur, parent };
+                        }
+                    } else {
+                        if (cur.name === choice.name) {
+                            return { ...cur, parent: undefined };
                         }
                     }
                 }
-                break;
+            } break;
         }
     }
 }

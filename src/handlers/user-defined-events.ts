@@ -1,9 +1,8 @@
-import { EventType, PayloadType, SernError } from '../core/structures/enums';
-import { eventDispatcher, handleCrash } from './event-utils'
+import { EventType,  SernError } from '../core/structures/enums';
+import { callInitPlugins, eventDispatcher, handleCrash } from './event-utils'
 import { EventModule,  Module  } from '../types/core-modules';
 import * as Files from '../core/module-loading'
 import type { UnpackedDependencies } from '../types/utility';
-import { resultPayload } from '../core/functions';
 import { from, map, mergeAll } from 'rxjs';
 
 const intoDispatcher = (deps: UnpackedDependencies) => 
@@ -29,20 +28,7 @@ export default async function(deps: UnpackedDependencies, eventDir: string) {
     const eventModules: EventModule[] = [];
     for await (const path of Files.readRecursive(eventDir)) {
         let { module } = await Files.importModule<Module>(path);
-        for(const plugin of module.plugins) {
-            const res = await plugin.execute({ 
-                module,
-                absPath: module.meta.absPath,
-                updateModule: (partial: Partial<Module>) => {
-                    module = { ...module, ...partial };
-                    return module;
-                }
-            });
-            if(res.isErr()) {
-                deps['@sern/emitter'].emit('module.register', resultPayload(PayloadType.Failure, module, SernError.PluginFailure));
-                throw Error("Plugin failed with controller.stop()");
-            }
-        }
+        await callInitPlugins(module, deps)
         eventModules.push(module as EventModule);
     }
     from(eventModules)

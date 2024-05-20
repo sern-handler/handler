@@ -17,7 +17,7 @@ import * as Id from '../core/id'
 import type { Emitter } from '../core/interfaces';
 import { PayloadType, SernError } from '../core/structures/enums'
 import { Err, Ok, Result } from 'ts-results-es';
-import type { UnpackedDependencies, VoidResult } from '../types/utility';
+import type { UnpackedDependencies } from '../types/utility';
 import type { CommandModule, Module, Processed } from '../types/core-modules';
 import * as assert from 'node:assert';
 import { Context } from '../core/structures/context';
@@ -36,15 +36,9 @@ interface ExecutePayload {
 
 function intoPayload(module: Module, deps: Dependencies) {
     return pipe(map(arrayifySource),
-                map(args => ({ module, args, deps })));
+                map(args => ({ module, args, deps })),
+                map(p => p.args));
 }
-const createResult = (deps: Dependencies) => 
-    createResultResolver<unknown[]>({ 
-        onNext: (p) => p.args,
-        onStop: (module) => {
-             //maybe do something when plugins fail?
-        }
-    });
 /**
  * Creates an observable from { source }
  * @param module
@@ -60,7 +54,6 @@ export function eventDispatcher(deps: Dependencies, module: Module, source: unkn
     //@ts-ignore
     return fromEvent(source, module.name!)
         .pipe(intoPayload(module, deps),
-              concatMap(createResult(deps)),
               execute);
 }
 
@@ -218,7 +211,23 @@ export function createResultResolver<Output>(config: {
         }
     };
 };
-
+export async function callInitPlugins(module: Module, deps: Dependencies, sEmitter?: Emitter) {
+    for(const plugin of module.plugins) {
+        const res = await plugin.execute({ 
+            module,
+            absPath: module.meta.absPath ,
+            updateModule: (partial: Partial<Module>) => {
+                module = { ...module, ...partial };
+                return module;
+            },
+            deps
+        });
+        if(res.isErr()) {
+            sEmitter?.emit('module.register', resultPayload(PayloadType.Failure, module, SernError.PluginFailure));
+            throw Error("Plugin failed with controller.stop()");
+        }
+    }
+}
 async function callPlugins({ args, module, deps }: ExecutePayload) {
     let state = {};
     for(const plugin of module.onEvent) {

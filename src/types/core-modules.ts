@@ -17,7 +17,7 @@ import type {
 } from 'discord.js';
 import type { CommandType, EventType } from '../core/structures/enums';
 import { Context } from '../core/structures/context'
-import { AnyCommandPlugin, AnyEventPlugin, ControlPlugin, InitPlugin } from './core-plugin';
+import { AnyPlugin, ControlPlugin, InitPlugin } from './core-plugin';
 import { Awaitable, SernEventsMapping } from './utility';
 
 type ToBeDecided = {
@@ -193,12 +193,12 @@ type EventModulesNoPlugins = {
 };
 
 export type InputEvent = {
-    [T in EventType]: EventModulesNoPlugins[T] & { plugins?: AnyEventPlugin[] };
+    [T in EventType]: EventModulesNoPlugins[T];
 }[EventType];
 
 export type InputCommand = {
     [T in CommandType]: CommandModuleNoPlugins[T] & {
-        plugins?: AnyCommandPlugin[];
+        plugins?: AnyPlugin[];
     };
 }[CommandType];
 

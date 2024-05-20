@@ -16,13 +16,12 @@ import type {
     Module,
     Processed,
 } from './core-modules';
-import type { Awaitable, Payload } from './utility';
-import type { CommandType, EventType, PluginType } from '../core/structures/enums'
+import type { Awaitable } from './utility';
+import type { CommandType, PluginType } from '../core/structures/enums'
 import type { Context } from '../core/structures/context'
 import type {
     ButtonInteraction,
     ChannelSelectMenuInteraction,
-    ClientEvents,
     MentionableSelectMenuInteraction,
     MessageContextMenuCommandInteraction,
     ModalSubmitInteraction,
@@ -37,6 +36,7 @@ export type PluginResult = Awaitable<Result<unknown, unknown>>;
 export interface InitArgs<T extends Processed<Module> = Processed<Module>> {
     module: T;
     absPath: string;
+    deps: Dependencies
     updateModule: (module: Partial<T>) => T
 }
 export interface Controller {
@@ -57,11 +57,9 @@ export interface ControlPlugin<Args extends any[] = any[]> {
     execute: (...args: Args) => PluginResult;
 }
 
-export type AnyCommandPlugin = ControlPlugin | InitPlugin<[InitArgs<Processed<Module>>]>;
-export type AnyEventPlugin = ControlPlugin | InitPlugin<[InitArgs<Processed<Module>>]>;
+export type AnyPlugin = ControlPlugin | InitPlugin<[InitArgs<Processed<Module>>]>;
 
 export type CommandArgs<I extends CommandType = CommandType > = CommandArgsMatrix[I]
-export type EventArgs<I extends EventType = EventType> = EventArgsMatrix[I]
 
 interface CommandArgsMatrix {
     [CommandType.Text]: [Context];
@@ -76,11 +74,4 @@ interface CommandArgsMatrix {
     [CommandType.MentionableSelect]: [MentionableSelectMenuInteraction];
     [CommandType.UserSelect]: [UserSelectMenuInteraction];
     [CommandType.Modal]: [ModalSubmitInteraction];
-}
-
-interface EventArgsMatrix {
-    [EventType.Discord]: ClientEvents[keyof ClientEvents];
-    [EventType.Sern]: [Payload];
-    [EventType.External]: unknown[];
-    [EventType.Cron]: unknown[];
 }

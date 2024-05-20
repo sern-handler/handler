@@ -5,6 +5,7 @@ import { PayloadType } from '..';
 import { CommandType, SernError } from '../core/structures/enums';
 import { Module } from '../types/core-modules';
 import { UnpackedDependencies } from '../types/utility';
+import { callInitPlugins } from './event-utils';
 
 export default async function(dir: string, deps : UnpackedDependencies) {
     const { '@sern/client': client,
@@ -23,20 +24,7 @@ export default async function(dir: string, deps : UnpackedDependencies) {
         if(!validType) {
             throw Error(`Found ${module.name} at ${module.meta.absPath}, which has incorrect \`type\``);
         }
-        for(const plugin of module.plugins) {
-            const res = await plugin.execute({ 
-                module,
-                absPath: module.meta.absPath ,
-                updateModule: (partial: Partial<Module>) => {
-                    module = { ...module, ...partial };
-                    return module;
-                }
-            });
-            if(res.isErr()) {
-                sEmitter.emit('module.register', resultPayload(PayloadType.Failure, module, SernError.PluginFailure));
-                throw Error("Plugin failed with controller.stop()");
-            }
-        }
+        await callInitPlugins(module, deps, sEmitter);
         // FREEZE! no more writing!!
         commands.set(module.meta.id, Object.freeze(module));
         sEmitter.emit('module.register', resultPayload(PayloadType.Success, module));

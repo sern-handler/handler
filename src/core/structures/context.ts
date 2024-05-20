@@ -24,25 +24,26 @@ function fmt(msg: string, prefix?: string): string[] {
  * Message and ChatInputCommandInteraction
  */
 export class Context extends CoreContext<Message, ChatInputCommandInteraction> {
-    prefix: string|undefined;
 
     get options() {
         return this.interaction.options;
     }
 
-    args() {
-        return {
-            message: <T = string[]>() => {
+    args(type: 'message'|'interaction', parser?: Function) {
+        switch(type) {
+            case 'message': {
                 const [, ...rest] = fmt(this.message.content, this.prefix);
-                return rest as T;
-            },
-            interaction: () => this.interaction.options
+                return rest;
+            };
+            case 'interaction': {
+                return this.interaction.options;
+            };
         }
     }
 
-    protected constructor(protected ctx: Result<Message, ChatInputCommandInteraction>, prefix?: string) {
+    protected constructor(protected ctx: Result<Message, ChatInputCommandInteraction>,
+                          public prefix?: string) {
         super(ctx);
-        this.prefix = prefix
     }
 
     public get id(): Snowflake {
@@ -52,9 +53,7 @@ export class Context extends CoreContext<Message, ChatInputCommandInteraction> {
     }
 
     public get channel() {
-        return safeUnwrap(this.ctx
-                            .map(m => m.channel)
-                            .mapErr(i => i.channel));
+        return safeUnwrap(this.ctx.map(m => m.channel).mapErr(i => i.channel));
     }
 
     public get channelId(): Snowflake {

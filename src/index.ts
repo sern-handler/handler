@@ -32,8 +32,7 @@ export type {
     InitPlugin,
     ControlPlugin,
     Plugin,
-    AnyEventPlugin,
-    AnyCommandPlugin,
+    AnyPlugin,
 } from './types/core-plugin';
 
 

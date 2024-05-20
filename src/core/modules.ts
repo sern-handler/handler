@@ -1,6 +1,5 @@
 import type { ClientEvents } from 'discord.js';
 import { EventType } from '../core/structures/enums';
-import type { AnyEventPlugin, } from '../types/core-plugin';
 import type {
     InputCommand,
     InputEvent,
@@ -21,18 +20,14 @@ export function commandModule(mod: InputCommand): Module {
         plugins,
     } as Module;
 }
+
 /**
  * @since 1.0.0
  * The wrapper function to define event modules for sern
  * @param mod
  */
 export function eventModule(mod: InputEvent): Module {
-    const [onEvent, plugins] = partitionPlugins(mod.plugins);
-    return {
-        ...mod,
-        plugins,
-        onEvent,
-    } as Module;
+    return mod as Module;
 }
 
 /** Create event modules from discord.js client events,
@@ -43,7 +38,6 @@ export function eventModule(mod: InputEvent): Module {
  */
 export function discordEvent<T extends keyof ClientEvents>(mod: {
     name: T;
-    plugins?: AnyEventPlugin[];
     execute: (...args: ClientEvents[T]) => Awaitable<unknown>;
 }) {
     return eventModule({ type: EventType.Discord, ...mod, });
