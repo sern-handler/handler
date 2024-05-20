@@ -1,6 +1,6 @@
 import { EMPTY, mergeMap, concatMap } from 'rxjs';
 import type { Message } from 'discord.js';
-import { createMessageHandler, executeModule, makeModuleExecutor } from './event-utils';
+import { createMessageHandler, executeModule, intoTask  } from './event-utils';
 import { PayloadType, SernError } from '../core/structures/enums'
 import { resultPayload } from '../core/functions'
 import {  filterTap, sharedEventStream } from '../core/operators'
@@ -21,29 +21,31 @@ function hasPrefix(prefix: string, content: string) {
 }
 
 export default function message(
-    {"@sern/emitter": emitter, '@sern/errors':err, 
-     '@sern/logger': log, '@sern/client': client,
-     '@sern/modules': commands}: UnpackedDependencies,
+    deps: UnpackedDependencies,
     defaultPrefix: string | undefined
 ) {
+    const {"@sern/emitter": emitter,  
+           '@sern/logger': log, 
+           '@sern/client': client } = deps
+
     if (!defaultPrefix) {
         log?.debug({ message: 'No prefix found. message handler shutting down' });
         return EMPTY;
     }
     const messageStream$ = sharedEventStream<Message>(client as unknown as Emitter, 'messageCreate');
-    const handle = createMessageHandler(messageStream$, defaultPrefix, commands);
+    const handle = createMessageHandler(messageStream$, defaultPrefix, deps);
 
     const msgCommands$ = handle(isNonBot(defaultPrefix));
 
     return msgCommands$.pipe(
         filterTap((e) => emitter.emit('warning', resultPayload(PayloadType.Warning, undefined, e))),
-        concatMap(makeModuleExecutor(module => {
+        concatMap(intoTask(module => {
             const result = resultPayload(PayloadType.Failure, module, SernError.PluginFailure);
             emitter.emit('module.activate', result);
         })),
         mergeMap(payload => {
             if(payload)
-                return executeModule(emitter, log, err, payload)
+                return executeModule(emitter, payload)
             return EMPTY;
         }));
 }

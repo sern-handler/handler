@@ -10,19 +10,18 @@ const intoDispatcher = (deps: UnpackedDependencies) =>
     (module : EventModule) => {
         switch (module.type) {
             case EventType.Sern:
-                return eventDispatcher(module,  deps['@sern/emitter']);
+                return eventDispatcher(deps, module,  deps['@sern/emitter']);
             case EventType.Discord:
-                return eventDispatcher(module,  deps['@sern/client']);
+                return eventDispatcher(deps, module,  deps['@sern/client']);
             case EventType.External:
-                return eventDispatcher(module,  deps[module.emitter]);
+                return eventDispatcher(deps, module,  deps[module.emitter]);
             case EventType.Cron: {
                 //@ts-ignore
                 const cron = deps['@sern/cron'];
                 cron.addCronModule(module);
-                return eventDispatcher(module, cron);
+                return eventDispatcher(deps, module, cron);
             }
-            default:
-                throw Error(SernError.InvalidModuleType + ' while creating event handler');
+            default: throw Error(SernError.InvalidModuleType + ' while creating event handler');
         }
 };
 
@@ -33,7 +32,7 @@ export default async function(deps: UnpackedDependencies, eventDir: string) {
         for(const plugin of module.plugins) {
             const res = await plugin.execute({ 
                 module,
-                absPath: module.meta.absPath ,
+                absPath: module.meta.absPath,
                 updateModule: (partial: Partial<Module>) => {
                     module = { ...module, ...partial };
                     return module;

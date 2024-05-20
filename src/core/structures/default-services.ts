@@ -65,10 +65,9 @@ export class Cron implements Emitter {
         const retrievedModule = this.modules.get(eventName);
         if(!retrievedModule) throw Error("Adding task: module " +eventName +"was not found");
         const { pattern, name, runOnInit, timezone } = retrievedModule;
-        const task = cron.schedule(pattern, 
-                     (date) => listener({ date, deps: this.deps }),
-                     { name, runOnInit, timezone, scheduled: true });
-        task.on('task-failed', console.error)
+        cron.schedule(pattern, 
+            (date) => listener({ date, deps: this.deps }),
+            { name, runOnInit, timezone, scheduled: true });
         return this;
     }
     removeListener(eventName: string | symbol, listener: AnyFunction) {

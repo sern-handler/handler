@@ -9,6 +9,7 @@ import { presenceHandler } from './handlers/presence';
 import { handleCrash } from './handlers/event-utils';
 import { useContainerRaw } from './core/ioc/global';
 import { UnpackedDependencies } from './types/utility';
+import type { PresenceResult } from './core/presences';
 
 interface Wrapper {
     commands: string;
@@ -49,7 +50,7 @@ export function init(maybeWrapper: Wrapper = { commands: "./dist/commands" }) {
             const time = ((performance.now() - startTime) / 1000).toFixed(2);
             deps['@sern/logger']?.info({ message: `sern: registered in ${time} s` });
             if(presencePath.exists) {
-                const setPresence = async (p: any) => {
+                const setPresence = async (p: PresenceResult) => {
                     return deps['@sern/client'].user?.setPresence(p);
                 }
                 presenceHandler(presencePath.path, setPresence).subscribe();

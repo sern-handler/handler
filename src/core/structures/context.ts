@@ -124,7 +124,7 @@ export class Context extends CoreContext<Message, ChatInputCommandInteraction> {
         );
     }
 
-    static override wrap(wrappable: BaseInteraction | Message, prefix?: string): Context {
+    static wrap(wrappable: BaseInteraction | Message, prefix?: string): Context {
         if ('interaction' in wrappable) {
             return new Context(Ok(wrappable), prefix);
         }

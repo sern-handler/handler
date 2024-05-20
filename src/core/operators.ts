@@ -24,7 +24,6 @@ export function filterMapTo<V>(item: () => V): OperatorFunction<boolean, V> {
     return concatMap(keep => keep ? of(item()) : EMPTY);
 }
 
-
 export const arrayifySource = <T>(src: T) => 
     Array.isArray(src) ? src : [src];
 

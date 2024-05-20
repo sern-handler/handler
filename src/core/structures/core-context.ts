@@ -23,10 +23,4 @@ export abstract class CoreContext<M, I> {
     public isSlash(): this is CoreContext<never, I> {
         return !this.isMessage();
     }
-    //todo: add agnostic options resolver for Context
-    abstract get options(): unknown;
-
-    static wrap(_: unknown): unknown {
-        throw Error('You need to override this method; cannot wrap an abstract class');
-    }
 }

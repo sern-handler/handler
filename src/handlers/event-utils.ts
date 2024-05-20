@@ -4,19 +4,20 @@ import {
     Observable,
     concatMap,
     filter,
-    of,
     throwError,
-    fromEvent, map, OperatorFunction,
+    fromEvent,
+    map, 
+    type OperatorFunction,
     catchError,
     finalize,
     pipe,
+    from,
 } from 'rxjs';
 import * as Id from '../core/id'
-import type { Emitter, ErrorHandling, Logging } from '../core/interfaces';
+import type { Emitter } from '../core/interfaces';
 import { PayloadType, SernError } from '../core/structures/enums'
 import { Err, Ok, Result } from 'ts-results-es';
-import type { Awaitable, UnpackedDependencies, VoidResult } from '../types/utility';
-import type { ControlPlugin } from '../types/core-plugin';
+import type { UnpackedDependencies, VoidResult } from '../types/utility';
 import type { CommandModule, Module, Processed } from '../types/core-modules';
 import * as assert from 'node:assert';
 import { Context } from '../core/structures/context';
@@ -26,59 +27,75 @@ import { disposeAll } from '../core/ioc/base';
 import { arrayifySource, handleError } from '../core/operators';
 import { resultPayload, isAutocomplete, treeSearch } from '../core/functions'
 
-function intoPayload(module: Module) {
-    return pipe(map(arrayifySource),
-                map(args => ({ module, args })));
+interface ExecutePayload {
+    module: Module;
+    args: unknown[];
+    deps: Dependencies
+    [key: string]: unknown
 }
-const createResult = createResultResolver<
-    Processed<Module>,
-    { module: Processed<Module>; args: unknown[]  },
-    unknown[]
->({ onNext: (p) => p.args, });
+
+function intoPayload(module: Module, deps: Dependencies) {
+    return pipe(map(arrayifySource),
+                map(args => ({ module, args, deps })));
+}
+const createResult = (deps: Dependencies) => 
+    createResultResolver<unknown[]>({ 
+        onNext: (p) => p.args,
+        onStop: (module) => {
+             //maybe do something when plugins fail?
+        }
+    });
 /**
  * Creates an observable from { source }
  * @param module
  * @param source
  */
-export function eventDispatcher(module: Module, source: unknown) {
+export function eventDispatcher(deps: Dependencies, module: Module, source: unknown) {
     assert.ok(source && typeof source === 'object',
               `${source} cannot be constructed into an event listener`);
-    const execute: OperatorFunction<unknown[], unknown> =
-        concatMap(async args => module.execute(...args));
+    const execute: OperatorFunction<unknown[]|undefined, unknown> =
+        concatMap(async args => {
+            if(args)
+                return module.execute.apply(null, args);
+        });
     //@ts-ignore
     return fromEvent(source, module.name!)
-        //@ts-ignore
-        .pipe(intoPayload(module),
-              concatMap(createResult),
+        .pipe(intoPayload(module, deps),
+              concatMap(createResult(deps)),
               execute);
 }
 
 interface DispatchPayload { 
     module: Processed<CommandModule>;
     event: BaseInteraction; 
-    defaultPrefix?: string 
+    defaultPrefix?: string;
+    deps: Dependencies
 };
-export function createDispatcher({ module, event, defaultPrefix }: DispatchPayload) {
+export function createDispatcher({ module, event, defaultPrefix, deps }: DispatchPayload): ExecutePayload {
     assert.ok(CommandType.Text !== module.type,
         SernError.MismatchEvent + 'Found text command in interaction stream');
+
     if(isAutocomplete(event)) {
         assert.ok(module.type === CommandType.Slash 
-            || module.type === CommandType.Both);
+               || module.type === CommandType.Both, "Autocomplete option on non command interaction");
         const option = treeSearch(event, module.options);
         assert.ok(option, SernError.NotSupportedInteraction + ` There is no autocomplete tag for ` + inspect(module));
         const { command } = option;
         return { module: command as Processed<Module>, //autocomplete is not a true "module" warning cast!
-                 args: [event] };
+                 args: [event],
+                 deps };
     }
+
     switch (module.type) {
         case CommandType.Slash:
         case CommandType.Both: {
             return {
                 module, 
-                args: [Context.wrap(event, defaultPrefix)]
+                args: [Context.wrap(event, defaultPrefix)],
+                deps
             };
         }
-        default: return { module, args: [event] };
+        default: return { module, args: [event], deps };
     }
 }
 function createGenericHandler<Source, Narrowed extends Source, Output>(
@@ -114,25 +131,27 @@ export function fmt(msg: string, prefix: string): string[] {
  */
 export function createInteractionHandler<T extends Interaction>(
     source: Observable<Interaction>,
-    mg: Map<string, Module>,
+    deps: Dependencies,
     defaultPrefix?: string
 ) {
+    const mg = deps['@sern/modules']
     return createGenericHandler<Interaction, T, Result<ReturnType<typeof createDispatcher>, void>>(
         source,
         async event => {
             const possibleIds = Id.reconstruct(event);
-            let fullPaths= possibleIds
+            let modules = possibleIds
                 .map(id => mg.get(id))
                 .filter((id): id is Module => id !== undefined);
 
-            if(fullPaths.length == 0) {
+            if(modules.length == 0) {
                 return Err.EMPTY;
             }
-            const [ path ] = fullPaths;
+            const [ module ] = modules;
             return Ok(createDispatcher({ 
-                module: path as Processed<CommandModule>, 
+                module: module as Processed<CommandModule>, 
                 event, 
-                defaultPrefix 
+                defaultPrefix,
+                deps
             }));
     });
 }
@@ -140,24 +159,20 @@ export function createInteractionHandler<T extends Interaction>(
 export function createMessageHandler(
     source: Observable<Message>,
     defaultPrefix: string,
-    mg: Map<string, Module>,
+    deps: Dependencies
 ) {
+    const mg = deps['@sern/modules'];
     return createGenericHandler(source, async event => {
         const [prefix] = fmt(event.content, defaultPrefix);
         let module= mg.get(`${prefix}_T`) ?? mg.get(`${prefix}_B`) as Module;
         if(!module) {
             return Err('Possibly undefined behavior: could not find a static id to resolve');
         }
-        return Ok({ args: [Context.wrap(event, defaultPrefix)], module })
+        return Ok({ args: [Context.wrap(event, defaultPrefix)], module, deps })
     });
 }
 
 
-
-interface ExecutePayload {
-    module: Processed<Module>;
-    task: () => Awaitable<unknown>;
-}
 /**
  * Wraps the task in a Result as a try / catch.
  * if the task is ok, an event is emitted and the stream becomes empty
@@ -169,20 +184,16 @@ interface ExecutePayload {
  */
 export function executeModule(
     emitter: Emitter,
-    logger: Logging|undefined,
-    errHandler: ErrorHandling,
-    { module, task }: ExecutePayload,
+    { module, args }: ExecutePayload,
 ) {
-    return of(module).pipe(
-        //converting the task into a promise so rxjs can resolve the Awaitable properly
-        concatMap(() => Result.wrapAsync(async () => task())),
-        concatMap(result => {
+    return from(Result.wrapAsync(async () => module.execute(...args)))
+        .pipe(concatMap(result => { 
             if (result.isOk()) {
                 emitter.emit('module.activate', resultPayload(PayloadType.Success, module));
                 return EMPTY;
-            } 
+            }
             return throwError(() => resultPayload(PayloadType.Failure, module, result.error));
-        }));
+        }))
 };
 
 /**
@@ -194,29 +205,25 @@ export function executeModule(
  * @param config
  * @returns receiver function for flattening a stream of data
  */
-export function createResultResolver<
-    T extends { execute: (...args: any[]) => any; onEvent: ControlPlugin[] },
-    Args extends { module: T; [key: string]: unknown },
-    Output,
->(config: {
-    onStop?: (module: T) => unknown;
-    onNext: (args: Args, map: Record<string, unknown>) => Output;
+export function createResultResolver<Output>(config: {
+    onStop?: (module: Module) => unknown;
+    onNext: (args: ExecutePayload, map: Record<string, unknown>) => Output;
 }) {
-    return async (payload: Args) => {
-        //@ts-ignore fix later
+    const { onStop, onNext } = config;
+    return async (payload: ExecutePayload) => {
         const task = await callPlugins(payload);
         if(task.isOk()) {
-            return config.onNext(payload, task.value) as ExecutePayload;
+            return onNext(payload, task.value) as Output;
         } else {
-            config.onStop?.(payload.module);
+            onStop?.(payload.module);
         }
     };
 };
 
-async function callPlugins({ args, module }: { args: unknown[], module: Module }) {
+async function callPlugins({ args, module, deps }: ExecutePayload) {
     let state = {};
     for(const plugin of module.onEvent) {
-        const result = await plugin.execute.apply(null, arrayifySource(args));
+        const result = await plugin.execute(...args, { state, deps });
         if(result.isErr()) {
             return result;
         }
@@ -230,11 +237,11 @@ async function callPlugins({ args, module }: { args: unknown[], module: Module }
  * Creates an executable task ( execute the command ) if all control plugins are successful
  * @param onStop emits a failure response to the SernEmitter
  */
-export function makeModuleExecutor<M extends Module, Args extends { module: M; args: unknown[]; }>
-(onStop: (m: M) => unknown) {
-    const onNext = ({ args, module }: Args, state: Record<string, unknown>) => ({
-        task: () => module.execute(...args, state),
+export function intoTask(onStop: (m: Module) => unknown) {
+    const onNext = ({ args, module, deps }: ExecutePayload, state: Record<string, unknown>) => ({
         module,
+        args: [...args, { state }],
+        deps
     });
     return createResultResolver({ onStop, onNext })
 }
@@ -243,8 +250,6 @@ export const handleCrash =
     ({ "@sern/errors": err, '@sern/emitter': sem, '@sern/logger': log } : UnpackedDependencies) => 
     pipe(catchError(handleError(err, sem, log)),
          finalize(() => {
-            log?.info({
-                message: 'A stream closed or reached end of lifetime',
-            });
+            log?.info({ message: 'A stream closed or reached end of lifetime' });
             disposeAll(log);
          }))
