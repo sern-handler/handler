@@ -15,6 +15,7 @@ import type { Err, Ok, Result } from 'ts-results-es';
 import type {
     Module,
     Processed,
+    SDT,
 } from './core-modules';
 import type { Awaitable } from './utility';
 import type { CommandType, PluginType } from '../core/structures/enums'
@@ -62,16 +63,16 @@ export type AnyPlugin = ControlPlugin | InitPlugin<[InitArgs<Processed<Module>>]
 export type CommandArgs<I extends CommandType = CommandType > = CommandArgsMatrix[I]
 
 interface CommandArgsMatrix {
-    [CommandType.Text]: [Context];
-    [CommandType.Slash]: [Context];
-    [CommandType.Both]: [Context];
-    [CommandType.CtxMsg]: [MessageContextMenuCommandInteraction];
-    [CommandType.CtxUser]: [UserContextMenuCommandInteraction];
-    [CommandType.Button]: [ButtonInteraction];
-    [CommandType.StringSelect]: [StringSelectMenuInteraction];
-    [CommandType.RoleSelect]: [RoleSelectMenuInteraction];
-    [CommandType.ChannelSelect]: [ChannelSelectMenuInteraction];
-    [CommandType.MentionableSelect]: [MentionableSelectMenuInteraction];
-    [CommandType.UserSelect]: [UserSelectMenuInteraction];
-    [CommandType.Modal]: [ModalSubmitInteraction];
+    [CommandType.Text]: [Context, SDT];
+    [CommandType.Slash]: [Context, SDT];
+    [CommandType.Both]: [Context, SDT];
+    [CommandType.CtxMsg]: [MessageContextMenuCommandInteraction, SDT];
+    [CommandType.CtxUser]: [UserContextMenuCommandInteraction, SDT];
+    [CommandType.Button]: [ButtonInteraction, SDT];
+    [CommandType.StringSelect]: [StringSelectMenuInteraction, SDT];
+    [CommandType.RoleSelect]: [RoleSelectMenuInteraction, SDT];
+    [CommandType.ChannelSelect]: [ChannelSelectMenuInteraction, SDT];
+    [CommandType.MentionableSelect]: [MentionableSelectMenuInteraction, SDT];
+    [CommandType.UserSelect]: [UserSelectMenuInteraction, SDT];
+    [CommandType.Modal]: [ModalSubmitInteraction, SDT];
 }

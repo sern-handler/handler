@@ -20,10 +20,13 @@ import { Context } from '../core/structures/context'
 import { AnyPlugin, ControlPlugin, InitPlugin } from './core-plugin';
 import { Awaitable, SernEventsMapping } from './utility';
 
-type ToBeDecided = {
+//state, deps, type (very original)
+export type SDT = {
     state: Record<string,unknown>;
-    deps: Dependencies
-}
+    deps: Dependencies;
+    type: 'slash' | 'text'
+};
+
 export type Processed<T> = T & { name: string; description: string };
 
 export interface Module {
@@ -63,47 +66,47 @@ export interface CronEventCommand extends Module {
 
 export interface ContextMenuUser extends Module {
     type: CommandType.CtxUser;
-    execute: (ctx: UserContextMenuCommandInteraction, tbd: ToBeDecided) => Awaitable<unknown>;
+    execute: (ctx: UserContextMenuCommandInteraction, tbd: SDT) => Awaitable<unknown>;
 }
 
 export interface ContextMenuMsg extends Module {
     type: CommandType.CtxMsg;
-    execute: (ctx: MessageContextMenuCommandInteraction, tbd: ToBeDecided) => Awaitable<unknown>;
+    execute: (ctx: MessageContextMenuCommandInteraction, tbd: SDT) => Awaitable<unknown>;
 }
 
 export interface ButtonCommand extends Module {
     type: CommandType.Button;
-    execute: (ctx: ButtonInteraction, tbd: ToBeDecided) => Awaitable<unknown>;
+    execute: (ctx: ButtonInteraction, tbd: SDT) => Awaitable<unknown>;
 }
 
 export interface StringSelectCommand extends Module {
     type: CommandType.StringSelect;
-    execute: (ctx: StringSelectMenuInteraction, tbd: ToBeDecided) => Awaitable<unknown>;
+    execute: (ctx: StringSelectMenuInteraction, tbd: SDT) => Awaitable<unknown>;
 }
 
 export interface ChannelSelectCommand extends Module {
     type: CommandType.ChannelSelect;
-    execute: (ctx: ChannelSelectMenuInteraction, tbd: ToBeDecided) => Awaitable<unknown>;
+    execute: (ctx: ChannelSelectMenuInteraction, tbd: SDT) => Awaitable<unknown>;
 }
 
 export interface RoleSelectCommand extends Module {
     type: CommandType.RoleSelect;
-    execute: (ctx: RoleSelectMenuInteraction, tbd: ToBeDecided) => Awaitable<unknown>;
+    execute: (ctx: RoleSelectMenuInteraction, tbd: SDT) => Awaitable<unknown>;
 }
 
 export interface MentionableSelectCommand extends Module {
     type: CommandType.MentionableSelect;
-    execute: (ctx: MentionableSelectMenuInteraction, tbd: ToBeDecided) => Awaitable<unknown>;
+    execute: (ctx: MentionableSelectMenuInteraction, tbd: SDT) => Awaitable<unknown>;
 }
 
 export interface UserSelectCommand extends Module {
     type: CommandType.UserSelect;
-    execute: (ctx: UserSelectMenuInteraction, tbd: ToBeDecided) => Awaitable<unknown>;
+    execute: (ctx: UserSelectMenuInteraction, tbd: SDT) => Awaitable<unknown>;
 }
 
 export interface ModalSubmitCommand extends Module {
     type: CommandType.Modal;
-    execute: (ctx: ModalSubmitInteraction, tbd: ToBeDecided) => Awaitable<unknown>;
+    execute: (ctx: ModalSubmitInteraction, tbd: SDT) => Awaitable<unknown>;
 }
 
 export interface AutocompleteCommand {
@@ -119,21 +122,21 @@ export interface DiscordEventCommand<T extends keyof ClientEvents = keyof Client
 }
 export interface TextCommand extends Module {
     type: CommandType.Text;
-    execute: (ctx: Context, tbd: ToBeDecided) => Awaitable<unknown>;
+    execute: (ctx: Context, tbd: SDT) => Awaitable<unknown>;
 }
 
 export interface SlashCommand extends Module {
     type: CommandType.Slash;
     description: string;
     options?: SernOptionsData[];
-    execute: (ctx: Context, tbd: ToBeDecided) => Awaitable<unknown>;
+    execute: (ctx: Context, tbd: SDT) => Awaitable<unknown>;
 }
 
 export interface BothCommand extends Module {
     type: CommandType.Both;
     description: string;
     options?: SernOptionsData[];
-    execute: (ctx: Context, tbd: ToBeDecided) => Awaitable<unknown>;
+    execute: (ctx: Context, tbd: SDT) => Awaitable<unknown>;
 }
 
 export type EventModule = DiscordEventCommand | SernEventCommand | ExternalEventCommand  | CronEventCommand;

@@ -20,10 +20,8 @@ function hasPrefix(prefix: string, content: string) {
     return prefixInContent.localeCompare(prefix, undefined, { sensitivity: 'accent' }) === 0;
 }
 
-export default function (
-    deps: UnpackedDependencies,
-    defaultPrefix?: string 
-) {
+export default 
+function (deps: UnpackedDependencies, defaultPrefix?: string) {
     const {"@sern/emitter": emitter,  
            '@sern/logger': log, 
            '@sern/client': client} = deps
@@ -38,7 +36,7 @@ export default function (
     const msgCommands$ = handle(isNonBot(defaultPrefix));
 
     return msgCommands$.pipe(
-        filterTap((e) => emitter.emit('warning', resultPayload(PayloadType.Warning, undefined, e))),
+        filterTap(e => emitter.emit('warning', resultPayload(PayloadType.Warning, undefined, e))),
         concatMap(intoTask(module => {
             const result = resultPayload(PayloadType.Failure, module, SernError.PluginFailure);
             emitter.emit('module.activate', result);

@@ -8,6 +8,5 @@ import { CoreDependencies } from './ioc';
 
 declare global {
     interface Dependencies extends CoreDependencies {}
-
 }
 

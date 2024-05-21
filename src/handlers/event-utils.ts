@@ -1,17 +1,8 @@
 import type { Interaction, Message, BaseInteraction } from 'discord.js';
 import {
-    EMPTY,
-    Observable,
-    concatMap,
-    filter,
-    throwError,
-    fromEvent,
-    map, 
-    type OperatorFunction,
-    catchError,
-    finalize,
-    pipe,
-    from,
+    EMPTY, type Observable, concatMap, filter,
+    throwError, fromEvent, map, type OperatorFunction,
+    catchError, finalize, pipe, from,
 } from 'rxjs';
 import * as Id from '../core/id'
 import type { Emitter } from '../core/interfaces';
@@ -49,7 +40,7 @@ export function eventDispatcher(deps: Dependencies, module: Module, source: unkn
               `${source} cannot be constructed into an event listener`);
     const execute: OperatorFunction<unknown[]|undefined, unknown> =
         concatMap(async args => {
-            if(args) return module.execute.apply(null, args);
+            if(args) return Reflect.apply(module.execute, null, args);
         });
     //@ts-ignore
     return fromEvent(source, module.name!)
@@ -81,11 +72,7 @@ export function createDispatcher({ module, event, defaultPrefix, deps }: Dispatc
     switch (module.type) {
         case CommandType.Slash:
         case CommandType.Both: {
-            return {
-                module, 
-                args: [Context.wrap(event, defaultPrefix)],
-                deps
-            };
+            return { module, args: [Context.wrap(event, defaultPrefix)], deps };
         }
         default: return { module, args: [event], deps };
     }
@@ -198,7 +185,7 @@ export function executeModule(
  * @returns receiver function for flattening a stream of data
  */
 export function createResultResolver<Output>(config: {
-    onStop?: (module: Module) => unknown;
+    onStop?: (module: Module, err?: string) => unknown;
     onNext: (args: ExecutePayload, map: Record<string, unknown>) => Output;
 }) {
     const { onStop, onNext } = config;
@@ -207,7 +194,7 @@ export function createResultResolver<Output>(config: {
         if(task.isOk()) {
             return onNext(payload, task.value) as Output;
         } else {
-            onStop?.(payload.module);
+            onStop?.(payload.module, String(task.error));
         }
     };
 };
@@ -231,7 +218,7 @@ export async function callInitPlugins(module: Module, deps: Dependencies, sEmitt
 async function callPlugins({ args, module, deps }: ExecutePayload) {
     let state = {};
     for(const plugin of module.onEvent) {
-        const result = await plugin.execute(...args, { state, deps });
+        const result = await plugin.execute(...args, { state, deps, type: module.type === CommandType.Text?'text':'slash' });
         if(result.isErr()) {
             return result;
         }
@@ -248,10 +235,10 @@ async function callPlugins({ args, module, deps }: ExecutePayload) {
 export function intoTask(onStop: (m: Module) => unknown) {
     const onNext = ({ args, module, deps }: ExecutePayload, state: Record<string, unknown>) => ({
         module,
-        args: [...args, { state, deps }],
+        args: [...args, { state, deps, type: module.type === CommandType.Text?'text':'slash' }],
         deps
     });
-    return createResultResolver({ onStop, onNext })
+    return createResultResolver({ onStop, onNext });
 }
 
 export const handleCrash = 

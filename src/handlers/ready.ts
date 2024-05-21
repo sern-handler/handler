@@ -2,7 +2,7 @@ import * as Files from '../core/module-loading'
 import { once } from 'events';
 import { resultPayload } from '../core/functions';
 import { PayloadType } from '..';
-import { CommandType, SernError } from '../core/structures/enums';
+import { CommandType } from '../core/structures/enums';
 import { Module } from '../types/core-modules';
 import { UnpackedDependencies } from '../types/utility';
 import { callInitPlugins } from './event-utils';
