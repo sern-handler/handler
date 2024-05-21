@@ -119,9 +119,9 @@ export function createInteractionHandler<T extends Interaction>(
         async event => {
             const possibleIds = Id.reconstruct(event);
             let modules = possibleIds
-                .map(id => mg.get(id))
+                .map(({ id }) => mg.get(id))
                 .filter((id): id is Module => id !== undefined);
-
+            
             if(modules.length == 0) {
                 return Err.EMPTY;
             }
@@ -198,12 +198,12 @@ export function createResultResolver<Output>(config: {
         }
     };
 };
+
 export async function callInitPlugins(module: Module, deps: Dependencies, sEmitter?: Emitter) {
     let _module = module;
     for(const plugin of _module.plugins ?? []) {
         const res = await plugin.execute({ 
-            module,
-            absPath: _module.meta.absPath ,
+            module, absPath: _module.meta.absPath ,
             updateModule: (partial: Partial<Module>) => {
                 _module = { ..._module, ...partial };
                 return _module;
@@ -217,9 +217,10 @@ export async function callInitPlugins(module: Module, deps: Dependencies, sEmitt
     }
     return _module
 }
+
 async function callPlugins({ args, module, deps }: ExecutePayload) {
     let state = {};
-    for(const plugin of module.onEvent) {
+    for(const plugin of module.onEvent??[]) {
         const result = await plugin.execute(...args, { state, deps, type: module.type === CommandType.Text?'text':'slash' });
         if(result.isErr()) {
             return result;
