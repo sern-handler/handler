@@ -1,14 +1,14 @@
 import { ApplicationCommandType, ComponentType, Interaction, InteractionType } from 'discord.js';
 import { CommandType, EventType } from './structures/enums';
 
-const parseParams = (event: { customId: string }, id: string) => {
+const parseParams = (event: { customId: string }, id: string, append: string) => {
     const hasSlash = event.customId.indexOf('/')
     if(hasSlash === -1) {
         return { id };
     }
     const baseid = event.customId.substring(0, hasSlash);
     const params = event.customId.substring(hasSlash+1);
-    return { id: baseid, params }
+    return { id: baseid+append, params }
 }
 /**
  * Construct unique ID for a given interaction object.
@@ -18,8 +18,9 @@ const parseParams = (event: { customId: string }, id: string) => {
 export function reconstruct<T extends Interaction>(event: T) {
     switch (event.type) {
         case InteractionType.MessageComponent: {
-            let id = `${event.customId}_C${event.componentType}`;
-            const data = parseParams(event, id)
+            let id = event.customId;
+            const data = parseParams(event, id, `_C${event.componentType}`)
+            console.log(data)
             return [data];
         }
         case InteractionType.ApplicationCommand:
@@ -27,8 +28,8 @@ export function reconstruct<T extends Interaction>(event: T) {
             return [{ id: `${event.commandName}_A${event.commandType}` }, { id: `${event.commandName}_B` }];
         //Modal interactions are classified as components for sern
         case InteractionType.ModalSubmit: {
-            let id = `${event.customId}_M`;
-            const data = parseParams(event, id);
+            let id = `${event.customId}`;
+            const data = parseParams(event, id, '_M');
             return [data];
         }
     }
