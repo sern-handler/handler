@@ -199,13 +199,14 @@ export function createResultResolver<Output>(config: {
     };
 };
 export async function callInitPlugins(module: Module, deps: Dependencies, sEmitter?: Emitter) {
-    for(const plugin of module.plugins) {
+    let _module = module;
+    for(const plugin of _module.plugins ?? []) {
         const res = await plugin.execute({ 
             module,
-            absPath: module.meta.absPath ,
+            absPath: _module.meta.absPath ,
             updateModule: (partial: Partial<Module>) => {
-                module = { ...module, ...partial };
-                return module;
+                _module = { ..._module, ...partial };
+                return _module;
             },
             deps
         });
@@ -214,6 +215,7 @@ export async function callInitPlugins(module: Module, deps: Dependencies, sEmitt
             throw Error("Plugin failed with controller.stop()");
         }
     }
+    return _module
 }
 async function callPlugins({ args, module, deps }: ExecutePayload) {
     let state = {};

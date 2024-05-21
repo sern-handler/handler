@@ -24,7 +24,6 @@ function mockDeps() {
    }
 }
 
-
  
 describe('eventDispatcher standard', () => {
     let m: Processed<Module>;
