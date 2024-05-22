@@ -21,11 +21,13 @@ export type IntoDependencies<Tuple extends [...any[]]> = {
 
 /**
   * @deprecated This old signature will be incompatible with future versions of sern.
+  * ```ts
+  *  To switch your old code:
+     await makeDependencies(({ add }) => { 
+            add('@sern/client', new Client())
+     })
+  *  ```
   */
 export interface DependencyConfiguration {
-    /*
-     * @deprecated. Loggers will be opt-in the future
-     */
-    exclude?: Set<'@sern/logger'>;
     build: (root: Container) => Container;
 }

@@ -1,5 +1,5 @@
 import * as Files from '../core/module-loading'
-import { once } from 'events';
+import { once } from 'node:events';
 import { resultPayload } from '../core/functions';
 import { PayloadType } from '..';
 import { CommandType } from '../core/structures/enums';
@@ -25,7 +25,6 @@ export default async function(dir: string, deps : UnpackedDependencies) {
             throw Error(`Found ${module.name} at ${module.meta.absPath}, which has incorrect \`type\``);
         }
         const resultModule = await callInitPlugins(module, deps, sEmitter);
-        console.log(resultModule)
         // FREEZE! no more writing!!
         commands.set(resultModule.meta.id, Object.freeze(resultModule));
         sEmitter.emit('module.register', resultPayload(PayloadType.Success, resultModule));

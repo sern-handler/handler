@@ -21,7 +21,8 @@ import { resultPayload, isAutocomplete, treeSearch } from '../core/functions'
 interface ExecutePayload {
     module: Module;
     args: unknown[];
-    deps: Dependencies
+    deps: Dependencies;
+    params?: string;
     [key: string]: unknown
 }
 
@@ -52,9 +53,10 @@ interface DispatchPayload {
     module: Processed<CommandModule>;
     event: BaseInteraction; 
     defaultPrefix?: string;
-    deps: Dependencies
+    deps: Dependencies;
+    params?: string
 };
-export function createDispatcher({ module, event, defaultPrefix, deps }: DispatchPayload): ExecutePayload {
+export function createDispatcher({ module, event, defaultPrefix, deps, params }: DispatchPayload): ExecutePayload {
     assert.ok(CommandType.Text !== module.type,
         SernError.MismatchEvent + 'Found text command in interaction stream');
 
@@ -68,13 +70,12 @@ export function createDispatcher({ module, event, defaultPrefix, deps }: Dispatc
                  args: [event],
                  deps };
     }
-
     switch (module.type) {
         case CommandType.Slash:
         case CommandType.Both: {
             return { module, args: [Context.wrap(event, defaultPrefix)], deps };
         }
-        default: return { module, args: [event], deps };
+        default: return { module, args: [event], deps, params };
     }
 }
 function createGenericHandler<Source, Narrowed extends Source, Output>(
@@ -113,24 +114,22 @@ export function createInteractionHandler<T extends Interaction>(
     deps: Dependencies,
     defaultPrefix?: string
 ) {
-    const mg = deps['@sern/modules']
+    const mg = deps['@sern/modules'];
     return createGenericHandler<Interaction, T, Result<ReturnType<typeof createDispatcher>, void>>(
         source,
         async event => {
             const possibleIds = Id.reconstruct(event);
             let modules = possibleIds
-                .map(({ id }) => mg.get(id))
-                .filter((id): id is Module => id !== undefined);
+                .map(({ id, params }) => ({ module: mg.get(id), params }))
+                .filter((id) => id !== undefined);
             
             if(modules.length == 0) {
                 return Err.EMPTY;
             }
-            const [ module ] = modules;
+            const [{module, params}] = modules;
             return Ok(createDispatcher({ 
                 module: module as Processed<CommandModule>, 
-                event, 
-                defaultPrefix,
-                deps
+                event, defaultPrefix, deps, params 
             }));
     });
 }
@@ -218,10 +217,10 @@ export async function callInitPlugins(module: Module, deps: Dependencies, sEmitt
     return _module
 }
 
-async function callPlugins({ args, module, deps }: ExecutePayload) {
+async function callPlugins({ args, module, deps, params }: ExecutePayload) {
     let state = {};
     for(const plugin of module.onEvent??[]) {
-        const result = await plugin.execute(...args, { state, deps, type: module.type === CommandType.Text?'text':'slash' });
+        const result = await plugin.execute(...args, { state, deps, params, type: module.type });
         if(result.isErr()) {
             return result;
         }
@@ -236,9 +235,9 @@ async function callPlugins({ args, module, deps }: ExecutePayload) {
  * @param onStop emits a failure response to the SernEmitter
  */
 export function intoTask(onStop: (m: Module) => unknown) {
-    const onNext = ({ args, module, deps }: ExecutePayload, state: Record<string, unknown>) => ({
+    const onNext = ({ args, module, deps, params }: ExecutePayload, state: Record<string, unknown>) => ({
         module,
-        args: [...args, { state, deps, type: module.type === CommandType.Text?'text':'slash' }],
+        args: [...args, { state, deps, params, type: module.type }],
         deps
     });
     return createResultResolver({ onStop, onNext });

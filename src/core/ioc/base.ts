@@ -65,7 +65,7 @@ async function composeRoot(
     conf: DependencyConfiguration,
 ) {
     //container should have no client or logger yet.
-    const hasLogger = conf.exclude?.has('@sern/logger');
+    const hasLogger = container.hasKey('@sern/logger');
     if (!hasLogger) {
         __add_container('@sern/logger', new __Services.DefaultLogging());
     }

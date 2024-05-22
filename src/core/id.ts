@@ -20,7 +20,6 @@ export function reconstruct<T extends Interaction>(event: T) {
         case InteractionType.MessageComponent: {
             let id = event.customId;
             const data = parseParams(event, id, `_C${event.componentType}`)
-            console.log(data)
             return [data];
         }
         case InteractionType.ApplicationCommand:
