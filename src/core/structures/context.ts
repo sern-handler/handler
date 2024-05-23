@@ -28,7 +28,7 @@ export class Context extends CoreContext<Message, ChatInputCommandInteraction> {
     get options() {
         return this.interaction.options;
     }
-
+    //TODO
     args(type: 'message'|'interaction', parser?: Function) {
         switch(type) {
             case 'message': {
@@ -42,10 +42,12 @@ export class Context extends CoreContext<Message, ChatInputCommandInteraction> {
     }
 
     protected constructor(protected ctx: Result<Message, ChatInputCommandInteraction>,
-                          public prefix?: string) {
+                          private __prefix?: string) {
         super(ctx);
     }
-
+    public get prefix() {
+        return this.__prefix;
+    }
     public get id(): Snowflake {
         return safeUnwrap(this.ctx
                             .map(m => m.id)

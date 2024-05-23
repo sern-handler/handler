@@ -1,10 +1,10 @@
-import { ApplicationCommandType, ComponentType, Interaction, InteractionType } from 'discord.js';
+import { ApplicationCommandType, ComponentType, type Interaction, InteractionType } from 'discord.js';
 import { CommandType, EventType } from './structures/enums';
 
 const parseParams = (event: { customId: string }, id: string, append: string) => {
     const hasSlash = event.customId.indexOf('/')
     if(hasSlash === -1) {
-        return { id };
+        return { id:id+append };
     }
     const baseid = event.customId.substring(0, hasSlash);
     const params = event.customId.substring(hasSlash+1);

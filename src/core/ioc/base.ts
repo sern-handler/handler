@@ -1,4 +1,3 @@
-import type { DependencyConfiguration } from '../../types/ioc';
 import { Container } from './container';
 import * as  __Services from '../structures/default-services';
 import type { Logging } from '../interfaces';
@@ -11,11 +10,11 @@ export function disposeAll(logger: Logging|undefined) {
         .then(() => logger?.info({ message: 'Cleaning container and crashing' }));
 }
 
-
 type Insertable = 
         | ((container: Dependencies) => object)
         | object
-const dependencyBuilder = (container: Container, excluded: string[] ) => {
+
+const dependencyBuilder = (container: Container) => {
     return {
         /**
           * Insert a dependency into your container.
@@ -30,14 +29,6 @@ const dependencyBuilder = (container: Container, excluded: string[] ) => {
             }
         },
         /**
-          * Exclude any dependencies from being added.
-          * Warning: this could lead to bad errors if not used correctly
-          */
-        exclude(...keys: (keyof Dependencies)[]) {
-            keys.forEach(key => excluded.push(key));
-        },
-        
-        /**
           * @param key the key of the dependency
           * @param v The dependency to swap out.
           * Swap out a preexisting dependency.
@@ -49,60 +40,28 @@ const dependencyBuilder = (container: Container, excluded: string[] ) => {
    };
 };
 
-
+/**
+  * 
+  *
+  *
+  */
 type ValidDependencyConfig =
     | ((c: ReturnType<typeof dependencyBuilder>) => any)
-    | DependencyConfiguration;
 
-/**
- * Given the user's conf, check for any excluded/included dependency keys.
- * Then, call conf.build to get the rest of the users' dependencies.
- * Finally, update the containerSubject with the new container state
- * @param conf
- */
-async function composeRoot(
-    container: Container,
-    conf: DependencyConfiguration,
-) {
-    //container should have no client or logger yet.
-    const hasLogger = container.hasKey('@sern/logger');
-    if (!hasLogger) {
-        __add_container('@sern/logger', new __Services.DefaultLogging());
-    }
-    __add_container('@sern/errors', new __Services.DefaultErrorHandling());
-    __add_container('@sern/modules', new Map())
-    __add_container('@sern/emitter', new EventEmitter())
-    __add_wiredcontainer('@sern/cron', deps => new __Services.Cron(deps))
-    //Build the container based on the callback provided by the user
-    conf.build(container as Container);
-    
-    if (!hasLogger) {
-        container.get<Logging>('@sern/logger')
-                ?.info({ message: 'All dependencies loaded successfully.' });
-    }
-    await container.ready();
-}
 
 export async function makeDependencies (conf: ValidDependencyConfig) {
     const container = await __init_container({ autowire: false });
-    if(typeof conf === 'function') {
-        const excluded: string[] = [];
-        conf(dependencyBuilder(container, excluded));
-        //We only include logger if it does not exist 
-        const includeLogger = 
-            !excluded.includes('@sern/logger') 
-            && !container.hasKey('@sern/logger');
+    conf(dependencyBuilder(container));
+    //We only include logger if it does not exist 
+    const includeLogger = !container.hasKey('@sern/logger');
 
-        if(includeLogger) {
-            __add_container('@sern/logger', new __Services.DefaultLogging);
-        }
-        __add_container('@sern/errors', new __Services.DefaultErrorHandling());
-        __add_container('@sern/modules', new Map())
-        __add_container('@sern/emitter', new EventEmitter())
-        __add_wiredcontainer('@sern/cron', deps => new __Services.Cron(deps))
-        await container.ready();
-    } else {
-        await composeRoot(container, conf);
+    if(includeLogger) {
+        __add_container('@sern/logger', new __Services.DefaultLogging);
     }
+    __add_container('@sern/errors', new __Services.DefaultErrorHandling);
+    __add_container('@sern/modules', new Map)
+    __add_container('@sern/emitter', new EventEmitter)
+    __add_wiredcontainer('@sern/cron', deps => new __Services.Cron(deps))
+    await container.ready();
 }
 

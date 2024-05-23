@@ -24,7 +24,7 @@ export default async function(dir: string, deps : UnpackedDependencies) {
         if(!validType) {
             throw Error(`Found ${module.name} at ${module.meta.absPath}, which has incorrect \`type\``);
         }
-        const resultModule = await callInitPlugins(module, deps, sEmitter);
+        const resultModule = await callInitPlugins(module, deps, true);
         // FREEZE! no more writing!!
         commands.set(resultModule.meta.id, Object.freeze(resultModule));
         sEmitter.emit('module.register', resultPayload(PayloadType.Success, resultModule));

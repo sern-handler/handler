@@ -181,7 +181,7 @@ export function executeModule(
  * - if all results are ok, the stream is converted to { config.onNext }
  * config.onNext will be returned if everything is okay.
  * @param config
- * @returns receiver function for flattening a stream of data
+ * @returns function which calls all plugins and returns onNext or fail 
  */
 export function createResultResolver<Output>(config: {
     onStop?: (module: Module, err?: string) => unknown;
@@ -198,11 +198,11 @@ export function createResultResolver<Output>(config: {
     };
 };
 
-export async function callInitPlugins(module: Module, deps: Dependencies, sEmitter?: Emitter) {
+export async function callInitPlugins(module: Module, deps: Dependencies, emit?: boolean ) {
     let _module = module;
     for(const plugin of _module.plugins ?? []) {
         const res = await plugin.execute({ 
-            module, absPath: _module.meta.absPath ,
+            module, absPath: _module.meta.absPath,
             updateModule: (partial: Partial<Module>) => {
                 _module = { ..._module, ...partial };
                 return _module;
@@ -210,7 +210,10 @@ export async function callInitPlugins(module: Module, deps: Dependencies, sEmitt
             deps
         });
         if(res.isErr()) {
-            sEmitter?.emit('module.register', resultPayload(PayloadType.Failure, module, SernError.PluginFailure));
+            if(emit) {
+                deps['@sern/emitter']
+                    ?.emit('module.register', resultPayload(PayloadType.Failure, module, SernError.PluginFailure));
+            }
             throw Error("Plugin failed with controller.stop()");
         }
     }

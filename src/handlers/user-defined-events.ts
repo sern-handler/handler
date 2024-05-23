@@ -33,10 +33,7 @@ export default async function(deps: UnpackedDependencies, eventDir: string) {
     }
     from(eventModules)
         .pipe(map(intoDispatcher(deps)),
-              /**
-               * Where all events are turned on
-               */
-               mergeAll(),
+               mergeAll(), // all eventListeners are turned on
                handleCrash(deps))
             .subscribe();
 }
