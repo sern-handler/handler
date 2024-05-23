@@ -18,8 +18,7 @@ const parseParams = (event: { customId: string }, id: string, append: string) =>
 export function reconstruct<T extends Interaction>(event: T) {
     switch (event.type) {
         case InteractionType.MessageComponent: {
-            let id = event.customId;
-            const data = parseParams(event, id, `_C${event.componentType}`)
+            const data = parseParams(event, event.customId, `_C${event.componentType}`)
             return [data];
         }
         case InteractionType.ApplicationCommand:
@@ -27,8 +26,7 @@ export function reconstruct<T extends Interaction>(event: T) {
             return [{ id: `${event.commandName}_A${event.commandType}` }, { id: `${event.commandName}_B` }];
         //Modal interactions are classified as components for sern
         case InteractionType.ModalSubmit: {
-            let id = `${event.customId}`;
-            const data = parseParams(event, id, '_M');
+            const data = parseParams(event, event.customId, '_M');
             return [data];
         }
     }

@@ -6,7 +6,7 @@ export function makePlugin<V extends unknown[]>(
     type: PluginType,
     execute: (...args: any[]) => any,
 ): Plugin<V> {
-    return { type, execute, } as Plugin<V>;
+    return { type, execute } as Plugin<V>;
 }
 /**
  * @since 2.5.0

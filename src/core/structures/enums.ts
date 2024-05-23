@@ -86,20 +86,12 @@ export enum PluginType {
     Control = 2,
 }
 /**
+ * @deprecated - Use strings 'success' | 'failure' | 'warning'
  * @enum { string }
  */
 export enum PayloadType {
-    /**
-     * The PayloadType for a SernEmitter success event
-     */
     Success = 'success',
-    /**
-     * The PayloadType for a SernEmitter failure event
-     */
     Failure = 'failure',
-    /**
-     * The PayloadType for a SernEmitter warning event
-     */
     Warning = 'warning',
 }
 

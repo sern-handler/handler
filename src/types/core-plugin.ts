@@ -13,7 +13,6 @@
 
 import type { Err, Ok, Result } from 'ts-results-es';
 import type {
-    CommandModuleDefs,
     Module,
     Processed,
     SDT,

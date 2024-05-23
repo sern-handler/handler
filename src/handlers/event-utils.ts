@@ -6,7 +6,7 @@ import {
 } from 'rxjs';
 import * as Id from '../core/id'
 import type { Emitter } from '../core/interfaces';
-import { PayloadType, SernError } from '../core/structures/enums'
+import { SernError } from '../core/structures/enums'
 import { Err, Ok, Result } from 'ts-results-es';
 import type { UnpackedDependencies } from '../types/utility';
 import type { CommandModule, Module, Processed } from '../types/core-modules';
@@ -167,10 +167,10 @@ export function executeModule(
     return from(Result.wrapAsync(async () => module.execute(...args)))
         .pipe(concatMap(result => { 
             if (result.isOk()) {
-                emitter.emit('module.activate', resultPayload(PayloadType.Success, module));
+                emitter.emit('module.activate', resultPayload('success', module));
                 return EMPTY;
             }
-            return throwError(() => resultPayload(PayloadType.Failure, module, result.error));
+            return throwError(() => resultPayload('failure', module, result.error));
         }))
 };
 
@@ -211,8 +211,7 @@ export async function callInitPlugins(module: Module, deps: Dependencies, emit?:
         });
         if(res.isErr()) {
             if(emit) {
-                deps['@sern/emitter']
-                    ?.emit('module.register', resultPayload(PayloadType.Failure, module, SernError.PluginFailure));
+                deps['@sern/emitter']?.emit('module.register', resultPayload('failure', module, SernError.PluginFailure));
             }
             throw Error("Plugin failed with controller.stop()");
         }

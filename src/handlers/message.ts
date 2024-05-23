@@ -1,6 +1,6 @@
 import { EMPTY, mergeMap, concatMap } from 'rxjs';
 import type { Message } from 'discord.js';
-import { createMessageHandler, executeModule, intoTask  } from './event-utils';
+import { createMessageHandler, executeModule, intoTask } from './event-utils';
 import { PayloadType, SernError } from '../core/structures/enums'
 import { resultPayload } from '../core/functions'
 import {  filterTap, sharedEventStream } from '../core/operators'

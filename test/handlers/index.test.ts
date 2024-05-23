@@ -1,19 +1,17 @@
 //@ts-nocheck
-import { beforeEach, describe, expect, vi, it } from 'vitest';
+import { beforeEach, describe, expect, vi, it, test } from 'vitest';
 import { callInitPlugins, eventDispatcher } from '../../src/handlers/event-utils';
 
-import { Client } from 'discord.js'
+import { Client, ChatInputCommandInteraction } from 'discord.js'
 import { faker } from '@faker-js/faker';
 import { Module } from '../../src/types/core-modules';
 import { Processed } from '../../src/types/core-modules';
 import { EventEmitter } from 'events';
 import { EventType } from '../../dist/core/structures/enums';
-import { CommandInitPlugin, controller } from '../../src';
+import { CommandControlPlugin, CommandInitPlugin, CommandType, controller } from '../../src';
 
-vi.mock('discord.js', () => {
-  const Client = vi.fn()
-  Client.prototype.login= vi.fn()
-    const Collection = Map;
+vi.mock('discord.js', async (importOriginal) => {
+    const mod = await importOriginal()
     const ModalSubmitInteraction = class {
         customId;
         type = 5;
@@ -44,41 +42,19 @@ vi.mock('discord.js', () => {
     };
 
     return {
-        Client,
-        Collection,
-        ComponentType: {
-            Button: 2,
-        },
-        InteractionType: {
-            Ping: 1,
-            ApplicationCommand: 2,
-            MessageComponent: 3,
-            ApplicationCommandAutocomplete: 4,
-            ModalSubmit: 5,
-        },
-        ApplicationCommandOptionType: {
-            Subcommand: 1,
-            SubcommandGroup: 2,
-            String: 3,
-            Integer: 4,
-            Boolean: 5,
-            User: 6,
-            Channel: 7,
-            Role: 8,
-            Mentionable: 9,
-            Number: 10,
-            Attachment: 11,
-        },
-        ApplicationCommandType: {
-            ChatInput: 1,
-            User: 2,
-            Message: 3,
-        },
+        Client : vi.fn(),
+        Collection: mod.Collection,
+        ComponentType: mod.ComponentType,
+        InteractionType: mod.InteractionType,
+        ApplicationCommandOptionType: mod.ApplicationCommandOptionType,
+        ApplicationCommandType: mod.ApplicationCommandType, 
         ModalSubmitInteraction,
         ButtonInteraction,
         AutocompleteInteraction,
+        ChatInputCommandInteraction: vi.fn()
     };
-})
+});
+
 function createRandomPlugin (s: 'go', mut?: Partial<Module>) {
     return CommandInitPlugin(({ module, updateModule }) => {
         if(mut) {
@@ -123,14 +99,43 @@ describe('eventDispatcher standard', () => {
     it("Shouldn't throw", () => {
         expect(() => eventDispatcher(mockDeps(), m, ee)).not.toThrowError();
     });
-    it('mutate with init plugins', async () => {
-        const deps = mockDeps()
-        const plugins = createRandomPlugin('go', { name: "abc" })
-        const mod = createRandomModule([plugins])
-        const s = await callInitPlugins(mod, deps, false)
-        expect(s.name).not.equal(mod.name)
-    })
-
 });
+
+test ('mutate with init plugins', async () => {
+    const deps = mockDeps()
+    const plugins = createRandomPlugin('go', { name: "abc" })
+    const mod = createRandomModule([plugins])
+    const s = await callInitPlugins(mod, deps, false)
+    expect(s.name).not.equal(mod.name)
+})
+
+
+test('call control plugin ', async () => {
+    const plugin = CommandControlPlugin<CommandType.Slash>((ctx,sdt) => {
+        return controller.next();
+    });
+    const res = await plugin.execute(new ChatInputCommandInteraction(), {})
+    expect(res.isOk()).toBe(true)
+})
+
+test('form sdt', async () => {
+
+    const expectedObject = { 
+        "plugin/abc": faker.person.jobArea(),
+        "plugin2/abc": faker.git.branch(),
+        "plugin3/cheese": faker.person.jobArea()
+    }
+
+//    const plugin = CommandControlPlugin<CommandType.Slash>((ctx,sdt) => {
+//        return controller.next({ "plugin/abc": expectedObject['plugin/abc'] });
+//    });
+//    const plugin2 = CommandControlPlugin<CommandType.Slash>((ctx,sdt) => {
+//        return controller.next({ "plugin2/abc": expectedObject['plugin2/abc'] });
+//    });
+//    const plugin3 = CommandControlPlugin<CommandType.Slash>((ctx,sdt) => {
+//        return controller.next({ "plugin3/cheese": expectedObject['plugin3/cheese'] });
+//    });
+    
+})
 
 

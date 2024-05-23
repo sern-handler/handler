@@ -27,7 +27,7 @@ export default async function(dir: string, deps : UnpackedDependencies) {
         const resultModule = await callInitPlugins(module, deps, true);
         // FREEZE! no more writing!!
         commands.set(resultModule.meta.id, Object.freeze(resultModule));
-        sEmitter.emit('module.register', resultPayload(PayloadType.Success, resultModule));
+        sEmitter.emit('module.register', resultPayload('success', resultModule));
     }
     sEmitter.emit('modulesLoaded');
 }

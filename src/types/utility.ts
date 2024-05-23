@@ -11,7 +11,7 @@ export type AnyFunction = (...args: any[]) => unknown;
 export interface SernEventsMapping {
     'module.register': [Payload];
     'module.activate': [Payload];
-    error: [{ type: PayloadType.Failure; module?: Module; reason: string | Error }];
+    error: [{ type: 'failure'; module?: Module; reason: string | Error }];
     warning: [Payload];
     modulesLoaded: [never?];
 }

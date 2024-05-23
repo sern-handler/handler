@@ -3,6 +3,7 @@ import path from 'node:path'
 import * as Files from '../../src/core/module-loading'
 import { Module } from '../../src/types/core-modules'
 import { AssertionError } from 'node:assert'
+//TODO: mock fs?
 describe('module-loading', () => {
     it('should get the filename of the commandmodule (linux, esm)', () => {
         const fname = "///home/pooba/Projects/sern/halibu/dist/commands/ping.js"

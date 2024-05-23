@@ -47,56 +47,45 @@ vi.mock('discord.js', async (importOriginal) => {
     };
 });
 test('id -> Text', () => {
-    const bothCmdId = Id.create("ping", CommandType.Text)
-    expect(bothCmdId).toBe("ping_T")
+    expect(Id.create("ping", CommandType.Text)).toBe("ping_T")
 })
 
 test('id -> Both', () => {
-    const bothCmdId = Id.create("ping", CommandType.Both)
-    expect(bothCmdId).toBe("ping_B")
+    expect(Id.create("ping", CommandType.Both)).toBe("ping_B")
 })
 
 test('id -> CtxMsg', () => {
-    const bothCmdId = Id.create("ping", CommandType.CtxMsg)
-    expect(bothCmdId).toBe("ping_A3")
+    expect(Id.create("ping", CommandType.CtxMsg)).toBe("ping_A3")
 })
 test('id -> CtxUsr', () => {
-    const bothCmdId = Id.create("ping", CommandType.CtxUser)
-    expect(bothCmdId).toBe("ping_A2")
+    expect(Id.create("ping", CommandType.CtxUser)).toBe("ping_A2")
 })
 test('id -> Modal', () => {
-    const modal = Id.create("my-modal", CommandType.Modal)
-    expect(modal).toBe("my-modal_M");
+    expect(Id.create("my-modal", CommandType.Modal)).toBe("my-modal_M");
 })
 
 test('id -> Button', () => {
-    const modal = Id.create("my-button", CommandType.Button)
-    expect(modal).toBe("my-button_C2");
+    expect(Id.create("my-button", CommandType.Button)).toBe("my-button_C2");
 })
 
 test('id -> Slash', () => {
-    const modal = Id.create("myslash", CommandType.Slash)
-    expect(modal).toBe("myslash_A1");
+    expect(Id.create("myslash", CommandType.Slash)).toBe("myslash_A1");
 })
 
 test('id -> StringSelect', () => {
-    const modal = Id.create("mystringselect", CommandType.StringSelect)
-    expect(modal).toBe("mystringselect_C3");
+    expect(Id.create("mystringselect", CommandType.StringSelect)).toBe("mystringselect_C3");
 })
 
 test('id -> UserSelect', () => {
-    const modal = Id.create("myuserselect", CommandType.UserSelect)
-    expect(modal).toBe("myuserselect_C5");
+    expect(Id.create("myuserselect", CommandType.UserSelect)).toBe("myuserselect_C5");
 })
 
 test('id -> RoleSelect', () => {
-    const modal = Id.create("myroleselect", CommandType.RoleSelect)
-    expect(modal).toBe("myroleselect_C6");
+    expect(Id.create("myroleselect", CommandType.RoleSelect)).toBe("myroleselect_C6");
 })
 
 test('id -> MentionSelect', () => {
-    const modal = Id.create("mymentionselect", CommandType.MentionableSelect)
-    expect(modal).toBe("mymentionselect_C7");
+    expect(Id.create("mymentionselect", CommandType.MentionableSelect)).toBe("mymentionselect_C7");
 })
 
 test('id -> ChannelSelect', () => {
@@ -129,6 +118,12 @@ test('id reconstruct button with empty params', () => {
     expect(idload[0].id).toBe("btn_C2")
     expect(idload[0].params).toBe("")
 })
+test('id reconstruct with multiple slashes', () => {
+    const idload = Id.reconstruct(new ButtonInteraction("btn//"))
+    expect(idload[0].id).toBe("btn_C2")
+    expect(idload[0].params).toBe("/")
+})
+
 
 test('id reconstruct button', () => {
     const idload = Id.reconstruct(new ButtonInteraction("btn"))

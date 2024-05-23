@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { existsSync } from 'fs';
+import { existsSync } from 'node:fs';
 import { readdir } from 'fs/promises';
 import assert from 'node:assert';
 import * as Id from './id'

@@ -100,7 +100,7 @@ export function isModal(i: InteractionTypable): i is ModalSubmitInteraction {
     return i.type === InteractionType.ModalSubmit;
 }
 
-export function resultPayload<T extends PayloadType>
+export function resultPayload<T extends 'success'|'warning'|'failure'>
 (type: T, module?: Module, reason?: unknown) {
     return { type, module, reason } as Payload & { type : T };
 }
