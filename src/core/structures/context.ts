@@ -12,11 +12,7 @@ import { CoreContext } from '../structures/core-context';
 import { Result, Ok, Err } from 'ts-results-es';
 import * as assert from 'assert';
 import type { ReplyOptions } from '../../types/utility';
-
-function fmt(msg: string, prefix?: string): string[] {
-    if(!prefix) throw Error("Unable to parse message without prefix");
-    return msg.slice(prefix.length).trim().split(/\s+/g);
-}
+import { fmt } from '../functions'
 
 /**
  * @since 1.0.0

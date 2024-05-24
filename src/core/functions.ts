@@ -1,4 +1,3 @@
-import { Err, Ok } from 'ts-results-es';
 import type { Module, SernAutocompleteData, SernOptionsData } from '../types/core-modules';
 import type {
     AnySelectMenuInteraction,
@@ -14,6 +13,20 @@ import { PluginType } from './structures/enums';
 import assert from 'assert';
 import type { Payload } from '../types/utility';
 
+/**
+ * Removes the first character(s) _[depending on prefix length]_ of the message
+ * @param msg
+ * @param prefix The prefix to remove
+ * @returns The message without the prefix
+ * @example
+ * message.content = '!ping';
+ * console.log(fmt(message, '!'));
+ * // [ 'ping' ]
+ */
+export function fmt(msg: string, prefix?: string): string[] {
+    if(!prefix) throw Error("Unable to parse message without prefix");
+    return msg.slice(prefix.length).trim().split(/\s+/g);
+}
 
 
 export function partitionPlugins<T,V>

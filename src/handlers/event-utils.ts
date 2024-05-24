@@ -16,7 +16,7 @@ import { CommandType } from '../core/structures/enums'
 import { inspect } from 'node:util'
 import { disposeAll } from '../core/ioc/base';
 import { arrayifySource, handleError } from '../core/operators';
-import { resultPayload, isAutocomplete, treeSearch } from '../core/functions'
+import { resultPayload, isAutocomplete, treeSearch, fmt } from '../core/functions'
 
 interface ExecutePayload {
     module: Module;
@@ -88,19 +88,6 @@ function createGenericHandler<Source, Narrowed extends Source, Output>(
             concatMap(makeModule)); // create a payload, preparing to execute
 }
 
-/**
- * Removes the first character(s) _[depending on prefix length]_ of the message
- * @param msg
- * @param prefix The prefix to remove
- * @returns The message without the prefix
- * @example
- * message.content = '!ping';
- * console.log(fmt(message, '!'));
- * // [ 'ping' ]
- */
-export function fmt(msg: string, prefix: string): string[] {
-    return msg.slice(prefix.length).trim().split(/\s+/g);
-}
 
 /**
  *
@@ -137,7 +124,7 @@ export function createInteractionHandler<T extends Interaction>(
 export function createMessageHandler(
     source: Observable<Message>,
     defaultPrefix: string,
-    deps: Dependencies
+    deps: Dependencies,
 ) {
     const mg = deps['@sern/modules'];
     return createGenericHandler(source, async event => {
