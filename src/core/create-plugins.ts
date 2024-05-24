@@ -1,6 +1,6 @@
 import { CommandType, PluginType } from './structures/enums';
 import type { Plugin, PluginResult, CommandArgs, InitArgs } from '../types/core-plugin';
-import { err, ok } from './functions';
+import { Err, Ok } from 'ts-results-es';
 
 export function makePlugin<V extends unknown[]>(
     type: PluginType,
@@ -37,6 +37,6 @@ export function CommandControlPlugin<I extends CommandType>(
  * The object passed into every plugin to control a command's behavior
  */
 export const controller = {
-    next: ok,
-    stop: err,
+    next: (val: unknown=undefined) => Ok(val),
+    stop: (val?: string) => Err(val),
 };

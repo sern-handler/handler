@@ -11,7 +11,7 @@ import type {
 import { CoreContext } from '../structures/core-context';
 import { Result, Ok, Err } from 'ts-results-es';
 import * as assert from 'assert';
-import { ReplyOptions } from '../../types/utility';
+import type { ReplyOptions } from '../../types/utility';
 
 function fmt(msg: string, prefix?: string): string[] {
     if(!prefix) throw Error("Unable to parse message without prefix");
@@ -29,7 +29,7 @@ export class Context extends CoreContext<Message, ChatInputCommandInteraction> {
         return this.interaction.options;
     }
     //TODO
-    args(type: 'message'|'interaction', parser?: Function) {
+    args(type: 'message'|'interaction') {
         switch(type) {
             case 'message': {
                 const [, ...rest] = fmt(this.message.content, this.prefix);
