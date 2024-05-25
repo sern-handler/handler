@@ -18,7 +18,7 @@ import type {
     SDT,
 } from './core-modules';
 import type { Awaitable } from './utility';
-import type { CommandType, EventType, PluginType } from '../core/structures/enums'
+import type { CommandType, PluginType } from '../core/structures/enums'
 import type { Context } from '../core/structures/context'
 import type {
     ButtonInteraction,

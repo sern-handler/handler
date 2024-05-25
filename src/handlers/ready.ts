@@ -1,7 +1,6 @@
 import * as Files from '../core/module-loading'
 import { once } from 'node:events';
 import { resultPayload } from '../core/functions';
-import { PayloadType } from '..';
 import { CommandType } from '../core/structures/enums';
 import { Module } from '../types/core-modules';
 import { UnpackedDependencies } from '../types/utility';

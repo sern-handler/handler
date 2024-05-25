@@ -38,7 +38,7 @@ function (deps: UnpackedDependencies, defaultPrefix?: string) {
     return msgCommands$.pipe(
         filterTap(e => emitter.emit('warning', resultPayload(PayloadType.Warning, undefined, e))),
         concatMap(intoTask(module => {
-            const result = resultPayload(PayloadType.Failure, module, SernError.PluginFailure);
+            const result = resultPayload('failure', module, SernError.PluginFailure);
             emitter.emit('module.activate', result);
         })),
         mergeMap(payload => {

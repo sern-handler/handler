@@ -2,7 +2,7 @@ import type { Interaction, Message, BaseInteraction } from 'discord.js';
 import {
     EMPTY, type Observable, concatMap, filter,
     throwError, fromEvent, map, type OperatorFunction,
-    catchError, finalize, pipe, from,
+    catchError, finalize, pipe, from, take,
 } from 'rxjs';
 import * as Id from '../core/id'
 import type { Emitter } from '../core/interfaces';
@@ -43,10 +43,15 @@ export function eventDispatcher(deps: Dependencies, module: Module, source: unkn
         concatMap(async args => {
             if(args) return Reflect.apply(module.execute, null, args);
         });
+
     //@ts-ignore
-    return fromEvent(source, module.name!)
-        .pipe(intoPayload(module, deps),
-              execute);
+    let ev = fromEvent(source ,module.name!);
+    //@ts-ignore
+    if(module['once']) {
+        ev = ev.pipe(take(1))
+    }
+    return ev.pipe(intoPayload(module, deps),
+                   execute);
 }
 
 interface DispatchPayload { 
@@ -108,8 +113,7 @@ export function createInteractionHandler<T extends Interaction>(
             const possibleIds = Id.reconstruct(event);
             let modules = possibleIds
                 .map(({ id, params }) => ({ module: mg.get(id), params }))
-                .filter((id) => id !== undefined);
-            
+                .filter(({ module }) => module !== undefined);
             if(modules.length == 0) {
                 return Err.EMPTY;
             }
