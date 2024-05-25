@@ -37,6 +37,6 @@ export function CommandControlPlugin<I extends CommandType>(
  * The object passed into every plugin to control a command's behavior
  */
 export const controller = {
-    next: (val: unknown=undefined) => Ok(val),
+    next: (val?: Record<string,unknown>) => Ok(val),
     stop: (val?: string) => Err(val),
 };

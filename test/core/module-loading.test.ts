@@ -10,15 +10,28 @@ describe('module-loading', () => {
         const callsiteinfo = Files.parseCallsite(fname)
         expect(callsiteinfo.name).toBe("ping")
     })
-    it('should get the filename of the commandmodule (windows, cjs)', () => {
-        const fname = "C:\\pooba\\Projects\\sern\\halibu\\dist\\commands\\ping.js"
+    it('should get filename of commandmodule (linux, cjs)', () => {
+        const fname = "file:///home/pooba/Projects/sern/halibu/dist/commands/ping.js"
         const callsiteinfo = Files.parseCallsite(fname)
-        expect(callsiteinfo.name).toEqual("ping");
+        expect(callsiteinfo.name).toBe("ping")
+
+    })
+    it('should get the filename of the commandmodule (windows, cjs)', () => {
+        //this test case is impossible on linux.
+        if(process.platform == 'win32') {
+            const fname = "C:\\pooba\\Projects\\sern\\halibu\\dist\\commands\\ping.js"
+            const callsiteinfo = Files.parseCallsite(fname)
+            expect(callsiteinfo.name).toEqual("ping");
+        }
     })
     it('should get filename of commandmodule (windows, esm)', () => {
-        const fname = "file:///C:\\pooba\\Projects\\sern\\halibu\\dist\\commands\\ping.js"
-        const callsiteinfo = Files.parseCallsite(fname)
-        expect(callsiteinfo.name).toEqual("ping");
+        //this test case is impossible on linux.
+        if(process.platform == 'win32') {
+            const fname = "file:///C:\\pooba\\Projects\\sern\\halibu\\dist\\commands\\ping.js"
+            const callsiteinfo = Files.parseCallsite(fname)
+            expect(callsiteinfo.name).toEqual("ping");
+        }
+        
     })
 
     it('should import a commandModule properly', async () => {

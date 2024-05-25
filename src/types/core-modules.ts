@@ -193,11 +193,11 @@ type CommandModuleNoPlugins = {
     [T in CommandType]: Omit<CommandModuleDefs[T], 'plugins' | 'onEvent' | 'meta'>;
 };
 type EventModulesNoPlugins = {
-    [T in EventType]: Omit<EventModuleDefs[T], 'plugins' | 'onEvent' | 'meta'> & { once?: boolean };
+    [T in EventType]: Omit<EventModuleDefs[T], 'plugins' | 'onEvent' | 'meta'> ;
 };
 
 export type InputEvent = {
-    [T in EventType]: EventModulesNoPlugins[T];
+    [T in EventType]: EventModulesNoPlugins[T] & { once?: boolean };
 }[EventType];
 
 export type InputCommand = {

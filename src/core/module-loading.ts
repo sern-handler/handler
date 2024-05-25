@@ -6,7 +6,7 @@ import * as Id from './id'
 import { Module } from '../types/core-modules';
 
 export const parseCallsite = (site: string) => {
-    const pathobj = path.parse(site.replace(/file:\\?/, "")
+    const pathobj = path.posix.parse(site.replace(/file:\\?/, "")
                                    .split(path.sep)
                                    .join(path.posix.sep))
     return { name: pathobj.name,

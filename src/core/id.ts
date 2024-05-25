@@ -4,7 +4,7 @@ import { CommandType, EventType } from './structures/enums';
 const parseParams = (event: { customId: string }, id: string, append: string) => {
     const hasSlash = event.customId.indexOf('/')
     if(hasSlash === -1) {
-        return { id:id+append };
+        return { id:event.customId+append };
     }
     const baseid = event.customId.substring(0, hasSlash);
     const params = event.customId.substring(hasSlash+1);
