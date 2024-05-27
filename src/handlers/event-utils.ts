@@ -191,6 +191,7 @@ export function createResultResolver<Output>(config: {
 
 export async function callInitPlugins(module: Module, deps: Dependencies, emit?: boolean ) {
     let _module = module;
+    const emitter = deps['@sern/emitter'];
     for(const plugin of _module.plugins ?? []) {
         const res = await plugin.execute({ 
             module, absPath: _module.meta.absPath,
@@ -202,9 +203,10 @@ export async function callInitPlugins(module: Module, deps: Dependencies, emit?:
         });
         if(res.isErr()) {
             if(emit) {
-                deps['@sern/emitter']?.emit('module.register', resultPayload('failure', module, SernError.PluginFailure));
+                emitter?.emit('module.register',
+                              resultPayload('failure', module, res.error ?? SernError.PluginFailure));
             }
-            throw Error("Plugin failed with controller.stop()");
+            throw Error(res.error ?? SernError.PluginFailure);
         }
     }
     return _module
@@ -218,7 +220,7 @@ async function callPlugins({ args, module, deps, params }: ExecutePayload) {
             return result;
         }
         if(typeof result.value  === 'object' && result.value !== null) {
-            state = { ...result.value, ...state };
+            state = { ...state, ...result.value,  };
         }
     }
     return Ok(state);

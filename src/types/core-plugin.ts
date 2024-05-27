@@ -11,7 +11,7 @@
  * Plugins are reminiscent of middleware in express.
  */
 
-import type { Err, Ok, Result } from 'ts-results-es';
+import type { Result } from 'ts-results-es';
 import type {
     Module,
     Processed,
@@ -32,17 +32,13 @@ import type {
     UserSelectMenuInteraction,
 } from 'discord.js';
 
-export type PluginResult = Awaitable<Result<unknown, unknown>>;
+export type PluginResult = Awaitable<Result<Record<string,unknown>|undefined, string|undefined>>;
 
 export interface InitArgs<T extends Processed<Module> = Processed<Module>> {
     module: T;
     absPath: string;
     deps: Dependencies
     updateModule: (module: Partial<T>) => T
-}
-export interface Controller {
-    next: () => Ok<unknown>;
-    stop: () => Err<string|undefined>;
 }
 export interface Plugin<Args extends any[] = any[]> {
     type: PluginType;
