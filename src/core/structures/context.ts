@@ -14,16 +14,19 @@ import * as assert from 'assert';
 import type { ReplyOptions } from '../../types/utility';
 import { fmt } from '../functions'
 
+type ShitType = ChatInputCommandInteraction['options']
+
 /**
  * @since 1.0.0
  * Provides values shared between
  * Message and ChatInputCommandInteraction
  */
 export class Context extends CoreContext<Message, ChatInputCommandInteraction> {
-
     get options() {
         return this.interaction.options;
     }
+    args(type: 'message') : string[]
+    args(type: 'interaction') : ShitType
     //TODO
     args(type: 'message'|'interaction') {
         switch(type) {

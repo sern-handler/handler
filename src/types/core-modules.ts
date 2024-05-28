@@ -24,7 +24,7 @@ import { Awaitable, SernEventsMapping } from './utility';
 export type SDT = {
     state: Record<string,unknown>;
     deps: Dependencies;
-    type: 'slash' | 'text',
+    type: CommandType,
     params?: string
 };
 
