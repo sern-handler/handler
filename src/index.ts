@@ -50,20 +50,37 @@ export {
 export * from './core/presences'
 export * from './core/interfaces'
 import type { controller } from './core/create-plugins';
+import { AttachmentBuilder } from 'discord.js';
 export type Controller = typeof controller
 export * from './core/create-plugins';
 export { CommandType, PluginType, PayloadType, EventType } from './core/structures/enums';
 export { Context } from './core/structures/context';
 export * from './core/ioc';
 
+export type AssetEncoding = "attachment"|"base64"|"binary"|"utf8"
 
-export async function Asset(p: string) {
-    const assetsDir = path.resolve('assets');
+const ASSETS_DIR = path.resolve('assets');
+/**
+ * Reads an asset file from the 'assets' directory.
+ */
+export async function Asset(p: string, opts: { name?: string, encoding?: AssetEncoding }) {
+    const encoding = opts.encoding || 'utf8';
+
+    let relativePath: string;
     if (path.isAbsolute(p)) {
-        const relativePath = path.relative(assetsDir, "assets"+p);
-        return fs.readFile(path.join(assetsDir, relativePath), 'utf8');
+        relativePath = path.relative(ASSETS_DIR, "assets" + p);
+    } else {
+        relativePath = p;
     }
-    return fs.readFile(path.join(assetsDir, p), 'utf8');
+
+    const filePath = path.join(ASSETS_DIR, relativePath);
+
+    if (encoding === 'attachment') {
+        const attachmentName = opts.name || path.basename(filePath);
+        return new AttachmentBuilder(filePath, { name: attachmentName });
+    } else {
+        return fs.readFile(filePath, encoding);
+    }
 }
 
 
