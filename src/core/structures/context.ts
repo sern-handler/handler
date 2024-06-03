@@ -14,7 +14,6 @@ import * as assert from 'assert';
 import type { ReplyOptions } from '../../types/utility';
 import { fmt } from '../functions'
 
-type ShitType = ChatInputCommandInteraction['options']
 
 /**
  * @since 1.0.0
@@ -22,21 +21,13 @@ type ShitType = ChatInputCommandInteraction['options']
  * Message and ChatInputCommandInteraction
  */
 export class Context extends CoreContext<Message, ChatInputCommandInteraction> {
+
     get options() {
-        return this.interaction.options;
-    }
-    args(type: 'message') : string[]
-    args(type: 'interaction') : ShitType
-    //TODO
-    args(type: 'message'|'interaction') {
-        switch(type) {
-            case 'message': {
-                const [, ...rest] = fmt(this.message.content, this.prefix);
-                return rest;
-            };
-            case 'interaction': {
-                return this.interaction.options;
-            };
+        if(this.isMessage()) {
+            const [, ...rest] = fmt(this.message.content, this.prefix);
+            return rest;
+        } else {
+            return this.interaction.options;
         }
     }
 
