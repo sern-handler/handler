@@ -4,7 +4,7 @@
  */
 function hasCallableMethod(obj: object, name: PropertyKey) {
     //@ts-ignore
-    return Object.hasOwn(obj, name) && typeof obj[name] == 'function';
+    return typeof obj[name] == 'function';
 }
 /**
  * A Depedency injection container capable of adding singletons, firing hooks, and managing IOC within an application
@@ -15,7 +15,6 @@ export class Container {
     private finished_init = false;
     constructor(options: { autowire: boolean; path?: string }) {
         if(options.autowire) { /* noop */ }
-
     }
     
     addHook(name: string, callback: Function) {
@@ -25,11 +24,13 @@ export class Container {
         this.hooks.get(name)!.push(callback);
     }
     private registerHooks(hookname: string, insert: object) {
+
         if(hasCallableMethod(insert, hookname)) {
             //@ts-ignore
             this.addHook(hookname, () => insert[hookname]())
         }
     }
+
     addSingleton(key: string, insert: object) {
         if(typeof insert !== 'object') {
             throw Error("Inserted object must be an object");
