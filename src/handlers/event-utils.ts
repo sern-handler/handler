@@ -1,11 +1,12 @@
 import type { Interaction, Message, BaseInteraction } from 'discord.js';
+import util from 'node:util';
 import {
     EMPTY, type Observable, concatMap, filter,
     throwError, fromEvent, map, type OperatorFunction,
-    catchError, finalize, pipe, from, take,
+    catchError, finalize, pipe, from, take, share, of,
 } from 'rxjs';
 import * as Id from '../core/id'
-import type { Emitter } from '../core/interfaces';
+import type { Emitter, ErrorHandling, Logging } from '../core/interfaces';
 import { SernError } from '../core/structures/enums'
 import { Err, Ok, Result } from 'ts-results-es';
 import type { UnpackedDependencies } from '../types/utility';
@@ -15,8 +16,21 @@ import { Context } from '../core/structures/context';
 import { CommandType } from '../core/structures/enums'
 import { inspect } from 'node:util'
 import { disposeAll } from '../core/ioc/base';
-import { arrayifySource, handleError } from '../core/operators';
 import { resultPayload, isAutocomplete, treeSearch, fmt } from '../core/functions'
+
+function handleError<C>(crashHandler: ErrorHandling, emitter: Emitter, logging?: Logging) {
+    return (pload: unknown, caught: Observable<C>) => {
+        // This is done to fit the ErrorHandling contract
+        if(!emitter.emit('error', pload)) {
+            const err = pload instanceof Error ? pload : Error(util.inspect(pload, { colors: true }));
+            logging?.error({ message: util.inspect(pload) });
+            crashHandler.updateAlive(err);
+        }
+        return caught;
+    };
+}
+const arrayify= <T>(src: T) => 
+    Array.isArray(src) ? src : [src];
 
 interface ExecutePayload {
     module: Module;
@@ -26,8 +40,20 @@ interface ExecutePayload {
     [key: string]: unknown
 }
 
+export const filterTap = <K, R>(onErr: (e: R) => void): OperatorFunction<Result<K, R>, K> => 
+    concatMap(result => {
+        if(result.isOk()) {
+            return of(result.value)
+        }
+        onErr(result.error);
+        return EMPTY;
+    })
+
+export const sharedEventStream = <T>(e: Emitter, eventName: string) => 
+    (fromEvent(e, eventName) as Observable<T>).pipe(share());
+
 function intoPayload(module: Module, deps: Dependencies) {
-    return pipe(map(arrayifySource),
+    return pipe(map(arrayify),
                 map(args => ({ module, args, deps })),
                 map(p => p.args));
 }
@@ -151,10 +177,7 @@ export function createMessageHandler(
  * @param module the module that will be executed with task
  * @param task the deferred execution which will be called
  */
-export function executeModule(
-    emitter: Emitter,
-    { module, args }: ExecutePayload,
-) {
+export function executeModule(emitter: Emitter, { module, args }: ExecutePayload) {
     return from(Result.wrapAsync(async () => module.execute(...args)))
         .pipe(concatMap(result => { 
             if (result.isOk()) {
@@ -181,6 +204,7 @@ export function createResultResolver<Output>(config: {
     const { onStop, onNext } = config;
     return async (payload: ExecutePayload) => {
         const task = await callPlugins(payload);
+        if (!task) throw Error("Plugin did not return anything.");
         if(task.isOk()) {
             return onNext(payload, task.value) as Output;
         } else {
@@ -189,18 +213,16 @@ export function createResultResolver<Output>(config: {
     };
 };
 
-export async function callInitPlugins(module: Module, deps: Dependencies, emit?: boolean ) {
+export async function callInitPlugins(module: Module, deps: Dependencies, emit?: boolean) {
     let _module = module;
     const emitter = deps['@sern/emitter'];
     for(const plugin of _module.plugins ?? []) {
         const res = await plugin.execute({ 
-            module, absPath: _module.meta.absPath,
-            updateModule: (partial: Partial<Module>) => {
-                _module = { ..._module, ...partial };
-                return _module;
-            },
+            module: _module,
+            absPath: _module.meta.absPath,
             deps
         });
+        if (!res) throw Error("Plugin did not return anything.");
         if(res.isErr()) {
             if(emit) {
                 emitter?.emit('module.register',

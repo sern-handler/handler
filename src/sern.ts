@@ -10,6 +10,7 @@ import { handleCrash } from './handlers/event-utils';
 import { useContainerRaw } from './core/ioc/global';
 import { UnpackedDependencies } from './types/utility';
 import type { PresenceResult } from './core/presences';
+import fs from 'fs/promises'
 
 interface Wrapper {
     commands: string;
@@ -62,4 +63,17 @@ export function init(maybeWrapper: Wrapper = { commands: "./dist/commands" }) {
     const interactions$ = interactionHandler(deps, maybeWrapper.defaultPrefix);
     // listening to the message stream and interaction stream
     merge(messages$, interactions$).pipe(handleCrash(deps)).subscribe();
+}
+
+
+export async function publisher() {
+    const directoryToWatch = "./src/commands";
+    const watcher = fs.watch(directoryToWatch, { recursive: true }, );
+    for await (const { eventType, filename }  of watcher) {
+        switch(eventType) {
+            case 'change': {
+                console.log('change', filename)
+            } break;
+        }
+    }
 }

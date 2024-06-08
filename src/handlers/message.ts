@@ -1,9 +1,8 @@
 import { EMPTY, mergeMap, concatMap } from 'rxjs';
 import type { Message } from 'discord.js';
-import { createMessageHandler, executeModule, intoTask } from './event-utils';
-import { PayloadType, SernError } from '../core/structures/enums'
+import { createMessageHandler, executeModule, intoTask, sharedEventStream, filterTap} from './event-utils';
+import { SernError } from '../core/structures/enums'
 import { resultPayload } from '../core/functions'
-import {  filterTap, sharedEventStream } from '../core/operators'
 import { UnpackedDependencies } from '../types/utility';
 import type { Emitter } from '../core/interfaces';
 
@@ -36,7 +35,7 @@ function (deps: UnpackedDependencies, defaultPrefix?: string) {
     const msgCommands$ = handle(isNonBot(defaultPrefix));
 
     return msgCommands$.pipe(
-        filterTap(e => emitter.emit('warning', resultPayload(PayloadType.Warning, undefined, e))),
+        filterTap(e => emitter.emit('warning', resultPayload('warning', undefined, e))),
         concatMap(intoTask(module => {
             const result = resultPayload('failure', module, SernError.PluginFailure);
             emitter.emit('module.activate', result);

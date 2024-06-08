@@ -14,6 +14,7 @@ import type {
     StringSelectMenuInteraction,
     UserContextMenuCommandInteraction,
     UserSelectMenuInteraction,
+    ChatInputCommandInteraction,
 } from 'discord.js';
 import type { CommandType, EventType } from '../core/structures/enums';
 import { Context } from '../core/structures/context'
@@ -123,14 +124,14 @@ export interface DiscordEventCommand<T extends keyof ClientEvents = keyof Client
 }
 export interface TextCommand extends Module {
     type: CommandType.Text;
-    execute: (ctx: Context, tbd: SDT) => Awaitable<unknown>;
+    execute: (ctx: Context & { get options(): string[] }, tbd: SDT) => Awaitable<unknown>;
 }
 
 export interface SlashCommand extends Module {
     type: CommandType.Slash;
     description: string;
     options?: SernOptionsData[];
-    execute: (ctx: Context, tbd: SDT) => Awaitable<unknown>;
+    execute: (ctx: Context  & { get options(): ChatInputCommandInteraction['options']}, tbd: SDT) => Awaitable<unknown>;
 }
 
 export interface BothCommand extends Module {

@@ -61,4 +61,5 @@ export const Presence = {
 export type PresenceConfig <T extends (keyof Dependencies)[]> = {
     inject?: [...T]
     execute: (...v: IntoDependencies<T>) => PresenceResult;
+    
 };

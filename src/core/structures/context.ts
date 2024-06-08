@@ -13,6 +13,7 @@ import { Result, Ok, Err } from 'ts-results-es';
 import * as assert from 'assert';
 import type { ReplyOptions } from '../../types/utility';
 import { fmt } from '../functions'
+import { SernError } from './enums';
 
 
 /**
@@ -21,7 +22,7 @@ import { fmt } from '../functions'
  * Message and ChatInputCommandInteraction
  */
 export class Context extends CoreContext<Message, ChatInputCommandInteraction> {
-
+    
     get options() {
         if(this.isMessage()) {
             const [, ...rest] = fmt(this.message.content, this.prefix);
@@ -30,6 +31,7 @@ export class Context extends CoreContext<Message, ChatInputCommandInteraction> {
             return this.interaction.options;
         }
     }
+    
 
     protected constructor(protected ctx: Result<Message, ChatInputCommandInteraction>,
                           private __prefix?: string) {
@@ -93,6 +95,15 @@ export class Context extends CoreContext<Message, ChatInputCommandInteraction> {
                             .map(m => m.member)
                             .mapErr(i => i.member));
     }
+
+    get message(): Message {
+        return this.ctx.expect(SernError.MismatchEvent);
+    }
+
+    get interaction(): ChatInputCommandInteraction {
+        return this.ctx.expectErr(SernError.MismatchEvent);
+    }
+
 
     public get client(): Client {
         return safeUnwrap(this.ctx

@@ -56,9 +56,11 @@ vi.mock('discord.js', async (importOriginal) => {
 });
 
 function createRandomPlugin (s: 'go', mut?: Partial<Module>) {
-    return CommandInitPlugin(({ module, updateModule }) => {
+    return CommandInitPlugin(({ module }) => {
         if(mut) {
-            updateModule(mut)
+            for(const [k,v] of Object.entries(mut)) {
+                module[k] = v
+            }
         }
         return  s == 'go'
             ? controller.next()
@@ -105,8 +107,10 @@ test ('mutate with init plugins', async () => {
     const deps = mockDeps()
     const plugins = createRandomPlugin('go', { name: "abc" })
     const mod = createRandomModule([plugins])
+    console.log(mod)
     const s = await callInitPlugins(mod, deps, false)
-    expect(s.name).not.equal(mod.name)
+    console.log(s)
+    expect("abc").equal(s.name)
 })
 
 

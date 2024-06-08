@@ -1,7 +1,6 @@
 import type { Interaction } from 'discord.js';
 import { mergeMap, merge, concatMap, EMPTY } from 'rxjs';
-import { filterTap, sharedEventStream } from '../core/operators'
-import { createInteractionHandler, executeModule, intoTask } from './event-utils';
+import { createInteractionHandler, executeModule, intoTask, sharedEventStream, filterTap } from './event-utils';
 import { SernError } from '../core/structures/enums'
 import { isAutocomplete, isCommand, isMessageComponent, isModal, resultPayload } from '../core/functions'
 import { UnpackedDependencies } from '../types/utility';
