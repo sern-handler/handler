@@ -51,7 +51,6 @@ type ValidDependencyConfig =
 
 export async function makeDependencies (conf: ValidDependencyConfig) {
     const container = await __init_container({ autowire: false });
-    conf(dependencyBuilder(container));
     //We only include logger if it does not exist 
     const includeLogger = !container.hasKey('@sern/logger');
 
@@ -62,6 +61,7 @@ export async function makeDependencies (conf: ValidDependencyConfig) {
     __add_container('@sern/modules', new Map)
     __add_container('@sern/emitter', new EventEmitter)
     __add_wiredcontainer('@sern/cron', deps => new __Services.Cron(deps))
+    conf(dependencyBuilder(container));
     await container.ready();
 }
 

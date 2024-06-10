@@ -89,3 +89,4 @@ export async function Asset(p: string, opts?: { name?: string, encoding: AssetEn
         return fs.readFile(filePath, encoding);
     }
 }
+

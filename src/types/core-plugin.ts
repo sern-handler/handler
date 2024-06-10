@@ -38,20 +38,17 @@ export interface InitArgs<T extends Processed<Module> = Processed<Module>> {
     module: T;
     absPath: string;
     deps: Dependencies
-    updateModule: (module: Partial<T>) => T
 }
 export interface Plugin<Args extends any[] = any[]> {
     type: PluginType;
     execute: (...args: Args) => PluginResult;
 }
 
-export interface InitPlugin<Args extends any[] = any[]> {
+export interface InitPlugin<Args extends any[] = any[]> extends Plugin<Args> {
     type: PluginType.Init;
-    execute: (...args: Args) => PluginResult;
 }
-export interface ControlPlugin<Args extends any[] = any[]> {
+export interface ControlPlugin<Args extends any[] = any[]> extends Plugin<Args> {
     type: PluginType.Control;
-    execute: (...args: Args) => PluginResult;
 }
 
 export type AnyPlugin = ControlPlugin | InitPlugin<[InitArgs<Processed<Module>>]>;
