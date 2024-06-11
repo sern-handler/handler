@@ -31,27 +31,26 @@ export const Presence = {
             /**
              * @example
              * Presence
-             *     .of({ 
-             *          activities: [{ name: "deez nuts" }] 
-             *     }) //starts the presence with "deez nuts".
+             *     .of({ activities: [{ name: "deez nuts" }] }) //starts presence with "deez nuts".
              *     .repeated(prev => { 
              *         return {
              *             afk: true,
              *             activities: prev.activities?.map(s => ({ ...s, name: s.name+"s" }))
              *         };
-             *     }, 10000)) //every 10 s, the callback sets the presence to the returned one.
+             *     }, 10000)) //every 10 s, the callback sets the presence to the value returned.
              */
             repeated: (onRepeat: PresenceReduce, repeat: number | [Emitter, string]) => {
                 return { repeat, onRepeat, ...root }
             },
             /**
              * @example
+             * ```ts
              * Presence.of({
              *          activities: [
              *              { name: "Chilling out" }
              *          ]
-             *      })
-             *     .once() // Sets the presence once, with what's provided in '.of()'
+             *      }).once() // Sets the presence once, with what's provided in '.of()'
+             *  ```
              */
             once: () => root
         };

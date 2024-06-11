@@ -27,7 +27,9 @@ export function commandModule(mod: InputCommand): Module {
  * @param mod
  */
 export function eventModule(mod: InputEvent): Module {
-    return mod as Module;
+    const [onEvent, plugins] = partitionPlugins(mod.plugins);
+    if(onEvent.length !== 0) throw Error("Event modules cannot have ControlPlugins");
+    return { ...mod, plugins } as Module;
 }
 
 /** Create event modules from discord.js client events,

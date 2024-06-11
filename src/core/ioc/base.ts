@@ -48,7 +48,16 @@ const dependencyBuilder = (container: Container) => {
 type ValidDependencyConfig =
     | ((c: ReturnType<typeof dependencyBuilder>) => any)
 
-
+/**
+  * makeDependencies constructs a dependency injection container for sern handler to use.
+  * This is required to start the handler, and is to be called before Sern.init.
+  * @example
+  * ```ts
+  * await makeDependencies(({ add }) => {
+  *     add('@sern/client', new Client({ intents, partials }) 
+  * })
+  * ```
+  */
 export async function makeDependencies (conf: ValidDependencyConfig) {
     const container = await __init_container({ autowire: false });
     //We only include logger if it does not exist 

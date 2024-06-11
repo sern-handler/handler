@@ -33,7 +33,10 @@ export function Services<const T extends (keyof Dependencies)[]>(...keys: [...T]
  * Creates a singleton object.
  * @param cb
  */
-export function single<T>(cb: () => T) { return cb(); }
+export function single<T>(cb: () => T) { 
+    console.log('The `single` function is deprecated and has no effect')
+    return cb(); 
+}
 
 /**
  * @deprecated
@@ -41,5 +44,8 @@ export function single<T>(cb: () => T) { return cb(); }
  * Creates a transient object
  * @param cb
  */
-export function transient<T>(cb: () => () => T) { return cb()(); }
+export function transient<T>(cb: () => () => T) { 
+    console.log('The `transient` function is deprecated and has no effect')
+    return cb()(); 
+}
 

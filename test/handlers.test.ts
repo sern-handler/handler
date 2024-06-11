@@ -1,14 +1,14 @@
 //@ts-nocheck
 import { beforeEach, describe, expect, vi, it, test } from 'vitest';
-import { callInitPlugins, eventDispatcher } from '../../src/handlers/event-utils';
+import { callInitPlugins, eventDispatcher } from '../src/handlers/event-utils';
 
 import { Client, ChatInputCommandInteraction } from 'discord.js'
 import { faker } from '@faker-js/faker';
-import { Module } from '../../src/types/core-modules';
-import { Processed } from '../../src/types/core-modules';
+import { Module } from '../src/types/core-modules';
+import { Processed } from '../src/types/core-modules';
 import { EventEmitter } from 'events';
-import { EventType } from '../../dist/core/structures/enums';
-import { CommandControlPlugin, CommandInitPlugin, CommandType, controller } from '../../src';
+import { EventType } from '../dist/core/structures/enums';
+import { CommandControlPlugin, CommandInitPlugin, CommandType, controller } from '../src';
 
 vi.mock('discord.js', async (importOriginal) => {
     const mod = await importOriginal()
@@ -129,16 +129,16 @@ test('form sdt', async () => {
         "plugin2/abc": faker.git.branch(),
         "plugin3/cheese": faker.person.jobArea()
     }
-
-//    const plugin = CommandControlPlugin<CommandType.Slash>((ctx,sdt) => {
-//        return controller.next({ "plugin/abc": expectedObject['plugin/abc'] });
-//    });
-//    const plugin2 = CommandControlPlugin<CommandType.Slash>((ctx,sdt) => {
-//        return controller.next({ "plugin2/abc": expectedObject['plugin2/abc'] });
-//    });
-//    const plugin3 = CommandControlPlugin<CommandType.Slash>((ctx,sdt) => {
-//        return controller.next({ "plugin3/cheese": expectedObject['plugin3/cheese'] });
-//    });
+    
+    const plugin = CommandControlPlugin<CommandType.Slash>((ctx,sdt) => {
+        return controller.next({ "plugin/abc": expectedObject['plugin/abc'] });
+    });
+    const plugin2 = CommandControlPlugin<CommandType.Slash>((ctx,sdt) => {
+        return controller.next({ "plugin2/abc": expectedObject['plugin2/abc'] });
+    });
+    const plugin3 = CommandControlPlugin<CommandType.Slash>((ctx,sdt) => {
+        return controller.next({ "plugin3/cheese": expectedObject['plugin3/cheese'] });
+    });
     
 })
 

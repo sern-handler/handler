@@ -53,7 +53,7 @@ export interface ControlPlugin<Args extends any[] = any[]> extends Plugin<Args> 
 
 export type AnyPlugin = ControlPlugin | InitPlugin<[InitArgs<Processed<Module>>]>;
 
-export type CommandArgs<I extends CommandType = CommandType > = CommandArgsMatrix[I]
+export type CommandArgs<I extends CommandType = CommandType> = CommandArgsMatrix[I]
 
 interface CommandArgsMatrix {
     [CommandType.Text]: [Context, SDT];

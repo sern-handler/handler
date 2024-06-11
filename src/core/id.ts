@@ -1,7 +1,7 @@
 import { ApplicationCommandType, ComponentType, type Interaction, InteractionType } from 'discord.js';
 import { CommandType, EventType } from './structures/enums';
 
-const parseParams = (event: { customId: string }, id: string, append: string) => {
+const parseParams = (event: { customId: string }, append: string) => {
     const hasSlash = event.customId.indexOf('/')
     if(hasSlash === -1) {
         return { id:event.customId+append };
@@ -18,7 +18,7 @@ const parseParams = (event: { customId: string }, id: string, append: string) =>
 export function reconstruct<T extends Interaction>(event: T) {
     switch (event.type) {
         case InteractionType.MessageComponent: {
-            const data = parseParams(event, event.customId, `_C${event.componentType}`)
+            const data = parseParams(event, `_C${event.componentType}`)
             return [data];
         }
         case InteractionType.ApplicationCommand:
@@ -26,7 +26,7 @@ export function reconstruct<T extends Interaction>(event: T) {
             return [{ id: `${event.commandName}_A${event.commandType}` }, { id: `${event.commandName}_B` }];
         //Modal interactions are classified as components for sern
         case InteractionType.ModalSubmit: {
-            const data = parseParams(event, event.customId, '_M');
+            const data = parseParams(event, '_M');
             return [data];
         }
     }

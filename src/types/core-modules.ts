@@ -198,7 +198,10 @@ type EventModulesNoPlugins = {
 };
 
 export type InputEvent = {
-    [T in EventType]: EventModulesNoPlugins[T] & { once?: boolean };
+    [T in EventType]: EventModulesNoPlugins[T] & {
+        once?: boolean;
+        plugins?: InitPlugin[] 
+    };
 }[EventType];
 
 export type InputCommand = {
