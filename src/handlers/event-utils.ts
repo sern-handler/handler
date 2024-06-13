@@ -15,7 +15,7 @@ import * as assert from 'node:assert';
 import { Context } from '../core/structures/context';
 import { CommandType } from '../core/structures/enums'
 import { inspect } from 'node:util'
-import { disposeAll } from '../core/ioc/base';
+import { disposeAll } from '../core/ioc';
 import { resultPayload, isAutocomplete, treeSearch, fmt } from '../core/functions'
 
 function handleError<C>(crashHandler: ErrorHandling, emitter: Emitter, logging?: Logging) {

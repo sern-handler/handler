@@ -1,3 +1,6 @@
+//side effect: global container
+import { useContainerRaw } from '@sern/ioc/global';
+
 import callsites from 'callsites';
 import * as  Files from './core/module-loading';
 import { merge } from 'rxjs';
@@ -7,7 +10,6 @@ import messageHandler from './handlers/message';
 import interactionHandler from './handlers/interaction';
 import { presenceHandler } from './handlers/presence';
 import { handleCrash } from './handlers/event-utils';
-import { useContainerRaw } from './core/ioc/global';
 import { UnpackedDependencies } from './types/utility';
 import type { PresenceResult } from './core/presences';
 

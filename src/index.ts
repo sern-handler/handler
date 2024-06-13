@@ -53,7 +53,7 @@ export type Controller = typeof controller
 export * from './core/create-plugins';
 export { CommandType, PluginType, PayloadType, EventType } from './core/structures/enums';
 export { Context } from './core/structures/context';
-export * from './core/ioc';
+export { makeDependencies, single, transient, Service, Services } from './core/ioc';
 
 
 

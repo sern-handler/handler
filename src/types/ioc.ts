@@ -1,4 +1,4 @@
-import type { Container } from '../core/ioc/container';
+import type { Container } from '@sern/ioc';
 import * as Contracts from '../core/interfaces';
 import type { UnpackFunction  } from './utility'
 import type { Client } from 'discord.js'

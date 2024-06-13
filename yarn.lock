@@ -553,7 +553,7 @@ __metadata:
   resolution: "@sern/handler@workspace:."
   dependencies:
     "@faker-js/faker": ^8.0.1
-    "@sern/ioc": ^1.0.2
+    "@sern/ioc": ^1.0.3
     "@types/node": ^20.0.0
     "@types/node-cron": ^3.0.11
     "@typescript-eslint/eslint-plugin": 5.58.0
@@ -569,10 +569,10 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@sern/ioc@npm:^1.0.2":
-  version: 1.0.2
-  resolution: "@sern/ioc@npm:1.0.2"
-  checksum: 7e127e07c3f7eb2eefa77eb5f7c48ba37a259f089cbadfd91e1f6d448a5083cd7f38d4d3c5a2c6efada1b62120d310a3854ba2ba6444fb6a7279a11e2a0b4705
+"@sern/ioc@npm:^1.0.3":
+  version: 1.0.3
+  resolution: "@sern/ioc@npm:1.0.3"
+  checksum: 2c640cabbf3927d923b57233e660be1d6d4da1cd376a4ba77b118fd9aa5ef81c465d287357a15a7cd7827306dd614c73bde68751978d2030c3a4877dcbb0d02d
   languageName: node
   linkType: hard
 
