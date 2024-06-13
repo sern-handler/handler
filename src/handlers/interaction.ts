@@ -4,13 +4,12 @@ import { createInteractionHandler, executeModule, intoTask, sharedEventStream, f
 import { SernError } from '../core/structures/enums'
 import { isAutocomplete, isCommand, isMessageComponent, isModal, resultPayload } from '../core/functions'
 import { UnpackedDependencies } from '../types/utility';
-import { Emitter } from '../core/interfaces';
 
 export default function interactionHandler(deps: UnpackedDependencies, defaultPrefix?: string) {
     //i wish javascript had clojure destructuring 
     const { '@sern/client': client,
             '@sern/emitter': emitter } = deps
-    const interactionStream$ = sharedEventStream<Interaction>(client as unknown as Emitter, 'interactionCreate');
+    const interactionStream$ = sharedEventStream<Interaction>(client, 'interactionCreate');
     const handle = createInteractionHandler(interactionStream$, deps, defaultPrefix);
 
     const interactionHandler$ = merge(handle(isMessageComponent),

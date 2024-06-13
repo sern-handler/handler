@@ -222,7 +222,7 @@ export async function callInitPlugins(module: Module, deps: Dependencies, emit?:
             absPath: _module.meta.absPath,
             deps
         });
-        if (!res) throw Error("Plugin did not return anything.");
+        if (!res) throw Error("Plugin did not return anything. " + inspect(plugin, false, Infinity, true));
         if(res.isErr()) {
             if(emit) {
                 emitter?.emit('module.register',
