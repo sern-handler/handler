@@ -1,4 +1,4 @@
-import { Container } from './container';
+import { Container } from '@sern/ioc';
 import * as  __Services from '../structures/default-services';
 import type { Logging } from '../interfaces';
 import { __add_container, __add_wiredcontainer, __init_container, __swap_container, useContainerRaw } from './global';
@@ -34,8 +34,7 @@ const dependencyBuilder = (container: Container) => {
           * Swap out a preexisting dependency.
           */
         swap(key: keyof Dependencies, v: Insertable) {
-            //todo in container
-            this.add(key, v);
+            this.swap(key, v);
         },
    };
 };

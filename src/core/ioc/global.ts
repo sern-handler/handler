@@ -1,5 +1,5 @@
+import { Container } from '@sern/ioc';
 import { UnpackedDependencies } from '../../types/utility';
-import { Container } from './container';
 
 //SIDE EFFECT: GLOBAL DI
 let containerSubject: Container;

@@ -1,4 +1,4 @@
-import { IntoDependencies } from '../../types/ioc';
+import type { IntoDependencies } from '../../types/ioc';
 import { Service as __Service, Services as __Services } from './global'
 export { makeDependencies } from './base';
 
