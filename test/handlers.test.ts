@@ -57,8 +57,13 @@ vi.mock('discord.js', async (importOriginal) => {
 
 function createRandomPlugin (s: 'go', mut?: Partial<Module>) {
     return CommandInitPlugin(({ module }) => {
+        if(mut) {
+            Object.entries(mut).forEach(([k, v]) => {
+                module[k] = v
+            })
+        }
         return  s == 'go'
-            ? controller.next(mut)
+            ? controller.next()
             : controller.stop()
     })
 }
