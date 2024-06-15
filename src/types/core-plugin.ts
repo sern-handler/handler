@@ -33,7 +33,6 @@ import type {
 } from 'discord.js';
 
 export type PluginResult = Awaitable<Result<Record<string,unknown>|undefined, string|undefined>>;
-
 export interface InitArgs<T extends Processed<Module> = Processed<Module>> {
     module: T;
     absPath: string;
@@ -46,6 +45,7 @@ export interface Plugin<Args extends any[] = any[]> {
 
 export interface InitPlugin<Args extends any[] = any[]> extends Plugin<Args> {
     type: PluginType.Init;
+    execute: (...args: Args) => PluginResult;
 }
 export interface ControlPlugin<Args extends any[] = any[]> extends Plugin<Args> {
     type: PluginType.Control;

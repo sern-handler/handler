@@ -18,7 +18,7 @@ import type {
 } from 'discord.js';
 import type { CommandType, EventType } from '../core/structures/enums';
 import { Context } from '../core/structures/context'
-import { AnyPlugin, ControlPlugin, InitPlugin } from './core-plugin';
+import { ControlPlugin, InitPlugin, Plugin } from './core-plugin';
 import { Awaitable, SernEventsMapping } from './utility';
 
 //state, deps, type (very original)
@@ -41,6 +41,7 @@ export interface Module {
         id: string;
         absPath: string;
     }
+    locals: Record<string,unknown>
     execute(...args: any[]): Awaitable<any>;
 }
 
@@ -191,10 +192,10 @@ export interface SernAutocompleteData
 }
 
 type CommandModuleNoPlugins = {
-    [T in CommandType]: Omit<CommandModuleDefs[T], 'plugins' | 'onEvent' | 'meta'>;
+    [T in CommandType]: Omit<CommandModuleDefs[T], 'plugins' | 'onEvent' | 'meta' | 'locals'>;
 };
 type EventModulesNoPlugins = {
-    [T in EventType]: Omit<EventModuleDefs[T], 'plugins' | 'onEvent' | 'meta'> ;
+    [T in EventType]: Omit<EventModuleDefs[T], 'plugins' | 'onEvent' | 'meta' | 'locals'> ;
 };
 
 export type InputEvent = {
@@ -206,7 +207,7 @@ export type InputEvent = {
 
 export type InputCommand = {
     [T in CommandType]: CommandModuleNoPlugins[T] & {
-        plugins?: AnyPlugin[];
+        plugins?: Plugin[];
     };
 }[CommandType];
 

@@ -14,11 +14,10 @@ import type { Awaitable } from '../types/utility';
  */
 export function commandModule(mod: InputCommand): Module {
     const [onEvent, plugins] = partitionPlugins(mod.plugins);
-    return {
-        ...mod,
-        onEvent,
-        plugins,
-    } as Module;
+    return { ...mod,
+             onEvent,
+             plugins,
+             locals: {} } as Module;
 }
 
 /**
@@ -29,7 +28,9 @@ export function commandModule(mod: InputCommand): Module {
 export function eventModule(mod: InputEvent): Module {
     const [onEvent, plugins] = partitionPlugins(mod.plugins);
     if(onEvent.length !== 0) throw Error("Event modules cannot have ControlPlugins");
-    return { ...mod, plugins } as Module;
+    return { ...mod,
+             plugins,
+             locals: {} } as Module;
 }
 
 /** Create event modules from discord.js client events,

@@ -17,6 +17,7 @@ import { CommandType } from '../core/structures/enums'
 import { inspect } from 'node:util'
 import { disposeAll } from '../core/ioc';
 import { resultPayload, isAutocomplete, treeSearch, fmt } from '../core/functions'
+import merge from 'deepmerge'
 
 function handleError<C>(crashHandler: ErrorHandling, emitter: Emitter, logging?: Logging) {
     return (pload: unknown, caught: Observable<C>) => {
@@ -213,25 +214,26 @@ export function createResultResolver<Output>(config: {
     };
 };
 
-export async function callInitPlugins(module: Module, deps: Dependencies, emit?: boolean) {
-    let _module = module;
+function isObject(item: unknown) {
+    return (item && typeof item === 'object' && !Array.isArray(item));
+}
+
+//_module is frozen, preventing from mutations
+export async function callInitPlugins(_module: Module, deps: Dependencies, emit?: boolean) {
+    let module = _module;
     const emitter = deps['@sern/emitter'];
-    for(const plugin of _module.plugins ?? []) {
-        const res = await plugin.execute({ 
-            module: _module,
-            absPath: _module.meta.absPath,
-            deps
-        });
-        if (!res) throw Error("Plugin did not return anything. " + inspect(plugin, false, Infinity, true));
-        if(res.isErr()) {
+    for(const plugin of module.plugins ?? []) {
+        const result = await plugin.execute({ module, absPath: module.meta.absPath, deps });
+        if (!result) throw Error("Plugin did not return anything. " + inspect(plugin, false, Infinity, true));
+        if(result.isErr()) {
             if(emit) {
                 emitter?.emit('module.register',
-                              resultPayload('failure', module, res.error ?? SernError.PluginFailure));
+                              resultPayload('failure', module, result.error ?? SernError.PluginFailure));
             }
-            throw Error(res.error ?? SernError.PluginFailure);
+            throw Error(result.error ?? SernError.PluginFailure);
         }
     }
-    return _module
+    return module
 }
 
 async function callPlugins({ args, module, deps, params }: ExecutePayload) {
@@ -241,8 +243,8 @@ async function callPlugins({ args, module, deps, params }: ExecutePayload) {
         if(result.isErr()) {
             return result;
         }
-        if(typeof result.value  === 'object' && result.value !== null) {
-            state = { ...state, ...result.value,  };
+        if(isObject(result.value)) {
+            state = merge(state, result.value!);
         }
     }
     return Ok(state);

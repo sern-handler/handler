@@ -553,12 +553,13 @@ __metadata:
   resolution: "@sern/handler@workspace:."
   dependencies:
     "@faker-js/faker": ^8.0.1
-    "@sern/ioc": ^1.0.3
+    "@sern/ioc": ^1.0.4
     "@types/node": ^20.0.0
     "@types/node-cron": ^3.0.11
     "@typescript-eslint/eslint-plugin": 5.58.0
     "@typescript-eslint/parser": 5.59.1
     callsites: ^3.1.0
+    deepmerge: ^4.3.1
     discord.js: ^14.x.x
     eslint: 8.39.0
     node-cron: ^3.0.3
@@ -569,10 +570,10 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@sern/ioc@npm:^1.0.3":
-  version: 1.0.3
-  resolution: "@sern/ioc@npm:1.0.3"
-  checksum: 2c640cabbf3927d923b57233e660be1d6d4da1cd376a4ba77b118fd9aa5ef81c465d287357a15a7cd7827306dd614c73bde68751978d2030c3a4877dcbb0d02d
+"@sern/ioc@npm:^1.0.4":
+  version: 1.0.4
+  resolution: "@sern/ioc@npm:1.0.4"
+  checksum: 3d1a63099b3e8ff0d44bb73007b1d66c3f3b27cf7a193c2d9122e021cb72be1ced535ea98efaf72602f371a489177e3b144ed72da8d7de80887c0408ce79cce2
   languageName: node
   linkType: hard
 
@@ -1169,6 +1170,13 @@ __metadata:
   version: 0.1.4
   resolution: "deep-is@npm:0.1.4"
   checksum: edb65dd0d7d1b9c40b2f50219aef30e116cedd6fc79290e740972c132c09106d2e80aa0bc8826673dd5a00222d4179c84b36a790eef63a4c4bca75a37ef90804
+  languageName: node
+  linkType: hard
+
+"deepmerge@npm:^4.3.1":
+  version: 4.3.1
+  resolution: "deepmerge@npm:4.3.1"
+  checksum: 2024c6a980a1b7128084170c4cf56b0fd58a63f2da1660dcfe977415f27b17dbe5888668b59d0b063753f3220719d5e400b7f113609489c90160bb9a5518d052
   languageName: node
   linkType: hard
 

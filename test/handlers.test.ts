@@ -57,13 +57,8 @@ vi.mock('discord.js', async (importOriginal) => {
 
 function createRandomPlugin (s: 'go', mut?: Partial<Module>) {
     return CommandInitPlugin(({ module }) => {
-        if(mut) {
-            for(const [k,v] of Object.entries(mut)) {
-                module[k] = v
-            }
-        }
         return  s == 'go'
-            ? controller.next()
+            ? controller.next(mut)
             : controller.stop()
     })
 }
@@ -103,16 +98,22 @@ describe('eventDispatcher standard', () => {
     });
 });
 
-test ('mutate with init plugins', async () => {
+test ('call init plugins', async () => {
     const deps = mockDeps()
     const plugins = createRandomPlugin('go', { name: "abc" })
     const mod = createRandomModule([plugins])
-    console.log(mod)
     const s = await callInitPlugins(mod, deps, false)
-    console.log(s)
     expect("abc").equal(s.name)
 })
 
+test('init plugins replace array', async () => {
+    const deps = mockDeps()
+    const plugins = createRandomPlugin('go', { opts: [] })
+    const plugins2 = createRandomPlugin('go', { opts: ['a'] })
+    const mod = createRandomModule([plugins, plugins2])
+    const s = await callInitPlugins(mod, deps, false)
+    expect(['a']).deep.equal(s.opts)
+})
 
 test('call control plugin ', async () => {
     const plugin = CommandControlPlugin<CommandType.Slash>((ctx,sdt) => {
