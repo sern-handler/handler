@@ -20,7 +20,7 @@ interface Wrapper {
 }
 /**
  * @since 1.0.0
- * @param wrapper Options to pass into sern.
+ * @param maybeWrapper Options to pass into sern.
  * Function to start the handler up
  * @example
  * ```ts title="src/index.ts"
