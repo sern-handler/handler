@@ -3,7 +3,7 @@ import {
     CommandControlPlugin,
     CommandInitPlugin,
     EventInitPlugin,
-} from '../../src/core/create-plugins';
+} from '../../src';
 import { PluginType, controller } from '../../src';
 
 describe('create-plugins', () => {

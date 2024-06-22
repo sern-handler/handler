@@ -1,5 +1,5 @@
 import type { ActivitiesOptions } from "discord.js";
-import type { IntoDependencies } from "../types/ioc";
+import type { IntoDependencies } from "./ioc";
 import type { Emitter } from "./interfaces";
 
 type Status = 'online' | 'idle' | 'invisible' | 'dnd'

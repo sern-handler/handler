@@ -1,10 +1,13 @@
-import type { IntoDependencies } from '../types/ioc';
 import { Service as $Service, Services as $Services } from '@sern/ioc/global'
 import { Container } from '@sern/ioc';
+import * as Contracts from './interfaces';
 import * as  __Services from './structures/default-services';
 import type { Logging } from './interfaces';
 import { __init_container, useContainerRaw } from '@sern/ioc/global';
 import { EventEmitter } from 'node:events';
+import { Client } from 'discord.js';
+import { Module } from '../types/core-modules';
+import { UnpackFunction } from '../types/utility';
 
 export function disposeAll(logger: Logging|undefined) {
    useContainerRaw() 
@@ -115,5 +118,39 @@ export function single<T>(cb: () => T) {
 export function transient<T>(cb: () => () => T) { 
     console.log('The `transient` function is deprecated and has no effect')
     return cb()(); 
+}
+
+export type DependencyFromKey<T extends keyof Dependencies> = Dependencies[T];
+
+
+
+export type IntoDependencies<Tuple extends [...any[]]> = {
+    [Index in keyof Tuple]: UnpackFunction<NonNullable<DependencyFromKey<Tuple[Index]>>>; //Unpack and make NonNullable
+} & { length: Tuple['length'] };
+
+export interface CoreDependencies {
+    /**
+      * discord.js client.
+      */
+    '@sern/client':  Client;
+    /**
+      * sern emitter listens to events that happen throughout
+      * the handler. some include module.register, module.activate.
+      */
+    '@sern/emitter': Contracts.Emitter;
+    /**
+      * An error handler which is the final step before 
+      * the sern process actually crashes.
+      */
+    '@sern/errors':  Contracts.ErrorHandling;
+    /**
+      * Optional logger. Performs ... logging
+      */
+    '@sern/logger'?: Contracts.Logging;
+    /**
+      * Readonly module store. sern stores these 
+      * by module.meta.id -> Module
+      */
+    '@sern/modules': Map<string, Module>;
 }
 

@@ -7,7 +7,7 @@ import { faker } from '@faker-js/faker';
 import { Module } from '../src/types/core-modules';
 import { Processed } from '../src/types/core-modules';
 import { EventEmitter } from 'events';
-import { EventType } from '../dist/core/structures/enums';
+import { EventType } from '../src/core/structures/enums';
 import { CommandControlPlugin, CommandInitPlugin, CommandType, controller } from '../src';
 
 vi.mock('discord.js', async (importOriginal) => {

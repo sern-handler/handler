@@ -40,3 +40,6 @@ export const controller = {
     next: (val?: Record<string,unknown>) => Ok(val),
     stop: (val?: string) => Err(val),
 };
+
+
+export type Controller = typeof controller;

@@ -38,7 +38,6 @@ export type {
 
 
 export type { Payload, SernEventsMapping } from './types/utility';
-export type { CoreDependencies } from './types/ioc';
 
 export {
     commandModule,
@@ -48,12 +47,23 @@ export {
 
 export * from './core/presences'
 export * from './core/interfaces'
-import type { controller } from './core/create-plugins';
-export type Controller = typeof controller
-export * from './core/create-plugins';
+export * from './core/plugin';
 export { CommandType, PluginType, PayloadType, EventType } from './core/structures/enums';
 export { Context } from './core/structures/context';
-export { makeDependencies, single, transient, Service, Services } from './core/ioc';
+export { type CoreDependencies, makeDependencies, single, transient, Service, Services } from './core/ioc';
 
 
+import type { Container } from '@sern/ioc';
 
+/**
+  * @deprecated This old signature will be incompatible with future versions of sern.
+  * ```ts
+  *  To switch your old code:
+     await makeDependencies(({ add }) => { 
+            add('@sern/client', new Client())
+     })
+  *  ```
+  */
+export interface DependencyConfiguration {
+    build: (root: Container) => Container;
+}
