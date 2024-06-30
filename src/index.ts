@@ -56,7 +56,8 @@ export { type CoreDependencies, makeDependencies, single, transient, Service, Se
 import type { Container } from '@sern/ioc';
 
 /**
-  * @deprecated This old signature will be incompatible with future versions of sern.
+  * @deprecated This old signature will be incompatible with future versions of sern >= 4.0.0. See {@link makeDependencies}
+  * @example
   * ```ts
   *  To switch your old code:
      await makeDependencies(({ add }) => { 
