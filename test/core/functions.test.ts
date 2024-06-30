@@ -1,11 +1,13 @@
+//@ts-nocheck
+
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { PluginType, SernOptionsData, controller } from '../../src/index';
 import { partitionPlugins, treeSearch } from '../../src/core/functions';
 import { faker } from '@faker-js/faker';
 import { ApplicationCommandOptionType, AutocompleteInteraction } from 'discord.js';
 
-vi.mock('discord.js', () => {
-    const Collection = Map;
+vi.mock('discord.js', async (importOriginal) => {
+    const mod = await importOriginal()
     const ModalSubmitInteraction = class {
         customId;
         type = 5;
@@ -36,35 +38,11 @@ vi.mock('discord.js', () => {
     };
 
     return {
-        Collection,
-        ComponentType: {
-            Button: 2,
-        },
-        InteractionType: {
-            Ping: 1,
-            ApplicationCommand: 2,
-            MessageComponent: 3,
-            ApplicationCommandAutocomplete: 4,
-            ModalSubmit: 5,
-        },
-        ApplicationCommandOptionType: {
-            Subcommand: 1,
-            SubcommandGroup: 2,
-            String: 3,
-            Integer: 4,
-            Boolean: 5,
-            User: 6,
-            Channel: 7,
-            Role: 8,
-            Mentionable: 9,
-            Number: 10,
-            Attachment: 11,
-        },
-        ApplicationCommandType: {
-            ChatInput: 1,
-            User: 2,
-            Message: 3,
-        },
+        Collection: mod.Collection,
+        ComponentType: mod.ComponentType,
+        InteractionType: mod.InteractionType,
+        ApplicationCommandOptionType: mod.ApplicationCommandOptionType,
+        ApplicationCommandType: mod.ApplicationCommandType, 
         ModalSubmitInteraction,
         ButtonInteraction,
         AutocompleteInteraction,
