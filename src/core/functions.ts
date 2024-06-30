@@ -20,7 +20,7 @@ import type { Payload } from '../types/utility';
  * @returns The message without the prefix
  * @example
  * message.content = '!ping';
- * console.log(fmt(message, '!'));
+ * console.log(fmt(message.content, '!'));
  * // [ 'ping' ]
  */
 export function fmt(msg: string, prefix?: string): string[] {
