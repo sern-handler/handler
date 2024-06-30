@@ -88,5 +88,11 @@
     "engines": {
         "node": ">= 20.0.x"
     },
-    "homepage": "https://sern.dev"
+    "homepage": "https://sern.dev",
+    "overrides": {
+        "ws": "8.17.1"
+    },
+    "resolutions": {
+        "ws": "8.17.1"
+    }
 }
