@@ -1,11 +1,11 @@
 import { concatMap, from, interval, of, map, scan, startWith, fromEvent, take } from "rxjs"
-import { PresenceConfig, PresenceResult } from "../core/presences";
+import { Presence  } from "../core/presences";
 import { Services } from "../core/ioc";
 import assert from "node:assert";
 import * as Files from "../core/module-loading";
-type SetPresence = (conf: PresenceResult) => Promise<unknown>
+type SetPresence = (conf: Presence.Result) => Promise<unknown>
 
-const parseConfig = async (conf: Promise<PresenceResult>) => {
+const parseConfig = async (conf: Promise<Presence.Result>) => {
     return conf.then(s => {
         if('repeat' in s) {
             const { onRepeat, repeat } = s;
@@ -23,7 +23,7 @@ const parseConfig = async (conf: Promise<PresenceResult>) => {
 
 export const presenceHandler = (path: string, setPresence: SetPresence) => {
     const presence = Files
-        .importModule<PresenceConfig<(keyof Dependencies)[]>>(path)
+        .importModule<Presence.Config<(keyof Dependencies)[]>>(path)
         .then(({ module }) => {
             //fetch services with the order preserved, passing it to the execute fn 
             const fetchedServices = Services(...module.inject ?? []);

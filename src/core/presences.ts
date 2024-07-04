@@ -3,16 +3,9 @@ import type { IntoDependencies } from "./ioc";
 import type { Emitter } from "./interfaces";
 
 type Status = 'online' | 'idle' | 'invisible' | 'dnd'
-type PresenceReduce = (previous: PresenceResult) => PresenceResult;
+type PresenceReduce = (previous: Presence.Result) => Presence.Result;
 
-export interface PresenceResult { 
-    status?: Status;
-    afk?: boolean;
-    activities?: ActivitiesOptions[];
-    shardId?: number[];
-    repeat?: number | [Emitter, string];
-    onRepeat?: (previous: PresenceResult) => PresenceResult; 
-}
+
 
 export const Presence = {
     /**
@@ -20,13 +13,13 @@ export const Presence = {
      * Create a Presence module which **MUST** be put in a file called presence.(language-extension)
      * adjacent to the file where **Sern.init** is CALLED.
      */
-    module : <T extends (keyof Dependencies)[]>(conf: PresenceConfig<T>) => conf,
+    module : <T extends (keyof Dependencies)[]>(conf: Presence.Config<T>) => conf,
     /**
      * Create a Presence body which can be either: 
      * - once, the presence is activated only once.
      * - repeated, per cycle or event, the presence can be changed.
      */
-    of : (root: Omit<PresenceResult, 'repeat' | 'onRepeat'>) => {
+    of : (root: Omit<Presence.Result, 'repeat' | 'onRepeat'>) => {
         return { 
             /**
              * @example
@@ -56,9 +49,20 @@ export const Presence = {
         };
     }
 }
+export declare namespace Presence {
+    type Config<T extends (keyof Dependencies)[]> = {
+        inject?: [...T]
+        execute: (...v: IntoDependencies<T>) => Presence.Result;
 
-export type PresenceConfig <T extends (keyof Dependencies)[]> = {
-    inject?: [...T]
-    execute: (...v: IntoDependencies<T>) => PresenceResult;
-    
-};
+    }
+
+    export interface Result { 
+        status?: Status;
+        afk?: boolean;
+        activities?: ActivitiesOptions[];
+        shardId?: number[];
+        repeat?: number | [Emitter, string];
+        onRepeat?: (previous: Result) => Result; 
+    }
+}
+
