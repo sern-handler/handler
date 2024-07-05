@@ -39,10 +39,8 @@ export const Presence = {
              * @example
              * ```ts
              * Presence.of({
-             *          activities: [
-             *              { name: "Chilling out" }
-             *          ]
-             *      }).once() // Sets the presence once, with what's provided in '.of()'
+             *    activities: [{ name: "Chilling out" }]
+             * }).once() // Sets the presence once, with what's provided in '.of()'
              *  ```
              */
             once: () => root
@@ -50,7 +48,7 @@ export const Presence = {
     }
 }
 export declare namespace Presence {
-    type Config<T extends (keyof Dependencies)[]> = {
+    export type Config<T extends (keyof Dependencies)[]> = {
         inject?: [...T]
         execute: (...v: IntoDependencies<T>) => Presence.Result;
 

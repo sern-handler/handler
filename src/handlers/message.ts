@@ -1,6 +1,6 @@
 import { EMPTY, mergeMap, concatMap } from 'rxjs';
 import type { Message } from 'discord.js';
-import { createMessageHandler, executeModule, intoTask, sharedEventStream, filterTap} from './event-utils';
+import { createMessageHandler, executeModule, intoTask, sharedEventStream, filterTap, handleCrash} from './event-utils';
 import { SernError } from '../core/structures/enums'
 import { resultPayload } from '../core/functions'
 import { UnpackedDependencies } from '../types/utility';
@@ -44,5 +44,7 @@ function (deps: UnpackedDependencies, defaultPrefix?: string) {
             if(payload)
                 return executeModule(emitter, payload)
             return EMPTY;
-        }));
+        }),
+        handleCrash(deps, "message handling")
+    )
 }

@@ -58,7 +58,6 @@ export enum EventType {
      * Could be for example, `process` events, database events
      */
     External,
-    Cron
 }
 
 /**

@@ -12,11 +12,13 @@ import { presenceHandler } from './handlers/presence';
 import { handleCrash } from './handlers/event-utils';
 import { UnpackedDependencies } from './types/utility';
 import type { Presence} from './core/presences';
+import { registerTasks } from './handlers/tasks';
 
 interface Wrapper {
     commands: string;
     defaultPrefix?: string;
     events?: string;
+    tasks?: string;
 }
 /**
  * @since 1.0.0
@@ -57,11 +59,14 @@ export function init(maybeWrapper: Wrapper = { commands: "./dist/commands" }) {
                 }
                 presenceHandler(presencePath.path, setPresence).subscribe();
             }
+            if(maybeWrapper.tasks) {
+                registerTasks(maybeWrapper.tasks, deps);
+            }
         })
         .catch(err => { throw err });
 
     const messages$ = messageHandler(deps, maybeWrapper.defaultPrefix);
     const interactions$ = interactionHandler(deps, maybeWrapper.defaultPrefix);
     // listening to the message stream and interaction stream
-    merge(messages$, interactions$).pipe(handleCrash(deps)).subscribe();
+    merge(messages$, interactions$).subscribe();
 }

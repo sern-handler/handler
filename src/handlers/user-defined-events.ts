@@ -14,12 +14,6 @@ const intoDispatcher = (deps: UnpackedDependencies) =>
                 return eventDispatcher(deps, module,  deps['@sern/client']);
             case EventType.External:
                 return eventDispatcher(deps, module,  deps[module.emitter]);
-            case EventType.Cron: {
-                //@ts-ignore
-                const cron = deps['@sern/cron'];
-                cron.addCronModule(module);
-                return eventDispatcher(deps, module, cron);
-            }
             default: throw Error(SernError.InvalidModuleType + ' while creating event handler');
         }
 };
@@ -34,6 +28,6 @@ export default async function(deps: UnpackedDependencies, eventDir: string) {
     from(eventModules)
         .pipe(map(intoDispatcher(deps)),
                mergeAll(), // all eventListeners are turned on
-               handleCrash(deps))
+               handleCrash(deps, "event modules"))
             .subscribe();
 }

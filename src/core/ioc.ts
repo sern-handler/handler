@@ -67,8 +67,8 @@ export async function makeDependencies (conf: ValidDependencyConfig) {
     container.addSingleton('@sern/errors', new __Services.DefaultErrorHandling);
     container.addSingleton('@sern/modules', new Map);
     container.addSingleton('@sern/emitter', new EventEmitter)
-    container.addWiredSingleton('@sern/cron', 
-                         (deps) => new __Services.Cron(deps as unknown as Dependencies))
+    container.addWiredSingleton('@sern/scheduler', 
+                         (deps) => new __Services.CronScheduler(deps as unknown as Dependencies))
     conf(dependencyBuilder(container));
     await container.ready();
 }

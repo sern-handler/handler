@@ -58,14 +58,7 @@ export interface ExternalEventCommand extends Module {
     type: EventType.External;
     execute(...args: unknown[]): Awaitable<unknown>;
 }
-export interface CronEventCommand extends Module { 
-    type: EventType.Cron;
-    name?: string;
-    pattern: string;
-    runOnInit?: boolean
-    timezone?: string;
-    execute(...args: unknown[]): Awaitable<unknown>;
-}
+
 
 export interface ContextMenuUser extends Module {
     type: CommandType.CtxUser;
@@ -142,7 +135,7 @@ export interface BothCommand extends Module {
     execute: (ctx: Context, tbd: SDT) => Awaitable<unknown>;
 }
 
-export type EventModule = DiscordEventCommand | SernEventCommand | ExternalEventCommand  | CronEventCommand;
+export type EventModule = DiscordEventCommand | SernEventCommand | ExternalEventCommand;  
 export type CommandModule =
     | TextCommand
     | SlashCommand
@@ -178,7 +171,6 @@ export interface EventModuleDefs {
     [EventType.Sern]: SernEventCommand;
     [EventType.Discord]: DiscordEventCommand;
     [EventType.External]: ExternalEventCommand;
-    [EventType.Cron]: CronEventCommand;
 }
 
 export interface SernAutocompleteData

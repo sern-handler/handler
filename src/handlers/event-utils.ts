@@ -262,10 +262,9 @@ export function intoTask(onStop: (m: Module) => unknown) {
     return createResultResolver({ onStop, onNext });
 }
 
-export const handleCrash = 
-    ({ "@sern/errors": err, '@sern/emitter': sem, '@sern/logger': log } : UnpackedDependencies) => 
+export const handleCrash = ({ "@sern/errors": err, '@sern/emitter': sem, '@sern/logger': log } : UnpackedDependencies, metadata: string) => 
     pipe(catchError(handleError(err, sem, log)),
          finalize(() => {
-            log?.info({ message: 'A stream closed or reached end of lifetime' });
+            log?.info({ message: 'A stream closed: ' + metadata  });
             disposeAll(log);
          }))
