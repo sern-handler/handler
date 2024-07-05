@@ -4,6 +4,7 @@ import type {
     InputCommand,
     InputEvent,
     Module,
+    ScheduledTask,
 } from '../types/core-modules';
 import { partitionPlugins } from './functions'
 import type { Awaitable } from '../types/utility';
@@ -44,5 +45,10 @@ export function discordEvent<T extends keyof ClientEvents>(mod: {
     execute: (...args: ClientEvents[T]) => Awaitable<unknown>;
 }) {
     return eventModule({ type: EventType.Discord, ...mod, });
+}
+
+
+export function scheduledTask(i : ScheduledTask) {
+    return i 
 }
 

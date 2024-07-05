@@ -2,16 +2,24 @@ import { CronJob } from 'cron';
 export class TaskScheduler {
     private __tasks: Map<string, CronJob> = new Map();
 
-    scheduleTask(taskName: string, cronExpression: string, task: () => void): boolean {
+    scheduleTask(taskName: string, cronExpression: string | Date, task: () => void, tz: string|  undefined): boolean {
         if (this.__tasks.has(taskName)) {
+            console.warn("While scheduling a task",
+                         "found another task of same name. Not scheduling",
+                         taskName, "again");
             return false;
         }
         try {
-          const job = new CronJob(cronExpression, task);
+          const job = CronJob.from({
+              cronTime: cronExpression,
+              onTick: task,
+              timeZone: tz
+          });
           job.start();
           this.__tasks.set(taskName, job);
           return true;
         } catch (error) {
+          console.error("While scheduling a task " + error);
           return false;
         }
     }

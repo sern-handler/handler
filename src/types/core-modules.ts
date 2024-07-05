@@ -19,7 +19,7 @@ import type {
 import type { CommandType, EventType } from '../core/structures/enums';
 import { Context } from '../core/structures/context'
 import { ControlPlugin, InitPlugin, Plugin } from './core-plugin';
-import { Awaitable, SernEventsMapping } from './utility';
+import { Awaitable, SernEventsMapping, UnpackedDependencies } from './utility';
 
 //state, deps, type (very original)
 export type SDT = {
@@ -222,3 +222,21 @@ export interface SernSubCommandGroupData extends BaseApplicationCommandOptionsDa
     type: ApplicationCommandOptionType.SubcommandGroup;
     options?: SernSubCommandData[];
 }
+
+
+interface ScheduledTaskContext {
+    deps: UnpackedDependencies, 
+    lastTimeExecution: Date | null;
+    runningTasks: string[];
+    nextTimeExecution: Date | null;
+}
+
+export interface ScheduledTask {
+    name?: string;
+    pattern: string | Date;
+    description?: string;
+    timezone?: string;
+    execute(tasks: ScheduledTaskContext): Awaitable<void>
+}
+
+

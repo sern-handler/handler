@@ -25,7 +25,8 @@ export type {
     SernOptionsData,
     SernSubCommandData,
     SernSubCommandGroupData,
-    SDT
+    SDT,
+    ScheduledTask
 } from './types/core-modules';
 
 export type {
@@ -43,6 +44,7 @@ export {
     commandModule,
     eventModule,
     discordEvent,
+    scheduledTask
 } from './core/modules';
 
 export * from './core/presences'
