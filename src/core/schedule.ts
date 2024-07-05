@@ -1,26 +1,21 @@
 import { CronJob } from 'cron';
+import { Err, Ok, type Result } from 'ts-results-es'
 export class TaskScheduler {
     private __tasks: Map<string, CronJob> = new Map();
 
-    scheduleTask(taskName: string, cronExpression: string | Date, task: () => void, tz: string|  undefined): boolean {
+    scheduleTask(taskName: string, cronExpression: string | Date, task: () => void, tz: string|  undefined): Result<void, string> {
         if (this.__tasks.has(taskName)) {
-            console.warn("While scheduling a task",
-                         "found another task of same name. Not scheduling",
-                         taskName, "again");
-            return false;
+            return Err("while scheduling a task \
+                        found another task of same name. Not scheduling " +
+                       taskName + "again."  );
         }
         try {
-          const job = CronJob.from({
-              cronTime: cronExpression,
-              onTick: task,
-              timeZone: tz
-          });
+          const job = CronJob.from({ cronTime: cronExpression, onTick: task, timeZone: tz });
           job.start();
           this.__tasks.set(taskName, job);
-          return true;
+          return Ok.EMPTY;
         } catch (error) {
-          console.error("While scheduling a task " + error);
-          return false;
+          return Err(`while scheduling a task ${taskName} ` +  error);
         }
     }
   

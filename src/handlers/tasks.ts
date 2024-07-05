@@ -14,16 +14,14 @@ export const registerTasks = async (tasksPath: string, deps: UnpackedDependencie
         
         //module.name is assigned by Files.importModule<>
         // the id created for the task is unique
-        const uuid = module.name!+":"+relative(tasksPath,fileURLToPath(f))
-        taskManager.scheduleTask(uuid, module.pattern, function(this: CronJob) {
+        const uuid = module.name!+"/"+relative(tasksPath,fileURLToPath(f))
+       taskManager.scheduleTask(uuid, module.pattern, function(this: CronJob) {
             module.execute({  
                 deps,
                 runningTasks: taskManager.tasks(),
                 lastTimeExecution: this.lastExecution,
                 nextTimeExecution: this.nextDate().toJSDate()
             })
-        },
-        module.timezone)
+        }, module.timezone).unwrap()
     }
-
 }
