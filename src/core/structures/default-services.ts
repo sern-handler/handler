@@ -1,5 +1,5 @@
-import type { LogPayload, Logging, ErrorHandling, Emitter } from '../interfaces';
-import { AnyFunction, UnpackedDependencies } from '../../types/utility';
+import type { LogPayload, Logging, ErrorHandling } from '../interfaces';
+import { CronJob } from 'cron';
 
 /**
  * @internal
@@ -40,30 +40,46 @@ export class DefaultLogging implements Logging {
     }
 }
 
-export class CronScheduler {
-    tasks: string[] = [];
-    constructor(private deps: UnpackedDependencies) {}
-//    addListener(eventName: string | symbol, listener: AnyFunction): this {
-//        const retrievedModule = this.modules.get(eventName);
-//        if(!retrievedModule) throw Error("Adding task: module " +eventName +"was not found");
-//        const { pattern, name, runOnInit, timezone } = retrievedModule;
-//        cron.schedule(pattern, 
-//            (date) => listener({ date, deps: this.deps }),
-//            { name, runOnInit, timezone, scheduled: true });
-//        return this;
-//    }
-//    removeListener(eventName: string | symbol, listener: AnyFunction) {
-//        const retrievedModule = this.modules.get(eventName);
-//        if(!retrievedModule) throw Error("Removing cron: module " +eventName +"was not found");
-//        const task = cron.getTasks().get(retrievedModule.name!) 
-//        if(!task) throw Error("Finding cron task with"+ retrievedModule.name + " not found");
-//        task.stop();
-//        return this;
-//    }
-//    emit(eventName: string | symbol, ...payload: any[]): boolean {
-//        const retrievedModule = this.modules.get(eventName);
-//        if(!retrievedModule) throw Error("Removing cron: module " +eventName +"was not found");
-//        const task= cron.getTasks().get(retrievedModule.name!) 
-//        return task?.emit(eventName, payload) ?? false;
-//    }
+
+export class TaskScheduler {
+    private __tasks: Map<string, CronJob> = new Map();
+
+    schedule(taskName: string, cronExpression: string | Date, task: () => void, tz: string|  undefined) {
+        if (this.__tasks.has(taskName)) {
+            throw Error("while scheduling a task \
+                        found another task of same name. Not scheduling " +
+                       taskName + "again."  );
+        }
+        try {
+          const job = CronJob.from({ cronTime: cronExpression, onTick: task, timeZone: tz });
+          job.start();
+          this.__tasks.set(taskName, job);
+        } catch (error) {
+          throw Error(`while scheduling a task ${taskName} ` +  error);
+        }
+    }
+  
+    kill(taskName: string): boolean {
+        const job = this.__tasks.get(taskName);
+        if (job) {
+            job.stop();
+            this.__tasks.delete(taskName);
+            return true;
+        }
+        return false;
+    }
+  
+    private restartTask(taskName: string): boolean {
+        const job = this.__tasks.get(taskName);
+        if (job) {
+            job.start();
+            return true;
+        }
+        return false;
+    }
+
+    get tasks(): string[] {
+        return Array.from(this.__tasks.keys());
+    }
+    
 }
