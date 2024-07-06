@@ -224,7 +224,7 @@ export interface SernSubCommandGroupData extends BaseApplicationCommandOptionsDa
 }
 
 
-interface ScheduledTaskContext {
+export interface ScheduledTaskContext {
     /**
      * An object of dependencies configured in `makeDependencies`
      */
@@ -243,10 +243,10 @@ interface ScheduledTaskContext {
     nextTimeExecution: Date | null;
 }
 
+
 export interface ScheduledTask {
     name?: string;
     trigger: string | Date;
-    description?: string;
     timezone?: string;
     execute(tasks: ScheduledTaskContext): Awaitable<void>
 }

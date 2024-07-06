@@ -1,4 +1,5 @@
-import type { LogPayload, Logging, ErrorHandling } from '../interfaces';
+import { ScheduledTask } from '../../types/core-modules';
+import type { LogPayload, Logging, ErrorHandling, Disposable } from '../interfaces';
 import { CronJob } from 'cron';
 
 /**
@@ -41,21 +42,28 @@ export class DefaultLogging implements Logging {
 }
 
 
-export class TaskScheduler {
-    private __tasks: Map<string, CronJob> = new Map();
+export class TaskScheduler implements Disposable {
+    private __tasks: Map<string, CronJob<any, any>> = new Map();
 
-    schedule(taskName: string, cronExpression: string | Date, task: () => void, tz: string|  undefined) {
-        if (this.__tasks.has(taskName)) {
+    schedule(uuid: string, task: ScheduledTask, deps: Dependencies) {
+        if (this.__tasks.has(uuid)) {
             throw Error("while scheduling a task \
-                        found another task of same name. Not scheduling " +
-                       taskName + "again."  );
+                         found another task of same name. Not scheduling " +
+                         uuid + "again."  );
         }
         try {
-          const job = CronJob.from({ cronTime: cronExpression, onTick: task, timeZone: tz });
-          job.start();
-          this.__tasks.set(taskName, job);
+            const onTick = async function(this: CronJob) {
+                task.execute({
+                    deps, id: uuid,
+                    lastTimeExecution: this.lastExecution,
+                    nextTimeExecution: this.nextDate().toJSDate()
+                })
+           }
+           const job = CronJob.from({ cronTime: task.trigger, onTick, timeZone: task.timezone });
+           job.start();
+           this.__tasks.set(uuid, job);
         } catch (error) {
-          throw Error(`while scheduling a task ${taskName} ` +  error);
+           throw Error(`while scheduling a task ${uuid} ` +  error);
         }
     }
   
@@ -69,17 +77,15 @@ export class TaskScheduler {
         return false;
     }
   
-    private restartTask(taskName: string): boolean {
-        const job = this.__tasks.get(taskName);
-        if (job) {
-            job.start();
-            return true;
-        }
-        return false;
-    }
-
     get tasks(): string[] {
         return Array.from(this.__tasks.keys());
+    }
+
+    dispose() {
+        for(const [id,] of this.__tasks){
+            this.kill(id);
+            this.__tasks.delete(id);
+        }
     }
     
 }

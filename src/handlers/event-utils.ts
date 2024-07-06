@@ -236,7 +236,7 @@ export async function callInitPlugins(_module: Module, deps: Dependencies, emit?
     return module
 }
 
-async function callPlugins({ args, module, deps, params }: ExecutePayload) {
+export async function callPlugins({ args, module, deps, params }: ExecutePayload) {
     let state = {};
     for(const plugin of module.onEvent??[]) {
         const result = await plugin.execute(...args, { state, deps, params, type: module.type });

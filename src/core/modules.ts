@@ -47,8 +47,7 @@ export function discordEvent<T extends keyof ClientEvents>(mod: {
     return eventModule({ type: EventType.Discord, ...mod, });
 }
 
-
-export function scheduledTask(i : ScheduledTask) {
-    return i 
+export function scheduledTask(ism: ScheduledTask) {
+    return ism 
 }
 
