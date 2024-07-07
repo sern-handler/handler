@@ -54,7 +54,8 @@ export class TaskScheduler implements Disposable {
         try {
             const onTick = async function(this: CronJob) {
                 task.execute({
-                    deps, id: uuid,
+                    deps, 
+                    id: uuid,
                     lastTimeExecution: this.lastExecution,
                     nextTimeExecution: this.nextDate().toJSDate()
                 })
@@ -82,10 +83,10 @@ export class TaskScheduler implements Disposable {
     }
 
     dispose() {
-        for(const [id,] of this.__tasks){
+        this.__tasks.forEach((_, id) => {
             this.kill(id);
             this.__tasks.delete(id);
-        }
+        })
     }
     
 }

@@ -1,7 +1,6 @@
 import * as Files from '../core/module-loading'
 import { UnpackedDependencies } from "../types/utility";
 import type { ScheduledTask } from "../types/core-modules";
-import { CronJob } from "cron";
 import { relative } from "path";
 import { fileURLToPath } from "url";
 

@@ -37,17 +37,15 @@ export function eventModule(mod: InputEvent): Module {
 /** Create event modules from discord.js client events,
  * This is an {@link eventModule} for discord events,
  * where typings can be very bad.
- * @Experimental
  * @param mod
  */
 export function discordEvent<T extends keyof ClientEvents>(mod: {
     name: T;
+    once?: boolean;
     execute: (...args: ClientEvents[T]) => Awaitable<unknown>;
 }) {
     return eventModule({ type: EventType.Discord, ...mod, });
 }
 
-export function scheduledTask(ism: ScheduledTask) {
-    return ism 
-}
+export function scheduledTask(ism: ScheduledTask) { return ism }
 

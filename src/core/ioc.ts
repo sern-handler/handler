@@ -74,9 +74,9 @@ export async function makeDependencies (conf: ValidDependencyConfig) {
 
 
 /**
- * The new Service api, a cleaner alternative to useContainer
+ * The Service api, which allows users to access dependencies in places IOC cannot reach. 
  * To obtain intellisense, ensure a .d.ts file exists in the root of compilation.
- * Usually our scaffolding tool takes care of this.
+ * Our scaffolding tool takes care of this.
  * Note: this method only works AFTER your container has been initiated
  * @since 3.0.0
  * @example
@@ -84,7 +84,7 @@ export async function makeDependencies (conf: ValidDependencyConfig) {
  * const client = Service('@sern/client');
  * ```
  * @param key a key that corresponds to a dependency registered.
- *
+ * @throws if container is absent or not present
  */
 export function Service<const T extends keyof Dependencies>(key: T) {
     return $Service(key) as Dependencies[T]
@@ -92,7 +92,9 @@ export function Service<const T extends keyof Dependencies>(key: T) {
 /**
  * @since 3.0.0
  * The plural version of {@link Service}
+ * @throws if container is absent or not present
  * @returns array of dependencies, in the same order of keys provided
+ *
  */
 export function Services<const T extends (keyof Dependencies)[]>(...keys: [...T]) {
     return $Services<T, IntoDependencies<T>>(...keys)
