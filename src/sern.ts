@@ -9,7 +9,6 @@ import ready  from './handlers/ready';
 import messageHandler from './handlers/message';
 import interactionHandler from './handlers/interaction';
 import { presenceHandler } from './handlers/presence';
-import { handleCrash } from './handlers/event-utils';
 import { UnpackedDependencies } from './types/utility';
 import type { Presence} from './core/presences';
 import { registerTasks } from './handlers/tasks';

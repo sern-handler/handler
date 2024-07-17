@@ -38,7 +38,11 @@ const dependencyBuilder = (container: Container) => {
           * Swap out a preexisting dependency.
           */
         swap(key: keyof Dependencies, v: Insertable) {
-            container.swap(key, v);
+            if(typeof v !== 'function') {
+                container.swap(key, v);
+            } else {
+                container.swap(key, v(container.deps()));
+            }
         },
    };
 };
