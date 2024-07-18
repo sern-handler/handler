@@ -1,6 +1,4 @@
-import { Err, Ok } from 'ts-results-es';
 import type { Module, SernAutocompleteData, SernOptionsData } from '../types/core-modules';
-import type { AnyCommandPlugin, AnyEventPlugin, Plugin } from '../types/core-plugin';
 import type {
     AnySelectMenuInteraction,
     ButtonInteraction,
@@ -11,31 +9,37 @@ import type {
     AutocompleteInteraction
 } from 'discord.js';
 import { ApplicationCommandOptionType, InteractionType } from 'discord.js';
-import { PayloadType, PluginType } from './structures';
+import { PluginType } from './structures/enums';
 import assert from 'assert';
 import type { Payload } from '../types/utility';
 
-//function wrappers for empty ok / err
-export const ok = /* @__PURE__*/ () => Ok.EMPTY;
-export const err = /* @__PURE__*/ () => Err.EMPTY;
+/**
+ * Removes the first character(s) _[depending on prefix length]_ of the message
+ * @param msg
+ * @param prefix The prefix to remove
+ * @returns The message without the prefix
+ * @example
+ * message.content = '!ping';
+ * console.log(fmt(message.content, '!'));
+ * // [ 'ping' ]
+ */
+export function fmt(msg: string, prefix?: string): string[] {
+    if(!prefix) throw Error("Unable to parse message without prefix");
+    return msg.slice(prefix.length).trim().split(/\s+/g);
+}
 
-export function partitionPlugins(
-    arr: (AnyEventPlugin | AnyCommandPlugin)[] = [],
-): [Plugin[], Plugin[]] {
+
+export function partitionPlugins<T,V>
+(arr: Array<{ type: PluginType }> = []): [T[], V[]] {
     const controlPlugins = [];
     const initPlugins = [];
-
     for (const el of arr) {
         switch (el.type) {
-            case PluginType.Control:
-                controlPlugins.push(el);
-                break;
-            case PluginType.Init:
-                initPlugins.push(el);
-                break;
+            case PluginType.Control: controlPlugins.push(el); break;
+            case PluginType.Init: initPlugins.push(el); break;
         }
     }
-    return [controlPlugins, initPlugins];
+    return [controlPlugins, initPlugins] as [T[], V[]];
 }
 
 /**
@@ -54,40 +58,31 @@ export function treeSearch(
     while (_options.length > 0) {
         const cur = _options.pop()!;
         switch (cur.type) {
-            case ApplicationCommandOptionType.Subcommand:
-                {
+            case ApplicationCommandOptionType.Subcommand: {
                     subcommands.add(cur.name);
                     for (const option of cur.options ?? []) _options.push(option);
-                }
-                break;
-            case ApplicationCommandOptionType.SubcommandGroup:
-                {
+                } break;
+            case ApplicationCommandOptionType.SubcommandGroup: {
                     for (const command of cur.options ?? []) _options.push(command);
-                }
-                break;
-            default:
-                {
-                    if ('autocomplete' in cur && cur.autocomplete) {
-                        const choice = iAutocomplete.options.getFocused(true);
-                        assert(
-                            'command' in cur,
-                            'No `command` property found for autocomplete option',
-                        );
-                        if (subcommands.size > 0) {
-                            const parent = iAutocomplete.options.getSubcommand();
-                            const parentAndOptionMatches =
-                                subcommands.has(parent) && cur.name === choice.name;
-                            if (parentAndOptionMatches) {
-                                return { ...cur, parent };
-                            }
-                        } else {
-                            if (cur.name === choice.name) {
-                                return { ...cur, parent: undefined };
-                            }
+                } break;
+            default: {
+                if ('autocomplete' in cur && cur.autocomplete) {
+                    const choice = iAutocomplete.options.getFocused(true);
+                    assert( 'command' in cur, 'No `command` property found for option ' + cur.name);
+                    if (subcommands.size > 0) {
+                        const parent = iAutocomplete.options.getSubcommand();
+                        const parentAndOptionMatches =
+                            subcommands.has(parent) && cur.name === choice.name;
+                        if (parentAndOptionMatches) {
+                            return { ...cur, parent };
+                        }
+                    } else {
+                        if (cur.name === choice.name) {
+                            return { ...cur, parent: undefined };
                         }
                     }
                 }
-                break;
+            } break;
         }
     }
 }
@@ -117,7 +112,15 @@ export function isModal(i: InteractionTypable): i is ModalSubmitInteraction {
     return i.type === InteractionType.ModalSubmit;
 }
 
-export function resultPayload<T extends PayloadType>
+export function resultPayload<T extends 'success'|'warning'|'failure'>
 (type: T, module?: Module, reason?: unknown) {
     return { type, module, reason } as Payload & { type : T };
+}
+
+export function pipe<T>(arg: unknown, firstFn: Function, ...fns: Function[]): T {
+  let result = firstFn(arg);
+  for (let fn of fns) {
+    result = fn(result);
+  }
+  return result;
 }

@@ -1,6 +1,7 @@
 export * as Sern from './sern';
-export * from './core';
+
 export type {
+    Module,
     CommandModule,
     EventModule,
     BothCommand,
@@ -24,30 +25,48 @@ export type {
     SernOptionsData,
     SernSubCommandData,
     SernSubCommandGroupData,
+    SDT,
+    ScheduledTask
 } from './types/core-modules';
 
 export type {
-    Controller,
     PluginResult,
     InitPlugin,
     ControlPlugin,
     Plugin,
-    AnyEventPlugin,
-    AnyCommandPlugin,
+    AnyPlugin,
 } from './types/core-plugin';
 
-export type { Wrapper } from './types/core';
 
-export type { Args, SlashOptions, Payload, SernEventsMapping } from './types/utility';
-
-export type { Singleton, Transient, CoreDependencies, Initializable } from './types/ioc';
+export type { Payload, SernEventsMapping } from './types/utility';
 
 export {
     commandModule,
     eventModule,
     discordEvent,
+    scheduledTask
 } from './core/modules';
 
-export * as Presence from './core/presences'
+export * from './core/presences'
+export * from './core/interfaces'
+export * from './core/plugin';
+export { CommandType, PluginType, PayloadType, EventType } from './core/structures/enums';
+export { Context } from './core/structures/context';
+export { type CoreDependencies, makeDependencies, single, transient, Service, Services } from './core/ioc';
 
 
+import type { Container } from '@sern/ioc';
+
+/**
+  * @deprecated This old signature will be incompatible with future versions of sern >= 4.0.0. See {@link makeDependencies}
+  * @example
+  * ```ts
+  *  To switch your old code:
+     await makeDependencies(({ add }) => { 
+            add('@sern/client', new Client())
+     })
+  *  ```
+  */
+export interface DependencyConfiguration {
+    build: (root: Container) => Container;
+}

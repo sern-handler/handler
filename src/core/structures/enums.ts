@@ -48,16 +48,16 @@ export enum EventType {
     /**
      * The EventType for handling discord events
      */
-    Discord = 1,
+    Discord,
     /**
      * The EventType for handling sern events
      */
-    Sern = 2,
+    Sern,
     /**
      * The EventType for handling external events.
      * Could be for example, `process` events, database events
      */
-    External = 3,
+    External,
 }
 
 /**
@@ -85,20 +85,12 @@ export enum PluginType {
     Control = 2,
 }
 /**
+ * @deprecated - Use strings 'success' | 'failure' | 'warning'
  * @enum { string }
  */
 export enum PayloadType {
-    /**
-     * The PayloadType for a SernEmitter success event
-     */
     Success = 'success',
-    /**
-     * The PayloadType for a SernEmitter failure event
-     */
     Failure = 'failure',
-    /**
-     * The PayloadType for a SernEmitter warning event
-     */
     Warning = 'warning',
 }
 

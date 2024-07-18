@@ -4,15 +4,17 @@
         "strict": true,
         "esModuleInterop": true,
         "strictNullChecks": true,
-        "moduleResolution": "node",
+        "moduleResolution": "node16",
         "skipLibCheck": true,
         "declaration": true,
         "preserveSymlinks": true,
         "allowSyntheticDefaultImports": true,
         "forceConsistentCasingInFileNames": true,
         "isolatedModules": true,
-        "module": "esnext",
-        "target": "esnext"
+        "outDir": "dist",
+        "module": "node16",
+        "target": "esnext",
+        "sourceMap": true
     },
     "exclude": ["node_modules", "dist"],
     "include": ["./src", "./src/**/*.d.ts"]

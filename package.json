@@ -1,25 +1,23 @@
 {
     "name": "@sern/handler",
     "packageManager": "yarn@3.5.0",
-    "version": "3.3.4",
+    "version": "4.0.0",
     "description": "A complete, customizable, typesafe, & reactive framework for discord bots.",
     "main": "./dist/index.js",
-    "module": "./dist/index.mjs",
-    "types": "./dist/index.d.ts",
+    "module": "./dist/index.js",
     "exports": {
         ".": {
-            "import": "./dist/index.mjs",
-            "require": "./dist/index.js",
-            "types": "./dist/index.d.ts"
+            "import": "./dist/index.js",
+            "require": "./dist/index.js"
         }
     },
     "scripts": {
-        "watch": "tsup --watch",
+        "watch": "tsc --watch",
         "lint": "eslint src/**/*.ts",
         "format": "eslint src/**/*.ts --fix",
-        "build:dev": "tsup --metafile",
-        "build:prod": "tsup ",
-        "prepare": "npm run build:prod",
+        "build:dev": "tsc",
+        "build:prod": "tsc",
+        "prepare": "tsc",
         "pretty": "prettier --write .",
         "tdd": "vitest",
         "test": "vitest --run",
@@ -37,30 +35,23 @@
     "author": "SernDevs",
     "license": "MIT",
     "dependencies": {
+        "@sern/ioc": "^1.1.0",
         "callsites": "^3.1.0",
-        "iti": "^0.6.0",
+        "cron": "^3.1.7",
+        "deepmerge": "^4.3.1",
         "rxjs": "^7.8.0",
         "ts-results-es": "^4.1.0"
     },
     "devDependencies": {
         "@faker-js/faker": "^8.0.1",
-        "@types/node": "^18.15.11",
+        "@types/node": "^20.0.0",
+        "@types/node-cron": "^3.0.11",
         "@typescript-eslint/eslint-plugin": "5.58.0",
         "@typescript-eslint/parser": "5.59.1",
-        "discord.js": "^14.11.0",
+        "discord.js": "^14.15.3",
         "eslint": "8.39.0",
-        "prettier": "2.8.8",
-        "tsup": "^6.7.0",
         "typescript": "5.0.2",
-        "vitest": "latest"
-    },
-    "prettier": {
-        "semi": true,
-        "trailingComma": "all",
-        "singleQuote": true,
-        "printWidth": 100,
-        "tabWidth": 4,
-        "arrowParens": "avoid"
+        "vitest": "^1.6.0"
     },
     "eslintConfig": {
         "parser": "@typescript-eslint/parser",
@@ -95,7 +86,13 @@
         "url": "git+https://github.com/sern-handler/handler.git"
     },
     "engines": {
-        "node": ">= 18.16.x"
+        "node": ">= 20.0.x"
     },
-    "homepage": "https://sern.dev"
+    "homepage": "https://sern.dev",
+    "overrides": {
+        "ws": "8.17.1"
+    },
+    "resolutions": {
+        "ws": "8.17.1"
+    }
 }

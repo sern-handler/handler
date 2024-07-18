@@ -1,60 +1,125 @@
-import { Interaction, Message } from 'discord.js';
+import type { Interaction, Message, BaseInteraction } from 'discord.js';
+import util from 'node:util';
 import {
-    EMPTY,
-    Observable,
-    concatMap,
-    filter,
-    from,
-    of,
-    throwError,
-    tap,
-    catchError,
-    finalize,
-    map,
+    EMPTY, type Observable, concatMap, filter,
+    throwError, fromEvent, map, type OperatorFunction,
+    catchError, finalize, pipe, from, take, share, of,
 } from 'rxjs';
-import {
-    Files,
-    Id,
-    callPlugin,
-    everyPluginOk,
-    filterMapTo,
-    handleError,
-    SernError,
-    VoidResult,
-    resultPayload,
-} from '../core/_internal';
-import { Emitter, ErrorHandling, Logging, ModuleManager, PayloadType } from '../core';
-import { contextArgs, createDispatcher } from './dispatchers';
-import { ObservableInput, pipe } from 'rxjs';
+import * as Id from '../core/id'
+import type { Emitter, ErrorHandling, Logging } from '../core/interfaces';
+import { SernError } from '../core/structures/enums'
 import { Err, Ok, Result } from 'ts-results-es';
-import type { Awaitable } from '../types/utility';
-import type { ControlPlugin } from '../types/core-plugin';
-import type { AnyModule, CommandMeta, CommandModule, Module, Processed } from '../types/core-modules';
-import { disposeAll } from '../core/ioc/base';
+import type { UnpackedDependencies } from '../types/utility';
+import type { CommandModule, Module, Processed } from '../types/core-modules';
+import * as assert from 'node:assert';
+import { Context } from '../core/structures/context';
+import { CommandType } from '../core/structures/enums'
+import { inspect } from 'node:util'
+import { disposeAll } from '../core/ioc';
+import { resultPayload, isAutocomplete, treeSearch, fmt } from '../core/functions'
+import merge from 'deepmerge'
 
+function handleError<C>(crashHandler: ErrorHandling, emitter: Emitter, logging?: Logging) {
+    return (pload: unknown, caught: Observable<C>) => {
+        // This is done to fit the ErrorHandling contract
+        if(!emitter.emit('error', pload)) {
+            const err = pload instanceof Error ? pload : Error(util.inspect(pload, { colors: true }));
+            logging?.error({ message: util.inspect(pload) });
+            crashHandler.updateAlive(err);
+        }
+        return caught;
+    };
+}
+const arrayify= <T>(src: T) => 
+    Array.isArray(src) ? src : [src];
+
+interface ExecutePayload {
+    module: Module;
+    args: unknown[];
+    deps: Dependencies;
+    params?: string;
+    [key: string]: unknown
+}
+
+export const filterTap = <K, R>(onErr: (e: R) => void): OperatorFunction<Result<K, R>, K> => 
+    concatMap(result => {
+        if(result.isOk()) {
+            return of(result.value)
+        }
+        onErr(result.error);
+        return EMPTY;
+    })
+
+export const sharedEventStream = <T>(e: Emitter, eventName: string) => 
+    (fromEvent(e, eventName) as Observable<T>).pipe(share());
+
+function intoPayload(module: Module, deps: Dependencies) {
+    return pipe(map(arrayify),
+                map(args => ({ module, args, deps })),
+                map(p => p.args));
+}
+/**
+ * Creates an observable from { source }
+ * @param module
+ * @param source
+ */
+export function eventDispatcher(deps: Dependencies, module: Module, source: unknown) {
+    assert.ok(source && typeof source === 'object',
+              `${source} cannot be constructed into an event listener`);
+    const execute: OperatorFunction<unknown[]|undefined, unknown> =
+        concatMap(async args => {
+            if(args) return Reflect.apply(module.execute, null, args);
+        });
+
+    //@ts-ignore
+    let ev = fromEvent(source ,module.name!);
+    //@ts-ignore
+    if(module['once']) {
+        ev = ev.pipe(take(1))
+    }
+    return ev.pipe(intoPayload(module, deps),
+                   execute);
+}
+
+interface DispatchPayload { 
+    module: Processed<CommandModule>;
+    event: BaseInteraction; 
+    defaultPrefix?: string;
+    deps: Dependencies;
+    params?: string
+};
+export function createDispatcher({ module, event, defaultPrefix, deps, params }: DispatchPayload): ExecutePayload {
+    assert.ok(CommandType.Text !== module.type,
+        SernError.MismatchEvent + 'Found text command in interaction stream');
+
+    if(isAutocomplete(event)) {
+        assert.ok(module.type === CommandType.Slash 
+               || module.type === CommandType.Both, "Autocomplete option on non command interaction");
+        const option = treeSearch(event, module.options);
+        assert.ok(option, SernError.NotSupportedInteraction + ` There is no autocomplete tag for ` + inspect(module));
+        const { command } = option;
+        return { module: command as Processed<Module>, //autocomplete is not a true "module" warning cast!
+                 args: [event],
+                 deps };
+    }
+    switch (module.type) {
+        case CommandType.Slash:
+        case CommandType.Both: {
+            return { module, args: [Context.wrap(event, defaultPrefix)], deps };
+        }
+        default: return { module, args: [event], deps, params };
+    }
+}
 function createGenericHandler<Source, Narrowed extends Source, Output>(
     source: Observable<Source>,
     makeModule: (event: Narrowed) => Promise<Output>,
 ) {
     return (pred: (i: Source) => i is Narrowed) => 
         source.pipe(
-            filter(pred),
-            concatMap(makeModule));
+            filter(pred), // only handle this stream if it passes pred
+            concatMap(makeModule)); // create a payload, preparing to execute
 }
 
-/**
- * Removes the first character(s) _[depending on prefix length]_ of the message
- * @param msg
- * @param prefix The prefix to remove
- * @returns The message without the prefix
- * @example
- * message.content = '!ping';
- * console.log(fmt(message, '!'));
- * // [ 'ping' ]
- */
-export function fmt(msg: string, prefix: string): string[] {
-    return msg.slice(prefix.length).trim().split(/\s+/g);
-}
 
 /**
  *
@@ -65,193 +130,141 @@ export function fmt(msg: string, prefix: string): string[] {
  */
 export function createInteractionHandler<T extends Interaction>(
     source: Observable<Interaction>,
-    mg: ModuleManager,
+    deps: Dependencies,
+    defaultPrefix?: string
 ) {
+    const mg = deps['@sern/modules'];
     return createGenericHandler<Interaction, T, Result<ReturnType<typeof createDispatcher>, void>>(
         source,
         async event => {
             const possibleIds = Id.reconstruct(event);
-            let fullPaths= possibleIds
-                .map(id => mg.get(id))
-                .filter((id): id is Module => id !== undefined);
-
-            if(fullPaths.length == 0) {
+            let modules = possibleIds
+                .map(({ id, params }) => ({ module: mg.get(id), params }))
+                .filter(({ module }) => module !== undefined);
+            if(modules.length == 0) {
                 return Err.EMPTY;
             }
-            const [ path ] = fullPaths;
-            return Ok(createDispatcher({ module: path as Processed<CommandModule>, event }));
+            const [{module, params}] = modules;
+            return Ok(createDispatcher({ 
+                module: module as Processed<CommandModule>, 
+                event, defaultPrefix, deps, params 
+            }));
     });
 }
 
 export function createMessageHandler(
     source: Observable<Message>,
     defaultPrefix: string,
-    mg: ModuleManager,
+    deps: Dependencies,
 ) {
+    const mg = deps['@sern/modules'];
     return createGenericHandler(source, async event => {
-        const [prefix, ...rest] = fmt(event.content, defaultPrefix);
-        let fullPath = mg.get(`${prefix}_T`);
-        if(!fullPath) {
-            fullPath = mg.get(`${prefix}_B`);
-            if(!fullPath) {
-                return Err('Possibly undefined behavior: could not find a static id to resolve');
-            }
+        const [prefix] = fmt(event.content, defaultPrefix);
+        let module= mg.get(`${prefix}_T`) ?? mg.get(`${prefix}_B`) as Module;
+        if(!module) {
+            return Err('Possibly undefined behavior: could not find a static id to resolve');
         }
-        return Ok({ args: contextArgs(event, rest), module: fullPath as Processed<CommandModule>  })
-    });
-}
-/**
- * This function assigns remaining, incomplete data to each imported module.
- */
-function assignDefaults() {
-    return map(({ module, absPath }) => {
-        const processed = {
-            name: module.name ?? Files.filename(absPath),
-            description: module.description ?? '...',
-            ...module
-        }
-        return {
-            module: processed,
-            absPath,
-            metadata: {
-                isClass: module.constructor.name === 'Function',
-                fullPath: absPath,
-                id: Id.create(processed.name, module.type),
-            }
-        }
+        return Ok({ args: [Context.wrap(event, defaultPrefix)], module, deps })
     });
 }
 
-export function buildModules<T extends AnyModule>(
-    input: ObservableInput<string>,
-) {
-    return Files
-        .buildModuleStream<Processed<T>>(input)
-        .pipe(assignDefaults());
-}
 
-
-interface ExecutePayload {
-    module: Processed<Module>;
-    task: () => Awaitable<unknown>;
-    args: unknown[]
-}
 /**
  * Wraps the task in a Result as a try / catch.
  * if the task is ok, an event is emitted and the stream becomes empty
  * if the task is an error, throw an error down the stream which will be handled by catchError
+ * thank u kingomes
  * @param emitter reference to SernEmitter that will emit a successful execution of module
  * @param module the module that will be executed with task
  * @param task the deferred execution which will be called
  */
-export function executeModule(
-    emitter: Emitter,
-    logger: Logging|undefined,
-    errHandler: ErrorHandling,
-    {
-        module,
-        task,
-        args
-    }: ExecutePayload,
-) {
-    return of(module).pipe(
-        //converting the task into a promise so rxjs can resolve the Awaitable properly
-        concatMap(() => Result.wrapAsync(async () => task())),
-        concatMap(result => {
+export function executeModule(emitter: Emitter, { module, args }: ExecutePayload) {
+    return from(Result.wrapAsync(async () => module.execute(...args)))
+        .pipe(concatMap(result => { 
             if (result.isOk()) {
-                emitter.emit('module.activate', resultPayload(PayloadType.Success, module));
+                emitter.emit('module.activate', resultPayload('success', module));
                 return EMPTY;
-            } 
-            return throwError(() => resultPayload(PayloadType.Failure, module, result.error));
-            
-        }),
-    );
-}
-
-
+            }
+            return throwError(() => resultPayload('failure', module, result.error));
+        }))
+};
 
 /**
  * A higher order function that
- * - creates a stream of {@link VoidResult} { config.createStream }
- * - any failures results to { config.onFailure } being called
+ * - calls all control plugins.
+ * - any failures results to { config.onStop } being called
  * - if all results are ok, the stream is converted to { config.onNext }
- * emit config.onSuccess Observable
+ * config.onNext will be returned if everything is okay.
  * @param config
- * @returns receiver function for flattening a stream of data
+ * @returns function which calls all plugins and returns onNext or fail 
  */
-export function createResultResolver<
-    T extends { execute: (...args: any[]) => any; onEvent: ControlPlugin[] },
-    Args extends { module: T; [key: string]: unknown },
-    Output,
->(config: {
-    onStop?: (module: T) => unknown;
-    onNext: (args: Args) => Output;
-    createStream: (args: Args) => Observable<VoidResult>;
+export function createResultResolver<Output>(config: {
+    onStop?: (module: Module, err?: string) => unknown;
+    onNext: (args: ExecutePayload, map: Record<string, unknown>) => Output;
 }) {
-    return (args: Args) => {
-        const task$ = config.createStream(args);
-        return task$.pipe(
-            tap(result => {
-                result.isErr() && config.onStop?.(args.module);
-            }),
-            everyPluginOk,
-            filterMapTo(() => config.onNext(args)),
-        );
+    const { onStop, onNext } = config;
+    return async (payload: ExecutePayload) => {
+        const task = await callPlugins(payload);
+        if (!task) throw Error("Plugin did not return anything.");
+        if(task.isOk()) {
+            return onNext(payload, task.value) as Output;
+        } else {
+            onStop?.(payload.module, String(task.error));
+        }
     };
+};
+
+function isObject(item: unknown) {
+    return (item && typeof item === 'object' && !Array.isArray(item));
 }
 
-/**
- * Calls a module's init plugins and checks for Err. If so, call { onStop } and
- * ignore the module
- */
-export function callInitPlugins<T extends Processed<AnyModule>>(sernEmitter: Emitter) {
-    return concatMap(
-        createResultResolver({
-            createStream: args => from(args.module.plugins).pipe(callPlugin(args)),
-            onStop: (module: T) => {
-                sernEmitter.emit('module.register', resultPayload(PayloadType.Failure, module, SernError.PluginFailure));
-            },
-            onNext: (payload) => {
-                sernEmitter.emit('module.register', resultPayload(PayloadType.Success, payload.module));
-                return payload as { module: T; metadata: CommandMeta };
-            },
-        }),
-    );
+//_module is frozen, preventing from mutations
+export async function callInitPlugins(_module: Module, deps: Dependencies, emit?: boolean) {
+    let module = _module;
+    const emitter = deps['@sern/emitter'];
+    for(const plugin of module.plugins ?? []) {
+        const result = await plugin.execute({ module, absPath: module.meta.absPath, deps });
+        if (!result) throw Error("Plugin did not return anything. " + inspect(plugin, false, Infinity, true));
+        if(result.isErr()) {
+            if(emit) {
+                emitter?.emit('module.register',
+                              resultPayload('failure', module, result.error ?? SernError.PluginFailure));
+            }
+            throw Error(result.error ?? SernError.PluginFailure);
+        }
+    }
+    return module
 }
 
+export async function callPlugins({ args, module, deps, params }: ExecutePayload) {
+    let state = {};
+    for(const plugin of module.onEvent??[]) {
+        const result = await plugin.execute(...args, { state, deps, params, type: module.type });
+        if(result.isErr()) {
+            return result;
+        }
+        if(isObject(result.value)) {
+            state = merge(state, result.value!);
+        }
+    }
+    return Ok(state);
+}
 /**
- * Creates an executable task ( execute the command ) if  all control plugins are successful
+ * Creates an executable task ( execute the command ) if all control plugins are successful
  * @param onStop emits a failure response to the SernEmitter
  */
-export function makeModuleExecutor<
-    M extends Processed<Module>,
-    Args extends { 
-        module: M;
-        args: unknown[];
-    },
->(onStop: (m: M) => unknown) {
-    const onNext = ({ args, module }: Args) => ({
-        task: () => module.execute(...args),
+export function intoTask(onStop: (m: Module) => unknown) {
+    const onNext = ({ args, module, deps, params }: ExecutePayload, state: Record<string, unknown>) => ({
         module,
-        args
+        args: [...args, { state, deps, params, type: module.type }],
+        deps
     });
-    return concatMap(
-        createResultResolver({
-            onStop,
-            createStream: ({ args, module }) => 
-                from(module.onEvent)
-                    .pipe(callPlugin(args)),
-            onNext,
-        }),
-    );
+    return createResultResolver({ onStop, onNext });
 }
 
-export const handleCrash = (err: ErrorHandling,sernemitter: Emitter, log?: Logging) =>
-    pipe(
-        catchError(handleError(err, sernemitter, log)),
-        finalize(() => {
-            log?.info({
-                message: 'A stream closed or reached end of lifetime',
-            });
+export const handleCrash = ({ "@sern/errors": err, '@sern/emitter': sem, '@sern/logger': log } : UnpackedDependencies, metadata: string) => 
+    pipe(catchError(handleError(err, sem, log)),
+         finalize(() => {
+            log?.info({ message: 'A stream closed: ' + metadata  });
             disposeAll(log);
-        }));
+         }))

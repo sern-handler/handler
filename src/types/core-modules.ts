@@ -14,17 +14,20 @@ import type {
     StringSelectMenuInteraction,
     UserContextMenuCommandInteraction,
     UserSelectMenuInteraction,
+    ChatInputCommandInteraction,
 } from 'discord.js';
-import { CommandType, Context, EventType } from '../../src/core';
-import { AnyCommandPlugin, AnyEventPlugin, ControlPlugin, InitPlugin } from './core-plugin';
-import { Awaitable, Args, SlashOptions, SernEventsMapping } from './utility';
+import type { CommandType, EventType } from '../core/structures/enums';
+import { Context } from '../core/structures/context'
+import { ControlPlugin, InitPlugin, Plugin } from './core-plugin';
+import { Awaitable, SernEventsMapping, UnpackedDependencies } from './utility';
 
-
-export interface CommandMeta {
-    fullPath: string;
-    id: string;
-    isClass: boolean;
-}
+//state, deps, type (very original)
+export type SDT = {
+    state: Record<string,unknown>;
+    deps: Dependencies;
+    type: CommandType,
+    params?: string
+};
 
 export type Processed<T> = T & { name: string; description: string };
 
@@ -34,6 +37,11 @@ export interface Module {
     onEvent: ControlPlugin[];
     plugins: InitPlugin[];
     description?: string;
+    meta: {
+        id: string;
+        absPath: string;
+    }
+    locals: Record<string,unknown>
     execute(...args: any[]): Awaitable<any>;
 }
 
@@ -43,6 +51,7 @@ export interface SernEventCommand<T extends keyof SernEventsMapping = keyof Sern
     type: EventType.Sern;
     execute(...args: SernEventsMapping[T]): Awaitable<unknown>;
 }
+
 export interface ExternalEventCommand extends Module {
     name?: string;
     emitter: keyof Dependencies;
@@ -50,54 +59,54 @@ export interface ExternalEventCommand extends Module {
     execute(...args: unknown[]): Awaitable<unknown>;
 }
 
+
 export interface ContextMenuUser extends Module {
     type: CommandType.CtxUser;
-    execute: (ctx: UserContextMenuCommandInteraction) => Awaitable<unknown>;
+    execute: (ctx: UserContextMenuCommandInteraction, tbd: SDT) => Awaitable<unknown>;
 }
 
 export interface ContextMenuMsg extends Module {
     type: CommandType.CtxMsg;
-    execute: (ctx: MessageContextMenuCommandInteraction) => Awaitable<unknown>;
+    execute: (ctx: MessageContextMenuCommandInteraction, tbd: SDT) => Awaitable<unknown>;
 }
 
 export interface ButtonCommand extends Module {
     type: CommandType.Button;
-    execute: (ctx: ButtonInteraction) => Awaitable<unknown>;
+    execute: (ctx: ButtonInteraction, tbd: SDT) => Awaitable<unknown>;
 }
 
 export interface StringSelectCommand extends Module {
     type: CommandType.StringSelect;
-    execute: (ctx: StringSelectMenuInteraction) => Awaitable<unknown>;
+    execute: (ctx: StringSelectMenuInteraction, tbd: SDT) => Awaitable<unknown>;
 }
 
 export interface ChannelSelectCommand extends Module {
     type: CommandType.ChannelSelect;
-    execute: (ctx: ChannelSelectMenuInteraction) => Awaitable<unknown>;
+    execute: (ctx: ChannelSelectMenuInteraction, tbd: SDT) => Awaitable<unknown>;
 }
 
 export interface RoleSelectCommand extends Module {
     type: CommandType.RoleSelect;
-    execute: (ctx: RoleSelectMenuInteraction) => Awaitable<unknown>;
+    execute: (ctx: RoleSelectMenuInteraction, tbd: SDT) => Awaitable<unknown>;
 }
 
 export interface MentionableSelectCommand extends Module {
     type: CommandType.MentionableSelect;
-    execute: (ctx: MentionableSelectMenuInteraction) => Awaitable<unknown>;
+    execute: (ctx: MentionableSelectMenuInteraction, tbd: SDT) => Awaitable<unknown>;
 }
 
 export interface UserSelectCommand extends Module {
     type: CommandType.UserSelect;
-    execute: (ctx: UserSelectMenuInteraction) => Awaitable<unknown>;
+    execute: (ctx: UserSelectMenuInteraction, tbd: SDT) => Awaitable<unknown>;
 }
 
 export interface ModalSubmitCommand extends Module {
     type: CommandType.Modal;
-    execute: (ctx: ModalSubmitInteraction) => Awaitable<unknown>;
+    execute: (ctx: ModalSubmitInteraction, tbd: SDT) => Awaitable<unknown>;
 }
 
-export interface AutocompleteCommand
-    extends Omit<Module, 'name' | 'type' | 'plugins' | 'description'> {
-    onEvent: ControlPlugin[];
+export interface AutocompleteCommand {
+    onEvent?: ControlPlugin[];
     execute: (ctx: AutocompleteInteraction) => Awaitable<unknown>;
 }
 
@@ -109,26 +118,24 @@ export interface DiscordEventCommand<T extends keyof ClientEvents = keyof Client
 }
 export interface TextCommand extends Module {
     type: CommandType.Text;
-    alias?: string[];
-    execute: (ctx: Context, args: ['text', string[]]) => Awaitable<unknown>;
+    execute: (ctx: Context & { get options(): string[] }, tbd: SDT) => Awaitable<unknown>;
 }
 
 export interface SlashCommand extends Module {
     type: CommandType.Slash;
     description: string;
     options?: SernOptionsData[];
-    execute: (ctx: Context, args: ['slash', SlashOptions]) => Awaitable<unknown>;
+    execute: (ctx: Context  & { get options(): ChatInputCommandInteraction['options']}, tbd: SDT) => Awaitable<unknown>;
 }
 
 export interface BothCommand extends Module {
     type: CommandType.Both;
-    alias?: string[];
     description: string;
     options?: SernOptionsData[];
-    execute: (ctx: Context, args: Args) => Awaitable<unknown>;
+    execute: (ctx: Context, tbd: SDT) => Awaitable<unknown>;
 }
 
-export type EventModule = DiscordEventCommand | SernEventCommand | ExternalEventCommand;
+export type EventModule = DiscordEventCommand | SernEventCommand | ExternalEventCommand;  
 export type CommandModule =
     | TextCommand
     | SlashCommand
@@ -143,7 +150,6 @@ export type CommandModule =
     | RoleSelectCommand
     | ModalSubmitCommand;
 
-export type AnyModule = CommandModule | EventModule;
 //https://stackoverflow.com/questions/64092736/alternative-to-switch-statement-for-typescript-discriminated-union
 // Explicit Module Definitions for mapping
 export interface CommandModuleDefs {
@@ -178,19 +184,22 @@ export interface SernAutocompleteData
 }
 
 type CommandModuleNoPlugins = {
-    [T in CommandType]: Omit<CommandModuleDefs[T], 'plugins' | 'onEvent'>;
+    [T in CommandType]: Omit<CommandModuleDefs[T], 'plugins' | 'onEvent' | 'meta' | 'locals'>;
 };
 type EventModulesNoPlugins = {
-    [T in EventType]: Omit<EventModuleDefs[T], 'plugins' | 'onEvent'>;
+    [T in EventType]: Omit<EventModuleDefs[T], 'plugins' | 'onEvent' | 'meta' | 'locals'> ;
 };
 
 export type InputEvent = {
-    [T in EventType]: EventModulesNoPlugins[T] & { plugins?: AnyEventPlugin[] };
+    [T in EventType]: EventModulesNoPlugins[T] & {
+        once?: boolean;
+        plugins?: InitPlugin[] 
+    };
 }[EventType];
 
 export type InputCommand = {
     [T in CommandType]: CommandModuleNoPlugins[T] & {
-        plugins?: AnyCommandPlugin[];
+        plugins?: Plugin[];
     };
 }[CommandType];
 
@@ -213,3 +222,37 @@ export interface SernSubCommandGroupData extends BaseApplicationCommandOptionsDa
     type: ApplicationCommandOptionType.SubcommandGroup;
     options?: SernSubCommandData[];
 }
+
+
+export interface ScheduledTaskContext {
+     
+    /**
+     * the uuid of the current task being run
+     */
+    id: string;
+    /**
+     * the last time this task was executed. If this is the first time, it is null.
+     */
+    lastTimeExecution: Date | null;
+    /**
+      * The next time this task will be executed.
+      */
+    nextTimeExecution: Date | null;
+}
+
+//name subject to change
+interface TaskAttrs {
+    /**
+     * An object of dependencies configured in `makeDependencies`
+     */
+    deps: UnpackedDependencies
+}
+
+export interface ScheduledTask {
+    name?: string;
+    trigger: string | Date;
+    timezone?: string;
+    execute(tasks: ScheduledTaskContext, sdt: TaskAttrs): Awaitable<void>
+}
+
+

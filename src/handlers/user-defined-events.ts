@@ -1,36 +1,33 @@
-import { ObservableInput, map, mergeAll } from 'rxjs';
-import { EventType } from '../core/structures';
-import { SernError } from '../core/_internal';
-import { buildModules, callInitPlugins, handleCrash, eventDispatcher } from './_internal';
-import { Service } from '../core/ioc';
-import type { DependencyList } from '../types/ioc';
-import type { EventModule,  Processed } from '../types/core-modules';
+import { EventType,  SernError } from '../core/structures/enums';
+import { callInitPlugins, eventDispatcher, handleCrash } from './event-utils'
+import { EventModule,  Module  } from '../types/core-modules';
+import * as Files from '../core/module-loading'
+import type { UnpackedDependencies } from '../types/utility';
+import { from, map, mergeAll } from 'rxjs';
 
-export function eventsHandler(
-    [emitter, err, log, moduleManager, client]: DependencyList,
-    allPaths: ObservableInput<string>,
-) {
-    //code smell
-    const intoDispatcher = (e: { module: Processed<EventModule> }) => {
-        switch (e.module.type) {
+const intoDispatcher = (deps: UnpackedDependencies) => 
+    (module : EventModule) => {
+        switch (module.type) {
             case EventType.Sern:
-                return eventDispatcher(e.module,  emitter);
+                return eventDispatcher(deps, module,  deps['@sern/emitter']);
             case EventType.Discord:
-                return eventDispatcher(e.module,  client);
+                return eventDispatcher(deps, module,  deps['@sern/client']);
             case EventType.External:
-                return eventDispatcher(e.module,  Service(e.module.emitter));
-            default:
-                throw Error(SernError.InvalidModuleType + ' while creating event handler');
+                return eventDispatcher(deps, module,  deps[module.emitter]);
+            default: throw Error(SernError.InvalidModuleType + ' while creating event handler');
         }
-    };
-    buildModules<EventModule>(allPaths)
-        .pipe(
-            callInitPlugins(emitter),
-            map(intoDispatcher),
-            /**
-             * Where all events are turned on
-             */
-            mergeAll(),
-            handleCrash(err, emitter, log))
-        .subscribe();
+};
+
+export default async function(deps: UnpackedDependencies, eventDir: string) {
+    const eventModules: EventModule[] = [];
+    for await (const path of Files.readRecursive(eventDir)) {
+        let { module } = await Files.importModule<Module>(path);
+        await callInitPlugins(module, deps)
+        eventModules.push(module as EventModule);
+    }
+    from(eventModules)
+        .pipe(map(intoDispatcher(deps)),
+               mergeAll(), // all eventListeners are turned on
+               handleCrash(deps, "event modules"))
+            .subscribe();
 }

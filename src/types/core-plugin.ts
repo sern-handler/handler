@@ -11,34 +11,18 @@
  * Plugins are reminiscent of middleware in express.
  */
 
-import type { Err, Ok, Result } from 'ts-results-es';
+import type { Result } from 'ts-results-es';
 import type {
-    BothCommand,
-    ButtonCommand,
-    ChannelSelectCommand,
-    CommandModule,
-    ContextMenuMsg,
-    ContextMenuUser,
-    DiscordEventCommand,
-    EventModule,
-    ExternalEventCommand,
-    MentionableSelectCommand,
-    ModalSubmitCommand,
     Module,
     Processed,
-    RoleSelectCommand,
-    SernEventCommand,
-    SlashCommand,
-    StringSelectCommand,
-    TextCommand,
-    UserSelectCommand,
+    SDT,
 } from './core-modules';
-import type { Args, Awaitable, Payload, SlashOptions } from './utility';
-import type { CommandType, Context, EventType, PluginType } from '../core';
+import type { Awaitable } from './utility';
+import type { CommandType, PluginType } from '../core/structures/enums'
+import type { Context } from '../core/structures/context'
 import type {
     ButtonInteraction,
     ChannelSelectMenuInteraction,
-    ClientEvents,
     MentionableSelectMenuInteraction,
     MessageContextMenuCommandInteraction,
     ModalSubmitInteraction,
@@ -48,106 +32,40 @@ import type {
     UserSelectMenuInteraction,
 } from 'discord.js';
 
-export type PluginResult = Awaitable<VoidResult>;
-export type VoidResult = Result<void, void>;
-
-export interface InitArgs<T extends Processed<Module>> {
+export type PluginResult = Awaitable<Result<Record<string,unknown>|undefined, string|undefined>>;
+export interface InitArgs<T extends Processed<Module> = Processed<Module>> {
     module: T;
     absPath: string;
-}
-export interface Controller {
-    next: () => Ok<void>;
-    stop: () => Err<void>;
+    deps: Dependencies
 }
 export interface Plugin<Args extends any[] = any[]> {
     type: PluginType;
     execute: (...args: Args) => PluginResult;
 }
 
-export interface InitPlugin<Args extends any[] = any[]> {
+export interface InitPlugin<Args extends any[] = any[]> extends Plugin<Args> {
     type: PluginType.Init;
     execute: (...args: Args) => PluginResult;
 }
-export interface ControlPlugin<Args extends any[] = any[]> {
+export interface ControlPlugin<Args extends any[] = any[]> extends Plugin<Args> {
     type: PluginType.Control;
-    execute: (...args: Args) => PluginResult;
 }
 
-export type AnyCommandPlugin = ControlPlugin | InitPlugin<[InitArgs<Processed<CommandModule>>]>;
-export type AnyEventPlugin = ControlPlugin | InitPlugin<[InitArgs<Processed<EventModule>>]>;
+export type AnyPlugin = ControlPlugin | InitPlugin<[InitArgs<Processed<Module>>]>;
 
-export type CommandArgs<
-    I extends CommandType = CommandType,
-    J extends PluginType = PluginType,
-> = CommandArgsMatrix[I][J];
-
-export type EventArgs<
-    I extends EventType = EventType,
-    J extends PluginType = PluginType,
-> = EventArgsMatrix[I][J];
+export type CommandArgs<I extends CommandType = CommandType> = CommandArgsMatrix[I]
 
 interface CommandArgsMatrix {
-    [CommandType.Text]: {
-        [PluginType.Control]: [Context, ['text', string[]]];
-        [PluginType.Init]: [InitArgs<Processed<TextCommand>>];
-    };
-    [CommandType.Slash]: {
-        [PluginType.Control]: [Context, ['slash', /* library coupled */ SlashOptions]];
-        [PluginType.Init]: [InitArgs<Processed<SlashCommand>>];
-    };
-    [CommandType.Both]: {
-        [PluginType.Control]: [Context, Args];
-        [PluginType.Init]: [InitArgs<Processed<BothCommand>>];
-    };
-    [CommandType.CtxMsg]: {
-        [PluginType.Control]: [/* library coupled */ MessageContextMenuCommandInteraction];
-        [PluginType.Init]: [InitArgs<Processed<ContextMenuMsg>>];
-    };
-    [CommandType.CtxUser]: {
-        [PluginType.Control]: [/* library coupled */ UserContextMenuCommandInteraction];
-        [PluginType.Init]: [InitArgs<Processed<ContextMenuUser>>];
-    };
-    [CommandType.Button]: {
-        [PluginType.Control]: [/* library coupled */ ButtonInteraction];
-        [PluginType.Init]: [InitArgs<Processed<ButtonCommand>>];
-    };
-    [CommandType.StringSelect]: {
-        [PluginType.Control]: [/* library coupled */ StringSelectMenuInteraction];
-        [PluginType.Init]: [InitArgs<Processed<StringSelectCommand>>];
-    };
-    [CommandType.RoleSelect]: {
-        [PluginType.Control]: [/* library coupled */ RoleSelectMenuInteraction];
-        [PluginType.Init]: [InitArgs<Processed<RoleSelectCommand>>];
-    };
-    [CommandType.ChannelSelect]: {
-        [PluginType.Control]: [/* library coupled */ ChannelSelectMenuInteraction];
-        [PluginType.Init]: [InitArgs<Processed<ChannelSelectCommand>>];
-    };
-    [CommandType.MentionableSelect]: {
-        [PluginType.Control]: [/* library coupled */ MentionableSelectMenuInteraction];
-        [PluginType.Init]: [InitArgs<Processed<MentionableSelectCommand>>];
-    };
-    [CommandType.UserSelect]: {
-        [PluginType.Control]: [/* library coupled */ UserSelectMenuInteraction];
-        [PluginType.Init]: [InitArgs<Processed<UserSelectCommand>>];
-    };
-    [CommandType.Modal]: {
-        [PluginType.Control]: [/* library coupled */ ModalSubmitInteraction];
-        [PluginType.Init]: [InitArgs<Processed<ModalSubmitCommand>>];
-    };
-}
-
-interface EventArgsMatrix {
-    [EventType.Discord]: {
-        [PluginType.Control]: /* library coupled */ ClientEvents[keyof ClientEvents];
-        [PluginType.Init]: [InitArgs<Processed<DiscordEventCommand>>];
-    };
-    [EventType.Sern]: {
-        [PluginType.Control]: [Payload];
-        [PluginType.Init]: [InitArgs<Processed<SernEventCommand>>];
-    };
-    [EventType.External]: {
-        [PluginType.Control]: unknown[];
-        [PluginType.Init]: [InitArgs<Processed<ExternalEventCommand>>];
-    };
+    [CommandType.Text]: [Context, SDT];
+    [CommandType.Slash]: [Context, SDT];
+    [CommandType.Both]: [Context, SDT];
+    [CommandType.CtxMsg]: [MessageContextMenuCommandInteraction, SDT];
+    [CommandType.CtxUser]: [UserContextMenuCommandInteraction, SDT];
+    [CommandType.Button]: [ButtonInteraction, SDT];
+    [CommandType.StringSelect]: [StringSelectMenuInteraction, SDT];
+    [CommandType.RoleSelect]: [RoleSelectMenuInteraction, SDT];
+    [CommandType.ChannelSelect]: [ChannelSelectMenuInteraction, SDT];
+    [CommandType.MentionableSelect]: [MentionableSelectMenuInteraction, SDT];
+    [CommandType.UserSelect]: [UserSelectMenuInteraction, SDT];
+    [CommandType.Modal]: [ModalSubmitInteraction, SDT];
 }

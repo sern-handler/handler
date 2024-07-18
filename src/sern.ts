@@ -1,16 +1,24 @@
-import { handleCrash } from './handlers/_internal';
-import callsites from 'callsites';
-import { Files } from './core/_internal';
-import { merge } from 'rxjs';
-import { Services } from './core/ioc';
-import { Wrapper } from './types/core';
-import { eventsHandler } from './handlers/user-defined-events';
-import { readyHandler } from './handlers/ready-event';
-import { messageHandler } from './handlers/message-event';
-import { interactionHandler } from './handlers/interaction-event';
-import { presenceHandler } from './handlers/presence';
-import { Client } from 'discord.js';
+//side effect: global container
+import { useContainerRaw } from '@sern/ioc/global';
 
+import callsites from 'callsites';
+import * as  Files from './core/module-loading';
+import { merge } from 'rxjs';
+import eventsHandler from './handlers/user-defined-events';
+import ready  from './handlers/ready';
+import messageHandler from './handlers/message';
+import interactionHandler from './handlers/interaction';
+import { presenceHandler } from './handlers/presence';
+import { UnpackedDependencies } from './types/utility';
+import type { Presence} from './core/presences';
+import { registerTasks } from './handlers/tasks';
+
+interface Wrapper {
+    commands: string;
+    defaultPrefix?: string;
+    events?: string;
+    tasks?: string;
+}
 /**
  * @since 1.0.0
  * @param maybeWrapper Options to pass into sern.
@@ -23,40 +31,41 @@ import { Client } from 'discord.js';
  * })
  * ```
  */
-export function init(maybeWrapper: Wrapper | 'file') {
-    const startTime = performance.now();
-    const dependencies = Services('@sern/emitter', 
-                                  '@sern/errors',
-                                  '@sern/logger',
-                                  '@sern/modules',
-                                  '@sern/client');
-    const logger = dependencies[2],
-        errorHandler = dependencies[1];
 
-    const wrapper = Files.loadConfig(maybeWrapper, logger);
-    if (wrapper.events !== undefined) {
-        eventsHandler(dependencies, Files.getFullPathTree(wrapper.events));
+export function init(maybeWrapper: Wrapper = { commands: "./dist/commands" }) {
+    const startTime = performance.now();
+    const deps = useContainerRaw().deps<UnpackedDependencies>();
+    
+    if (maybeWrapper.events !== undefined) {
+        eventsHandler(deps, maybeWrapper.events)
+            .then(() => {
+                deps['@sern/logger']?.info({ message: "Events registered" });
+            });
+    } else {
+        deps['@sern/logger']?.info({ message: "No events registered" });
     }
 
     const initCallsite = callsites()[1].getFileName();
     const presencePath = Files.shouldHandle(initCallsite!, "presence");
     //Ready event: load all modules and when finished, time should be taken and logged
-    readyHandler(dependencies, Files.getFullPathTree(wrapper.commands))
-        .add(() => {
-            logger?.info({ message: "Client signaled ready, registering modules" });
+    ready(maybeWrapper.commands, deps)
+        .then(() => {
             const time = ((performance.now() - startTime) / 1000).toFixed(2);
-            dependencies[0].emit('modulesLoaded');
-            logger?.info({ message: `sern: registered in ${time} s`, });
+            deps['@sern/logger']?.info({ message: `sern: registered in ${time} s` });
             if(presencePath.exists) {
-                const setPresence = async (p: any) => {
-                    return (dependencies[4] as Client).user?.setPresence(p);
+                const setPresence = async (p: Presence.Result) => {
+                    return deps['@sern/client'].user?.setPresence(p);
                 }
                 presenceHandler(presencePath.path, setPresence).subscribe();
             }
-        });
+            if(maybeWrapper.tasks) {
+                registerTasks(maybeWrapper.tasks, deps);
+            }
+        })
+        .catch(err => { throw err });
 
-    const messages$ = messageHandler(dependencies, wrapper.defaultPrefix);
-    const interactions$ = interactionHandler(dependencies);
+    const messages$ = messageHandler(deps, maybeWrapper.defaultPrefix);
+    const interactions$ = interactionHandler(deps, maybeWrapper.defaultPrefix);
     // listening to the message stream and interaction stream
-    merge(messages$, interactions$).pipe(handleCrash(errorHandler, dependencies[0], logger)).subscribe();
+    merge(messages$, interactions$).subscribe();
 }

@@ -11,7 +11,9 @@ import type {
 import { CoreContext } from '../structures/core-context';
 import { Result, Ok, Err } from 'ts-results-es';
 import * as assert from 'assert';
-import { ReplyOptions } from '../../types/utility';
+import type { ReplyOptions } from '../../types/utility';
+import { fmt } from '../functions'
+import { SernError } from './enums';
 
 
 /**
@@ -20,16 +22,24 @@ import { ReplyOptions } from '../../types/utility';
  * Message and ChatInputCommandInteraction
  */
 export class Context extends CoreContext<Message, ChatInputCommandInteraction> {
-    /*
-     * @Experimental
-     */
+    
     get options() {
-        return this.interaction.options;
+        if(this.isMessage()) {
+            const [, ...rest] = fmt(this.message.content, this.prefix);
+            return rest;
+        } else {
+            return this.interaction.options;
+        }
     }
-    protected constructor(protected ctx: Result<Message, ChatInputCommandInteraction>) {
+    
+
+    protected constructor(protected ctx: Result<Message, ChatInputCommandInteraction>,
+                          private __prefix?: string) {
         super(ctx);
     }
-
+    public get prefix() {
+        return this.__prefix;
+    }
     public get id(): Snowflake {
         return safeUnwrap(this.ctx
                             .map(m => m.id)
@@ -37,9 +47,7 @@ export class Context extends CoreContext<Message, ChatInputCommandInteraction> {
     }
 
     public get channel() {
-        return safeUnwrap(this.ctx
-                            .map(m => m.channel)
-                            .mapErr(i => i.channel));
+        return safeUnwrap(this.ctx.map(m => m.channel).mapErr(i => i.channel));
     }
 
     public get channelId(): Snowflake {
@@ -88,6 +96,15 @@ export class Context extends CoreContext<Message, ChatInputCommandInteraction> {
                             .mapErr(i => i.member));
     }
 
+    get message(): Message {
+        return this.ctx.expect(SernError.MismatchEvent);
+    }
+
+    get interaction(): ChatInputCommandInteraction {
+        return this.ctx.expectErr(SernError.MismatchEvent);
+    }
+
+
     public get client(): Client {
         return safeUnwrap(this.ctx
                             .map(m => m.client)
@@ -105,17 +122,16 @@ export class Context extends CoreContext<Message, ChatInputCommandInteraction> {
             this.ctx
                 .map(m => m.reply(content as MessageReplyOptions))
                 .mapErr(i =>
-                    i.reply(content as InteractionReplyOptions).then(() => i.fetchReply()),
-                ),
+                    i.reply(content as InteractionReplyOptions).then(() => i.fetchReply())),
         );
     }
 
-    static override wrap(wrappable: BaseInteraction | Message): Context {
+    static wrap(wrappable: BaseInteraction | Message, prefix?: string): Context {
         if ('interaction' in wrappable) {
-            return new Context(Ok(wrappable));
+            return new Context(Ok(wrappable), prefix);
         }
         assert.ok(wrappable.isChatInputCommand(), "Context created with bad interaction.");
-        return new Context(Err(wrappable));
+        return new Context(Err(wrappable), prefix);
     }
 }
 
