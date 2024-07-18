@@ -53,12 +53,9 @@ export class TaskScheduler implements Disposable {
         }
         try {
             const onTick = async function(this: CronJob) {
-                task.execute({
-                    deps, 
-                    id: uuid,
-                    lastTimeExecution: this.lastExecution,
-                    nextTimeExecution: this.nextDate().toJSDate()
-                })
+                task.execute({ id: uuid,
+                               lastTimeExecution: this.lastExecution,
+                               nextTimeExecution: this.nextDate().toJSDate() }, { deps })
            }
            const job = CronJob.from({ cronTime: task.trigger, onTick, timeZone: task.timezone });
            job.start();
