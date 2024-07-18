@@ -1,5 +1,17 @@
 # Changelog
 
+## [4.0.0](https://github.com/sern-handler/handler/compare/v3.3.4...v4.0.0) (2024-07-18)
+
+
+### Features
+
+* v4 ([#361](https://github.com/sern-handler/handler/issues/361)) ([9a8904f](https://github.com/sern-handler/handler/commit/9a8904f5aed4fa36b018ad73bbe58049bae33274))
+
+
+### Miscellaneous Chores
+
+* release 4.0.0 ([dda0e33](https://github.com/sern-handler/handler/commit/dda0e3395b6704862bfd3fda2a201e2cb9b45d2f))
+
 ## [3.3.4](https://github.com/sern-handler/handler/compare/v3.3.3...v3.3.4) (2024-03-18)
 
 
