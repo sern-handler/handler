@@ -25,7 +25,7 @@
 - Unleash its full potential with a powerful CLI and awesome plugins.
 
 ## 📜 Installation
-[Start here!!](https://sern.dev/docs/guide/walkthrough/new-project)
+[Start here!!](https://sern.dev/v4/reference/getting-started)
 
 ## 👶 Basic Usage
 <details><summary>ping.ts</summary>
@@ -48,7 +48,6 @@ export default commandModule({
 - [Community Bot](https://github.com/sern-handler/sern-community), the community bot for our [discord server](https://sern.dev/discord).
 - [Vinci](https://github.com/SrIzan10/vinci), the bot for Mara Turing.
 - [Bask](https://github.com/baskbotml/bask), Listen your favorite artists on Discord.
-- [ava](https://github.com/SrIzan10/ava), A discord bot that plays KNGI and Gensokyo Radio.
 - [Murayama](https://github.com/murayamabot/murayama), :pepega:
 - [Protector (WIP)](https://github.com/needhamgary/Protector), Just a simple bot to help enhance a private minecraft server.
 - [SmokinWeed 💨](https://github.com/Peter-MJ-Parker/sern-bud), A fun bot for a small - but growing - server.
