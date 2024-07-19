@@ -107,7 +107,7 @@ export interface ModalSubmitCommand extends Module {
 
 export interface AutocompleteCommand {
     onEvent?: ControlPlugin[];
-    execute: (ctx: AutocompleteInteraction) => Awaitable<unknown>;
+    execute: (ctx: AutocompleteInteraction, tbd: SDT) => Awaitable<unknown>;
 }
 
 export interface DiscordEventCommand<T extends keyof ClientEvents = keyof ClientEvents>
