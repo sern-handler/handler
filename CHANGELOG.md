@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.0.1](https://github.com/sern-handler/handler/compare/v4.0.0...v4.0.1) (2024-07-19)
+
+
+### Bug Fixes
+
+* add SDT typings to autocomplete commands ([#363](https://github.com/sern-handler/handler/issues/363)) ([92623d2](https://github.com/sern-handler/handler/commit/92623d2914fb80e31365f06cf896bb37f36fc814))
+
 ## [4.0.0](https://github.com/sern-handler/handler/compare/v3.3.4...v4.0.0) (2024-07-18)
 
 
