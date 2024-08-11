@@ -231,7 +231,8 @@ export async function callInitPlugins(_module: Module, deps: Dependencies, emit?
                 emitter?.emit('module.register',
                               resultPayload('failure', module, result.error ?? SernError.PluginFailure));
             }
-            throw Error(result.error ?? SernError.PluginFailure);
+            throw Error((result.error ?? SernError.PluginFailure) +
+                        'on module' + module.name + " " + module.meta.absPath);
         }
     }
     return module
