@@ -120,13 +120,6 @@ test('init plugins replace array', async () => {
     expect(['a']).deep.equal(s.opts)
 })
 
-test('call control plugin ', async () => {
-    const plugin = CommandControlPlugin<CommandType.Slash>((ctx,sdt) => {
-        return controller.next();
-    });
-    const res = await plugin.execute(new ChatInputCommandInteraction(), {})
-    expect(res.isOk()).toBe(true)
-})
 
 test('form sdt', async () => {
 

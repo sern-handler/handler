@@ -557,7 +557,6 @@ __metadata:
     discord.js: ^14.15.3
     eslint: 8.39.0
     rxjs: ^7.8.0
-    ts-results-es: ^4.1.0
     typescript: 5.0.2
     vitest: ^1.6.0
   languageName: unknown
@@ -2956,13 +2955,6 @@ __metadata:
   version: 6.0.4
   resolution: "ts-mixer@npm:6.0.4"
   checksum: 36b1af526befd74345e736e9aa16f5c28876ebcea07784da14d929149fd7e6028cfd2fe9304c8efe8cb91b588443a9cc9e991df58e4c6e602326edbaae2af3ab
-  languageName: node
-  linkType: hard
-
-"ts-results-es@npm:^4.1.0":
-  version: 4.2.0
-  resolution: "ts-results-es@npm:4.2.0"
-  checksum: ff475c2f6d44377e0204211e6eafdbcabddf3ad09d40540ad5dee3d817eefbd48c07a21f5ad86864ef82cd8a5542a266af9dd8dd4d58d4766fdd6e79370519bb
   languageName: node
   linkType: hard
 
