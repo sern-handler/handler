@@ -6,7 +6,7 @@ import { fileURLToPath } from "url";
 
 export const registerTasks = async (tasksPath: string, deps: UnpackedDependencies) => {
     const taskManager = deps['@sern/scheduler']
-    for await (const f of Files.readRecursive(tasksPath)) {
+    for await (const [f, _] of Files.readRecursive(tasksPath)) {
         let { module } = await Files.importModule<ScheduledTask>(f);
         //module.name is assigned by Files.importModule<>
         // the id created for the task is unique
