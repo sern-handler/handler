@@ -20,7 +20,8 @@ const intoDispatcher = (deps: UnpackedDependencies) =>
 
 export default async function(deps: UnpackedDependencies, eventDir: string) {
     const eventModules: EventModule[] = [];
-    for await (const path of Files.readRecursive(eventDir)) {
+    for await (const [path, _] of Files.readRecursive(eventDir)) {
+        console.log(path, _)
         let { module } = await Files.importModule<Module>(path);
         await callInitPlugins(module, deps)
         eventModules.push(module as EventModule);

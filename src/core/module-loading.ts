@@ -1,7 +1,6 @@
 import path from 'node:path';
-import { existsSync } from 'node:fs';
+import { type Dirent, existsSync } from 'node:fs';
 import { readdir } from 'fs/promises';
-import assert from 'node:assert';
 import * as Id from './id'
 import { Module } from '../types/core-modules';
 
@@ -38,8 +37,9 @@ export async function importModule<T>(absPath: string) {
     let fileModule = await import(absPath);
 
     let commandModule: Module = fileModule.default;
-
-    assert(commandModule , `No default export @ ${absPath}`);
+    if(!commandModule) { 
+        throw Error(`No default export @ ${absPath}`);
+    }
     if ('default' in commandModule) {
         commandModule = commandModule.default as Module;
     }
@@ -53,16 +53,17 @@ export async function importModule<T>(absPath: string) {
 }
 
 
-export async function* readRecursive(dir: string): AsyncGenerator<string> {
+export async function* readRecursive(dir: string, directoryPlugins: string[] = []): AsyncGenerator<[string, string[]]> {
     const files = await readdir(dir, { withFileTypes: true });
+    const plugins = files.find(file => file.isFile() && file.name.startsWith('!plugins')) as Dirent;
     for (const file of files) {
         const fullPath = path.posix.join(dir, file.name);
         if (file.isDirectory()) {
             if (!file.name.startsWith('!')) {
-                yield* readRecursive(fullPath);
+                yield* readRecursive(fullPath, [path.posix.join(dir, plugins?.name!), ...directoryPlugins]);
             }
         } else if (!file.name.startsWith('!')) {
-            yield "file:///"+path.resolve(fullPath);
+            yield ["file:///"+path.resolve(fullPath), directoryPlugins];
         }
     }
 }

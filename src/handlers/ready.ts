@@ -17,7 +17,8 @@ export default async function(dir: string, deps : UnpackedDependencies) {
 
     // https://observablehq.com/@ehouais/multiple-promises-as-an-async-generator
     // possibly optimize to concurrently import modules
-    for await (const path of Files.readRecursive(dir)) {
+    for await (const [path, directoryPlugins] of Files.readRecursive(dir)) {
+        console.log(directoryPlugins)
         let { module } = await Files.importModule<Module>(path);
         const validType = module.type >= CommandType.Text && module.type <= CommandType.ChannelSelect;
         if(!validType) {
