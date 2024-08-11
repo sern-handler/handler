@@ -26,9 +26,8 @@ export class Context {
         if(this.isMessage()) {
             const [, ...rest] = fmt(this.message.content, this.prefix);
             return rest;
-        } else {
-            return this.interaction.options;
-        }
+        } 
+        return this.interaction.options;
     }
     
 
@@ -56,9 +55,9 @@ export class Context {
     public get user(): User {
         if(this.ctx.ok) {
             return this.ctx.value.author;
-        } else {
-            return this.ctx.error.user;
-        }
+        } 
+        return this.ctx.error.user;
+        
     }
 
     public get userId(): Snowflake {
@@ -116,10 +115,10 @@ export class Context {
     public async reply(content: ReplyOptions) {
         if(this.ctx.ok) {
             return this.ctx.value.reply(content as MessageReplyOptions)
-        } else {
-            interface FetchReply { fetchReply: true };
-            return this.ctx.error.reply(content as InteractionReplyOptions & FetchReply)
-        }
+        } 
+        interface FetchReply { fetchReply: true };
+        return this.ctx.error.reply(content as InteractionReplyOptions & FetchReply)
+       
     }
 
     static wrap(wrappable: BaseInteraction | Message, prefix?: string): Context {
