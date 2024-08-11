@@ -8,7 +8,7 @@ import {
 import * as Id from '../core/id'
 import type { Emitter, ErrorHandling, Logging } from '../core/interfaces';
 import { SernError } from '../core/structures/enums'
-import { Err, Ok, Result } from 'ts-results-es';
+import { EMPTY_ERR, Err, Ok, Result, isErr, isOk, wrapAsync } from '../core/structures/result';
 import type { UnpackedDependencies } from '../types/utility';
 import type { CommandModule, Module, Processed } from '../types/core-modules';
 import * as assert from 'node:assert';
@@ -17,6 +17,7 @@ import { CommandType } from '../core/structures/enums'
 import { inspect } from 'node:util'
 import { disposeAll } from '../core/ioc';
 import { resultPayload, isAutocomplete, treeSearch, fmt } from '../core/functions'
+
 import merge from 'deepmerge'
 
 function handleError<C>(crashHandler: ErrorHandling, emitter: Emitter, logging?: Logging) {
@@ -43,7 +44,7 @@ interface ExecutePayload {
 
 export const filterTap = <K, R>(onErr: (e: R) => void): OperatorFunction<Result<K, R>, K> => 
     concatMap(result => {
-        if(result.isOk()) {
+        if(isOk(result)) {
             return of(result.value)
         }
         onErr(result.error);
@@ -142,7 +143,7 @@ export function createInteractionHandler<T extends Interaction>(
                 .map(({ id, params }) => ({ module: mg.get(id), params }))
                 .filter(({ module }) => module !== undefined);
             if(modules.length == 0) {
-                return Err.EMPTY;
+                return EMPTY_ERR;
             }
             const [{module, params}] = modules;
             return Ok(createDispatcher({ 
@@ -179,9 +180,9 @@ export function createMessageHandler(
  * @param task the deferred execution which will be called
  */
 export function executeModule(emitter: Emitter, { module, args }: ExecutePayload) {
-    return from(Result.wrapAsync(async () => module.execute(...args)))
+    return from(wrapAsync(async () => module.execute(...args)))
         .pipe(concatMap(result => { 
-            if (result.isOk()) {
+            if (isOk(result)) {
                 emitter.emit('module.activate', resultPayload('success', module));
                 return EMPTY;
             }
@@ -206,10 +207,10 @@ export function createResultResolver<Output>(config: {
     return async (payload: ExecutePayload) => {
         const task = await callPlugins(payload);
         if (!task) throw Error("Plugin did not return anything.");
-        if(task.isOk()) {
-            return onNext(payload, task.value) as Output;
-        } else {
+        if(isErr(task)) {
             onStop?.(payload.module, String(task.error));
+        } else {
+            return onNext(payload, task.value) as Output;
         }
     };
 };
@@ -225,7 +226,7 @@ export async function callInitPlugins(_module: Module, deps: Dependencies, emit?
     for(const plugin of module.plugins ?? []) {
         const result = await plugin.execute({ module, absPath: module.meta.absPath, deps });
         if (!result) throw Error("Plugin did not return anything. " + inspect(plugin, false, Infinity, true));
-        if(result.isErr()) {
+        if(isErr(result)) {
             if(emit) {
                 emitter?.emit('module.register',
                               resultPayload('failure', module, result.error ?? SernError.PluginFailure));
@@ -240,7 +241,7 @@ export async function callPlugins({ args, module, deps, params }: ExecutePayload
     let state = {};
     for(const plugin of module.onEvent??[]) {
         const result = await plugin.execute(...args, { state, deps, params, type: module.type });
-        if(result.isErr()) {
+        if(isErr(result)) {
             return result;
         }
         if(isObject(result.value)) {

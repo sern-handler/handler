@@ -1,6 +1,6 @@
 import { CommandType, PluginType } from './structures/enums';
 import type { Plugin, PluginResult, CommandArgs, InitArgs } from '../types/core-plugin';
-import { Err, Ok } from 'ts-results-es';
+import { Err, Ok } from './structures/result';
 
 export function makePlugin<V extends unknown[]>(
     type: PluginType,

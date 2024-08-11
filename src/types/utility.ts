@@ -1,6 +1,6 @@
 import type { InteractionReplyOptions, MessageReplyOptions } from 'discord.js';
 import type { Module } from './core-modules';
-import type { Result } from 'ts-results-es';
+import type { Result } from '../core/structures/result';
 
 export type Awaitable<T> = PromiseLike<T> | T;
 
