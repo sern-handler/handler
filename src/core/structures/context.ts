@@ -8,7 +8,7 @@ import type {
     Snowflake,
     User,
 } from 'discord.js';
-import { Result, Ok, Err, val, isOk } from './result';
+import { Result, Ok, Err, val } from './result';
 import * as assert from 'assert';
 import type { ReplyOptions } from '../../types/utility';
 import { fmt } from '../functions'
@@ -54,7 +54,7 @@ export class Context {
      * else, interaction.user
      */
     public get user(): User {
-        if(isOk(this.ctx)) {
+        if(this.ctx.ok) {
             return this.ctx.value.author;
         } else {
             return this.ctx.error.user;
@@ -84,13 +84,13 @@ export class Context {
     }
 
     get message(): Message {
-        if(isOk(this.ctx)) {
+        if(this.ctx.ok) {
             return this.ctx.value;
         }
         throw Error(SernError.MismatchEvent);
     }
     public isMessage(): this is Context & { ctx: Result<Message, never> } {
-        return isOk(this.ctx);
+        return this.ctx.ok;
     }
 
     public isSlash(): this is Context & { ctx: Result<never, ChatInputCommandInteraction> } {
@@ -98,7 +98,7 @@ export class Context {
     }
 
     get interaction(): ChatInputCommandInteraction {
-        if(!isOk(this.ctx)) {
+        if(!this.ctx.ok) {
             return this.ctx.error;
         }
         throw Error(SernError.MismatchEvent);
@@ -114,7 +114,7 @@ export class Context {
     }
 
     public async reply(content: ReplyOptions) {
-        if(isOk(this.ctx)) {
+        if(this.ctx.ok) {
             return this.ctx.value.reply(content as MessageReplyOptions)
         } else {
             interface FetchReply { fetchReply: true };

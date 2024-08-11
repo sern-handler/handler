@@ -8,7 +8,7 @@ import {
 import * as Id from '../core/id'
 import type { Emitter, ErrorHandling, Logging } from '../core/interfaces';
 import { SernError } from '../core/structures/enums'
-import { EMPTY_ERR, Err, Ok, Result, isErr, isOk, wrapAsync } from '../core/structures/result';
+import { EMPTY_ERR, Err, Ok, Result,  wrapAsync } from '../core/structures/result';
 import type { UnpackedDependencies } from '../types/utility';
 import type { CommandModule, Module, Processed } from '../types/core-modules';
 import * as assert from 'node:assert';
@@ -44,7 +44,7 @@ interface ExecutePayload {
 
 export const filterTap = <K, R>(onErr: (e: R) => void): OperatorFunction<Result<K, R>, K> => 
     concatMap(result => {
-        if(isOk(result)) {
+        if(result.ok){
             return of(result.value)
         }
         onErr(result.error);
@@ -182,7 +182,7 @@ export function createMessageHandler(
 export function executeModule(emitter: Emitter, { module, args }: ExecutePayload) {
     return from(wrapAsync(async () => module.execute(...args)))
         .pipe(concatMap(result => { 
-            if (isOk(result)) {
+            if (result.ok){
                 emitter.emit('module.activate', resultPayload('success', module));
                 return EMPTY;
             }
@@ -207,7 +207,7 @@ export function createResultResolver<Output>(config: {
     return async (payload: ExecutePayload) => {
         const task = await callPlugins(payload);
         if (!task) throw Error("Plugin did not return anything.");
-        if(isErr(task)) {
+        if(!task.ok) {
             onStop?.(payload.module, String(task.error));
         } else {
             return onNext(payload, task.value) as Output;
@@ -226,7 +226,7 @@ export async function callInitPlugins(_module: Module, deps: Dependencies, emit?
     for(const plugin of module.plugins ?? []) {
         const result = await plugin.execute({ module, absPath: module.meta.absPath, deps });
         if (!result) throw Error("Plugin did not return anything. " + inspect(plugin, false, Infinity, true));
-        if(isErr(result)) {
+        if(!result.ok) {
             if(emit) {
                 emitter?.emit('module.register',
                               resultPayload('failure', module, result.error ?? SernError.PluginFailure));
@@ -241,7 +241,7 @@ export async function callPlugins({ args, module, deps, params }: ExecutePayload
     let state = {};
     for(const plugin of module.onEvent??[]) {
         const result = await plugin.execute(...args, { state, deps, params, type: module.type });
-        if(isErr(result)) {
+        if(!result.ok) {
             return result;
         }
         if(isObject(result.value)) {
