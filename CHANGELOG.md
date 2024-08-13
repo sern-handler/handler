@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.0.2](https://github.com/sern-handler/handler/compare/v4.0.1...v4.0.2) (2024-08-13)
+
+
+### Bug Fixes
+
+* type issue ([2106cdc](https://github.com/sern-handler/handler/commit/2106cdc1d033f88b6ee4ccca6754fe7a595a9328))
+
 ## [4.0.1](https://github.com/sern-handler/handler/compare/v4.0.0...v4.0.1) (2024-07-19)
 
 
