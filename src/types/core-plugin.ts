@@ -22,6 +22,7 @@ import type { Context } from '../core/structures/context'
 import type {
     ButtonInteraction,
     ChannelSelectMenuInteraction,
+    ChatInputCommandInteraction,
     MentionableSelectMenuInteraction,
     MessageContextMenuCommandInteraction,
     ModalSubmitInteraction,
@@ -56,8 +57,8 @@ export type AnyPlugin = ControlPlugin | InitPlugin<[InitArgs<Processed<Module>>]
 export type CommandArgs<I extends CommandType = CommandType> = CommandArgsMatrix[I]
 
 interface CommandArgsMatrix {
-    [CommandType.Text]: [Context, SDT];
-    [CommandType.Slash]: [Context, SDT];
+    [CommandType.Text]: [Context & { get options(): string[]}, SDT];
+    [CommandType.Slash]: [Context  & { get options(): ChatInputCommandInteraction['options']}, SDT];
     [CommandType.Both]: [Context, SDT];
     [CommandType.CtxMsg]: [MessageContextMenuCommandInteraction, SDT];
     [CommandType.CtxUser]: [UserContextMenuCommandInteraction, SDT];
