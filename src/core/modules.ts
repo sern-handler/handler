@@ -26,7 +26,7 @@ export function commandModule(mod: InputCommand): Module {
  * The wrapper function to define event modules for sern
  * @param mod
  */
-export function eventModule(mod: InputEvent): Module {
+export function eventModule<T extends keyof ClientEvents = keyof ClientEvents>(mod: InputEvent<T>): Module {
     const [onEvent, plugins] = partitionPlugins(mod.plugins);
     if(onEvent.length !== 0) throw Error("Event modules cannot have ControlPlugins");
     return { ...mod,
@@ -35,8 +35,9 @@ export function eventModule(mod: InputEvent): Module {
 }
 
 /** Create event modules from discord.js client events,
- * This is an {@link eventModule} for discord events,
- * where typings can be very bad.
+ * This was an {@link eventModule} for discord events,
+ * where typings were bad.
+ * @deprecated Use {@link eventModule} instead
  * @param mod
  */
 export function discordEvent<T extends keyof ClientEvents>(mod: {
