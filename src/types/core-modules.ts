@@ -167,9 +167,9 @@ export interface CommandModuleDefs {
     [CommandType.Modal]: ModalSubmitCommand;
 }
 
-export interface EventModuleDefs {
+export interface EventModuleDefs<T extends keyof ClientEvents = keyof ClientEvents> {
     [EventType.Sern]: SernEventCommand;
-    [EventType.Discord]: DiscordEventCommand;
+    [EventType.Discord]: DiscordEventCommand<T>;
     [EventType.External]: ExternalEventCommand;
 }
 
@@ -186,12 +186,12 @@ export interface SernAutocompleteData
 type CommandModuleNoPlugins = {
     [T in CommandType]: Omit<CommandModuleDefs[T], 'plugins' | 'onEvent' | 'meta' | 'locals'>;
 };
-type EventModulesNoPlugins = {
-    [T in EventType]: Omit<EventModuleDefs[T], 'plugins' | 'onEvent' | 'meta' | 'locals'> ;
+type EventModulesNoPlugins<K extends keyof ClientEvents = keyof ClientEvents> = {
+    [T in EventType]: Omit<EventModuleDefs<K>[T], 'plugins' | 'onEvent' | 'meta' | 'locals'> ;
 };
 
-export type InputEvent = {
-    [T in EventType]: EventModulesNoPlugins[T] & {
+export type InputEvent<K extends keyof ClientEvents = keyof ClientEvents> = {
+    [T in EventType]: EventModulesNoPlugins<K>[T] & {
         once?: boolean;
         plugins?: InitPlugin[] 
     };
