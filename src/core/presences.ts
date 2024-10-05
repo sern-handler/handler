@@ -1,11 +1,10 @@
 import type { ActivitiesOptions } from "discord.js";
 import type { IntoDependencies } from "./ioc";
 import type { Emitter } from "./interfaces";
+import { Awaitable } from "../types/utility";
 
 type Status = 'online' | 'idle' | 'invisible' | 'dnd'
 type PresenceReduce = (previous: Presence.Result) => Presence.Result;
-
-
 
 export const Presence = {
     /**
@@ -50,7 +49,7 @@ export const Presence = {
 export declare namespace Presence {
     export type Config<T extends (keyof Dependencies)[]> = {
         inject?: [...T]
-        execute: (...v: IntoDependencies<T>) => Presence.Result;
+        execute: (...v: IntoDependencies<T>) => Awaitable<Presence.Result>;
 
     }
 
