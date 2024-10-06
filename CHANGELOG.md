@@ -1,5 +1,13 @@
 # Changelog
 
+## [4.0.3](https://github.com/sern-handler/handler/compare/v4.0.2...v4.0.3) (2024-10-06)
+
+
+### Bug Fixes
+
+* async presence ([#369](https://github.com/sern-handler/handler/issues/369)) ([eabfb81](https://github.com/sern-handler/handler/commit/eabfb81819b53a4656d8eac6e21cfb488b724a42))
+* fix eventModule typing for Discord events ([#368](https://github.com/sern-handler/handler/issues/368)) ([1789ccb](https://github.com/sern-handler/handler/commit/1789ccb2f22f502f87538fecdb07106ff7110434))
+
 ## [4.0.2](https://github.com/sern-handler/handler/compare/v4.0.1...v4.0.2) (2024-08-13)
 
 
