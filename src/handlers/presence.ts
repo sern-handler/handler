@@ -1,4 +1,4 @@
-import { concatMap, from, interval, of, map, scan, startWith, fromEvent, take } from "rxjs"
+import { concatMap, from, interval, of, map, scan, startWith, fromEvent, take, mergeScan } from "rxjs"
 import { Presence  } from "../core/presences";
 import { Services } from "../core/ioc";
 import assert from "node:assert";
@@ -14,7 +14,7 @@ const parseConfig = async (conf: Promise<Presence.Result>) => {
             const src$ = typeof repeat === 'number' 
                 ? interval(repeat)
                 : fromEvent(...repeat);
-                return src$.pipe(scan(onRepeat, s), 
+                return src$.pipe(mergeScan(async (args) => onRepeat(args), s), 
                                  startWith(s));
         }
         return of(s).pipe(take(1));
