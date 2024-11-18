@@ -49,7 +49,7 @@ export default commandModule({
 - [Vinci](https://github.com/SrIzan10/vinci), the bot for Mara Turing.
 - [Bask](https://github.com/baskbotml/bask), Listen your favorite artists on Discord.
 - [Murayama](https://github.com/murayamabot/murayama), :pepega:
-- [Protector (WIP)](https://github.com/needhamgary/Protector), Just a simple bot to help enhance a private minecraft server.
+- [Protector](https://github.com/GlitchApotamus/Protector), Just a simple bot to help enhance a private minecraft server.
 - [SmokinWeed 💨](https://github.com/Peter-MJ-Parker/sern-bud), A fun bot for a small - but growing - server.
 - [Man Nomic](https://github.com/jacoobes/man-nomic), A simple information bot to provide information to the nomic-ai discord community.
 - [Linear-Discord](https://github.com/sern-handler/linear-discord) Display and manage a linear dashboard.
