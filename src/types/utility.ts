@@ -3,6 +3,7 @@ import type { Module } from './core-modules';
 import type { Result } from '../core/structures/result';
 
 export type Awaitable<T> = PromiseLike<T> | T;
+export type Dictionary = Record<string, unknown>
 
 export type VoidResult = Result<void, void>;
 export type AnyFunction = (...args: any[]) => unknown;

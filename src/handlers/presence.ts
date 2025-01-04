@@ -1,4 +1,4 @@
-import { concatMap, from, interval, of, map, scan, startWith, fromEvent, take, mergeScan } from "rxjs"
+import { concatMap, from, interval, of, map, startWith, fromEvent, take, mergeScan } from "rxjs"
 import { Presence  } from "../core/presences";
 import { Services } from "../core/ioc";
 import assert from "node:assert";

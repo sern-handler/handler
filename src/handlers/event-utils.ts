@@ -241,7 +241,19 @@ export async function callInitPlugins(_module: Module, deps: Dependencies, emit?
 export async function callPlugins({ args, module, deps, params }: ExecutePayload) {
     let state = {};
     for(const plugin of module.onEvent??[]) {
-        const result = await plugin.execute(...args, { state, deps, params, type: module.type });
+        const executionContext  = {
+            state, 
+            deps,
+            params,
+            type: module.type,
+            module: {
+                name: module.name,
+                description: module.description,
+                locals: module.locals,
+                meta: module.meta
+            }
+        };
+        const result = await plugin.execute(...args, executionContext);
         if(!result.ok) {
             return result;
         }
