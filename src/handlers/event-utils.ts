@@ -246,12 +246,10 @@ export async function callPlugins({ args, module, deps, params }: ExecutePayload
             deps,
             params,
             type: module.type,
-            module: {
-                name: module.name,
-                description: module.description,
-                locals: module.locals,
-                meta: module.meta
-            }
+            module: { name: module.name,
+                      description: module.description,
+                      locals: module.locals,
+                      meta: module.meta }
         };
         const result = await plugin.execute(...args, executionContext);
         if(!result.ok) {
@@ -265,14 +263,26 @@ export async function callPlugins({ args, module, deps, params }: ExecutePayload
 }
 /**
  * Creates an executable task ( execute the command ) if all control plugins are successful
+ * this needs to go
  * @param onStop emits a failure response to the SernEmitter
  */
 export function intoTask(onStop: (m: Module) => unknown) {
-    const onNext = ({ args, module, deps, params }: ExecutePayload, state: Record<string, unknown>) => ({
-        module,
-        args: [...args, { state, deps, params, type: module.type }],
-        deps
-    });
+    const onNext = ({ args, module, deps, params }: ExecutePayload, state: Record<string, unknown>) => {
+        
+        return {
+            module,
+            args: [...args, { state,
+                              deps,
+                              params,
+                              type: module.type,
+                              module: { name: module.name,
+                                        description: module.description,
+                                        locals: module.locals,
+                                        meta: module.meta } }],
+            deps
+        }
+
+    };
     return createResultResolver({ onStop, onNext });
 }
 
