@@ -10,8 +10,39 @@ import { partitionPlugins } from './functions'
 import type { Awaitable } from '../types/utility';
 
 /**
- * @since 1.0.0 The wrapper function to define command modules for sern
- * @param mod
+ * Creates a command module with standardized structure and plugin support.
+ * 
+ * @since 1.0.0
+ * @param {InputCommand} mod - Command module configuration
+ * @returns {Module} Processed command module ready for registration
+ * 
+ * @example
+ * // Basic slash command
+ * export default commandModule({
+ *   type: CommandType.Slash,
+ *   description: "Ping command",
+ *   execute: async (ctx) => {
+ *     await ctx.reply("Pong! 🏓");
+ *   }
+ * });
+ * 
+ * @example
+ * // Command with component interaction
+ * export default commandModule({
+ *   type: CommandType.Slash,
+ *   description: "Interactive command",
+ *   execute: async (ctx) => {
+ *     const button = new ButtonBuilder({
+ *       customId: "btn/someData",
+ *       label: "Click me",
+ *       style: ButtonStyle.Primary
+ *     });
+ *     await ctx.reply({
+ *       content: "Interactive message",
+ *       components: [new ActionRowBuilder().addComponents(button)]
+ *     });
+ *   }
+ * });
  */
 export function commandModule(mod: InputCommand): Module {
     const [onEvent, plugins] = partitionPlugins(mod.plugins);
@@ -21,10 +52,33 @@ export function commandModule(mod: InputCommand): Module {
              locals: {} } as Module;
 }
 
+
 /**
+ * Creates an event module for handling Discord.js or custom events.
+ * 
  * @since 1.0.0
- * The wrapper function to define event modules for sern
- * @param mod
+ * @template T - Event name from ClientEvents
+ * @param {InputEvent<T>} mod - Event module configuration
+ * @returns {Module} Processed event module ready for registration
+ * @throws {Error} If ControlPlugins are used in event modules
+ * 
+ * @example
+ * // Discord event listener
+ * export default eventModule({
+ *   type: EventType.Discord,
+ *   execute: async (message) => {
+ *     console.log(`${message.author.tag}: ${message.content}`);
+ *   }
+ * });
+ * 
+ * @example
+ * // Custom sern event
+ * export default eventModule({
+ *   type: EventType.Sern,
+ *   execute: async (eventData) => {
+ *     // Handle sern-specific event
+ *   }
+ * });
  */
 export function eventModule<T extends keyof ClientEvents = keyof ClientEvents>(mod: InputEvent<T>): Module {
     const [onEvent, plugins] = partitionPlugins(mod.plugins);

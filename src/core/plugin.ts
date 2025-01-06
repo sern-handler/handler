@@ -1,6 +1,7 @@
 import { CommandType, PluginType } from './structures/enums';
 import type { Plugin, PluginResult, CommandArgs, InitArgs } from '../types/core-plugin';
 import { Err, Ok } from './structures/result';
+import type { Dictionary } from '../types/utility';
 
 export function makePlugin<V extends unknown[]>(
     type: PluginType,
@@ -37,7 +38,7 @@ export function CommandControlPlugin<I extends CommandType>(
  * The object passed into every plugin to control a command's behavior
  */
 export const controller = {
-    next: (val?: Record<string,unknown>) => Ok(val),
+    next: (val?: Dictionary) => Ok(val),
     stop: (val?: string) => Err(val),
 };
 

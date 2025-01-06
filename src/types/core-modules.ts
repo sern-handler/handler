@@ -19,14 +19,97 @@ import type {
 import type { CommandType, EventType } from '../core/structures/enums';
 import { Context } from '../core/structures/context'
 import { ControlPlugin, InitPlugin, Plugin } from './core-plugin';
-import { Awaitable, SernEventsMapping, UnpackedDependencies } from './utility';
+import { Awaitable, SernEventsMapping, UnpackedDependencies, Dictionary } from './utility';
 
-//state, deps, type (very original)
+/**
+ * SDT (State, Dependencies, Type) interface represents the core data structure
+ * passed through the plugin pipeline to command modules.
+ * 
+ * @interface SDT
+ * @template TState - Type parameter for the state object's structure
+ * @template TDeps - Type parameter for dependencies interface
+ * 
+ * @property {Record<string, unknown>} state - Accumulated state data passed between plugins
+ * @property {TDeps} deps - Instance of application dependencies
+ * @property {CommandType} type - Command type identifier
+ * @property {string} [params] - Optional parameters passed to the command
+ * 
+ * @example
+ * // Example of a plugin using SDT
+ * const loggingPlugin = CommandControlPlugin((ctx, sdt: SDT) => {
+ *     console.log(`User ${ctx.user.id} executed command`);
+ *     return controller.next({ 'logging/timestamp': Date.now() });
+ * });
+ * 
+ * @example
+ * // Example of state accumulation through multiple plugins
+ * const plugin1 = CommandControlPlugin((ctx, sdt: SDT) => {
+ *     return controller.next({ 'plugin1/data': 'value1' });
+ * });
+ * 
+ * const plugin2 = CommandControlPlugin((ctx, sdt: SDT) => {
+ *     // Access previous state
+ *     const prevData = sdt.state['plugin1/data'];
+ *     return controller.next({ 'plugin2/data': 'value2' });
+ * });
+ * 
+ * @remarks
+ * - State is immutable and accumulated through the plugin chain
+ * - Keys in state should be namespaced to avoid collisions
+ * - Dependencies are injected and available throughout the pipeline
+ * - Type information helps plugins make type-safe decisions
+ * 
+ * @see {@link CommandControlPlugin} for plugin implementation
+ * @see {@link CommandType} for available command types
+ * @see {@link Dependencies} for dependency injection interface
+ */
 export type SDT = {
-    state: Record<string,unknown>;
+    /**
+     * Accumulated state passed between plugins in the pipeline.
+     * Each plugin can add to or modify this state using controller.next().
+     * 
+     * @type {Record<string, unknown>}
+     * @example
+     * // Good: Namespaced state key
+     * { 'myPlugin/userData': { id: '123', name: 'User' } }
+     * 
+     * // Avoid: Non-namespaced keys that might collide
+     * { userData: { id: '123' } }
+     */
+    state: Record<string, unknown>;
+
+    /**
+     * Application dependencies available to plugins and command modules.
+     * Typically includes services, configurations, and utilities.
+     * 
+     * @type {Dependencies}
+     */
     deps: Dependencies;
-    type: CommandType,
-    params?: string
+
+    /**
+     * Identifies the type of command being processed.
+     * Used by plugins to apply type-specific logic.
+     * 
+     * @type {CommandType}
+     */
+    type: CommandType;
+
+    /**
+     * Optional parameters passed to the command.
+     * May contain additional configuration or runtime data.
+     * 
+     * @type {string}
+     * @optional
+     */
+    params?: string;
+
+    /**
+     * A copy of the current module that the plugin is running in.
+     */
+    module: { name: string; 
+                  description: string;
+                  meta: Dictionary; 
+                  locals: Dictionary; }
 };
 
 export type Processed<T> = T & { name: string; description: string };
@@ -41,7 +124,75 @@ export interface Module {
         id: string;
         absPath: string;
     }
-    locals: Record<string,unknown>
+
+    /**
+     * Custom data storage object for module-specific information.
+     * Plugins and module code can use this to store and retrieve metadata,
+     * configuration, or any other module-specific information.
+     * 
+     * @type {Dictionary}
+     * @description A key-value store that allows plugins and module code to persist
+     * data at the module level. This is especially useful for InitPlugins that need
+     * to attach metadata or configuration to modules.
+     * 
+     * @example
+     * // In a plugin
+     * module.locals.registrationDate = Date.now();
+     * module.locals.version = "1.0.0";
+     * module.locals.permissions = ["ADMIN", "MODERATE"];
+     * 
+     * @example
+     * // In module execution
+     * console.log(`Command registered on: ${new Date(module.locals.registrationDate)}`);
+     * 
+     * @example
+     * // Storing localization data
+     * module.locals.translations = {
+     *   en: "Hello",
+     *   es: "Hola",
+     *   fr: "Bonjour"
+     * };
+     * 
+     * @example
+     * // Storing command metadata
+     * module.locals.metadata = {
+     *   category: "admin",
+     *   cooldown: 5000,
+     *   requiresPermissions: true
+     * };
+     * 
+     * @remarks
+     * - The locals object is initialized as an empty object ({}) by default
+     * - Keys should be namespaced to avoid collisions between plugins
+     * - Values can be of any type
+     * - Data persists for the lifetime of the module
+     * - Commonly used by InitPlugins during module initialization
+     * 
+     * @best-practices
+     * 1. Namespace your keys to avoid conflicts:
+     *    ```typescript
+     *    module.locals['myPlugin:data'] = value;
+     *    ```
+     * 
+     * 2. Document the data structure you're storing:
+     *    ```typescript
+     *    interface MyPluginData {
+     *      version: string;
+     *      timestamp: number;
+     *    }
+     *    module.locals['myPlugin:data'] = {
+     *      version: '1.0.0',
+     *      timestamp: Date.now()
+     *    } as MyPluginData;
+     *    ```
+     * 
+     * 3. Use type-safe accessors when possible:
+     *    ```typescript
+     *    const getPluginData = (module: Module): MyPluginData => 
+     *      module.locals['myPlugin:data'];
+     *    ```
+     */
+    locals: Dictionary;
     execute(...args: any[]): Awaitable<any>;
 }
 
