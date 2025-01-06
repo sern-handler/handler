@@ -1,5 +1,17 @@
 # Changelog
 
+## [4.1.0](https://github.com/sern-handler/handler/compare/v4.0.3...v4.1.0) (2025-01-06)
+
+
+### Features
+
+* moduleinfo-in-eventplugins ([#373](https://github.com/sern-handler/handler/issues/373)) ([220a60e](https://github.com/sern-handler/handler/commit/220a60ecf853df8d288de2533c669562a430c3f9))
+
+
+### Bug Fixes
+
+* update github username ([#371](https://github.com/sern-handler/handler/issues/371)) ([55715d5](https://github.com/sern-handler/handler/commit/55715d565990fe686159f3c1eda3754d1262c72c))
+
 ## [4.0.3](https://github.com/sern-handler/handler/compare/v4.0.2...v4.0.3) (2024-10-06)
 
 
