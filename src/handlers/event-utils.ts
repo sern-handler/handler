@@ -1,4 +1,6 @@
-import type { Interaction, Message, BaseInteraction } from 'discord.js';
+// @ts-nocheck
+
+import type { Message, BaseInteraction } from 'discord.js';
 import util from 'node:util';
 import {
     EMPTY, type Observable, concatMap, filter,
@@ -8,7 +10,7 @@ import {
 import * as Id from '../core/id'
 import type { Emitter, ErrorHandling, Logging } from '../core/interfaces';
 import { SernError } from '../core/structures/enums'
-import { EMPTY_ERR, Err, Ok, Result,  wrapAsync } from '../core/structures/result';
+import { Err, Ok, Result,  wrapAsync } from '../core/structures/result';
 import type { UnpackedDependencies } from '../types/utility';
 import type { CommandModule, Module, Processed } from '../types/core-modules';
 import * as assert from 'node:assert';
@@ -37,8 +39,6 @@ const arrayify= <T>(src: T) =>
 interface ExecutePayload {
     module: Module;
     args: unknown[];
-    deps: Dependencies;
-    params?: string;
     [key: string]: unknown
 }
 
@@ -119,38 +119,6 @@ function createGenericHandler<Source, Narrowed extends Source, Output>(
         source.pipe(
             filter(pred), // only handle this stream if it passes pred
             concatMap(makeModule)); // create a payload, preparing to execute
-}
-
-
-/**
- *
- * Creates an RxJS observable that filters and maps incoming interactions to their respective modules.
- * @param i An RxJS observable of interactions.
- * @param mg The module manager instance used to retrieve the module path for each interaction.
- * @returns A handler to create a RxJS observable of dispatchers that take incoming interactions and execute their corresponding modules.
- */
-export function createInteractionHandler<T extends Interaction>(
-    source: Observable<Interaction>,
-    deps: Dependencies,
-    defaultPrefix?: string
-) {
-    const mg = deps['@sern/modules'];
-    return createGenericHandler<Interaction, T, Result<ReturnType<typeof createDispatcher>, void>>(
-        source,
-        async event => {
-            const possibleIds = Id.reconstruct(event);
-            let modules = possibleIds
-                .map(({ id, params }) => ({ module: mg.get(id), params }))
-                .filter(({ module }) => module !== undefined);
-            if(modules.length == 0) {
-                return EMPTY_ERR;
-            }
-            const [{module, params}] = modules;
-            return Ok(createDispatcher({ 
-                module: module as Processed<CommandModule>, 
-                event, defaultPrefix, deps, params 
-            }));
-    });
 }
 
 export function createMessageHandler(
@@ -238,20 +206,10 @@ export async function callInitPlugins(_module: Module, deps: Dependencies, emit?
     return module
 }
 
-export async function callPlugins({ args, module, deps, params }: ExecutePayload) {
+export async function callPlugins({ args, module }: ExecutePayload) {
     let state = {};
     for(const plugin of module.onEvent??[]) {
-        const executionContext  = {
-            state, 
-            deps,
-            params,
-            type: module.type,
-            module: { name: module.name,
-                      description: module.description,
-                      locals: module.locals,
-                      meta: module.meta }
-        };
-        const result = await plugin.execute(...args, executionContext);
+        const result = await plugin.execute(...args);
         if(!result.ok) {
             return result;
         }

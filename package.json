@@ -39,7 +39,7 @@
         "callsites": "^3.1.0",
         "cron": "^3.1.7",
         "deepmerge": "^4.3.1",
-        "rxjs": "^7.8.0"
+        "rxjs": "^7.8.1"
     },
     "devDependencies": {
         "@faker-js/faker": "^8.0.1",
