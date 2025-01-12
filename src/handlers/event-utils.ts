@@ -41,14 +41,19 @@ export function executeModule(emitter: Emitter, { module, args } : ExecutePayloa
     //do not await. this will block sern
     
     const moduleCalled = wrapAsync(async () => {
-        return  module.execute(...args);
+        console.log(module)
+        return module.execute(...args);
     })
     moduleCalled 
         .then(() => {
-            emitter.emit('module.activate', resultPayload('success', module) )    
+            console.log('success execute')
+            emitter.emit('module.activate', resultPayload('success', module))    
         })
         .catch(err => {
-            emitter.emit('error', resultPayload('failure', module, err))
+            console.log('err', err)
+            if(!emitter.emit('error', resultPayload('failure', module, err))) {
+                console.error(err)
+            }
         })
 };
 

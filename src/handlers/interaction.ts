@@ -55,6 +55,6 @@ export function interactionHandler(deps: UnpackedDependencies, defaultPrefix?: s
         payload.args[1].state = result.value
 
         // note: do not await this. will be blocking if long task (ie waiting for modal input)
-        executeModule(reporter, { module, args: payload.args });
+        executeModule(reporter, payload);
     });
 }
