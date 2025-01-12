@@ -102,5 +102,34 @@ export function discordEvent<T extends keyof ClientEvents>(mod: {
     return eventModule({ type: EventType.Discord, ...mod, });
 }
 
-export function scheduledTask(ism: ScheduledTask) { return ism }
+/**
+ * Creates a scheduled task that can be executed at specified intervals using cron patterns
+ * 
+ * @param {ScheduledTask} ism - The scheduled task configuration object
+ * @param {string} ism.trigger - A cron pattern that determines when the task should execute
+ *                              Format: "* * * * *" (minute hour day month day-of-week)
+ * @param {Function} ism.execute - The function to execute when the task is triggered
+ * @param {Object} ism.execute.context - The execution context passed to the task
+ * 
+ * @returns {ScheduledTask} The configured scheduled task
+ * 
+ * @example
+ * // Create a task that runs every minute
+ * export default scheduledTask({
+ *   trigger: "* * * * *",
+ *   execute: (context) => {
+ *     console.log("Task executed!");
+ *   }
+ * });
+ * 
+ * @remarks
+ * - Tasks must be placed in the 'tasks' directory specified in your config
+ * - The file name serves as a unique identifier for the task
+ * - Tasks can be cancelled using deps['@sern/scheduler'].kill(uuid)
+ * 
+ * @see {@link https://crontab.guru/} for testing and creating cron patterns
+ */
+export function scheduledTask(ism: ScheduledTask): ScheduledTask { 
+    return ism 
+}
 
