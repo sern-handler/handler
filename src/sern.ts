@@ -1,5 +1,8 @@
 //side effect: global container
 import { useContainerRaw } from '@sern/ioc/global';
+// set asynchronous capturing of errors
+import events from 'node:events'
+events.captureRejections = true;
 
 import callsites from 'callsites';
 import * as  Files from './core/module-loading';

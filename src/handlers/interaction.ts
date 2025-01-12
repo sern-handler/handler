@@ -1,7 +1,7 @@
 import type { Module } from '../types/core-modules'
-import {  callPlugins } from './event-utils';
+import {  callPlugins, executeModule } from './event-utils';
 import { SernError } from '../core/structures/enums'
-import { createSDT, isAutocomplete, isCommand, isMessageComponent, isModal, treeSearch } from '../core/functions'
+import { createSDT, isAutocomplete, isCommand, isMessageComponent, isModal, resultPayload, treeSearch } from '../core/functions'
 import { UnpackedDependencies } from '../types/utility';
 import * as Id from '../core/id'
 import { Context } from '../core/structures/context';
@@ -12,7 +12,7 @@ export function interactionHandler(deps: UnpackedDependencies, defaultPrefix?: s
     //i wish javascript had clojure destructuring 
     const { '@sern/client': client,
             '@sern/modules': moduleManager,
-            '@sern/emitter': emitter } = deps
+            '@sern/emitter': reporter } = deps
 
     client.on('interactionCreate', async (event) => {
 
@@ -45,17 +45,18 @@ export function interactionHandler(deps: UnpackedDependencies, defaultPrefix?: s
         }
         const result = await callPlugins(payload)
         if(!result.ok) {
-            throw Error(result.error ?? SernError.PluginFailure)
+            reporter.emit('module.activate', resultPayload('failure', module, result.error ?? SernError.PluginFailure))
+            return
         }
         if(payload.args.length != 2) {
-            throw Error ('assdfasd')
+            throw Error ('Invalid payload')
         }
         //@ts-ignore assigning final state from plugin
         payload.args[1].state = result.value
-        
 
         // will be blocking if long task + await 
         // todo, add to task queue
-        module.execute(...payload.args)
+        
+        executeModule(reporter, { module, args: payload.args });
     });
 }

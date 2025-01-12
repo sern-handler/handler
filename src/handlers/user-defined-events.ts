@@ -1,22 +1,11 @@
 import { EventType,  SernError } from '../core/structures/enums';
-import { callInitPlugins, eventDispatcher, handleCrash } from './event-utils'
+import { callInitPlugins } from './event-utils'
 import { EventModule,  Module  } from '../types/core-modules';
 import * as Files from '../core/module-loading'
 import type { UnpackedDependencies } from '../types/utility';
-import { from, map, mergeAll } from 'rxjs';
-
-const intoDispatcher = (deps: UnpackedDependencies) => 
-    (module : EventModule) => {
-        switch (module.type) {
-            case EventType.Sern:
-                return eventDispatcher(deps, module,  deps['@sern/emitter']);
-            case EventType.Discord:
-                return eventDispatcher(deps, module,  deps['@sern/client']);
-            case EventType.External:
-                return eventDispatcher(deps, module,  deps[module.emitter]);
-            default: throw Error(SernError.InvalidModuleType + ' while creating event handler');
-        }
-};
+import type { Emitter } from '../core/interfaces';
+import { inspect } from 'util'
+import { resultPayload } from '../core/functions';
 
 export default async function(deps: UnpackedDependencies, eventDir: string) {
     const eventModules: EventModule[] = [];
@@ -25,9 +14,43 @@ export default async function(deps: UnpackedDependencies, eventDir: string) {
         await callInitPlugins(module, deps)
         eventModules.push(module as EventModule);
     }
-    from(eventModules)
-        .pipe(map(intoDispatcher(deps)),
-               mergeAll(), // all eventListeners are turned on
-               handleCrash(deps, "event modules"))
-            .subscribe();
+    const logger = deps['@sern/logger'], report = deps['@sern/emitter'];
+    for (const module of eventModules) {
+        let source: Emitter;
+
+        switch (module.type) {
+            case EventType.Sern:
+                source=deps['@sern/emitter'];
+                break
+            case EventType.Discord:
+                source=deps['@sern/client'];
+                break
+            case EventType.External:
+                source=deps[module.emitter] as Emitter;
+                break   
+            default: throw Error(SernError.InvalidModuleType + ' while creating event handler');
+        }
+        if(!source && typeof source !== 'object') {
+            throw Error(`${source} cannot be constructed into an event listener`)
+        }
+        
+        if(!('addListener' in source && 'removeListener' in source)) {
+            throw Error('source must implement Emitter')
+        }
+        const execute = async (...args: any[]) => {
+            try {
+                if(args) {
+                    if('once' in module) { source.removeListener(module.name!, execute); }
+                    await Reflect.apply(module.execute, null, args);
+                }
+            } catch(e) {
+                const err = e instanceof Error ? e : Error(inspect(e, { colors: true }));
+                if(!report.emit('error', resultPayload('failure', module, err))) {
+                    logger?.error({ message: inspect(err) });
+                }
+            }
+           
+       }
+       source.addListener(module.name!, execute)
+    }
 }

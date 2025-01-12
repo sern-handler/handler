@@ -1,4 +1,3 @@
-import { concatMap,  map } from "rxjs"
 import { Presence  } from "../core/presences";
 import { Services } from "../core/ioc";
 import * as Files from "../core/module-loading";
@@ -9,7 +8,6 @@ const parseConfig = async (conf: Promise<Presence.Result>, setPresence: SetPrese
     
     if ('repeat' in result) {
         const { onRepeat, repeat } = result;
-        
         // Validate configuration
         if (repeat === undefined) {
             throw new Error("repeat option is undefined");
@@ -17,7 +15,6 @@ const parseConfig = async (conf: Promise<Presence.Result>, setPresence: SetPrese
         if (onRepeat === undefined) {
             throw new Error("onRepeat callback is undefined, but repeat exists");
         }
-
         // Initial state
         let currentState = result;
         const processState = async (state: typeof currentState) => {
@@ -46,7 +43,7 @@ const parseConfig = async (conf: Promise<Presence.Result>, setPresence: SetPrese
 
                     processState(currentState)
                         .then(newState => { 
-                            console.log(newState)
+                            //console.log(newState)
                             currentState = newState; 
                             return setPresence(currentState)
                         })
@@ -62,19 +59,22 @@ const parseConfig = async (conf: Promise<Presence.Result>, setPresence: SetPrese
         }
         // Handle event-based repeat
         else {
+            const handler = async () => {
+                currentState = await onRepeat(currentState);
+                await setPresence(currentState);
+            }; 
+            let has_registered = false;
             return new Promise((resolve) => {
                 const [target, eventName] = repeat;
                 
                 // Immediately return initial state
-                onRepeat(currentState);
+                processState(currentState);
 
                 // Set up event listener
-                const handler = async () => {
-                    currentState = await onRepeat(currentState);
-                };
-                
-                target.addListener(eventName, handler);
-
+                if(!has_registered) {
+                    target.addListener(eventName, handler);
+                    has_registered=true;
+                }
                 // Optional: Return cleanup function
                 return () => target.removeListener(eventName, handler);
             });
@@ -93,6 +93,7 @@ export const presenceHandler = async (path: string, setPresence: SetPresence) =>
                 const fetchedServices = Services(...module.inject ?? []);
                 return async () => module.execute(...fetchedServices);
              })
+     
     return parseConfig(presence(), setPresence);
        
 }

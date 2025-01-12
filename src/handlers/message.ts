@@ -1,10 +1,11 @@
 import type { Message } from 'discord.js';
-import { callPlugins} from './event-utils';
+import { callPlugins, executeModule } from './event-utils';
 import { SernError } from '../core/structures/enums'
-import { createSDT, fmt } from '../core/functions'
+import { createSDT, fmt, resultPayload } from '../core/functions'
 import { UnpackedDependencies } from '../types/utility';
 import type { Module } from '../types/core-modules';
 import { Context } from '../core/structures/context';
+
 /**
  * Ignores messages from any person / bot except itself
  * @param prefix
@@ -40,15 +41,13 @@ export function messageHandler (deps: UnpackedDependencies, defaultPrefix?: stri
         const payload = { module, args: [Context.wrap(message, defaultPrefix), createSDT(module, deps, undefined)] }
         const result = await callPlugins(payload)
         if (!result.ok) {
-//            const result = resultPayload('failure', module, SernError.PluginFailure);
-//            emitter.emit('module.activate', result);
-            throw Error(result.error ?? SernError.PluginFailure)
+            emitter.emit('module.activate', resultPayload('failure', module, result.error ?? SernError.PluginFailure))
+            return
         }
         //@ts-ignore
         payload.args[1].state = result.value
-        //todo, add to task queue
-        module.execute(...payload.args)
 
+        executeModule(emitter, { module, args: payload.args })
     })
     
 }

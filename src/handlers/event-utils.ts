@@ -1,40 +1,12 @@
-// @ts-nocheck
-
-import type { Message, BaseInteraction } from 'discord.js';
-import util from 'node:util';
-import {
-    EMPTY, type Observable, concatMap, filter,
-    throwError, fromEvent, map, type OperatorFunction,
-    catchError, finalize, pipe, from, take, share, of,
-} from 'rxjs';
-import * as Id from '../core/id'
-import type { Emitter, ErrorHandling, Logging } from '../core/interfaces';
+import type { Emitter, Logging } from '../core/interfaces';
 import { SernError } from '../core/structures/enums'
-import { Err, Ok, Result,  wrapAsync } from '../core/structures/result';
-import type { UnpackedDependencies } from '../types/utility';
-import type { CommandModule, Module, Processed } from '../types/core-modules';
-import * as assert from 'node:assert';
-import { Context } from '../core/structures/context';
-import { CommandType } from '../core/structures/enums'
+import { Ok, wrapAsync} from '../core/structures/result';
+import type {  Module } from '../types/core-modules';
 import { inspect } from 'node:util'
-import { disposeAll } from '../core/ioc';
-import { resultPayload, isAutocomplete, treeSearch, fmt } from '../core/functions'
+import { resultPayload,  } from '../core/functions'
 
 import merge from 'deepmerge'
 
-function handleError<C>(crashHandler: ErrorHandling, emitter: Emitter, logging?: Logging) {
-    return (pload: unknown, caught: Observable<C>) => {
-        // This is done to fit the ErrorHandling contract
-        if(!emitter.emit('error', pload)) {
-            const err = pload instanceof Error ? pload : Error(util.inspect(pload, { colors: true }));
-            logging?.error({ message: util.inspect(pload) });
-            crashHandler.updateAlive(err);
-        }
-        return caught;
-    };
-}
-const arrayify= <T>(src: T) => 
-    Array.isArray(src) ? src : [src];
 
 interface ExecutePayload {
     module: Module;
@@ -42,146 +14,6 @@ interface ExecutePayload {
     [key: string]: unknown
 }
 
-export const filterTap = <K, R>(onErr: (e: R) => void): OperatorFunction<Result<K, R>, K> => 
-    concatMap(result => {
-        if(result.ok){
-            return of(result.value)
-        }
-        onErr(result.error);
-        return EMPTY;
-    })
-
-export const sharedEventStream = <T>(e: Emitter, eventName: string) => 
-    (fromEvent(e, eventName) as Observable<T>).pipe(share());
-
-function intoPayload(module: Module, deps: Dependencies) {
-    return pipe(map(arrayify),
-                map(args => ({ module, args, deps })),
-                map(p => p.args));
-}
-/**
- * Creates an observable from { source }
- * @param module
- * @param source
- */
-export function eventDispatcher(deps: Dependencies, module: Module, source: unknown) {
-    assert.ok(source && typeof source === 'object',
-              `${source} cannot be constructed into an event listener`);
-    const execute: OperatorFunction<unknown[]|undefined, unknown> =
-        concatMap(async args => {
-            if(args) return Reflect.apply(module.execute, null, args);
-        });
-
-    //@ts-ignore
-    let ev = fromEvent(source ,module.name!);
-    //@ts-ignore
-    if(module['once']) {
-        ev = ev.pipe(take(1))
-    }
-    return ev.pipe(intoPayload(module, deps),
-                   execute);
-}
-
-interface DispatchPayload { 
-    module: Processed<CommandModule>;
-    event: BaseInteraction; 
-    defaultPrefix?: string;
-    deps: Dependencies;
-    params?: string
-};
-export function createDispatcher({ module, event, defaultPrefix, deps, params }: DispatchPayload): ExecutePayload {
-    assert.ok(CommandType.Text !== module.type,
-        SernError.MismatchEvent + 'Found text command in interaction stream');
-
-    if(isAutocomplete(event)) {
-        assert.ok(module.type === CommandType.Slash 
-               || module.type === CommandType.Both, "Autocomplete option on non command interaction");
-        const option = treeSearch(event, module.options);
-        assert.ok(option, SernError.NotSupportedInteraction + ` There is no autocomplete tag for ` + inspect(module));
-        const { command } = option;
-        return { module: command as Processed<Module>, //autocomplete is not a true "module" warning cast!
-                 args: [event],
-                 deps };
-    }
-    switch (module.type) {
-        case CommandType.Slash:
-        case CommandType.Both: {
-            return { module, args: [Context.wrap(event, defaultPrefix)], deps };
-        }
-        default: return { module, args: [event], deps, params };
-    }
-}
-function createGenericHandler<Source, Narrowed extends Source, Output>(
-    source: Observable<Source>,
-    makeModule: (event: Narrowed) => Promise<Output>,
-) {
-    return (pred: (i: Source) => i is Narrowed) => 
-        source.pipe(
-            filter(pred), // only handle this stream if it passes pred
-            concatMap(makeModule)); // create a payload, preparing to execute
-}
-
-export function createMessageHandler(
-    source: Observable<Message>,
-    defaultPrefix: string,
-    deps: Dependencies,
-) {
-    const mg = deps['@sern/modules'];
-    return createGenericHandler(source, async event => {
-        const [prefix] = fmt(event.content, defaultPrefix);
-        let module= mg.get(`${prefix}_T`) ?? mg.get(`${prefix}_B`) as Module;
-        if(!module) {
-            return Err('Possibly undefined behavior: could not find a static id to resolve');
-        }
-        return Ok({ args: [Context.wrap(event, defaultPrefix)], module, deps })
-    });
-}
-
-
-/**
- * Wraps the task in a Result as a try / catch.
- * if the task is ok, an event is emitted and the stream becomes empty
- * if the task is an error, throw an error down the stream which will be handled by catchError
- * thank u kingomes
- * @param emitter reference to SernEmitter that will emit a successful execution of module
- * @param module the module that will be executed with task
- * @param task the deferred execution which will be called
- */
-export function executeModule(emitter: Emitter, { module, args }: ExecutePayload) {
-    return from(wrapAsync(async () => module.execute(...args)))
-        .pipe(concatMap(result => { 
-            if (result.ok){
-                emitter.emit('module.activate', resultPayload('success', module));
-                return EMPTY;
-            }
-            return throwError(() => resultPayload('failure', module, result.error));
-        }))
-};
-
-/**
- * A higher order function that
- * - calls all control plugins.
- * - any failures results to { config.onStop } being called
- * - if all results are ok, the stream is converted to { config.onNext }
- * config.onNext will be returned if everything is okay.
- * @param config
- * @returns function which calls all plugins and returns onNext or fail 
- */
-export function createResultResolver<Output>(config: {
-    onStop?: (module: Module, err?: string) => unknown;
-    onNext: (args: ExecutePayload, map: Record<string, unknown>) => Output;
-}) {
-    const { onStop, onNext } = config;
-    return async (payload: ExecutePayload) => {
-        const task = await callPlugins(payload);
-        if (!task) throw Error("Plugin did not return anything.");
-        if(!task.ok) {
-            onStop?.(payload.module, String(task.error));
-        } else {
-            return onNext(payload, task.value) as Output;
-        }
-    };
-};
 
 function isObject(item: unknown) {
     return (item && typeof item === 'object' && !Array.isArray(item));
@@ -206,6 +38,22 @@ export async function callInitPlugins(_module: Module, deps: Dependencies, emit?
     return module
 }
 
+export function executeModule(emitter: Emitter, { module, args } : ExecutePayload) {
+    //do not await. this will block sern
+    
+    const moduleCalled = wrapAsync(async () => {
+        return  module.execute(...args);
+    })
+    moduleCalled 
+        .then(() => {
+            emitter.emit('module.activate', resultPayload('success', module) )    
+        })
+        .catch(err => {
+            emitter.emit('error', resultPayload('failure', module, err))
+        })
+};
+
+
 export async function callPlugins({ args, module }: ExecutePayload) {
     let state = {};
     for(const plugin of module.onEvent??[]) {
@@ -219,34 +67,3 @@ export async function callPlugins({ args, module }: ExecutePayload) {
     }
     return Ok(state);
 }
-/**
- * Creates an executable task ( execute the command ) if all control plugins are successful
- * this needs to go
- * @param onStop emits a failure response to the SernEmitter
- */
-export function intoTask(onStop: (m: Module) => unknown) {
-    const onNext = ({ args, module, deps, params }: ExecutePayload, state: Record<string, unknown>) => {
-        
-        return {
-            module,
-            args: [...args, { state,
-                              deps,
-                              params,
-                              type: module.type,
-                              module: { name: module.name,
-                                        description: module.description,
-                                        locals: module.locals,
-                                        meta: module.meta } }],
-            deps
-        }
-
-    };
-    return createResultResolver({ onStop, onNext });
-}
-
-export const handleCrash = ({ "@sern/errors": err, '@sern/emitter': sem, '@sern/logger': log } : UnpackedDependencies, metadata: string) => 
-    pipe(catchError(handleError(err, sem, log)),
-         finalize(() => {
-            log?.info({ message: 'A stream closed: ' + metadata  });
-            disposeAll(log);
-         }))
