@@ -23,7 +23,8 @@ const parseConfig = async (conf: Promise<Presence.Result>, setPresence: SetPrese
                 // If it's a promise, await it, otherwise use the value directly
                 return result instanceof Promise ? await result : result;
             } catch (error) {
-                console.error(error);
+                // TODO process error
+                //console.error(error);
                 return state; // Return previous state on error
             }
         };
@@ -43,7 +44,6 @@ const parseConfig = async (conf: Promise<Presence.Result>, setPresence: SetPrese
 
                     processState(currentState)
                         .then(newState => { 
-                            //console.log(newState)
                             currentState = newState; 
                             return setPresence(currentState)
                         })

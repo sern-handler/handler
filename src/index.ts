@@ -38,7 +38,7 @@ export type {
 } from './types/core-plugin';
 
 
-export type { Payload, SernEventsMapping } from './types/utility';
+export type { Payload, SernEventsMapping, Wrapper } from './types/utility';
 
 export {
     commandModule,

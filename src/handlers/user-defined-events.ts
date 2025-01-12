@@ -6,10 +6,11 @@ import type { UnpackedDependencies } from '../types/utility';
 import type { Emitter } from '../core/interfaces';
 import { inspect } from 'util'
 import { resultPayload } from '../core/functions';
+import { Wrapper } from '../'
 
-export default async function(deps: UnpackedDependencies, eventDir: string) {
+export default async function(deps: UnpackedDependencies, wrapper: Wrapper) {
     const eventModules: EventModule[] = [];
-    for await (const path of Files.readRecursive(eventDir)) {
+    for await (const path of Files.readRecursive(wrapper.events!)) {
         let { module } = await Files.importModule<Module>(path);
         await callInitPlugins(module, deps)
         eventModules.push(module as EventModule);
@@ -40,17 +41,20 @@ export default async function(deps: UnpackedDependencies, eventDir: string) {
         const execute = async (...args: any[]) => {
             try {
                 if(args) {
-                    if('once' in module) { source.removeListener(module.name!, execute); }
+                    if('once' in module) { source.removeListener(String(module.name!), execute); }
                     await Reflect.apply(module.execute, null, args);
                 }
             } catch(e) {
                 const err = e instanceof Error ? e : Error(inspect(e, { colors: true }));
+
+                //@ts-ignore
                 if(!report.emit('error', resultPayload('failure', module, err))) {
                     logger?.error({ message: inspect(err) });
                 }
             }
            
        }
-       source.addListener(module.name!, execute)
+       source.addListener(String(module.name!), execute)
     }
 }
+

@@ -11,16 +11,11 @@ import ready  from './handlers/ready';
 import { interactionHandler } from './handlers/interaction';
 import { messageHandler } from './handlers/message'
 import { presenceHandler } from './handlers/presence';
-import { UnpackedDependencies } from './types/utility';
+import { UnpackedDependencies, Wrapper } from './types/utility';
 import type { Presence} from './core/presences';
 import { registerTasks } from './handlers/tasks';
 
-interface Wrapper {
-    commands: string;
-    defaultPrefix?: string;
-    events?: string;
-    tasks?: string;
-}
+
 /**
  * @since 1.0.0
  * @param maybeWrapper Options to pass into sern.
@@ -39,7 +34,7 @@ export function init(maybeWrapper: Wrapper = { commands: "./dist/commands" }) {
     const deps = useContainerRaw().deps<UnpackedDependencies>();
     
     if (maybeWrapper.events !== undefined) {
-        eventsHandler(deps, maybeWrapper.events)
+        eventsHandler(deps, maybeWrapper)
             .then(() => {
                 deps['@sern/logger']?.info({ message: "Events registered" });
             });

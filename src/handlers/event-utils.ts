@@ -1,10 +1,9 @@
-import type { Emitter, Logging } from '../core/interfaces';
+import type { Emitter } from '../core/interfaces';
 import { SernError } from '../core/structures/enums'
 import { Ok, wrapAsync} from '../core/structures/result';
 import type {  Module } from '../types/core-modules';
 import { inspect } from 'node:util'
-import { resultPayload,  } from '../core/functions'
-
+import { resultPayload } from '../core/functions'
 import merge from 'deepmerge'
 
 

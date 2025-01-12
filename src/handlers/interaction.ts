@@ -2,7 +2,7 @@ import type { Module } from '../types/core-modules'
 import {  callPlugins, executeModule } from './event-utils';
 import { SernError } from '../core/structures/enums'
 import { createSDT, isAutocomplete, isCommand, isMessageComponent, isModal, resultPayload, treeSearch } from '../core/functions'
-import { UnpackedDependencies } from '../types/utility';
+import type { UnpackedDependencies } from '../types/utility';
 import * as Id from '../core/id'
 import { Context } from '../core/structures/context';
 
@@ -41,22 +41,20 @@ export function interactionHandler(deps: UnpackedDependencies, defaultPrefix?: s
         } else if (isModal(event) || isMessageComponent(event)) {
             payload={ module, args: [event, createSDT(module, deps, params)] }
         } else {
-            throw Error("Invalid event")
+            throw Error("Unknown interaction while handling in interactionCreate event " + event)
         }
         const result = await callPlugins(payload)
         if(!result.ok) {
             reporter.emit('module.activate', resultPayload('failure', module, result.error ?? SernError.PluginFailure))
             return
         }
-        if(payload.args.length != 2) {
+        if(payload.args.length !== 2) {
             throw Error ('Invalid payload')
         }
         //@ts-ignore assigning final state from plugin
         payload.args[1].state = result.value
 
-        // will be blocking if long task + await 
-        // todo, add to task queue
-        
+        // note: do not await this. will be blocking if long task (ie waiting for modal input)
         executeModule(reporter, { module, args: payload.args });
     });
 }

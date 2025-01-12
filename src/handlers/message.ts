@@ -2,7 +2,7 @@ import type { Message } from 'discord.js';
 import { callPlugins, executeModule } from './event-utils';
 import { SernError } from '../core/structures/enums'
 import { createSDT, fmt, resultPayload } from '../core/functions'
-import { UnpackedDependencies } from '../types/utility';
+import type { UnpackedDependencies } from '../types/utility';
 import type { Module } from '../types/core-modules';
 import { Context } from '../core/structures/context';
 
