@@ -6,6 +6,7 @@
 ### Bug Fixes
 
 * remove rxjs ([#376](https://github.com/sern-handler/handler/issues/376)) ([59d08ef](https://github.com/sern-handler/handler/commit/59d08ef207c486ce1cf0aba267e6f862838e0dfb))
+* This puts the light back into lightweight (\- 4.1 MB)
 
 ## [4.1.0](https://github.com/sern-handler/handler/compare/v4.0.3...v4.1.0) (2025-01-06)
 
