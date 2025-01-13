@@ -1,13 +1,11 @@
 //@ts-nocheck
 import { beforeEach, describe, expect, it, test } from 'vitest';
-import { callInitPlugins, eventDispatcher } from '../src/handlers/event-utils';
+import { callInitPlugins } from '../src/handlers/event-utils';
 
 import { Client } from 'discord.js'
 import { faker } from '@faker-js/faker';
-import { Module } from '../src/types/core-modules';
-import { Processed } from '../src/types/core-modules';
 import { EventEmitter } from 'events';
-import { CommandControlPlugin, CommandInitPlugin, CommandType, controller } from '../src';
+import { CommandControlPlugin, CommandType, controller } from '../src';
 import { createRandomModule, createRandomInitPlugin } from './setup/util';
 
 
@@ -19,23 +17,6 @@ function mockDeps() {
    }
 }
  
-describe('eventDispatcher standard', () => {
-    let m: Processed<Module>;
-    let ee: EventEmitter;
-    beforeEach(() => {
-        ee = new EventEmitter();
-        m = createRandomModule();
-    });
-
-    it('should throw', () => {
-        expect(() => eventDispatcher(mockDeps(), m,  'not event emitter')).toThrowError();
-    });
-
-    it("Shouldn't throw", () => {
-        expect(() => eventDispatcher(mockDeps(), m, ee)).not.toThrowError();
-    });
-});
-
 describe('calling init plugins', async () => {
    let deps;
    beforeEach(() => {

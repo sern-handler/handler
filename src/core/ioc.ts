@@ -70,7 +70,7 @@ export async function makeDependencies (conf: ValidDependencyConfig) {
     }
     container.addSingleton('@sern/errors', new __Services.DefaultErrorHandling);
     container.addSingleton('@sern/modules', new Map);
-    container.addSingleton('@sern/emitter', new EventEmitter)
+    container.addSingleton('@sern/emitter', new EventEmitter({ captureRejections: true }))
     container.addSingleton('@sern/scheduler', new __Services.TaskScheduler)
     conf(dependencyBuilder(container));
     await container.ready();

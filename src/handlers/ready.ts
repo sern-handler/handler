@@ -3,7 +3,7 @@ import { once } from 'node:events';
 import { resultPayload } from '../core/functions';
 import { CommandType } from '../core/structures/enums';
 import { Module } from '../types/core-modules';
-import { UnpackedDependencies } from '../types/utility';
+import type { UnpackedDependencies } from '../types/utility';
 import { callInitPlugins } from './event-utils';
 
 export default async function(dir: string, deps : UnpackedDependencies) {

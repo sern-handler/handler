@@ -1,24 +1,21 @@
 //side effect: global container
 import { useContainerRaw } from '@sern/ioc/global';
+// set asynchronous capturing of errors
+import events from 'node:events'
+events.captureRejections = true;
 
 import callsites from 'callsites';
 import * as  Files from './core/module-loading';
-import { merge } from 'rxjs';
 import eventsHandler from './handlers/user-defined-events';
 import ready  from './handlers/ready';
-import messageHandler from './handlers/message';
-import interactionHandler from './handlers/interaction';
+import { interactionHandler } from './handlers/interaction';
+import { messageHandler } from './handlers/message'
 import { presenceHandler } from './handlers/presence';
-import { UnpackedDependencies } from './types/utility';
+import { UnpackedDependencies, Wrapper } from './types/utility';
 import type { Presence} from './core/presences';
 import { registerTasks } from './handlers/tasks';
 
-interface Wrapper {
-    commands: string;
-    defaultPrefix?: string;
-    events?: string;
-    tasks?: string;
-}
+
 /**
  * @since 1.0.0
  * @param maybeWrapper Options to pass into sern.
@@ -37,7 +34,7 @@ export function init(maybeWrapper: Wrapper = { commands: "./dist/commands" }) {
     const deps = useContainerRaw().deps<UnpackedDependencies>();
     
     if (maybeWrapper.events !== undefined) {
-        eventsHandler(deps, maybeWrapper.events)
+        eventsHandler(deps, maybeWrapper)
             .then(() => {
                 deps['@sern/logger']?.info({ message: "Events registered" });
             });
@@ -56,7 +53,7 @@ export function init(maybeWrapper: Wrapper = { commands: "./dist/commands" }) {
                 const setPresence = async (p: Presence.Result) => {
                     return deps['@sern/client'].user?.setPresence(p);
                 }
-                presenceHandler(presencePath.path, setPresence).subscribe();
+                presenceHandler(presencePath.path, setPresence);
             }
             if(maybeWrapper.tasks) {
                 registerTasks(maybeWrapper.tasks, deps);
@@ -64,8 +61,9 @@ export function init(maybeWrapper: Wrapper = { commands: "./dist/commands" }) {
         })
         .catch(err => { throw err });
 
-    const messages$ = messageHandler(deps, maybeWrapper.defaultPrefix);
-    const interactions$ = interactionHandler(deps, maybeWrapper.defaultPrefix);
+    //const messages$ = messageHandler(deps, maybeWrapper.defaultPrefix);
+    interactionHandler(deps, maybeWrapper.defaultPrefix);
+    messageHandler(deps, maybeWrapper.defaultPrefix)
     // listening to the message stream and interaction stream
-    merge(messages$, interactions$).subscribe();
+    //merge(messages$, interactions$).subscribe();
 }

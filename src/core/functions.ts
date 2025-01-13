@@ -11,7 +11,22 @@ import type {
 import { ApplicationCommandOptionType, InteractionType } from 'discord.js';
 import { PluginType } from './structures/enums';
 import assert from 'assert';
-import type { Payload } from '../types/utility';
+import type { Payload, UnpackedDependencies } from '../types/utility';
+
+export const createSDT = (module: Module, deps: UnpackedDependencies, params: string|undefined) => {
+    return {
+        state: {},
+        deps,
+        params, 
+        type: module.type,
+        module: {
+            name: module.name,
+            description: module.description,
+            locals: module.locals,
+            meta: module.meta
+        }
+    }
+}
 
 /**
  * Removes the first character(s) _[depending on prefix length]_ of the message

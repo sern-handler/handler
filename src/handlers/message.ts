@@ -1,17 +1,17 @@
-import { EMPTY, mergeMap, concatMap } from 'rxjs';
 import type { Message } from 'discord.js';
-import { createMessageHandler, executeModule, intoTask, sharedEventStream, filterTap, handleCrash} from './event-utils';
+import { callPlugins, executeModule } from './event-utils';
 import { SernError } from '../core/structures/enums'
-import { resultPayload } from '../core/functions'
-import { UnpackedDependencies } from '../types/utility';
-import type { Emitter } from '../core/interfaces';
+import { createSDT, fmt, resultPayload } from '../core/functions'
+import type { UnpackedDependencies } from '../types/utility';
+import type { Module } from '../types/core-modules';
+import { Context } from '../core/structures/context';
 
 /**
  * Ignores messages from any person / bot except itself
  * @param prefix
  */
-function isNonBot(prefix: string) {
-    return (msg: Message): msg is Message => !msg.author.bot && hasPrefix(prefix, msg.content);
+function isBotOrNoPrefix(msg: Message, prefix: string) {
+    return msg.author.bot || !hasPrefix(prefix, msg.content);
 }
 
 function hasPrefix(prefix: string, content: string) {
@@ -19,32 +19,36 @@ function hasPrefix(prefix: string, content: string) {
     return prefixInContent.localeCompare(prefix, undefined, { sensitivity: 'accent' }) === 0;
 }
 
-export default 
-function (deps: UnpackedDependencies, defaultPrefix?: string) {
+export function messageHandler (deps: UnpackedDependencies, defaultPrefix?: string) {
     const {"@sern/emitter": emitter,  
            '@sern/logger': log, 
+           '@sern/modules': mg,
            '@sern/client': client} = deps
 
     if (!defaultPrefix) {
         log?.debug({ message: 'No prefix found. message handler shutting down' });
-        return EMPTY;
+        return;
     }
-    const messageStream$ = sharedEventStream<Message>(client as unknown as Emitter, 'messageCreate');
-    const handle = createMessageHandler(messageStream$, defaultPrefix, deps);
+    client.on('messageCreate', async message => {
+        if(isBotOrNoPrefix(message, defaultPrefix)) {
+           return 
+        }
+        const [prefix] = fmt(message.content, defaultPrefix);
+        let module = mg.get(`${prefix}_T`) ?? mg.get(`${prefix}_B`) as Module;
+        if(!module) {
+            throw Error('Possibly undefined behavior: could not find a static id to resolve')
+        }
+        const payload = { module, args: [Context.wrap(message, defaultPrefix), createSDT(module, deps, undefined)] }
+        const result = await callPlugins(payload)
+        if (!result.ok) {
+            emitter.emit('module.activate', resultPayload('failure', module, result.error ?? SernError.PluginFailure))
+            return
+        }
 
-    const msgCommands$ = handle(isNonBot(defaultPrefix));
+        //@ts-ignore
+        payload.args[1].state = result.value
 
-    return msgCommands$.pipe(
-        filterTap(e => emitter.emit('warning', resultPayload('warning', undefined, e))),
-        concatMap(intoTask(module => {
-            const result = resultPayload('failure', module, SernError.PluginFailure);
-            emitter.emit('module.activate', result);
-        })),
-        mergeMap(payload => {
-            if(payload)
-                return executeModule(emitter, payload)
-            return EMPTY;
-        }),
-        handleCrash(deps, "message handling")
-    )
+        executeModule(emitter, log, payload)
+    })
+    
 }

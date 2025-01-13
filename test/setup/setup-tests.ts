@@ -1,4 +1,6 @@
 import { vi } from 'vitest'
+import { makeDependencies } from '../../src';
+import { Client } from 'discord.js';
 
 vi.mock('discord.js', async (importOriginal) => {
     const mod = await importOriginal()
@@ -44,3 +46,9 @@ vi.mock('discord.js', async (importOriginal) => {
         ChatInputCommandInteraction: vi.fn()
     };
 });
+
+await makeDependencies(({ add }) => {
+    add('@sern/client', {  })
+})
+
+
