@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.1.1](https://github.com/sern-handler/handler/compare/v4.1.0...v4.1.1) (2025-01-13)
+
+
+### Bug Fixes
+
+* remove rxjs ([#376](https://github.com/sern-handler/handler/issues/376)) ([59d08ef](https://github.com/sern-handler/handler/commit/59d08ef207c486ce1cf0aba267e6f862838e0dfb))
+
 ## [4.1.0](https://github.com/sern-handler/handler/compare/v4.0.3...v4.1.0) (2025-01-06)
 
 
