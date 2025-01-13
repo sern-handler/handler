@@ -30,16 +30,13 @@ export function interactionHandler(deps: UnpackedDependencies, defaultPrefix?: s
         let payload;
         if(isAutocomplete(event)) {
             //@ts-ignore stfu
-            const option = treeSearch(event, module.options);
-            //@ts-ignore stfu
-            const { command } = option;
+            const { command } = treeSearch(event, module.options);
             payload= { module: command as Module, //autocomplete is not a true "module" warning cast!
                        args: [event, createSDT(command, deps, params)] };
         } else if(isCommand(event)) {
-            payload={ module, 
-                      args: [Context.wrap(event, defaultPrefix), createSDT(module, deps, params)] };
+            payload= { module, args: [Context.wrap(event, defaultPrefix), createSDT(module, deps, params)] };
         } else if (isModal(event) || isMessageComponent(event)) {
-            payload={ module, args: [event, createSDT(module, deps, params)] }
+            payload= { module, args: [event, createSDT(module, deps, params)] }
         } else {
             throw Error("Unknown interaction while handling in interactionCreate event " + event)
         }

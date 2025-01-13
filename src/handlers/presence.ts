@@ -80,9 +80,9 @@ const parseConfig = async (conf: Promise<Presence.Result>, setPresence: SetPrese
             });
         }
     }
-
+    
     // No repeat configuration, just return the result
-    return result;
+    return setPresence(result);
 };
 
 export const presenceHandler = async (path: string, setPresence: SetPresence) => {

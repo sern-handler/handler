@@ -38,19 +38,15 @@ export async function callInitPlugins(_module: Module, deps: Dependencies, emit?
 }
 
 export function executeModule(emitter: Emitter, { module, args } : ExecutePayload) {
-    //do not await. this will block sern
     
     const moduleCalled = wrapAsync(async () => {
-        console.log(module)
         return module.execute(...args);
     })
     moduleCalled 
         .then(() => {
-            console.log('success execute')
             emitter.emit('module.activate', resultPayload('success', module))    
         })
         .catch(err => {
-            console.log('err', err)
             if(!emitter.emit('error', resultPayload('failure', module, err))) {
                 console.error(err)
             }

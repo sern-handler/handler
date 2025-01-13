@@ -1,6 +1,7 @@
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { Presence } from '../../src';
-
+import * as Files from '../../src/core/module-loading'
+import { presenceHandler } from '../../src/handlers/presence'
 
 // Example test suite for the module function
 describe('module function', () => {
@@ -54,4 +55,38 @@ describe('of function', () => {
       activities: [{ name: 'Another Test Activity' }],
     });
   });
+
+
+})
+
+
+describe('Presence module execution', () => {
+    const mockExecuteResult = Presence.of({
+        status: 'online',
+    }).once();
+  
+    const mockModule = Presence.module({ 
+        inject: [ '@sern/client'],
+        execute: vi.fn().mockReturnValue(mockExecuteResult)
+    })
+    beforeEach(() => {
+        vi.clearAllMocks();
+        // Mock Files.importModule
+        vi.spyOn(Files, 'importModule').mockResolvedValue({
+          module: mockModule
+        });
+
+
+        
+    }); 
+    it('should set presence once.', async () => {
+        const setPresenceMock = vi.fn();
+        const mockPath = '/path/to/presence/config';
+    
+        await presenceHandler(mockPath, setPresenceMock);
+
+        expect(Files.importModule).toHaveBeenCalledWith(mockPath);
+        expect(setPresenceMock).toHaveBeenCalledOnce();
+    })
+
 })

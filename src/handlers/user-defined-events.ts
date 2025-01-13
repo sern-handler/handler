@@ -6,7 +6,7 @@ import type { UnpackedDependencies } from '../types/utility';
 import type { Emitter } from '../core/interfaces';
 import { inspect } from 'util'
 import { resultPayload } from '../core/functions';
-import { Wrapper } from '../'
+import type { Wrapper } from '../'
 
 export default async function(deps: UnpackedDependencies, wrapper: Wrapper) {
     const eventModules: EventModule[] = [];
@@ -52,7 +52,6 @@ export default async function(deps: UnpackedDependencies, wrapper: Wrapper) {
                     logger?.error({ message: inspect(err) });
                 }
             }
-           
        }
        source.addListener(String(module.name!), execute)
     }

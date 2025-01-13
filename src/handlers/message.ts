@@ -44,6 +44,7 @@ export function messageHandler (deps: UnpackedDependencies, defaultPrefix?: stri
             emitter.emit('module.activate', resultPayload('failure', module, result.error ?? SernError.PluginFailure))
             return
         }
+
         //@ts-ignore
         payload.args[1].state = result.value
 
