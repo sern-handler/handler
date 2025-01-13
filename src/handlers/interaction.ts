@@ -12,6 +12,7 @@ export function interactionHandler(deps: UnpackedDependencies, defaultPrefix?: s
     //i wish javascript had clojure destructuring 
     const { '@sern/client': client,
             '@sern/modules': moduleManager,
+            '@sern/logger': log,
             '@sern/emitter': reporter } = deps
 
     client.on('interactionCreate', async (event) => {
@@ -52,6 +53,6 @@ export function interactionHandler(deps: UnpackedDependencies, defaultPrefix?: s
         payload.args[1].state = result.value
 
         // note: do not await this. will be blocking if long task (ie waiting for modal input)
-        executeModule(reporter, payload);
+        executeModule(reporter, log, payload);
     });
 }

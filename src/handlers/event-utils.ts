@@ -1,4 +1,4 @@
-import type { Emitter } from '../core/interfaces';
+import type { Emitter, Logging } from '../core/interfaces';
 import { SernError } from '../core/structures/enums'
 import { Ok, wrapAsync} from '../core/structures/result';
 import type {  Module } from '../types/core-modules';
@@ -37,19 +37,24 @@ export async function callInitPlugins(_module: Module, deps: Dependencies, emit?
     return module
 }
 
-export function executeModule(emitter: Emitter, { module, args } : ExecutePayload) {
+export function executeModule(emitter: Emitter, logger: Logging|undefined, { module, args } : ExecutePayload) {
     
     const moduleCalled = wrapAsync(async () => {
         return module.execute(...args);
     })
     moduleCalled 
-        .then(() => {
-            emitter.emit('module.activate', resultPayload('success', module))    
-        })
-        .catch(err => {
-            if(!emitter.emit('error', resultPayload('failure', module, err))) {
-                console.error(err)
+        .then((res) => {
+            if(res.ok) {
+                emitter.emit('module.activate', resultPayload('success', module))    
+            } else {
+                if(!emitter.emit('error', resultPayload('failure', module, res.error))) {
+                    // node crashes here.
+                    logger?.error({ 'message': res.error })
+                }
             }
+        })
+        .catch(err => { 
+            throw err 
         })
 };
 

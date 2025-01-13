@@ -48,7 +48,7 @@ export function messageHandler (deps: UnpackedDependencies, defaultPrefix?: stri
         //@ts-ignore
         payload.args[1].state = result.value
 
-        executeModule(emitter, { module, args: payload.args })
+        executeModule(emitter, log, payload)
     })
     
 }

@@ -46,8 +46,6 @@ export default async function(deps: UnpackedDependencies, wrapper: Wrapper) {
                 }
             } catch(e) {
                 const err = e instanceof Error ? e : Error(inspect(e, { colors: true }));
-
-                //@ts-ignore
                 if(!report.emit('error', resultPayload('failure', module, err))) {
                     logger?.error({ message: inspect(err) });
                 }
