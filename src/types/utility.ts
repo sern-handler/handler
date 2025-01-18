@@ -44,14 +44,14 @@ export interface Wrapper {
      */
     commands: string | string[];
     /**
-     * @property {boolean} [autoHandleErrors]
+     * @property {boolean} [handleModuleErrors]
      * @description Optional flag to enable automatic error handling for modules.
      * When enabled, sern will automatically catch and handle errors that occur
      * during module execution, preventing crashes and providing error logging.
      * 
      * @default false
      */
-    autoHandleErrors?: boolean;
+    handleModuleErrors?: boolean;
     /**
      * @property {string} [defaultPrefix]
      * @description Optional prefix for text commands. This prefix will be used
