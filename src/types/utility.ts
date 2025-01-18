@@ -27,8 +27,8 @@ export type ReplyOptions = string | Omit<InteractionReplyOptions, 'fetchReply'> 
 
 
 export interface Wrapper {
-    commands: string;
+    commands: string | string[];
     defaultPrefix?: string;
-    events?: string;
-    tasks?: string;
+    events?: string | string[];
+    tasks?: string | string[];
 }

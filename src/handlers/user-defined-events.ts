@@ -1,6 +1,6 @@
 import { EventType,  SernError } from '../core/structures/enums';
 import { callInitPlugins } from './event-utils'
-import { EventModule,  Module  } from '../types/core-modules';
+import { EventModule  } from '../types/core-modules';
 import * as Files from '../core/module-loading'
 import type { UnpackedDependencies } from '../types/utility';
 import type { Emitter } from '../core/interfaces';
@@ -10,11 +10,16 @@ import type { Wrapper } from '../'
 
 export default async function(deps: UnpackedDependencies, wrapper: Wrapper) {
     const eventModules: EventModule[] = [];
-    for await (const path of Files.readRecursive(wrapper.events!)) {
-        let { module } = await Files.importModule<Module>(path);
-        await callInitPlugins(module, deps)
-        eventModules.push(module as EventModule);
+    const eventDirs = Array.isArray(wrapper.events!) ? wrapper.events! : [wrapper.events!];
+    
+    for (const dir of eventDirs) {
+        for await (const path of Files.readRecursive(dir)) {
+            let { module } = await Files.importModule<EventModule>(path);
+            await callInitPlugins(module, deps)
+            eventModules.push(module);
+        }
     }
+
     const logger = deps['@sern/logger'], report = deps['@sern/emitter'];
     for (const module of eventModules) {
         let source: Emitter;
