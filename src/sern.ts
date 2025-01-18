@@ -43,7 +43,7 @@ export function init(maybeWrapper: Wrapper = { commands: "./dist/commands" }) {
 
     // autohandle errors that occur in modules.
     // convenient for rapid iteration
-    if(maybeWrapper.autoHandleErrors) {
+    if(maybeWrapper.handleModuleErrors) {
         if(!deps['@sern/logger']) {
             throw Error('A logger is required to autoHandleModuleErrors.\n A default logger is already supplied!');
         }
