@@ -34,16 +34,15 @@ export type ReplyOptions = string | Omit<InteractionReplyOptions, 'fetchReply'> 
  */
 export interface Wrapper {
     /**
-     * @property {string} commands
+     * @property {string|string[]} commands
      * @description Specifies the directory path where command modules are located.
      * This is a required property that tells Sern where to find and load command files.
      * The path should be relative to the project root.
      * 
      * @example
-     * commands: "./dist/commands"
+     * commands: ["./dist/commands"]
      */
-    commands: string;
-
+    commands: string | string[];
     /**
      * @property {boolean} [autoHandleErrors]
      * @description Optional flag to enable automatic error handling for modules.
@@ -53,7 +52,6 @@ export interface Wrapper {
      * @default false
      */
     autoHandleErrors?: boolean;
-
     /**
      * @property {string} [defaultPrefix]
      * @description Optional prefix for text commands. This prefix will be used
@@ -64,26 +62,24 @@ export interface Wrapper {
      * defaultPrefix: "?"
      */
     defaultPrefix?: string;
-
     /**
-     * @property {string} [events]
+     * @property {string|string[]} [events]
      * @description Optional directory path where event modules are located.
      * If provided, Sern will automatically register and handle events from
      * modules in this directory. The path should be relative to the project root.
      * 
      * @example
-     * events: "./dist/events"
+     * events: ["./dist/events"]
      */
-    events?: string;
-
+    events?: string | string[];
     /**
-     * @property {string} [tasks]
+     * @property {string|string[]} [tasks]
      * @description Optional directory path where scheduled task modules are located.
      * If provided, Sern will automatically register and handle scheduled tasks
      * from modules in this directory. The path should be relative to the project root.
      * 
      * @example
-     * tasks: "./dist/tasks"
+     * tasks: ["./dist/tasks"]
      */
-    tasks?: string;
+    tasks?: string | string[];
 }
