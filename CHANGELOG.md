@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.2.0](https://github.com/sern-handler/handler/compare/v4.1.1...v4.2.0) (2025-01-18)
+
+
+### Features
+
+* 4.2.0 load multiple directories & `handleModuleErrors` ([#378](https://github.com/sern-handler/handler/issues/378)) ([f9e7eaf](https://github.com/sern-handler/handler/commit/f9e7eaf92d22b76d3d02a1bbe8324ca6813f48f8))
+
 ## [4.1.1](https://github.com/sern-handler/handler/compare/v4.1.0...v4.1.1) (2025-01-13)
 
 
