@@ -11,7 +11,7 @@ import ready  from './handlers/ready';
 import { interactionHandler } from './handlers/interaction';
 import { messageHandler } from './handlers/message'
 import { presenceHandler } from './handlers/presence';
-import { UnpackedDependencies, Wrapper } from './types/utility';
+import type { Payload, UnpackedDependencies, Wrapper } from './types/utility';
 import type { Presence} from './core/presences';
 import { registerTasks } from './handlers/tasks';
 
@@ -32,7 +32,6 @@ import { registerTasks } from './handlers/tasks';
 export function init(maybeWrapper: Wrapper = { commands: "./dist/commands" }) {
     const startTime = performance.now();
     const deps = useContainerRaw().deps<UnpackedDependencies>();
-    
     if (maybeWrapper.events !== undefined) {
         eventsHandler(deps, maybeWrapper)
             .then(() => {
@@ -40,6 +39,22 @@ export function init(maybeWrapper: Wrapper = { commands: "./dist/commands" }) {
             });
     } else {
         deps['@sern/logger']?.info({ message: "No events registered" });
+    }
+
+    // autohandle errors that occur in modules.
+    // convenient for rapid iteration
+    if(maybeWrapper.autoHandleErrors) {
+        if(!deps['@sern/logger']) {
+            throw Error('A logger is required to autoHandleModuleErrors.\n A default logger is already supplied!');
+        }
+        deps['@sern/logger']?.info({ 'message': 'autoHandleModuleErrors enabled' })
+        deps['@sern/emitter'].addListener('error', (payload: Payload) => {
+            if(payload.type === 'failure') {
+                deps['@sern/logger']?.error({ message: payload.reason })
+            } else {
+                deps['@sern/logger']?.warning({ message: "error event should only have payloads of 'failure'" });
+            }
+        })
     }
 
     const initCallsite = callsites()[1].getFileName();
@@ -60,10 +75,6 @@ export function init(maybeWrapper: Wrapper = { commands: "./dist/commands" }) {
             }
         })
         .catch(err => { throw err });
-
-    //const messages$ = messageHandler(deps, maybeWrapper.defaultPrefix);
     interactionHandler(deps, maybeWrapper.defaultPrefix);
     messageHandler(deps, maybeWrapper.defaultPrefix)
-    // listening to the message stream and interaction stream
-    //merge(messages$, interactions$).subscribe();
 }
