@@ -36,9 +36,10 @@ export interface Wrapper {
     /**
      * @property {string|string[]} commands
      * @description Specifies the directory path where command modules are located.
-     * This is a required property that tells Sern where to find and load command files.
-     * The path should be relative to the project root.
-     * 
+     * This is a required property that tells sern where to find and load command files.
+     * The path should be relative to the project root. If given an array, each directory is loaded in order
+     * they were declared. Order of modules in each directory is not guaranteed
+     *
      * @example
      * commands: ["./dist/commands"]
      */
@@ -67,6 +68,8 @@ export interface Wrapper {
      * @description Optional directory path where event modules are located.
      * If provided, Sern will automatically register and handle events from
      * modules in this directory. The path should be relative to the project root.
+     * If given an array, each directory is loaded in order they were declared. 
+     * Order of modules in each directory is not guaranteed.
      * 
      * @example
      * events: ["./dist/events"]
@@ -77,6 +80,8 @@ export interface Wrapper {
      * @description Optional directory path where scheduled task modules are located.
      * If provided, Sern will automatically register and handle scheduled tasks
      * from modules in this directory. The path should be relative to the project root.
+     * If given an array, each directory is loaded in order they were declared. 
+     * Order of modules in each directory is not guaranteed.
      * 
      * @example
      * tasks: ["./dist/tasks"]

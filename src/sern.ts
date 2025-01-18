@@ -45,9 +45,9 @@ export function init(maybeWrapper: Wrapper = { commands: "./dist/commands" }) {
     // convenient for rapid iteration
     if(maybeWrapper.handleModuleErrors) {
         if(!deps['@sern/logger']) {
-            throw Error('A logger is required to autoHandleModuleErrors.\n A default logger is already supplied!');
+            throw Error('A logger is required to handleModuleErrors.\n A default logger is already supplied!');
         }
-        deps['@sern/logger']?.info({ 'message': 'autoHandleModuleErrors enabled' })
+        deps['@sern/logger']?.info({ 'message': 'handleModuleErrors enabled' })
         deps['@sern/emitter'].addListener('error', (payload: Payload) => {
             if(payload.type === 'failure') {
                 deps['@sern/logger']?.error({ message: payload.reason })
