@@ -53,20 +53,3 @@ export * from './core/plugin';
 export { CommandType, PluginType, PayloadType, EventType } from './core/structures/enums';
 export { Context } from './core/structures/context';
 export { type CoreDependencies, makeDependencies, single, transient, Service, Services } from './core/ioc';
-
-
-import type { Container } from '@sern/ioc';
-
-/**
-  * @deprecated This old signature will be incompatible with future versions of sern >= 4.0.0. See {@link makeDependencies}
-  * @example
-  * ```ts
-  *  To switch your old code:
-     await makeDependencies(({ add }) => { 
-            add('@sern/client', new Client())
-     })
-  *  ```
-  */
-export interface DependencyConfiguration {
-    build: (root: Container) => Container;
-}
