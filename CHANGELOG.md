@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.2.1](https://github.com/sern-handler/handler/compare/v4.2.0...v4.2.1) (2025-01-24)
+
+
+### Bug Fixes
+
+* context-interactions error ([#382](https://github.com/sern-handler/handler/issues/382)) ([a52ad27](https://github.com/sern-handler/handler/commit/a52ad270d843e92db5bf2049d07527eed59d428c))
+
 ## [4.2.0](https://github.com/sern-handler/handler/compare/v4.1.1...v4.2.0) (2025-01-18)
 
 
