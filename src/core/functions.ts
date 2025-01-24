@@ -119,6 +119,9 @@ export function isMessageComponent(i: InteractionTypable): i is AnyMessageCompon
 export function isCommand(i: InteractionTypable): i is AnyCommandInteraction {
     return i.type === InteractionType.ApplicationCommand;
 }
+export function isContextCommand(i: AnyCommandInteraction): i is MessageContextMenuCommandInteraction | UserContextMenuCommandInteraction {
+    return i.isContextMenuCommand();
+}
 export function isAutocomplete(i: InteractionTypable): i is AutocompleteInteraction {
     return i.type === InteractionType.ApplicationCommandAutocomplete;
 }

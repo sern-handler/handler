@@ -1,7 +1,7 @@
 import type { Module } from '../types/core-modules'
 import {  callPlugins, executeModule } from './event-utils';
 import { SernError } from '../core/structures/enums'
-import { createSDT, isAutocomplete, isCommand, isMessageComponent, isModal, resultPayload, treeSearch } from '../core/functions'
+import { createSDT, isAutocomplete, isCommand, isContextCommand, isMessageComponent, isModal, resultPayload, treeSearch } from '../core/functions'
 import type { UnpackedDependencies } from '../types/utility';
 import * as Id from '../core/id'
 import { Context } from '../core/structures/context';
@@ -29,13 +29,23 @@ export function interactionHandler(deps: UnpackedDependencies, defaultPrefix?: s
         }
         const { module, params } = modules.at(0)!;
         let payload;
+        // handles autocomplete
         if(isAutocomplete(event)) {
             //@ts-ignore stfu
             const { command } = treeSearch(event, module.options);
             payload= { module: command as Module, //autocomplete is not a true "module" warning cast!
                        args: [event, createSDT(command, deps, params)] };
+            // either CommandTypes Slash |  ContextMessage | ContextUesr
         } else if(isCommand(event)) {
-            payload= { module, args: [Context.wrap(event, defaultPrefix), createSDT(module, deps, params)] };
+            const sdt = createSDT(module, deps, params)
+            // handle CommandType.CtxUser || CommandType.CtxMsg
+            if(isContextCommand(event)) {
+                payload= { module, args: [event, sdt] };
+            } else {
+                // handle CommandType.Slash || CommandType.Both
+                payload= { module, args: [Context.wrap(event, defaultPrefix), sdt] };
+            }
+            // handles modals or components
         } else if (isModal(event) || isMessageComponent(event)) {
             payload= { module, args: [event, createSDT(module, deps, params)] }
         } else {
