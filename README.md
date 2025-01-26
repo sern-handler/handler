@@ -19,7 +19,7 @@
 - Lightweight. Does a lot while being small.
 - Latest features. Support for discord.js v14 and all of its interactions.
 - Start quickly. Plug and play or customize to your liking.
-- works with [bun](https://bun.sh/) and [node](https://nodejs.org/en) out the box!
+- Works with [bun](https://bun.sh/) and [node](https://nodejs.org/en) out the box!
 - Use it with TypeScript or JavaScript. CommonJS and ESM supported.
 - Active and growing community, always here to help. [Join us](https://sern.dev/discord)
 - Unleash its full potential with a powerful CLI and awesome plugins.
@@ -45,7 +45,7 @@ export default commandModule({
 
 
 ## 🤖 Bots Using sern 
-- [Community Bot](https://github.com/sern-handler/sern-community) - The community bot for our [discord server](https://sern.dev/discord).
+- [Community Bot](https://github.com/sern-handler/sern-community) - The community bot for our [Discord server](https://sern.dev/discord).
 - [Vinci](https://github.com/SrIzan10/vinci) - The bot for Mara Turing.
 - [Bask](https://github.com/baskbotml/bask) - Listen to your favorite artists on Discord.
 - [Murayama](https://github.com/murayamabot/murayama) - :pepega:
