@@ -45,14 +45,14 @@ export default commandModule({
 
 
 ## 🤖 Bots Using sern 
-- [Community Bot](https://github.com/sern-handler/sern-community), the community bot for our [discord server](https://sern.dev/discord).
-- [Vinci](https://github.com/SrIzan10/vinci), the bot for Mara Turing.
-- [Bask](https://github.com/baskbotml/bask), Listen your favorite artists on Discord.
-- [Murayama](https://github.com/murayamabot/murayama), :pepega:
-- [Protector](https://github.com/GlitchApotamus/Protector), Just a simple bot to help enhance a private minecraft server.
-- [SmokinWeed 💨](https://github.com/Peter-MJ-Parker/sern-bud), A fun bot for a small - but growing - server.
-- [Man Nomic](https://github.com/jacoobes/man-nomic), A simple information bot to provide information to the nomic-ai discord community.
-- [Linear-Discord](https://github.com/sern-handler/linear-discord) Display and manage a linear dashboard.
+- [Community Bot](https://github.com/sern-handler/sern-community) - The community bot for our [discord server](https://sern.dev/discord).
+- [Vinci](https://github.com/SrIzan10/vinci) - The bot for Mara Turing.
+- [Bask](https://github.com/baskbotml/bask) - Listen to your favorite artists on Discord.
+- [Murayama](https://github.com/murayamabot/murayama) - :pepega:
+- [Protector](https://github.com/GlitchApotamus/Protector) - Just a simple bot to help enhance a private minecraft server.
+- [SmokinWeed 💨](https://github.com/Peter-MJ-Parker/sern-bud) - A fun bot for a small - but growing - server.
+- [Man Nomic](https://github.com/jacoobes/man-nomic) - A simple information bot to provide information to the nomic-ai discord community.
+- [Linear-Discord](https://github.com/sern-handler/linear-discord) - Display and manage a linear dashboard.
 ## 💻 CLI
 
 It is **highly encouraged** to use the [command line interface](https://github.com/sern-handler/cli) for your project. Don't forget to view it.
