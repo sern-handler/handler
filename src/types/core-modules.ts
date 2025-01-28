@@ -61,7 +61,7 @@ import { Awaitable, SernEventsMapping, UnpackedDependencies, Dictionary } from '
  * 
  * @see {@link CommandControlPlugin} for plugin implementation
  * @see {@link CommandType} for available command types
- * @see {@link Dependencies} for dependency injection interface
+ * @see {@link Dependencies} for [dependency injection](https://sern.dev/v4/reference/dependencies/) interface
  */
 export type SDT = {
     /**
@@ -114,6 +114,10 @@ export type SDT = {
 
 export type Processed<T> = T & { name: string; description: string };
 
+
+/**
+ * @since 1.0.0
+ */
 export interface Module {
     type: CommandType | EventType;
     name?: string;
@@ -196,13 +200,18 @@ export interface Module {
     execute(...args: any[]): Awaitable<any>;
 }
 
+/**
+ * @since 1.0.0
+ */
 export interface SernEventCommand<T extends keyof SernEventsMapping = keyof SernEventsMapping>
     extends Module {
     name?: T;
     type: EventType.Sern;
     execute(...args: SernEventsMapping[T]): Awaitable<unknown>;
 }
-
+/**
+ * @since 1.0.0
+ */
 export interface ExternalEventCommand extends Module {
     name?: string;
     emitter: keyof Dependencies;
@@ -210,83 +219,121 @@ export interface ExternalEventCommand extends Module {
     execute(...args: unknown[]): Awaitable<unknown>;
 }
 
-
+/**
+ * @since 1.0.0
+ */
 export interface ContextMenuUser extends Module {
     type: CommandType.CtxUser;
     execute: (ctx: UserContextMenuCommandInteraction, tbd: SDT) => Awaitable<unknown>;
 }
-
+/**
+ * @since 1.0.0
+ */
 export interface ContextMenuMsg extends Module {
     type: CommandType.CtxMsg;
     execute: (ctx: MessageContextMenuCommandInteraction, tbd: SDT) => Awaitable<unknown>;
 }
-
+/**
+ * @since 1.0.0
+ */
 export interface ButtonCommand extends Module {
     type: CommandType.Button;
     execute: (ctx: ButtonInteraction, tbd: SDT) => Awaitable<unknown>;
 }
-
+/**
+ * @since 1.0.0
+ */
 export interface StringSelectCommand extends Module {
     type: CommandType.StringSelect;
     execute: (ctx: StringSelectMenuInteraction, tbd: SDT) => Awaitable<unknown>;
 }
-
+/**
+ * @since 1.0.0
+ */
 export interface ChannelSelectCommand extends Module {
     type: CommandType.ChannelSelect;
     execute: (ctx: ChannelSelectMenuInteraction, tbd: SDT) => Awaitable<unknown>;
 }
-
+/**
+ * @since 1.0.0
+ */
 export interface RoleSelectCommand extends Module {
     type: CommandType.RoleSelect;
     execute: (ctx: RoleSelectMenuInteraction, tbd: SDT) => Awaitable<unknown>;
 }
-
+/**
+ * @since 1.0.0
+ */
 export interface MentionableSelectCommand extends Module {
     type: CommandType.MentionableSelect;
     execute: (ctx: MentionableSelectMenuInteraction, tbd: SDT) => Awaitable<unknown>;
 }
-
+/**
+ * @since 1.0.0
+ */
 export interface UserSelectCommand extends Module {
     type: CommandType.UserSelect;
     execute: (ctx: UserSelectMenuInteraction, tbd: SDT) => Awaitable<unknown>;
 }
-
+/**
+ * @since 1.0.0
+ */
 export interface ModalSubmitCommand extends Module {
     type: CommandType.Modal;
     execute: (ctx: ModalSubmitInteraction, tbd: SDT) => Awaitable<unknown>;
 }
-
+/**
+ * @since 1.0.0
+ */
 export interface AutocompleteCommand {
     onEvent?: ControlPlugin[];
     execute: (ctx: AutocompleteInteraction, tbd: SDT) => Awaitable<unknown>;
 }
-
+/**
+ * @since 1.0.0
+ */
 export interface DiscordEventCommand<T extends keyof ClientEvents = keyof ClientEvents>
     extends Module {
     name?: T;
     type: EventType.Discord;
     execute(...args: ClientEvents[T]): Awaitable<unknown>;
 }
+/**
+ * @since 1.0.0
+ * @see @link {commandModule} to create a text command
+ */
 export interface TextCommand extends Module {
     type: CommandType.Text;
     execute: (ctx: Context & { get options(): string[] }, tbd: SDT) => Awaitable<unknown>;
 }
-
+/**
+ * @since 1.0.0
+ * @see @link {commandModule} to create a slash command
+ */
 export interface SlashCommand extends Module {
     type: CommandType.Slash;
     description: string;
     options?: SernOptionsData[];
     execute: (ctx: Context  & { get options(): ChatInputCommandInteraction['options']}, tbd: SDT) => Awaitable<unknown>;
 }
-
+/**
+ * @since 1.0.0
+ * @see @link {commandModule} to create a both command
+ */
 export interface BothCommand extends Module {
     type: CommandType.Both;
     description: string;
     options?: SernOptionsData[];
     execute: (ctx: Context, tbd: SDT) => Awaitable<unknown>;
 }
-
+/**
+ * @since 1.0.0
+ */
 export type EventModule = DiscordEventCommand | SernEventCommand | ExternalEventCommand;  
+
+/**
+ * @since 1.0.0
+ */
 export type CommandModule =
     | TextCommand
     | SlashCommand
@@ -355,6 +402,7 @@ export type InputCommand = {
 }[CommandType];
 
 /**
+ * @see @link {https://sern.dev/v4/reference/autocomplete/}
  * Type that replaces autocomplete with {@link SernAutocompleteData}
  */
 export type SernOptionsData =
@@ -374,7 +422,9 @@ export interface SernSubCommandGroupData extends BaseApplicationCommandOptionsDa
     options?: SernSubCommandData[];
 }
 
-
+/**
+ * @since 4.0.0
+ */
 export interface ScheduledTaskContext {
      
     /**
@@ -398,7 +448,9 @@ interface TaskAttrs {
      */
     deps: UnpackedDependencies
 }
-
+/**
+ * @since 4.0.0
+ */
 export interface ScheduledTask {
     name?: string;
     trigger: string | Date;
