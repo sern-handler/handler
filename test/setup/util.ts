@@ -28,3 +28,21 @@ export function createRandomModule(plugins: any[]): Processed<Module> {
         execute: vi.fn(),
     };
 }
+
+
+export function createRandomChoice() {
+        return {
+            type: faker.number.int({ min: 1, max: 11 }),
+            name: faker.word.noun(),
+            description: faker.word.adjective(),
+        };
+    }
+
+
+export function createRandomPlugins(len: number) {
+        const random = () => Math.floor(Math.random() * 2) + 1; // 1 or 2, plugin enum
+        return Array.from({ length: len }, () => ({
+            type: random(),
+            execute: () => (random() === 1 ? controller.next() : controller.stop()),
+        }));
+    }

@@ -1,10 +1,11 @@
-import type { Module } from '../types/core-modules'
+import type { Module, SernAutocompleteData } from '../types/core-modules'
 import {  callPlugins, executeModule } from './event-utils';
 import { SernError } from '../core/structures/enums'
 import { createSDT, isAutocomplete, isCommand, isContextCommand, isMessageComponent, isModal, resultPayload, treeSearch } from '../core/functions'
 import type { UnpackedDependencies } from '../types/utility';
 import * as Id from '../core/id'
 import { Context } from '../core/structures/context';
+import path from 'node:path';
 
 
 
@@ -31,10 +32,15 @@ export function interactionHandler(deps: UnpackedDependencies, defaultPrefix?: s
         let payload;
         // handles autocomplete
         if(isAutocomplete(event)) {
-            //@ts-ignore stfu
-            const { command } = treeSearch(event, module.options);
-            payload= { module: command as Module, //autocomplete is not a true "module" warning cast!
-                       args: [event, createSDT(command, deps, params)] };
+            const lookupTable = module.locals['@sern/lookup-table'] as Map<string, SernAutocompleteData>
+            const subCommandGroup = event.options.getSubcommandGroup() ?? "",
+                  subCommand = event.options.getSubcommand() ?? "",
+                  option = event.options.getFocused(true),
+                  fullPath = path.join("<parent>", subCommandGroup, subCommand, option.name)
+                  
+            const resolvedModule = lookupTable.get(fullPath)! as unknown as Module
+            payload= { module: resolvedModule , //autocomplete is not a true "module" warning cast!
+                       args: [event, createSDT(resolvedModule, deps, params)] };
             // either CommandTypes Slash |  ContextMessage | ContextUesr
         } else if(isCommand(event)) {
             const sdt = createSDT(module, deps, params)
