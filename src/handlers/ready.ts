@@ -32,8 +32,7 @@ export default async function(dirs: string | string[], deps : UnpackedDependenci
 
             if(module.type === CommandType.Both || module.type === CommandType.Slash) {
                const options  = (Reflect.get(module, 'options') ?? []) as SernOptionsData[];
-               const lookupTable = new Map()
-               createLookupTable(lookupTable, options)
+               const lookupTable = createLookupTable(options)
                module.locals['@sern/lookup-table'] = lookupTable;
             }
             // FREEZE! no more writing!!

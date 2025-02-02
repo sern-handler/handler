@@ -1,7 +1,7 @@
 import type { Module, SernAutocompleteData } from '../types/core-modules'
 import {  callPlugins, executeModule } from './event-utils';
 import { SernError } from '../core/structures/enums'
-import { createSDT, isAutocomplete, isCommand, isContextCommand, isMessageComponent, isModal, resultPayload, treeSearch } from '../core/functions'
+import { createSDT, isAutocomplete, isCommand, isContextCommand, isMessageComponent, isModal, resultPayload } from '../core/functions'
 import type { UnpackedDependencies } from '../types/utility';
 import * as Id from '../core/id'
 import { Context } from '../core/structures/context';
