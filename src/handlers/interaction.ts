@@ -38,7 +38,7 @@ export function interactionHandler(deps: UnpackedDependencies, defaultPrefix?: s
                   option = event.options.getFocused(true),
                   fullPath = path.join("<parent>", subCommandGroup, subCommand, option.name)
                   
-            const resolvedModule = lookupTable.get(fullPath)! as unknown as Module
+            const resolvedModule = (lookupTable.get(fullPath)!.command) as Module
             payload= { module: resolvedModule , //autocomplete is not a true "module" warning cast!
                        args: [event, createSDT(resolvedModule, deps, params)] };
             // either CommandTypes Slash |  ContextMessage | ContextUesr
