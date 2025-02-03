@@ -20,6 +20,7 @@
         "prepare": "tsc",
         "pretty": "prettier --write .",
         "tdd": "vitest",
+        "benchmark": "vitest bench",
         "test": "vitest --run",
         "analyze-imports": "npx depcruise src --include-only \"^src\" --output-type dot | dot -T svg > dependency-graph.svg"
     },

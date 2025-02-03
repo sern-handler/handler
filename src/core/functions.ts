@@ -6,12 +6,12 @@ import type {
     MessageContextMenuCommandInteraction,
     ModalSubmitInteraction,
     UserContextMenuCommandInteraction,
-    AutocompleteInteraction
+    AutocompleteInteraction,
 } from 'discord.js';
 import { ApplicationCommandOptionType, InteractionType } from 'discord.js';
 import { PluginType } from './structures/enums';
-import assert from 'assert';
 import type { Payload, UnpackedDependencies } from '../types/utility';
+import path from 'node:path'
 
 export const createSDT = (module: Module, deps: UnpackedDependencies, params: string|undefined) => {
     return {
@@ -57,51 +57,31 @@ export function partitionPlugins<T,V>
     return [controlPlugins, initPlugins] as [T[], V[]];
 }
 
-/**
- * Uses an iterative DFS to check if an autocomplete node exists on the option tree
- * @param iAutocomplete
- * @param options
- */
-export function treeSearch(
-    iAutocomplete: AutocompleteInteraction,
-    options: SernOptionsData[] | undefined,
-): SernAutocompleteData & { parent?: string } | undefined {
-    if (options === undefined) return undefined;
-    //clone to prevent mutation of original command module
-    const _options = options.map(a => ({ ...a }));
-    const subcommands = new Set();
-    while (_options.length > 0) {
-        const cur = _options.pop()!;
-        switch (cur.type) {
+export const createLookupTable = (options: SernOptionsData[]): Map<string, SernAutocompleteData> => {
+    const table = new Map<string, SernAutocompleteData>();
+    _createLookupTable(table, options, "<parent>");
+    return table;
+}
+
+const _createLookupTable = (table: Map<string, SernAutocompleteData>, options: SernOptionsData[], parent: string) => {
+    for (const opt of options) {
+        const name = path.posix.join(parent, opt.name)
+        switch(opt.type) {
             case ApplicationCommandOptionType.Subcommand: {
-                    subcommands.add(cur.name);
-                    for (const option of cur.options ?? []) _options.push(option);
-                } break;
+                    _createLookupTable(table, opt.options ?? [], name);
+            } break;
             case ApplicationCommandOptionType.SubcommandGroup: {
-                    for (const command of cur.options ?? []) _options.push(command);
-                } break;
+                    _createLookupTable(table, opt.options ?? [], name);
+            } break;
             default: {
-                if ('autocomplete' in cur && cur.autocomplete) {
-                    const choice = iAutocomplete.options.getFocused(true);
-                    assert( 'command' in cur, 'No `command` property found for option ' + cur.name);
-                    if (subcommands.size > 0) {
-                        const parent = iAutocomplete.options.getSubcommand();
-                        const parentAndOptionMatches =
-                            subcommands.has(parent) && cur.name === choice.name;
-                        if (parentAndOptionMatches) {
-                            return { ...cur, parent };
-                        }
-                    } else {
-                        if (cur.name === choice.name) {
-                            return { ...cur, parent: undefined };
-                        }
-                    }
+                if(Reflect.get(opt, 'autocomplete') === true) {
+                    table.set(name, opt as SernAutocompleteData)
                 }
             } break;
         }
-    }
-}
+    } 
 
+}
 
 interface InteractionTypable {
     type: InteractionType;

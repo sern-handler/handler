@@ -1,10 +1,11 @@
 import * as Files from '../core/module-loading'
 import { once } from 'node:events';
-import { resultPayload } from '../core/functions';
+import { createLookupTable, resultPayload } from '../core/functions';
 import { CommandType } from '../core/structures/enums';
-import { Module } from '../types/core-modules';
+import { Module, SernOptionsData } from '../types/core-modules';
 import type { UnpackedDependencies, Wrapper } from '../types/utility';
 import { callInitPlugins } from './event-utils';
+import { SernAutocompleteData } from '..';
 
 export default async function(dirs: string | string[], deps : UnpackedDependencies) {
     const { '@sern/client': client,
@@ -28,6 +29,12 @@ export default async function(dirs: string | string[], deps : UnpackedDependenci
                 throw Error(`Found ${module.name} at ${module.meta.absPath}, which has incorrect \`type\``);
             }
             const resultModule = await callInitPlugins(module, deps, true);
+
+            if(module.type === CommandType.Both || module.type === CommandType.Slash) {
+               const options  = (Reflect.get(module, 'options') ?? []) as SernOptionsData[];
+               const lookupTable = createLookupTable(options)
+               module.locals['@sern/lookup-table'] = lookupTable;
+            }
             // FREEZE! no more writing!!
             commands.set(resultModule.meta.id, Object.freeze(resultModule));
             sEmitter.emit('module.register', resultPayload('success', resultModule));
