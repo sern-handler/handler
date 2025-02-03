@@ -34,6 +34,7 @@ describe('functions', () => {
                 },
             ];
             const table = createLookupTable(options)
+            console.log(table)
             const result = table.get('<parent>/autocomplete')
             expect(result == undefined).to.be.false;
             expect(result.name).to.be.eq('autocomplete');

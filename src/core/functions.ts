@@ -65,7 +65,7 @@ export const createLookupTable = (options: SernOptionsData[]): Map<string, SernA
 
 const _createLookupTable = (table: Map<string, SernAutocompleteData>, options: SernOptionsData[], parent: string) => {
     for (const opt of options) {
-        const name = path.join(parent, opt.name)
+        const name = path.posix.join(parent, opt.name)
         switch(opt.type) {
             case ApplicationCommandOptionType.Subcommand: {
                     _createLookupTable(table, opt.options ?? [], name);

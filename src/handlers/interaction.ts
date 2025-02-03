@@ -36,7 +36,7 @@ export function interactionHandler(deps: UnpackedDependencies, defaultPrefix?: s
             const subCommandGroup = event.options.getSubcommandGroup() ?? "",
                   subCommand = event.options.getSubcommand() ?? "",
                   option = event.options.getFocused(true),
-                  fullPath = path.join("<parent>", subCommandGroup, subCommand, option.name)
+                  fullPath = path.posix.join("<parent>", subCommandGroup, subCommand, option.name)
                   
             const resolvedModule = (lookupTable.get(fullPath)!.command) as Module
             payload= { module: resolvedModule , //autocomplete is not a true "module" warning cast!
