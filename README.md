@@ -7,6 +7,7 @@
 
 <div align="center" styles="margin-top: 10px">
   <img src="https://img.shields.io/badge/open-source-brightgreen" />
+  <img src="https://img.shields.io/badge/built_with-sern-pink?labelColor=%230C3478&color=%23ed5087&link=https%3A%2F%2Fsern.dev"/>
   <a href="https://www.npmjs.com/package/@sern/handler"><img src="https://img.shields.io/npm/v/@sern/handler?maxAge=3600" alt="NPM version" /></a>
   <a href="https://www.npmjs.com/package/@sern/handler"><img src="https://img.shields.io/npm/dt/@sern/handler?maxAge=3600" alt="NPM downloads" /></a>
   <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/license-MIT-brightgreen" alt="License MIT" /></a>
@@ -43,6 +44,11 @@ export default commandModule({
 ```
 </details>
 
+# Show off your sern Discord Bot!
+
+## Badge
+- Copy this and add it to your [README.md](https://img.shields.io/badge/built_with-sern-pink?labelColor=%230C3478&color=%23ed5087&link=https%3A%2F%2Fsern.dev)
+<img src="https://img.shields.io/badge/built_with-sern-pink?labelColor=%230C3478&color=%23ed5087&link=https%3A%2F%2Fsern.dev">
 
 ## 🤖 Bots Using sern 
 - [Community Bot](https://github.com/sern-handler/sern-community) - The community bot for our [Discord server](https://sern.dev/discord).
@@ -56,6 +62,8 @@ export default commandModule({
 ## 💻 CLI
 
 It is **highly encouraged** to use the [command line interface](https://github.com/sern-handler/cli) for your project. Don't forget to view it.
+
+
 
 ## 🔗 Links
 
