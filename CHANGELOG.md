@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.2.2](https://github.com/sern-handler/handler/compare/v4.2.1...v4.2.2) (2025-02-03)
+
+
+### Bug Fixes
+
+* faster autocomplete lookup ([#387](https://github.com/sern-handler/handler/issues/387)) ([974c30f](https://github.com/sern-handler/handler/commit/974c30fa6cccaae7b1c2c3246ffa9eecb6bc7bf9))
+
 ## [4.2.1](https://github.com/sern-handler/handler/compare/v4.2.0...v4.2.1) (2025-01-24)
 
 
