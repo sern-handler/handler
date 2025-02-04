@@ -23,7 +23,7 @@ export function removeCleanupListener(listener: CleanupListener): boolean {
 
 /** Executes all cleanup listeners and then exits the process. Call this instead of `process.exit` to ensure all listeners are fully executed. */
 export async function exitAfterCleanup(code = 0): Promise<never> {
-  await executeCleanupListeners(code);
+  await executeCleanupListeners();
   process.exit(code);
 }
 
