@@ -588,6 +588,7 @@ __metadata:
     "@types/node-cron": ^3.0.11
     "@typescript-eslint/eslint-plugin": 5.58.0
     "@typescript-eslint/parser": 5.59.1
+    async-cleanup: ^1.0.0
     callsites: ^3.1.0
     cron: ^3.1.7
     deepmerge: ^4.3.1
@@ -1009,6 +1010,13 @@ __metadata:
   version: 1.1.0
   resolution: "assertion-error@npm:1.1.0"
   checksum: fd9429d3a3d4fd61782eb3962ae76b6d08aa7383123fca0596020013b3ebd6647891a85b05ce821c47d1471ed1271f00b0545cf6a4326cf2fc91efcc3b0fbecf
+  languageName: node
+  linkType: hard
+
+"async-cleanup@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "async-cleanup@npm:1.0.0"
+  checksum: d2dea124db5f546716f9c5237714d78978de39e78f0bf9d9e884497249543e073203b1949c78262b2485e9ed827dc9a26d2392954be6e4025e9f06552c5164dc
   languageName: node
   linkType: hard
 
