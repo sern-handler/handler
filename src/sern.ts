@@ -14,6 +14,7 @@ import { presenceHandler } from './handlers/presence';
 import type { Payload, UnpackedDependencies, Wrapper } from './types/utility';
 import type { Presence} from './core/presences';
 import { registerTasks } from './handlers/tasks';
+import { addCleanupListener } from './cleanup';
 
 
 /**
@@ -76,5 +77,12 @@ export function init(maybeWrapper: Wrapper = { commands: "./dist/commands" }) {
         })
         .catch(err => { throw err });
     interactionHandler(deps, maybeWrapper.defaultPrefix);
-    messageHandler(deps, maybeWrapper.defaultPrefix)
+    messageHandler(deps, maybeWrapper.defaultPrefix);
+
+    addCleanupListener(async () => {
+        const duration = ((performance.now() - startTime) / 1000).toFixed(2)
+        deps['@sern/logger']?.info({ 'message': 'sern is shutting down after '+duration +" seconds" })
+        await useContainerRaw().disposeAll();
+    });
+    
 }
