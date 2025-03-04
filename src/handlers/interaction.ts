@@ -40,7 +40,7 @@ export function interactionHandler(deps: UnpackedDependencies, defaultPrefix?: s
                   
             const resolvedModule = (lookupTable.get(fullPath)!.command) as Module
             payload= { module: resolvedModule , //autocomplete is not a true "module" warning cast!
-                       args: [event, createSDT(resolvedModule, deps, params)] };
+                       args: [event, createSDT(module, deps, params)] };
             // either CommandTypes Slash |  ContextMessage | ContextUesr
         } else if(isCommand(event)) {
             const sdt = createSDT(module, deps, params)
