@@ -1,0 +1,12 @@
+{
+    "command/ping": {
+        "name": "ping",
+        "description": "yeth",
+        "options": { 
+            "asdfs": {
+                "name": "shidenglish",
+                "description": "yeah"
+            }
+        }
+    }
+}

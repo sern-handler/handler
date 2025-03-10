@@ -1,0 +1,13 @@
+{
+   "language": "typescript",
+   "defaultPrefix": "!",
+   "paths": {
+      "base": "src",
+      "commands": "commands",
+      "events": "events"
+   }, 
+   "app": { 
+        "tags": ["Nice ass bot"],
+        "description": "A bot"
+   }
+}

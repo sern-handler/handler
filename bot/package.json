@@ -1,0 +1,30 @@
+{
+  "name": "plugtest",
+  "version": "1.0.0",
+  "description": "a descriptiuon",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "sern build",
+    "start": "node ./dist/index.js",
+    "run": "node ./dist/index.js"
+  },
+  "keywords": [
+    "typescript",
+    "sern",
+    "discord.js"
+  ],
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@sern/handler": "file:../",
+    "@sern/localizer": "^1.1.3",
+    "@sern/publisher": "^1.1.2",
+    "discord.js": "^14.15.0",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.25",
+    "typescript": "latest"
+  },
+  "type": "module"
+}
