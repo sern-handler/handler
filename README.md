@@ -59,6 +59,8 @@ export default commandModule({
 - [SmokinWeed 💨](https://github.com/Peter-MJ-Parker/sern-bud) - A fun bot for a small, but growing server.
 - [Man Nomic](https://github.com/jacoobes/man-nomic) - A simple information bot to provide information to the nomic-ai Discord community.
 - [Linear-Discord](https://github.com/sern-handler/linear-discord) - Display and manage a linear dashboard.
+- [ZenithBot](https://github.com/CodeCraftersHaven/ZenithBot) - A versatile bot coded in TypeScript, designed to enhance server management and user interaction through its robust features.
+
 ## 💻 CLI
 
 It is **highly encouraged** to use the [command line interface](https://github.com/sern-handler/cli) for your project. Don't forget to view it.

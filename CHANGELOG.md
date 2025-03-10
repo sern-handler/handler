@@ -1,5 +1,19 @@
 # Changelog
 
+## [4.2.4](https://github.com/sern-handler/handler/compare/v4.2.3...v4.2.4) (2025-03-06)
+
+
+### Bug Fixes
+
+* flat autocomplete ([#395](https://github.com/sern-handler/handler/issues/395)) ([89d7409](https://github.com/sern-handler/handler/commit/89d74095363befddc3222b9e5c89c35e7c6457b9))
+
+## [4.2.3](https://github.com/sern-handler/handler/compare/v4.2.2...v4.2.3) (2025-03-04)
+
+
+### Bug Fixes
+
+* autocomplete sdt.module not present ([#393](https://github.com/sern-handler/handler/issues/393)) ([2414992](https://github.com/sern-handler/handler/commit/2414992b73a40065464b20f2d53826c78fcd3a5f))
+
 ## [4.2.2](https://github.com/sern-handler/handler/compare/v4.2.1...v4.2.2) (2025-02-03)
 
 

@@ -33,14 +33,14 @@ export function interactionHandler(deps: UnpackedDependencies, defaultPrefix?: s
         // handles autocomplete
         if(isAutocomplete(event)) {
             const lookupTable = module.locals['@sern/lookup-table'] as Map<string, SernAutocompleteData>
-            const subCommandGroup = event.options.getSubcommandGroup() ?? "",
-                  subCommand = event.options.getSubcommand() ?? "",
+            const subCommandGroup = event.options.getSubcommandGroup(false) ?? "",
+                  subCommand = event.options.getSubcommand(false) ?? "",
                   option = event.options.getFocused(true),
                   fullPath = path.posix.join("<parent>", subCommandGroup, subCommand, option.name)
                   
             const resolvedModule = (lookupTable.get(fullPath)!.command) as Module
             payload= { module: resolvedModule , //autocomplete is not a true "module" warning cast!
-                       args: [event, createSDT(resolvedModule, deps, params)] };
+                       args: [event, createSDT(module, deps, params)] };
             // either CommandTypes Slash |  ContextMessage | ContextUesr
         } else if(isCommand(event)) {
             const sdt = createSDT(module, deps, params)
