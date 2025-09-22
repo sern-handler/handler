@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.2.6](https://github.com/sern-handler/handler/compare/v4.2.5...v4.2.6) (2025-09-22)
+
+
+### Miscellaneous Chores
+
+* release 4.2.6 ([#402](https://github.com/sern-handler/handler/issues/402)) ([0eecb08](https://github.com/sern-handler/handler/commit/0eecb08e87e26102030ccf6ef38ddd81051ec373))
+
 ## [4.2.5](https://github.com/sern-handler/handler/compare/v4.2.4...v4.2.5) (2025-08-31)
 
 
