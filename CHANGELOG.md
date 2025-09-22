@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.2.5](https://github.com/sern-handler/handler/compare/v4.2.4...v4.2.5) (2025-08-31)
+
+
+### Bug Fixes
+
+* make message module warn rather than throwing ([#399](https://github.com/sern-handler/handler/issues/399)) ([797442e](https://github.com/sern-handler/handler/commit/797442ece3999bf2cb6b5ba0688ce0177e72a22f))
+
 ## [4.2.4](https://github.com/sern-handler/handler/compare/v4.2.3...v4.2.4) (2025-03-06)
 
 

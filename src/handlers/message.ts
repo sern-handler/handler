@@ -36,7 +36,7 @@ export function messageHandler (deps: UnpackedDependencies, defaultPrefix?: stri
         const [prefix] = fmt(message.content, defaultPrefix);
         let module = mg.get(`${prefix}_T`) ?? mg.get(`${prefix}_B`) as Module;
         if(!module) {
-            throw Error('Possibly undefined behavior: could not find a static id to resolve')
+            log?.warning({ message: 'Possibly undefined behavior: could not find a static id to resolve' });
         }
         const payload = { module, args: [Context.wrap(message, defaultPrefix), createSDT(module, deps, undefined)] }
         const result = await callPlugins(payload)
