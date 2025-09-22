@@ -13,7 +13,7 @@ export default async function(dirs: string | string[], deps : UnpackedDependenci
             '@sern/emitter': sEmitter,
             '@sern/modules': commands } = deps;
     log?.info({ message: "Waiting on discord client to be ready..." })
-    await once(client, "ready");
+    await once(client, "clientReady");
     log?.info({ message: "Client signaled ready, registering modules" });
 
     // https://observablehq.com/@ehouais/multiple-promises-as-an-async-generator
